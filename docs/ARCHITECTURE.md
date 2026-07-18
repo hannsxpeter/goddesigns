@@ -46,6 +46,18 @@ Three phases, in `references/checklist.md`:
 
 Gated, not ambient: pixels only when the seeded macrostructure, the row's signature, or the brief demands them; most runs ship zero raster images and generating an unrequested one is scored as a Restraint failure. When imagery fires, the prompt derives from the DIRECTION LOCK (locked hexes, row medium, composition, light) with mandatory negative clauses against the generic AI-image look, honesty rules against fabricated people, and a two-regeneration cap.
 
+## The taste loop
+
+Mechanical metrics (audits, distinctness) are necessary and insufficient: the skill's owner ranked competitor pages above audit-green goddesign pages until owner verdicts were compiled into rules (the Subject test, the substance gate, the atmosphere layer, grammar breaks). The loop is deliberate: a one-line human verdict becomes a mechanically-checkable rule the same day, and the next validation round tests it. Three owner-caught clustering axes (accent hues, color pairings, depth treatments) are now measured and capped in the deck, and the process is repeatable for any axis caught next.
+
+## The grammar layer
+
+Forensics on real Claude-built production sites identified seven compositional tells that survive font/palette/structure rotation: the band metronome, the eyebrow ceremony, three-caste type, the rationed accent, uniform finish, symmetrized content, and a stock ornament kit (full evidence in `validation/claude-grammar-2026-07.md`). Every page must now break that grammar in declared, gated ways: a band that escapes the container, a section with no heading ceremony, an orphan grid cell, uneven padding rhythm. The breaks are written into the DIRECTION LOCK and verified by the Grammar gate group.
+
+## The human-genome lane
+
+A model cannot author its way out of its own distribution: every Claude-authored deck row, however varied, is still drawn from the distribution being escaped. Deck rows 16 and up are therefore genomes extracted from real human-built sites (single-family type systems, full-coverage accent bands, business-fact grammar, deliberate unevenness), which Claude executes but did not design. The lane grows as the owner supplies admired sites; the long-term intent is for human genomes to outnumber authored rows.
+
 ## The refresh loop
 
 The recognizable-AI look is a moving target, so the tells catalog is a living artifact. [validation/sentiment-refresh-protocol.md](../validation/sentiment-refresh-protocol.md) documents the repeatable collect, verify, cluster, encode, validate cycle that keeps the skill current. New tells require counted, sourced evidence and land in three places: the DIVERGE attractor list, the Banned list (with an INSTEAD that points back into the deck), and the QA gate.

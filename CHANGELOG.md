@@ -1,9 +1,32 @@
 # Changelog
 
-## Unreleased
+## v1.1.0 (2026-07-18)
 
-- Automatic triggering: the skill description now enumerates concrete trigger phrases (landing page, dashboard, hero section, pricing page, mockup-to-code, restyle, "make it look better", any HTML/CSS/Tailwind/React styling) so hosts that auto-select skills fire it without the command; standing-instruction snippets for `CLAUDE.md` and `AGENTS.md` documented in `docs/INSTALL.md`.
-- README notes that the command is optional.
+The owner-taste release: five comparative validation rounds in one day, each owner verdict compiled into mechanism the same day.
+
+### The taste loop
+- Subject test (Step 4b): the signature element and at least one motif must be artifacts of the subject's world drawn in the locked direction's formal language; the page must show the product working.
+- Substance gate: at least one structured artifact of the product working per page; pure-assertion pages fail regardless of typographic beauty.
+- Atmosphere layer: the row's background treatment is mandatory ground treatment (texture, depth, overlap), exempt from the signature budget; flat band-stacks of rectangular panels fail.
+- Audience-fit remix trigger in Step 3c.
+
+### The grammar system
+- Forensics on 5 real Claude-built production sites plus 7 test runs identified seven grammar tells that survive font/palette/structure rotation (band metronome, eyebrow ceremony, three-caste type, rationed accent with headline spans, uniform finish, symmetrized content, stock ornament kit). Evidence: `validation/claude-grammar-2026-07.md`.
+- Counters encoded: mandatory declared grammar breaks (container escape, ceremony-free section, orphan cells, padding variance with the global `section { padding }` rule banned), stock-ornament-kit and headline-accent-span bans, and a seven-line Grammar gate group in the checklist.
+
+### Deck integrity (three clustering axes caught by the owner, all capped)
+- Accent hues rebalanced (Brutalist to magenta + Syne, Cinematic to ice, Neobrutalist to green, Industrial off gold to safety orange) with a 2-rows-per-hue-band authoring cap.
+- Depth-language uniqueness: hard offset shadows exclusive to Neobrutalist, sticker outline to Playful Pop, tilt to Lo-Fi Riso; the offset-shadow-plus-tilt-plus-chips kit is a flagged Claude default.
+- Cross-project user ledger (`~/.design-log.json`): rotation constraints now hold across all of a user's projects, with a no-3-in-a-row rule on accent and paper bands.
+
+### The human-DNA lane
+- Deck row 16 "Trade Counter": the first direction derived from a real human-built site rather than authored by Claude (single-family weight-driven type, full-coverage accent bands, diagonal cuts, phone-forward, no heading ceremony). Deck moduli updated 16 to 17 everywhere. Human-genome rows are the structural answer to "a model cannot author its way out of its own distribution"; more rows land as the owner supplies admired sites.
+
+### Triggering and docs
+- Automatic triggering: trigger vocabulary in the skill description plus standing-instruction snippets for `CLAUDE.md`/`AGENTS.md` (docs/INSTALL.md); the command is optional.
+
+### Evidence
+- Four comparative rounds archived (`validation/archive/`): goddesign 12 of 12 external audits green with no repeated identity; the official frontend-design skill 0 of 12 with per-domain concept/font/palette convergence (one display font shared across 11 of 12 of its runs). Round 5 ended in the owner's first goddesign 1-2 finish, under the full stack.
 
 ## v1.0.0 (2026-07-18)
 

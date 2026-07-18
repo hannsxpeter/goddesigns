@@ -20,6 +20,10 @@ A tell is admitted only with evidence, not taste:
 - Check the row against the entire Banned list; a banned pattern may appear only as the row's stated concept.
 - Update every seed modulus if a deck's size changes (`SKILL.md` Step 3b and its no-shell fallback): the moduli must always match deck sizes.
 
+## Contributing a human-genome row
+
+Rows 16+ are derived from real human-built sites, not authored. To add one: fetch and screenshot the site, extract its genome (type system, palette relationships including where it breaks polite defaults, grammar habits, density rhythm, signature devices, and its imperfections: they are part of the genome), then encode it as a complete row with a provenance line and a "do not polish the human traits away" note where the genome contradicts Claude instincts. Check the new row against the accent-distribution and depth-language caps like any other, and update every seed modulus.
+
 ## Changing scripts
 
 `audit.mjs`, `codex-audit-loop.sh`, and `genimage.sh` must stay dependency-light, degrade gracefully (clear message + documented exit code), and remain host-neutral. Test against the defect corpus in `validation/` before and after: the audit must still catch the known collisions and reveal bugs, and still pass the known-clean runs.
