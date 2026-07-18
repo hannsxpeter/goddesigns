@@ -22,7 +22,7 @@ One testable assertion per line. Check each; count passes; fix fails or state wh
 Tokens
 - [ ] Every color and font in components references a `:root` token; zero inline hex in component rules.
 - [ ] No banned values anywhere. Grep case-insensitively: `#6366f1`, `#7c3aed`, `#8b5cf6`, `font-family: Inter`, `Space Grotesk` (outside pairing 6), `JetBrains Mono` (outside a direction that states it), `transition: all`, `background-clip: text`, `!important` (outside the reduced-motion kill switch), `style="` in markup and `style={{` in JSX, `border-left` used as a colored accent stripe, `<hr`, `Courier`.
-- [ ] All spacing and font sizes sit on the declared scales; no orphan values like 13px or 27px.
+- [ ] All spacing and font sizes sit on the declared scales; no orphan values like 13px or 27px (the grammar breaks declared in the lock are exempt).
 - [ ] The Step 3d jitter is stated in the lock and present in the tokens (accent hue rotated, paper lightness nudged via relative color), or its skip reason is stated (extension mode, brand pin).
 
 Typography
@@ -52,6 +52,15 @@ States
 - [ ] Every interactive element has visible :focus-visible (2px outline, never removed), hover, active, and disabled.
 - [ ] Empty, error, and loading states designed where data can be empty, fail, or load.
 - [ ] Destructive actions require confirmation; status is never color-only.
+
+Grammar (the anti-metronome sweep; each break must also be declared in the lock)
+- [ ] Section vertical paddings take at least 3 distinct values, largest at least 2x smallest; no single global `section { padding }` rule.
+- [ ] At least one band escapes the master container (full-bleed, negative-margin overlap 64px+, or a second container width differing 25%+).
+- [ ] At least one section has no heading ceremony: no eyebrow, no label-heading-lead ritual; a bare claim, artifact, or image carries it.
+- [ ] At least one grid has an orphan or spanning cell, or visibly unequal columns left unequal; no min-height equalization on list rows.
+- [ ] At most 2 uppercase micro-labels outside the nav; no accent-colored span inside any h1 or h2; no section-opening ritual repeats more than twice in a row.
+- [ ] At least 2 distinct hover grammars on the page; a translateY lift is at most one of them.
+- [ ] At most one item from the stock ornament kit (glow blob, marquee ticker, stat band, hatched placeholder, full-accent CTA band, mirrored footer), and only if the locked row states it.
 
 Motion
 - [ ] At most 3 intentional motions; transform/opacity only; budgets respected.
