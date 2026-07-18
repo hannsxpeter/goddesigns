@@ -38,7 +38,7 @@ Fits: statement sites, studios, events, personal sites.
 - Colors: bg #F2EFE9, surface #E7E2D8, text #151410, muted #5C5952, accent #D8008F (magenta; the red-orange it replaced collided with Swiss, do not drift back warm)
 - Type: display Syne 800 at enormous sizes (12-20vw allowed, crop at container edges), body Libre Franklin 400, labels Libre Franklin 600 uppercase +8% tracking
 - Import: `https://fonts.googleapis.com/css2?family=Syne:wght@800&family=Libre+Franklin:wght@400;600&display=swap`
-- Radius: 0. Borders: 2px solid #151410. Shadow: hard offset `4px 4px 0 #151410`, no blur.
+- Radius: 0. Borders: 2px solid #151410. Shadow: none; depth comes from raw overlap and borders alone. Hard offset shadows belong to row 14 exclusively; the offset-shadow-plus-tilt kit is a flagged Claude default.
 - Background: solid. Let type collide with edges and section boundaries on purpose.
 - Signature: one element that crosses a section boundary (a word, an image, a rule).
 - Motion: one overshoot on the hero only, 350ms cubic-bezier(0.34,1.56,0.64,1). Everything else instant.
@@ -126,7 +126,7 @@ Fits: consumer apps, community, education, marketing with energy.
 - Colors: bg #FFF8EF, surface #FFEFD9, text #201A33, muted #6E6680, accent #FF4D6D, secondary #2EC4B6, highlight #FFC53D
 - Type: display Bricolage Grotesque 800, body Karla 400, labels Karla 700 uppercase +8% tracking
 - Import: `https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Karla:wght@400;700&display=swap`
-- Radius: 16px. Borders: 2px solid #201A33. Shadow: hard offset `6px 6px 0 #201A33`.
+- Radius: 16px. Borders: 2px solid #201A33. Shadow: die-cut sticker treatment: a 3px paper-colored outline ring (`box-shadow: 0 0 0 3px` in bg) under one soft 12%-opacity drop; never a hard offset (that belongs to row 14 exclusively).
 - Background: solid warm; one oversized tilted shape or sticker (max one).
 - Signature: springy buttons: this is the one row allowed cubic-bezier(0.34,1.56,0.64,1) on hover, 250ms.
 - Motion: 250ms spring on interactive elements; entrances 300ms ease-out.

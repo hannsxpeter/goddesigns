@@ -14,7 +14,8 @@ A tell is admitted only with evidence, not taste:
 ## Adding a direction row
 
 - Rows are complete packages: colors (hex), fonts with a working import line, radius, shadows, background treatment, one signature element, motion numbers. No field left as an adjective.
-- Accent distribution: no more than 2 rows per 30-degree accent hue band, and no two rows may share both a paper band and an accent hue band unless their saturation classes differ sharply (a candy pink and a deep oxblood are not confusable; two saturated red-oranges are). No two rows share a display font family or superfamily. The deck was rebalanced 2026-07-18 after the owner caught repeated pairings surviving the seed.
+- Accent distribution: no more than 2 rows per 30-degree accent hue band, and no two rows may share both a paper band and an accent hue band unless their saturation classes differ sharply (a candy pink and a deep oxblood are not confusable; two saturated red-oranges are). No two rows share a display font family or superfamily.
+- Depth-language uniqueness: each shadow/depth treatment belongs to exactly one row (hard offset shadows: row 14 only; sticker outline: row 10; soft layered tinted: one dark row and one light row at most; none-plus-rules for the rest). The hard-offset-plus-tilt-plus-chips kit is Claude's native default and reads as "a frontend-design variant" the moment two rows carry it; the owner caught this across three rounds. Tilt as a stated device: one row (Lo-Fi Riso misregistration). The deck was rebalanced 2026-07-18 after the owner caught repeated pairings surviving the seed.
 - Verify the Google Fonts import URL answers 200.
 - Check the row against the entire Banned list; a banned pattern may appear only as the row's stated concept.
 - Update every seed modulus if a deck's size changes (`SKILL.md` Step 3b and its no-shell fallback): the moduli must always match deck sizes.
