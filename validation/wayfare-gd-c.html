@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wayfare: plan the route, catch the train, know what today costs</title>
+<meta name="description" content="Wayfare is a trip planner for independent travelers: build day-by-day itineraries, track flights and trains live, and keep a daily budget that closes every night.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;800&family=Schibsted+Grotesk:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* goddesign | structure: Bento Anchor | direction: Swiss International | accent: 39 */
+/* seed 1453504112
+   Lock: bg #FAFAF8 surface #F0F0EC text #111114 muted #55565C accent #E63312 rule #D8D8D2
+   Jitter: accent h+7, bg/surface L+0.01, radius 0 (row identity)
+   Type: Archivo 800 display / Schibsted Grotesk 400,500 body / Archivo 500 caps labels
+   Signature: red route line left rail with station ticks. Motion: 150ms linear fades only. */
+
+:root {
+  --bg: oklch(from #FAFAF8 calc(l + 0.01) c h);
+  --surface: oklch(from #F0F0EC calc(l + 0.01) c h);
+  --text: #111114;
+  --muted: #55565C;
+  --accent: oklch(from #E63312 l c calc(h + 7));
+  --accent-down: oklch(from var(--accent) calc(l - 0.1) c h);
+  --rule: #D8D8D2;
+  --font-display: "Archivo", sans-serif;
+  --font-body: "Schibsted Grotesk", sans-serif;
+  --s-1: 4px;  --s-2: 8px;  --s-3: 12px; --s-4: 16px; --s-5: 24px;
+  --s-6: 32px; --s-7: 48px; --s-8: 64px; --s-9: 96px; --s-10: 128px;
+  --step-0: 1.0625rem;
+  --step-1: 1.33rem;
+  --step-2: 1.66rem;
+  --step-3: 2.07rem;
+  --step-4: 2.59rem;
+  --route-w: clamp(48px, 7vw, 88px);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  line-height: 1.55;
+  overflow-x: clip;
+  font-feature-settings: "tnum" 0;
+}
+
+h1, h2, h3 { text-wrap: balance; }
+p { text-wrap: pretty; }
+
+a { color: var(--text); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.label {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+
+/* ---------- page frame: route line left rail ---------- */
+
+.frame {
+  display: grid;
+  grid-template-columns: var(--route-w) minmax(0, 1fr);
+  max-width: 1280px;
+  margin-inline: auto;
+}
+
+.route-rail {
+  position: relative;
+  border-right: 4px solid var(--accent);
+}
+
+.stop-1 { top: 8rem; }
+.stop-2 { top: 42%; }
+.stop-3 { top: 72%; }
+.stop {
+  position: absolute;
+  right: -14px;
+  display: grid;
+  justify-items: end;
+  gap: var(--s-1);
+}
+.stop .tick {
+  width: 24px;
+  height: 4px;
+  background: var(--accent);
+}
+.stop .code {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  writing-mode: vertical-rl;
+  margin-right: 34px;
+}
+
+.main-col { min-width: 0; }
+
+/* ---------- nav ---------- */
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-5);
+  padding: var(--s-4) var(--s-6);
+  border-bottom: 1px solid var(--rule);
+}
+
+.brand {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.25rem;
+  letter-spacing: -0.03em;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--s-2);
+}
+.brand .dot {
+  width: 10px;
+  height: 10px;
+  background: var(--accent);
+  align-self: center;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: var(--s-5);
+  list-style: none;
+}
+.nav-links a {
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.9375rem;
+  padding: var(--s-2) var(--s-1);
+  border-bottom: 2px solid transparent;
+  transition: border-color 150ms linear, color 150ms linear;
+}
+.nav-links a:hover { border-bottom-color: var(--accent); }
+.nav-links a:active { color: var(--muted); }
+
+.btn {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 0.9375rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: var(--s-3) var(--s-5);
+  border: none;
+  cursor: pointer;
+  transition: background-color 150ms linear, color 150ms linear, opacity 150ms linear;
+}
+.btn-solid {
+  background: var(--accent);
+  color: var(--bg);
+}
+.btn-solid:hover { background: var(--accent-down); }
+.btn-solid:active { opacity: 0.85; }
+.btn-solid:disabled { background: var(--rule); color: var(--muted); cursor: not-allowed; }
+.btn-line {
+  background: transparent;
+  color: var(--text);
+  box-shadow: inset 0 0 0 1px var(--text);
+}
+.btn-line:hover { background: var(--surface); }
+.btn-line:active { opacity: 0.85; }
+.btn-line:disabled { color: var(--muted); box-shadow: inset 0 0 0 1px var(--rule); cursor: not-allowed; }
+
+/* ---------- hero ---------- */
+
+.hero {
+  padding: var(--s-9) var(--s-6) var(--s-8);
+  display: grid;
+  gap: var(--s-6);
+}
+
+.hero h1 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  font-size: clamp(2.4rem, 6.5vw, 6rem);
+  max-width: 16ch;
+}
+
+.hero .sub {
+  font-size: var(--step-1);
+  line-height: 1.5;
+  color: var(--muted);
+  max-width: 44ch;
+}
+
+.hero .cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-4);
+}
+
+.hero-board {
+  border-top: 4px solid var(--text);
+  border-bottom: 1px solid var(--rule);
+  margin-top: var(--s-5);
+}
+.board-row {
+  display: grid;
+  grid-template-columns: 5.5ch minmax(0, 1fr) auto auto;
+  gap: var(--s-4);
+  align-items: baseline;
+  padding: var(--s-3) 0;
+  border-top: 1px solid var(--rule);
+  font-variant-numeric: tabular-nums;
+}
+.board-row:first-child { border-top: none; }
+.board-row .t { font-weight: 500; }
+.board-row .via { color: var(--muted); }
+.board-row .plat {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+.board-row .status { font-weight: 500; }
+.board-row .status.delay { color: var(--accent); }
+
+/* ---------- bento features ---------- */
+
+.features {
+  background: var(--surface);
+  padding: var(--s-9) var(--s-6);
+}
+
+.features > h2 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  font-size: var(--step-4);
+  max-width: 24ch;
+  margin-bottom: var(--s-7);
+}
+
+.bento {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-auto-flow: dense;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+}
+
+.cell {
+  background: var(--bg);
+  padding: var(--s-6);
+  display: grid;
+  align-content: start;
+  gap: var(--s-4);
+}
+
+.cell h3 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  font-size: var(--step-2);
+  line-height: 1.2;
+}
+.cell p { color: var(--muted); max-width: 52ch; }
+
+.cell-intro { grid-column: span 2; }
+.cell-anchor { grid-column: span 4; grid-row: span 2; background: var(--surface); }
+.cell-half { grid-column: span 3; }
+.cell-wide { grid-column: span 4; }
+
+/* itinerary artifact inside anchor */
+.day-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-4);
+  border-bottom: 4px solid var(--text);
+  padding-bottom: var(--s-3);
+}
+.day-num {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  font-size: var(--step-4);
+  line-height: 1;
+}
+.day-route { font-weight: 500; }
+.day-total { font-variant-numeric: tabular-nums; color: var(--muted); }
+
+.leg {
+  display: grid;
+  grid-template-columns: 5.5ch minmax(0, 1fr) auto;
+  gap: var(--s-4);
+  align-items: baseline;
+  padding: var(--s-3) 0;
+  border-bottom: 1px solid var(--rule);
+  font-variant-numeric: tabular-nums;
+}
+.leg .lt { font-weight: 500; }
+.leg .ld small { display: block; color: var(--muted); font-size: 0.875rem; }
+.leg .lc { color: var(--muted); }
+
+/* flight / train tracker artifacts */
+.track-line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-4);
+  font-variant-numeric: tabular-nums;
+  border-top: 1px solid var(--rule);
+  padding-top: var(--s-3);
+}
+.track-line .id { font-family: var(--font-display); font-weight: 800; letter-spacing: -0.02em; }
+.track-line .st { font-weight: 500; }
+.track-line .st.delay { color: var(--accent); }
+
+/* budget ledger artifact */
+.ledger { border-top: 4px solid var(--text); font-variant-numeric: tabular-nums; }
+.ledger-row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s-4);
+  padding: var(--s-2) 0;
+  border-bottom: 1px solid var(--rule);
+}
+.ledger-row .amt { font-weight: 500; }
+.ledger-row.sum { border-bottom: none; padding-top: var(--s-3); }
+.ledger-row.sum .amt.over { color: var(--accent); }
+
+/* ---------- pricing ---------- */
+
+.pricing { padding: var(--s-9) var(--s-6); }
+
+.pricing > h2 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  font-size: var(--step-4);
+  margin-bottom: var(--s-3);
+}
+.pricing > .intro { color: var(--muted); max-width: 52ch; margin-bottom: var(--s-7); }
+
+.tiers {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 4px solid var(--text);
+  border-bottom: 1px solid var(--rule);
+}
+
+.tier {
+  padding: var(--s-6) var(--s-5) var(--s-7);
+  border-left: 1px solid var(--rule);
+  display: grid;
+  align-content: start;
+  gap: var(--s-4);
+}
+.tier:first-child { border-left: none; }
+
+.tier h3 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  font-size: var(--step-1);
+}
+.tier .price {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  font-size: var(--step-4);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.tier .price small {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: var(--step-0);
+  letter-spacing: 0;
+  color: var(--muted);
+}
+.tier ul { list-style: none; display: grid; gap: var(--s-2); }
+.tier li { color: var(--muted); padding-left: var(--s-4); position: relative; }
+.tier li::before { content: ""; position: absolute; left: 0; top: 0.62em; width: 8px; height: 2px; background: var(--text); }
+.tier .btn { margin-top: var(--s-3); }
+
+/* ---------- final CTA ---------- */
+
+.final {
+  background: var(--text);
+  color: var(--bg);
+  padding: var(--s-9) var(--s-6);
+  display: grid;
+  gap: var(--s-5);
+  justify-items: start;
+}
+.final h2 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  font-size: var(--step-4);
+  max-width: 20ch;
+}
+.final p { color: oklch(from var(--bg) calc(l - 0.15) c h); max-width: 48ch; }
+
+/* ---------- footer ---------- */
+
+.footer {
+  border-top: 1px solid var(--rule);
+  padding: var(--s-7) var(--s-6) var(--s-8);
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr));
+  gap: var(--s-6);
+}
+.footer .col { display: grid; gap: var(--s-3); align-content: start; justify-items: start; }
+.footer .col .label { margin-bottom: var(--s-1); }
+.footer a {
+  text-decoration: none;
+  font-size: 0.9375rem;
+  color: var(--muted);
+  padding: 2px 0;
+  transition: color 150ms linear;
+}
+.footer a:hover { color: var(--text); }
+.footer a:active { color: var(--accent); }
+.footer .fine { color: var(--muted); font-size: 0.875rem; max-width: 34ch; }
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 1024px) {
+  .cell-anchor { grid-column: span 6; }
+  .cell-intro { grid-column: span 3; }
+  .cell-half, .cell-wide { grid-column: span 3; }
+}
+
+@media (max-width: 768px) {
+  .frame { grid-template-columns: 20px minmax(0, 1fr); }
+  .route-rail { border-right-width: 3px; }
+  .stop { display: none; }
+  .nav { padding-inline: var(--s-4); }
+  .nav-links li.hide-m { display: none; }
+  .hero, .features, .pricing, .final { padding-inline: var(--s-4); }
+  .hero { padding-block: var(--s-7) var(--s-7); }
+  .features, .pricing, .final { padding-block: var(--s-7); }
+  .bento { grid-template-columns: minmax(0, 1fr); }
+  .cell-intro, .cell-anchor, .cell-half, .cell-wide { grid-column: auto; }
+  .board-row { grid-template-columns: 5.5ch minmax(0, 1fr) auto; }
+  .board-row .plat { display: none; }
+  .tiers { grid-template-columns: minmax(0, 1fr); border-bottom: none; }
+  .tier { border-left: none; border-top: 1px solid var(--rule); padding-inline: 0; }
+  .tier:first-child { border-top: none; }
+  .footer { grid-template-columns: minmax(0, 1fr); padding-inline: var(--s-4); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  html { scroll-behavior: auto; }
+}
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="route-rail" aria-hidden="true">
+    <span class="stop stop-1"><span class="tick"></span><span class="code">ZRH</span></span>
+    <span class="stop stop-2"><span class="tick"></span><span class="code">MIL</span></span>
+    <span class="stop stop-3"><span class="tick"></span><span class="code">FLR</span></span>
+  </div>
+
+  <div class="main-col">
+
+    <nav class="nav" aria-label="Main">
+      <a class="brand" href="#top"><span class="dot" aria-hidden="true"></span>Wayfare</a>
+      <ul class="nav-links">
+        <li class="hide-m"><a href="#features">Features</a></li>
+        <li class="hide-m"><a href="#pricing">Pricing</a></li>
+        <li><a class="btn btn-solid" href="#pricing">Start planning</a></li>
+      </ul>
+    </nav>
+
+    <header class="hero" id="top">
+      <h1>Plan the route. Catch the train. Know what today costs.</h1>
+      <p class="sub">Wayfare turns a multi-city trip into a day-by-day plan with live flight and train status and a budget that closes every night.</p>
+      <div class="cta-row">
+        <a class="btn btn-solid" href="#pricing">Start planning free</a>
+        <a class="btn btn-line" href="#features">See how it works</a>
+      </div>
+
+      <div class="hero-board" role="table" aria-label="Sample departures from your plan">
+        <div class="board-row" role="row">
+          <span class="t" role="cell">08:32</span>
+          <span class="via" role="cell">Zurich HB to Milano Centrale, EC 313</span>
+          <span class="plat" role="cell">Plat 11</span>
+          <span class="status" role="cell">On time</span>
+        </div>
+        <div class="board-row" role="row">
+          <span class="t" role="cell">14:05</span>
+          <span class="via" role="cell">Milano Centrale to Firenze SMN, FR 8517</span>
+          <span class="plat" role="cell">Plat 6</span>
+          <span class="status delay" role="cell">Delayed 10 min</span>
+        </div>
+        <div class="board-row" role="row">
+          <span class="t" role="cell">19:40</span>
+          <span class="via" role="cell">FLR to LGW, U2 8204</span>
+          <span class="plat" role="cell">Gate B4</span>
+          <span class="status" role="cell">Scheduled</span>
+        </div>
+      </div>
+    </header>
+
+    <section class="features" id="features" aria-label="Features">
+      <h2>Three tools, one plan: the itinerary, the tracker, the ledger.</h2>
+
+      <div class="bento">
+        <div class="cell cell-intro">
+          <h3>Itinerary builder</h3>
+          <p>Lay out each day as legs and stays. Drag a train earlier and every connection, check-in, and cost downstream moves with it.</p>
+        </div>
+
+        <div class="cell cell-anchor" aria-label="Example itinerary day">
+          <div class="day-head">
+            <span class="day-num">Day 4</span>
+            <span class="day-route">Zurich to Milan</span>
+            <span class="day-total">Budget 90.00 EUR</span>
+          </div>
+          <div class="leg">
+            <span class="lt">08:32</span>
+            <span class="ld">EC 313 to Milano Centrale <small>3 h 17 min, seat 42, coach 7</small></span>
+            <span class="lc">29.00</span>
+          </div>
+          <div class="leg">
+            <span class="lt">12:30</span>
+            <span class="ld">Lunch near Brera <small>walk 12 min from Centrale</small></span>
+            <span class="lc">16.00</span>
+          </div>
+          <div class="leg">
+            <span class="lt">15:00</span>
+            <span class="ld">Pinacoteca di Brera <small>timed entry, booked</small></span>
+            <span class="lc">15.00</span>
+          </div>
+          <div class="leg">
+            <span class="lt">18:00</span>
+            <span class="ld">Check in, Ostello Bello <small>2 nights, paid ahead</small></span>
+            <span class="lc">0.00</span>
+          </div>
+        </div>
+
+        <div class="cell cell-intro">
+          <h3>Flight and train tracking</h3>
+          <p>Every leg in your plan is watched live. A delay shows up in the itinerary before it shows up on the platform board.</p>
+        </div>
+
+        <div class="cell cell-half" aria-label="Example flight status">
+          <span class="label">Flight watch</span>
+          <div class="track-line">
+            <span class="id">U2 8204</span>
+            <span>FLR to LGW</span>
+            <span class="st">Gate B4, boarding 19:05</span>
+          </div>
+          <div class="track-line">
+            <span class="id">LX 1612</span>
+            <span>ZRH to FCO</span>
+            <span class="st delay">Delayed 25 min, new 11:45</span>
+          </div>
+        </div>
+
+        <div class="cell cell-half" aria-label="Example train status">
+          <span class="label">Train watch</span>
+          <div class="track-line">
+            <span class="id">EC 313</span>
+            <span>Zurich HB, platform 11</span>
+            <span class="st">On time</span>
+          </div>
+          <div class="track-line">
+            <span class="id">FR 8517</span>
+            <span>Milano C., platform 6</span>
+            <span class="st delay">Delayed 10 min</span>
+          </div>
+        </div>
+
+        <div class="cell cell-intro">
+          <h3>Daily budget tracking</h3>
+          <p>Set a number for each day. Log spending in any currency as you go; the ledger converts, sums, and tells you plainly where you stand.</p>
+        </div>
+
+        <div class="cell cell-wide" aria-label="Example daily budget ledger">
+          <span class="label">Day 4 ledger</span>
+          <div class="ledger">
+            <div class="ledger-row"><span>Train, Zurich to Milan</span><span class="amt">29.00 EUR</span></div>
+            <div class="ledger-row"><span>Lunch, Brera</span><span class="amt">16.00 EUR</span></div>
+            <div class="ledger-row"><span>Pinacoteca entry</span><span class="amt">15.00 EUR</span></div>
+            <div class="ledger-row"><span>Groceries, evening</span><span class="amt">11.40 EUR</span></div>
+            <div class="ledger-row sum"><span>Spent 71.40 of 90.00</span><span class="amt">18.60 under</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="pricing" id="pricing" aria-label="Pricing">
+      <h2>Pricing</h2>
+      <p class="intro">Start free and plan one trip end to end. Pay only when you want live tracking on every leg or more than one trip at once.</p>
+
+      <div class="tiers">
+        <div class="tier">
+          <h3>Backpack</h3>
+          <p class="price">0 <small>EUR / month</small></p>
+          <ul>
+            <li>1 active trip</li>
+            <li>Itinerary builder, unlimited days</li>
+            <li>Daily budget ledger, 1 currency</li>
+            <li>Manual status refresh</li>
+          </ul>
+          <a class="btn btn-line" href="#pricing">Start free</a>
+        </div>
+        <div class="tier">
+          <h3>Interrail</h3>
+          <p class="price">6 <small>EUR / month</small></p>
+          <ul>
+            <li>5 active trips</li>
+            <li>Live flight and train tracking</li>
+            <li>Delay alerts by email and push</li>
+            <li>Budget in any currency, auto converted</li>
+            <li>Offline itinerary export</li>
+          </ul>
+          <a class="btn btn-solid" href="#pricing">Choose Interrail</a>
+        </div>
+        <div class="tier">
+          <h3>Circumnavigate</h3>
+          <p class="price">12 <small>EUR / month</small></p>
+          <ul>
+            <li>Unlimited trips and travelers</li>
+            <li>Shared itineraries with edit rights</li>
+            <li>Split costs across the group</li>
+            <li>Trip history and spending reports</li>
+            <li>Priority support</li>
+          </ul>
+          <a class="btn btn-line" href="#pricing">Choose Circumnavigate</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="final" aria-label="Sign up">
+      <h2>Your next trip, planned to the platform number.</h2>
+      <p>Build your first itinerary in an evening. No card needed on the free plan.</p>
+      <a class="btn btn-solid" href="#pricing">Start planning free</a>
+    </section>
+
+    <footer class="footer">
+      <div class="col">
+        <a class="brand" href="#top"><span class="dot" aria-hidden="true"></span>Wayfare</a>
+        <p class="fine">Trip planning for people who read the timetable themselves.</p>
+      </div>
+      <div class="col">
+        <span class="label">Product</span>
+        <a href="#features">Itinerary builder</a>
+        <a href="#features">Flight and train tracking</a>
+        <a href="#features">Budget tracking</a>
+        <a href="#pricing">Pricing</a>
+      </div>
+      <div class="col">
+        <span class="label">Company</span>
+        <a href="#top">About</a>
+        <a href="#top">Journal</a>
+        <a href="#top">Contact</a>
+      </div>
+      <div class="col">
+        <span class="label">Legal</span>
+        <a href="#top">Privacy</a>
+        <a href="#top">Terms</a>
+        <a href="#top">Imprint</a>
+      </div>
+    </footer>
+
+  </div>
+</div>
+</body>
+</html>

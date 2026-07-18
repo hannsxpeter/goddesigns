@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wayfare - Plan the whole trip. Miss nothing.</title>
+<meta name="description" content="Wayfare is the trip-planning app for independent travelers: itinerary builder, flight and train tracking, and daily budget tracking in one place.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..800&family=IBM+Plex+Mono:wght@400;500;600&family=Public+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0b1626;
+    --ink-2:#101f36;
+    --ink-3:#16283f;
+    --line:rgba(214,228,245,.14);
+    --line-strong:rgba(214,228,245,.26);
+    --paper:#eef4fb;
+    --paper-dim:#a8b8cc;
+    --paper-faint:#6d7f96;
+    --signal:#ff5c1f;
+    --signal-soft:rgba(255,92,31,.14);
+    --board:#7df0b2;
+    --board-dim:rgba(125,240,178,.55);
+    --amber:#ffc555;
+    --font-display:"Bricolage Grotesque",Georgia,serif;
+    --font-body:"Public Sans",-apple-system,sans-serif;
+    --font-mono:"IBM Plex Mono",ui-monospace,monospace;
+    --radius:14px;
+    --max:1180px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--ink);
+    color:var(--paper);
+    font-family:var(--font-body);
+    font-size:16px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  ::selection{background:var(--signal);color:var(--ink)}
+
+  /* grain + atmosphere */
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.5;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.035 0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .glow{position:absolute;pointer-events:none;filter:blur(90px);border-radius:50%}
+
+  a{color:inherit;text-decoration:none}
+  img{max-width:100%}
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 28px;position:relative;z-index:2}
+
+  .kicker{
+    font-family:var(--font-mono);font-size:.72rem;font-weight:600;
+    letter-spacing:.22em;text-transform:uppercase;color:var(--signal);
+    display:inline-flex;align-items:center;gap:.7em;
+  }
+  .kicker::before{content:"";width:26px;height:1px;background:var(--signal)}
+
+  /* ============ NAV ============ */
+  header{
+    position:sticky;top:0;z-index:50;
+    background:rgba(11,22,38,.82);
+    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav{display:flex;align-items:center;justify-content:space-between;height:68px}
+  .logo{display:flex;align-items:center;gap:.6rem;font-family:var(--font-display);font-weight:700;font-size:1.25rem;letter-spacing:-.01em}
+  .logo svg{display:block}
+  .nav-links{display:flex;gap:2.1rem;font-size:.9rem;color:var(--paper-dim)}
+  .nav-links a{position:relative;transition:color .2s}
+  .nav-links a:hover{color:var(--paper)}
+  .nav-links a::after{content:"";position:absolute;left:0;bottom:-6px;width:0;height:2px;background:var(--signal);transition:width .25s}
+  .nav-links a:hover::after{width:100%}
+  .nav-cta{display:flex;align-items:center;gap:1.2rem}
+  .nav-cta .ghost{font-size:.9rem;color:var(--paper-dim);transition:color .2s}
+  .nav-cta .ghost:hover{color:var(--paper)}
+  .btn{
+    display:inline-flex;align-items:center;gap:.55rem;
+    background:var(--signal);color:#160a04;
+    font-family:var(--font-body);font-weight:700;font-size:.92rem;
+    padding:.72rem 1.35rem;border-radius:999px;border:none;cursor:pointer;
+    transition:transform .2s,box-shadow .2s,background .2s;
+    box-shadow:0 0 0 0 rgba(255,92,31,.35);
+  }
+  .btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px -8px rgba(255,92,31,.55);background:#ff6d38}
+  .btn svg{transition:transform .2s}
+  .btn:hover svg{transform:translateX(3px)}
+  .btn-outline{
+    background:transparent;color:var(--paper);
+    border:1px solid var(--line-strong);box-shadow:none;
+  }
+  .btn-outline:hover{background:rgba(214,228,245,.06);box-shadow:none;border-color:var(--paper-dim)}
+
+  /* ============ HERO ============ */
+  .hero{position:relative;padding:96px 0 110px;overflow:hidden}
+  .hero .glow.g1{width:520px;height:520px;top:-180px;right:-120px;background:rgba(255,92,31,.13)}
+  .hero .glow.g2{width:460px;height:460px;bottom:-220px;left:-140px;background:rgba(125,240,178,.07)}
+  .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:64px;align-items:center}
+  .hero h1{
+    font-family:var(--font-display);
+    font-size:clamp(2.6rem,5.2vw,4.15rem);
+    line-height:1.03;font-weight:700;letter-spacing:-.025em;
+    margin:1.2rem 0 1.3rem;
+  }
+  .hero h1 .accent{color:var(--signal);font-style:italic;font-weight:600}
+  .hero p.lede{font-size:1.12rem;color:var(--paper-dim);max-width:34rem;font-weight:300}
+  .hero-actions{display:flex;align-items:center;gap:1rem;margin-top:2.2rem;flex-wrap:wrap}
+  .hero-meta{
+    margin-top:2.6rem;display:flex;gap:2.4rem;flex-wrap:wrap;
+    font-family:var(--font-mono);font-size:.76rem;color:var(--paper-faint);letter-spacing:.04em;
+  }
+  .hero-meta strong{display:block;color:var(--paper);font-size:1.15rem;font-weight:600;letter-spacing:0}
+
+  /* departures board */
+  .board{
+    background:linear-gradient(160deg,var(--ink-2),#0a1424 70%);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:0 40px 80px -30px rgba(0,0,0,.65),inset 0 1px 0 rgba(214,228,245,.08);
+    overflow:hidden;
+    transform:rotate(1.2deg);
+  }
+  .board-head{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:.85rem 1.2rem;border-bottom:1px solid var(--line);
+    font-family:var(--font-mono);font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--paper-faint);
+  }
+  .board-head .live{display:inline-flex;align-items:center;gap:.5em;color:var(--board)}
+  .board-head .live::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--board);animation:pulse 1.6s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+  .board-rows{font-family:var(--font-mono);font-size:.82rem}
+  .brow{
+    display:grid;grid-template-columns:64px 1fr auto auto;gap:1rem;align-items:center;
+    padding:.8rem 1.2rem;border-bottom:1px solid var(--line);
+  }
+  .brow:last-child{border-bottom:none}
+  .brow .t{color:var(--paper);font-weight:600}
+  .brow .route{color:var(--paper-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .brow .code{color:var(--paper-faint);font-size:.72rem}
+  .status{font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:.28em .7em;border-radius:4px}
+  .status.on{color:var(--board);background:rgba(125,240,178,.1)}
+  .status.delay{color:var(--amber);background:rgba(255,197,85,.1)}
+  .status.board-now{color:var(--signal);background:var(--signal-soft);animation:pulse 1.4s infinite}
+  .board-foot{
+    padding:.75rem 1.2rem;font-family:var(--font-mono);font-size:.7rem;color:var(--paper-faint);
+    border-top:1px solid var(--line);display:flex;justify-content:space-between;
+  }
+  .board-foot .hint{color:var(--board-dim)}
+
+  /* ticket stub under board */
+  .stub{
+    position:absolute;right:8%;bottom:-34px;transform:rotate(-3deg);
+    background:var(--paper);color:var(--ink);
+    border-radius:10px;padding:.85rem 1.1rem;
+    font-family:var(--font-mono);font-size:.7rem;line-height:1.5;
+    box-shadow:0 24px 50px -18px rgba(0,0,0,.6);
+    display:flex;gap:1.1rem;align-items:center;
+  }
+  .stub .big{font-family:var(--font-display);font-size:1.25rem;font-weight:700;line-height:1}
+  .stub .divider{width:1px;align-self:stretch;background:repeating-linear-gradient(to bottom,#0b1626 0 4px,transparent 4px 8px);opacity:.35}
+  .stub .tag{color:var(--signal);font-weight:600}
+  .hero-visual{position:relative}
+
+  /* marquee strip */
+  .strip{
+    border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+    overflow:hidden;padding:.85rem 0;background:rgba(16,31,54,.5);position:relative;z-index:2;
+  }
+  .strip-track{display:flex;gap:3.5rem;width:max-content;animation:scrollx 34s linear infinite;
+    font-family:var(--font-mono);font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;color:var(--paper-faint);white-space:nowrap}
+  .strip-track span b{color:var(--signal);font-weight:600;margin-right:3.5rem}
+  @keyframes scrollx{to{transform:translateX(-50%)}}
+
+  /* ============ FEATURES ============ */
+  .features{padding:110px 0 40px}
+  .feature{
+    display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center;
+    padding:70px 0;border-bottom:1px dashed var(--line-strong);
+  }
+  .feature:last-child{border-bottom:none}
+  .feature:nth-child(even) .f-copy{order:2}
+  .feature h2{
+    font-family:var(--font-display);font-size:clamp(1.8rem,3.2vw,2.5rem);
+    font-weight:700;letter-spacing:-.02em;line-height:1.12;margin:1rem 0 1rem;
+  }
+  .feature p{color:var(--paper-dim);font-weight:300;max-width:30rem}
+  .f-list{list-style:none;margin-top:1.5rem;display:grid;gap:.7rem}
+  .f-list li{display:flex;gap:.7rem;align-items:flex-start;font-size:.93rem;color:var(--paper-dim)}
+  .f-list svg{flex:none;margin-top:.22rem;color:var(--signal)}
+
+  .panel{
+    background:linear-gradient(155deg,var(--ink-2),#0a1424);
+    border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:0 30px 70px -30px rgba(0,0,0,.6);
+    overflow:hidden;
+  }
+  .panel-head{
+    display:flex;align-items:center;gap:.5rem;padding:.7rem 1rem;
+    border-bottom:1px solid var(--line);
+    font-family:var(--font-mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--paper-faint);
+  }
+  .dots{display:flex;gap:5px;margin-right:.4rem}
+  .dots i{width:8px;height:8px;border-radius:50%;background:var(--line-strong)}
+  .panel-body{padding:1.2rem}
+
+  /* itinerary mock */
+  .day-tab{display:flex;gap:.5rem;margin-bottom:1rem;font-family:var(--font-mono);font-size:.7rem}
+  .day-tab span{padding:.35em .9em;border:1px solid var(--line);border-radius:999px;color:var(--paper-faint)}
+  .day-tab span.on{background:var(--signal);border-color:var(--signal);color:#160a04;font-weight:600}
+  .itin{display:grid;gap:.55rem}
+  .slot{
+    display:grid;grid-template-columns:56px 1fr auto;gap:.9rem;align-items:center;
+    background:rgba(214,228,245,.04);border:1px solid var(--line);border-radius:9px;
+    padding:.65rem .85rem;transition:transform .25s,border-color .25s;
+  }
+  .slot:hover{transform:translateX(6px);border-color:var(--line-strong)}
+  .slot .when{font-family:var(--font-mono);font-size:.72rem;color:var(--paper-faint)}
+  .slot .what{font-size:.88rem;font-weight:500}
+  .slot .what small{display:block;font-weight:300;color:var(--paper-faint);font-size:.75rem}
+  .chip{font-family:var(--font-mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;padding:.3em .65em;border-radius:4px}
+  .chip.walk{color:var(--board);background:rgba(125,240,178,.1)}
+  .chip.rail{color:var(--amber);background:rgba(255,197,85,.1)}
+  .chip.food{color:var(--signal);background:var(--signal-soft)}
+  .slot.drag{border-style:dashed;border-color:var(--signal);background:var(--signal-soft);transform:rotate(-1deg)}
+  .slot.drag .what{color:var(--signal)}
+
+  /* tracking mock */
+  .flight-line{display:flex;align-items:center;gap:.8rem;margin:1.1rem 0 1.3rem;font-family:var(--font-mono)}
+  .flight-line .apt{text-align:center}
+  .flight-line .apt b{display:block;font-size:1.35rem;color:var(--paper);letter-spacing:.04em}
+  .flight-line .apt span{font-size:.65rem;color:var(--paper-faint)}
+  .track-path{flex:1;position:relative;height:2px;background:var(--line-strong);border-radius:2px}
+  .track-path::after{
+    content:"";position:absolute;left:0;top:0;height:100%;width:68%;
+    background:linear-gradient(90deg,var(--board),var(--signal));border-radius:2px;
+  }
+  .plane-dot{
+    position:absolute;left:68%;top:50%;transform:translate(-50%,-50%) rotate(45deg);
+    color:var(--signal);animation:bob 2.4s ease-in-out infinite;
+  }
+  @keyframes bob{0%,100%{transform:translate(-50%,-56%) rotate(45deg)}50%{transform:translate(-50%,-44%) rotate(45deg)}}
+  .alert-card{
+    display:flex;gap:.8rem;align-items:flex-start;
+    background:rgba(255,197,85,.07);border:1px solid rgba(255,197,85,.25);
+    border-radius:9px;padding:.8rem .95rem;font-size:.84rem;
+  }
+  .alert-card svg{flex:none;color:var(--amber);margin-top:.15rem}
+  .alert-card b{color:var(--amber);font-weight:600}
+  .alert-card small{display:block;color:var(--paper-faint);font-size:.74rem;margin-top:.15rem}
+  .mini-rows{margin-top:.9rem;font-family:var(--font-mono);font-size:.76rem;display:grid;gap:.45rem}
+  .mini-rows .r{display:flex;justify-content:space-between;color:var(--paper-dim)}
+  .mini-rows .r span:last-child{color:var(--paper)}
+
+  /* budget mock */
+  .budget-top{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:1.1rem}
+  .budget-top .spent{font-family:var(--font-display);font-size:2.1rem;font-weight:700;letter-spacing:-.02em}
+  .budget-top .of{font-family:var(--font-mono);font-size:.72rem;color:var(--paper-faint)}
+  .budget-top .left{font-family:var(--font-mono);font-size:.74rem;color:var(--board)}
+  .bars{display:grid;gap:.8rem}
+  .bar-row{display:grid;grid-template-columns:86px 1fr 52px;gap:.8rem;align-items:center;font-size:.8rem}
+  .bar-row .lbl{color:var(--paper-dim)}
+  .bar-row .amt{font-family:var(--font-mono);font-size:.72rem;color:var(--paper-faint);text-align:right}
+  .bar{height:8px;background:rgba(214,228,245,.07);border-radius:99px;overflow:hidden}
+  .bar i{display:block;height:100%;border-radius:99px;background:var(--signal);transform-origin:left;animation:grow 1.1s cubic-bezier(.2,.8,.2,1) both}
+  .bar i.b1{width:72%}.bar i.b2{width:44%;background:var(--board)}
+  .bar i.b3{width:58%;background:var(--amber)}.bar i.b4{width:23%;background:var(--paper-dim)}
+  @keyframes grow{from{transform:scaleX(0)}}
+  .budget-note{
+    margin-top:1.1rem;padding-top:.9rem;border-top:1px dashed var(--line-strong);
+    font-family:var(--font-mono);font-size:.72rem;color:var(--paper-faint);
+    display:flex;justify-content:space-between;
+  }
+  .budget-note b{color:var(--board);font-weight:500}
+
+  /* ============ PRICING ============ */
+  .pricing{padding:110px 0}
+  .pricing-head{max-width:44rem;margin-bottom:3.4rem}
+  .pricing-head h2{font-family:var(--font-display);font-size:clamp(2rem,3.8vw,2.9rem);font-weight:700;letter-spacing:-.02em;margin:1rem 0 .8rem}
+  .pricing-head p{color:var(--paper-dim);font-weight:300}
+  .tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;align-items:stretch}
+  .tier{
+    position:relative;display:flex;flex-direction:column;
+    background:linear-gradient(160deg,var(--ink-2),#0a1424);
+    border:1px solid var(--line);border-radius:var(--radius);
+    padding:1.9rem 1.7rem;transition:transform .25s,border-color .25s;
+  }
+  .tier:hover{transform:translateY(-6px);border-color:var(--line-strong)}
+  .tier.hot{border-color:var(--signal);background:linear-gradient(160deg,#1a2136,#101828)}
+  .tier.hot:hover{border-color:#ff7a45}
+  .tier .flag{
+    position:absolute;top:-12px;left:1.6rem;
+    background:var(--signal);color:#160a04;
+    font-family:var(--font-mono);font-size:.62rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+    padding:.35em .85em;border-radius:4px;
+  }
+  .tier h3{font-family:var(--font-display);font-size:1.3rem;font-weight:700}
+  .tier .tag{font-family:var(--font-mono);font-size:.7rem;color:var(--paper-faint);letter-spacing:.06em;margin-top:.2rem}
+  .price{margin:1.4rem 0 .4rem;display:flex;align-items:baseline;gap:.4rem}
+  .price .n{font-family:var(--font-display);font-size:2.7rem;font-weight:700;letter-spacing:-.03em}
+  .price .per{font-family:var(--font-mono);font-size:.72rem;color:var(--paper-faint)}
+  .tier ul{list-style:none;margin:1.2rem 0 1.8rem;display:grid;gap:.65rem;flex:1}
+  .tier li{display:flex;gap:.65rem;align-items:flex-start;font-size:.88rem;color:var(--paper-dim)}
+  .tier li svg{flex:none;margin-top:.25rem;color:var(--board)}
+  .tier li.dim{color:var(--paper-faint)}
+  .tier li.dim svg{color:var(--paper-faint);opacity:.5}
+  .tier .btn{justify-content:center;width:100%}
+  .fine{margin-top:1.8rem;text-align:center;font-family:var(--font-mono);font-size:.72rem;color:var(--paper-faint)}
+
+  /* ============ FOOTER ============ */
+  footer{border-top:1px solid var(--line);background:#081120;position:relative;z-index:2}
+  .foot-cta{padding:84px 0;text-align:center;border-bottom:1px solid var(--line);position:relative;overflow:hidden}
+  .foot-cta .glow{width:560px;height:340px;left:50%;top:40%;transform:translate(-50%,-50%);background:rgba(255,92,31,.1)}
+  .foot-cta h2{font-family:var(--font-display);font-size:clamp(2rem,4.4vw,3.3rem);font-weight:700;letter-spacing:-.025em;margin-bottom:1rem}
+  .foot-cta h2 em{color:var(--signal);font-style:italic;font-weight:600}
+  .foot-cta p{color:var(--paper-dim);font-weight:300;max-width:32rem;margin:0 auto 2rem}
+  .foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:2.5rem;padding:60px 0 40px}
+  .foot-grid h4{font-family:var(--font-mono);font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--paper-faint);margin-bottom:1rem;font-weight:600}
+  .foot-grid ul{list-style:none;display:grid;gap:.6rem;font-size:.88rem;color:var(--paper-dim)}
+  .foot-grid a:hover{color:var(--signal)}
+  .foot-brand p{color:var(--paper-faint);font-size:.85rem;max-width:16rem;margin-top:.9rem;font-weight:300}
+  .foot-bottom{
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;
+    padding:1.4rem 0 2rem;border-top:1px solid var(--line);
+    font-family:var(--font-mono);font-size:.7rem;color:var(--paper-faint);letter-spacing:.06em;
+  }
+
+  /* reveal on scroll */
+  .reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s ease}
+  .reveal.in{opacity:1;transform:none}
+  .reveal.d1{transition-delay:.08s}.reveal.d2{transition-delay:.16s}.reveal.d3{transition-delay:.24s}
+
+  @media (max-width:960px){
+    .hero-grid,.feature{grid-template-columns:1fr;gap:44px}
+    .feature:nth-child(even) .f-copy{order:0}
+    .tiers{grid-template-columns:1fr;max-width:26rem;margin:0 auto}
+    .foot-grid{grid-template-columns:1fr 1fr}
+    .nav-links{display:none}
+    .hero{padding:64px 0 90px}
+    .stub{right:2%;bottom:-28px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation:none!important;transition:none!important}
+    .reveal{opacity:1;transform:none}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a class="logo" href="#" aria-label="Wayfare home">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+        <circle cx="13" cy="13" r="11.5" stroke="#ff5c1f" stroke-width="2"/>
+        <path d="M13 5.5 L16 16 L13 13.6 L10 16 Z" fill="#eef4fb"/>
+      </svg>
+      Wayfare
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#itinerary">Itinerary</a>
+      <a href="#tracking">Tracking</a>
+      <a href="#budget">Budget</a>
+      <a href="#pricing">Pricing</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="ghost" href="#">Sign in</a>
+      <a class="btn" href="#pricing">Start planning
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+  </div>
+</header>
+
+<main>
+<section class="hero">
+  <span class="glow g1"></span><span class="glow g2"></span>
+  <div class="wrap hero-grid">
+    <div>
+      <span class="kicker reveal in">For independent travelers</span>
+      <h1 class="reveal in d1">Plan the whole trip. <span class="accent">Miss nothing.</span></h1>
+      <p class="lede reveal in d2">Wayfare puts your itinerary, every flight and train, and your daily budget on one board, so a delayed connection in Zagreb never derails day six in Athens.</p>
+      <div class="hero-actions reveal in d3">
+        <a class="btn" href="#pricing">Start planning free
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a class="btn btn-outline" href="#itinerary">See how it works</a>
+      </div>
+      <div class="hero-meta reveal in d3">
+        <div><strong>412k</strong>trips planned</div>
+        <div><strong>190+</strong>rail + air carriers</div>
+        <div><strong>4.8</strong>App Store rating</div>
+      </div>
+    </div>
+
+    <div class="hero-visual reveal in d2">
+      <div class="board" role="img" aria-label="Live departures board showing tracked legs of a trip">
+        <div class="board-head">
+          <span>Your trip &middot; Balkans loop</span>
+          <span class="live">Live</span>
+        </div>
+        <div class="board-rows">
+          <div class="brow">
+            <span class="t">07:15</span>
+            <span class="route">LJU &rarr; ZAG &middot; Rail IC 502<br><span class="code">Platform 3 &middot; Seat 42</span></span>
+            <span class="status board-now">Boarding</span>
+          </div>
+          <div class="brow">
+            <span class="t">12:40</span>
+            <span class="route">ZAG &rarr; ATH &middot; OU 484<br><span class="code">Gate 21 &middot; 22F</span></span>
+            <span class="status delay">+25 min</span>
+          </div>
+          <div class="brow">
+            <span class="t">18:05</span>
+            <span class="route">Airport &rarr; Plaka &middot; Metro M3<br><span class="code">Every 8 min</span></span>
+            <span class="status on">On time</span>
+          </div>
+          <div class="brow">
+            <span class="t">20:30</span>
+            <span class="route">Dinner &middot; Ta Karamanlidika<br><span class="code">Booked for 2</span></span>
+            <span class="status on">Confirmed</span>
+          </div>
+        </div>
+        <div class="board-foot">
+          <span>Day 6 of 14</span>
+          <span class="hint">Buffer to connection: 1h 55m &middot; still safe</span>
+        </div>
+      </div>
+      <div class="stub" aria-hidden="true">
+        <div><div class="big">&euro;61</div>spent today</div>
+        <div class="divider"></div>
+        <div>daily budget &euro;85<br><span class="tag">&euro;24 under</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="strip" aria-hidden="true">
+  <div class="strip-track">
+    <span>Lisbon &rarr; Porto <b>&#9670;</b></span><span>Hanoi &rarr; Da Nang <b>&#9670;</b></span><span>Oaxaca &rarr; San Crist&oacute;bal <b>&#9670;</b></span><span>Tbilisi &rarr; Kutaisi <b>&#9670;</b></span><span>Osaka &rarr; Kanazawa <b>&#9670;</b></span><span>Marrakesh &rarr; Essaouira <b>&#9670;</b></span>
+    <span>Lisbon &rarr; Porto <b>&#9670;</b></span><span>Hanoi &rarr; Da Nang <b>&#9670;</b></span><span>Oaxaca &rarr; San Crist&oacute;bal <b>&#9670;</b></span><span>Tbilisi &rarr; Kutaisi <b>&#9670;</b></span><span>Osaka &rarr; Kanazawa <b>&#9670;</b></span><span>Marrakesh &rarr; Essaouira <b>&#9670;</b></span>
+  </div>
+</div>
+
+<section class="features wrap">
+
+  <div class="feature" id="itinerary">
+    <div class="f-copy reveal">
+      <span class="kicker">01 &middot; Itinerary builder</span>
+      <h2>Build days you can actually live.</h2>
+      <p>Drag places, trains, and meals into a timeline that knows travel time between everything. Wayfare flags the days you have overpacked before your feet find out.</p>
+      <ul class="f-list">
+        <li><svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M2.5 8l3.2 3L12.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Real walking and transit times between stops, not straight-line guesses</li>
+        <li><svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M2.5 8l3.2 3L12.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Opening hours checked against your arrival time, automatically</li>
+        <li><svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M2.5 8l3.2 3L12.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Offline maps and notes for every stop, even in a dead zone</li>
+      </ul>
+    </div>
+    <div class="reveal d1">
+      <div class="panel">
+        <div class="panel-head"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>Itinerary &middot; Kyoto, day 3</div>
+        <div class="panel-body">
+          <div class="day-tab" aria-hidden="true"><span>Day 2</span><span class="on">Day 3</span><span>Day 4</span><span>Day 5</span></div>
+          <div class="itin">
+            <div class="slot"><span class="when">08:30</span><span class="what">Fushimi Inari at opening<small>Beat the crowds. 40 min from hotel</small></span><span class="chip rail">JR Nara</span></div>
+            <div class="slot"><span class="when">11:15</span><span class="what">Nishiki Market lunch<small>Cash only stalls, budget &yen;1,800</small></span><span class="chip food">Eat</span></div>
+            <div class="slot drag"><span class="when">13:00</span><span class="what">Philosopher's Path<small>Dragging into afternoon slot...</small></span><span class="chip walk">Walk</span></div>
+            <div class="slot"><span class="when">16:30</span><span class="what">Kiyomizu-dera<small>Closes 18:00. You arrive with 90 min</small></span><span class="chip walk">Walk</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="feature" id="tracking">
+    <div class="f-copy reveal">
+      <span class="kicker">02 &middot; Flight + rail tracking</span>
+      <h2>Every leg watched. Every ripple caught.</h2>
+      <p>Wayfare tracks flights and trains together, then reads the consequences downstream: a late arrival tightens a connection, a strike reroutes an afternoon. You hear about it before the platform sign changes.</p>
+      <ul class="f-list">
+        <li><svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M2.5 8l3.2 3L12.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Live status for 190+ airlines and national rail operators</li>
+        <li><svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M2.5 8l3.2 3L12.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Connection risk scored against your real itinerary, not the schedule</li>
+        <li><svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M2.5 8l3.2 3L12.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Rebooking options surfaced the moment a leg goes red</li>
+      </ul>
+    </div>
+    <div class="reveal d1">
+      <div class="panel">
+        <div class="panel-head"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>Tracking &middot; OU 484</div>
+        <div class="panel-body">
+          <div class="flight-line" aria-hidden="true">
+            <div class="apt"><b>ZAG</b><span>12:40 &rarr; 13:05</span></div>
+            <div class="track-path"><span class="plane-dot">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M15 1L9.5 8.5 11 13l-1.5 1.5-2-4.5-3.5 2.5.5 2L3 16l-1.5-3.5L-2 11l1.5-1.5 2 .5L4 6.5l-4.5-2L1 3l4.5 1.5L13 -1z" transform="translate(1,1) scale(0.85)"/></svg>
+            </span></div>
+            <div class="apt"><b>ATH</b><span>15:55 est</span></div>
+          </div>
+          <div class="alert-card">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1.5 15 14H1L8 1.5z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M8 6v4M8 12.2v.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <div><b>Departure slipped 25 min.</b> Your Metro M3 leg and dinner booking still hold. No action needed.
+              <small>Checked against 3 downstream legs &middot; 2 min ago</small>
+            </div>
+          </div>
+          <div class="mini-rows" aria-hidden="true">
+            <div class="r"><span>Gate</span><span>21 (was 18)</span></div>
+            <div class="r"><span>Connection buffer</span><span>1h 55m</span></div>
+            <div class="r"><span>Risk</span><span style="color:var(--board)">Low</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="feature" id="budget">
+    <div class="f-copy reveal">
+      <span class="kicker">03 &middot; Daily budget</span>
+      <h2>Spend like a local, not like a tourist.</h2>
+      <p>Set a daily number and log spends in three taps, in any currency. Wayfare converts on the fly and rolls the surplus forward, so a cheap street-food day quietly funds Friday's splurge.</p>
+      <ul class="f-list">
+        <li><svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M2.5 8l3.2 3L12.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>160+ currencies with mid-market rates, updated hourly</li>
+        <li><svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M2.5 8l3.2 3L12.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Rollover budgeting: under one day, over the next, always balanced</li>
+        <li><svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M2.5 8l3.2 3L12.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Split any expense with travel partners, settle at trip's end</li>
+      </ul>
+    </div>
+    <div class="reveal d1">
+      <div class="panel">
+        <div class="panel-head"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>Budget &middot; Today, Athens</div>
+        <div class="panel-body">
+          <div class="budget-top">
+            <div><span class="spent">&euro;61</span> <span class="of">/ &euro;85 daily</span></div>
+            <span class="left">&euro;24 under</span>
+          </div>
+          <div class="bars" aria-hidden="true">
+            <div class="bar-row"><span class="lbl">Food</span><div class="bar"><i class="b1"></i></div><span class="amt">&euro;27.40</span></div>
+            <div class="bar-row"><span class="lbl">Transit</span><div class="bar"><i class="b2"></i></div><span class="amt">&euro;9.20</span></div>
+            <div class="bar-row"><span class="lbl">Sights</span><div class="bar"><i class="b3"></i></div><span class="amt">&euro;18.00</span></div>
+            <div class="bar-row"><span class="lbl">Other</span><div class="bar"><i class="b4"></i></div><span class="amt">&euro;6.40</span></div>
+          </div>
+          <div class="budget-note"><span>Trip so far: &euro;489 of &euro;1,190</span><b>&euro;131 rolled forward</b></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<section class="pricing" id="pricing">
+  <div class="wrap">
+    <div class="pricing-head reveal">
+      <span class="kicker">Pricing</span>
+      <h2>Cheaper than one missed connection.</h2>
+      <p>Start free. Upgrade when the trip gets serious. Every plan includes the itinerary builder and offline access.</p>
+    </div>
+    <div class="tiers">
+      <div class="tier reveal">
+        <h3>Daypack</h3>
+        <div class="tag">For the weekend escape</div>
+        <div class="price"><span class="n">$0</span><span class="per">forever</span></div>
+        <ul>
+          <li><svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M2.5 8l3.2 3L12.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>1 active trip, up to 7 days</li>
+          <li><svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M2.5 8l3.2 3L12.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Itinerary builder with transit times</li>
+          <li><svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M2.5 8l3.2 3L12.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Daily budget in one currency</li>
+          <li class="dim"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M4 4l7 7M11 4l-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Live flight + rail tracking</li>
+          <li class="dim"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M4 4l7 7M11 4l-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Expense splitting</li>
+        </ul>
+        <a class="btn btn-outline" href="#">Start free</a>
+      </div>
+
+      <div class="tier hot reveal d1">
+        <span class="flag">Most packed</span>
+        <h3>Wayfarer</h3>
+        <div class="tag">For the long, winding route</div>
+        <div class="price"><span class="n">$6</span><span class="per">/ month, billed yearly</span></div>
+        <ul>
+          <li><svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M2.5 8l3.2 3L12.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Unlimited trips, unlimited days</li>
+          <li><svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M2.5 8l3.2 3L12.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Live flight + rail tracking with connection risk</li>
+          <li><svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M2.5 8l3.2 3L12.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Multi-currency budgets with rollover</li>
+          <li><svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M2.5 8l3.2 3L12.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Disruption alerts with rebooking options</li>
+          <li><svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M2.5 8l3.2 3L12.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Offline everything</li>
+        </ul>
+        <a class="btn" href="#">Go Wayfarer</a>
+      </div>
+
+      <div class="tier reveal d2">
+        <h3>Caravan</h3>
+        <div class="tag">For crews of up to 6</div>
+        <div class="price"><span class="n">$12</span><span class="per">/ month, billed yearly</span></div>
+        <ul>
+          <li><svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M2.5 8l3.2 3L12.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Everything in Wayfarer, for 6 travelers</li>
+          <li><svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M2.5 8l3.2 3L12.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Shared itineraries with live edits</li>
+          <li><svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M2.5 8l3.2 3L12.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Group expense splitting and settle-up</li>
+          <li><svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M2.5 8l3.2 3L12.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Everyone's legs on one departures board</li>
+          <li><svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M2.5 8l3.2 3L12.5 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Priority support, human within hours</li>
+        </ul>
+        <a class="btn btn-outline" href="#">Gather the crew</a>
+      </div>
+    </div>
+    <p class="fine">Prices in USD. Cancel anytime; your trips stay exportable forever.</p>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="foot-cta">
+    <span class="glow"></span>
+    <div class="wrap">
+      <h2 class="reveal">The route is yours.<br><em>The logistics are ours.</em></h2>
+      <p class="reveal d1">Two minutes to your first itinerary. No card, no spam, no group tour.</p>
+      <a class="btn reveal d2" href="#pricing">Start planning free
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+  </div>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="logo" href="#">
+          <svg width="24" height="24" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+            <circle cx="13" cy="13" r="11.5" stroke="#ff5c1f" stroke-width="2"/>
+            <path d="M13 5.5 L16 16 L13 13.6 L10 16 Z" fill="#eef4fb"/>
+          </svg>
+          Wayfare
+        </a>
+        <p>Trip planning for people who build their own route. Made by a small team that travels on the product.</p>
+      </div>
+      <div>
+        <h4>Product</h4>
+        <ul>
+          <li><a href="#itinerary">Itinerary builder</a></li>
+          <li><a href="#tracking">Flight + rail tracking</a></li>
+          <li><a href="#budget">Budget tracking</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Field notes</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Press kit</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Support</h4>
+        <ul>
+          <li><a href="#">Help center</a></li>
+          <li><a href="#">Carrier coverage</a></li>
+          <li><a href="#">Privacy</a></li>
+          <li><a href="#">Terms</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>&copy; 2026 Wayfare Travel Co.</span>
+      <span>DEP 07:15 &middot; PLATFORM 3 &middot; MIND THE GAP</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    }
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.reveal:not(.in)').forEach(el => io.observe(el));
+</script>
+</body>
+</html>

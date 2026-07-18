@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wayfare · Trip operations for independent travelers</title>
+<meta name="description" content="Wayfare is a trip-planning app for independent travelers: build multi-leg itineraries, track every flight and train, and hold a daily budget.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders:opsz,wght@10..72,800&family=IBM+Plex+Sans:wght@400;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+/* goddesign | structure: Offset Cascade | direction: Industrial | accent: 82 */
+/* seed 290814129 | direction 1 Industrial | structure 9 Offset Cascade
+   lock: bg #12110E surface #1A1A18 text #E6E6E2 muted #8A8A84 accent #FFB400 line #2A2A26
+   jitter h+4 L-0.01 r+0 | Big Shoulders 800 / IBM Plex Sans 400,600 / JetBrains Mono 500
+   signature: departure-board spec panel in hero; hazard stripe once; motion 250ms linear only */
+
+:root {
+  --bg: oklch(from #12110E calc(l - 0.01) c h);
+  --surface: oklch(from #1A1A18 calc(l - 0.01) c h);
+  --text: #E6E6E2;
+  --muted: #8A8A84;
+  --accent: oklch(from #FFB400 l c calc(h + 4));
+  --line: #2A2A26;
+  --accent-hover: oklch(from var(--accent) calc(l - 0.1) c h);
+  --accent-dim: color-mix(in oklab, var(--accent) 15%, transparent);
+  --panel: oklch(from var(--surface) calc(l + 0.02) c h);
+  --footer-bg: oklch(from var(--bg) calc(l - 0.012) c h);
+  --on-accent: oklch(from var(--bg) calc(l - 0.02) c h);
+  --font-display: "Big Shoulders", sans-serif;
+  --font-body: "IBM Plex Sans", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  --radius: 2px;
+  --step--1: clamp(0.8125rem, 0.79rem + 0.15vw, 0.875rem);
+  --step-0: clamp(1rem, 0.96rem + 0.2vw, 1.0625rem);
+  --step-1: clamp(1.25rem, 1.18rem + 0.35vw, 1.4375rem);
+  --step-2: clamp(1.5625rem, 1.42rem + 0.7vw, 1.9375rem);
+  --step-3: clamp(1.9375rem, 1.7rem + 1.2vw, 2.625rem);
+  --step-hero: clamp(3rem, 8vw, 6rem);
+}
+
+* { box-sizing: border-box; margin: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  line-height: 1.55;
+  overflow-x: clip;
+}
+
+h1, h2, h3 { text-wrap: balance; }
+p { text-wrap: pretty; }
+
+.display {
+  font-family: var(--font-display);
+  font-weight: 800;
+  text-transform: uppercase;
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+}
+
+.label {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: var(--step--1);
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--muted);
+}
+
+.num {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.wrap {
+  max-width: 72rem;
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 4vw, 2rem);
+}
+
+a { color: var(--text); }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+::selection { background: var(--accent); color: var(--on-accent); }
+
+/* ---------- nav ---------- */
+
+.nav {
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  background: var(--bg);
+  z-index: 10;
+}
+
+.nav-inner {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  min-height: 64px;
+}
+
+.brand {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+}
+
+.brand-mark {
+  width: 14px;
+  height: 14px;
+  background: var(--accent);
+  clip-path: polygon(0 100%, 50% 0, 100% 100%, 50% 68%);
+}
+
+.nav-links {
+  display: flex;
+  gap: 24px;
+  margin-left: auto;
+  list-style: none;
+  padding: 0;
+}
+
+.nav-links a {
+  text-decoration: none;
+  font-size: var(--step--1);
+  font-weight: 600;
+  color: var(--muted);
+  padding: 8px 4px;
+  transition: color 250ms linear;
+}
+
+.nav-links a:hover { color: var(--text); }
+
+/* ---------- buttons ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 12px 24px;
+  border-radius: var(--radius);
+  border: 1px solid var(--accent);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: var(--step--1);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 250ms linear, color 250ms linear, border-color 250ms linear;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+.btn-primary:active { background: oklch(from var(--accent) calc(l - 0.16) c h); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text);
+  border-color: var(--line);
+}
+
+.btn-ghost:hover { border-color: var(--muted); }
+.btn-ghost:active { background: var(--surface); }
+
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ---------- hero ---------- */
+
+.hero { padding-block: clamp(48px, 8vw, 96px) clamp(96px, 10vw, 128px); }
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: clamp(32px, 5vw, 64px);
+  align-items: start;
+}
+
+.hero h1 {
+  font-size: var(--step-hero);
+  max-width: 12ch;
+  margin-top: 16px;
+}
+
+.hero-sub {
+  max-width: 46ch;
+  margin-top: 24px;
+  color: var(--muted);
+  font-size: var(--step-1);
+  line-height: 1.5;
+}
+
+.hero-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+/* signature: departure-board spec panel */
+
+.board {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.board-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.board-head .num { font-size: var(--step--1); color: var(--muted); }
+
+.board-rows { list-style: none; padding: 0; }
+
+.board-row {
+  display: grid;
+  grid-template-columns: auto auto 1fr auto;
+  gap: 12px;
+  align-items: baseline;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+  font-size: var(--step--1);
+}
+
+.board-row:last-child { border-bottom: 0; }
+
+.board-row .num { color: var(--text); }
+.board-row .carrier { color: var(--muted); font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
+.board-row .route { font-size: var(--step--1); }
+
+.status-ok { color: var(--muted); }
+.status-delay { color: var(--accent); }
+
+.board-foot {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--accent);
+  font-size: var(--step--1);
+}
+
+.board-foot .num { color: var(--accent); }
+
+/* ---------- offset cascade sections ---------- */
+
+.band-surface { background: var(--surface); }
+
+.section { padding-block: clamp(64px, 9vw, 128px); }
+
+.cascade {
+  display: grid;
+  gap: clamp(32px, 5vw, 64px);
+  align-items: start;
+}
+
+.cascade-left { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); }
+.cascade-right { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); }
+
+.overlap { margin-top: calc(-1 * clamp(48px, 7vw, 96px) - 48px); position: relative; z-index: 2; }
+
+.section h2 {
+  font-size: var(--step-3);
+  max-width: 18ch;
+}
+
+.section .lede {
+  color: var(--muted);
+  margin-top: 16px;
+  max-width: 52ch;
+}
+
+.feature-points {
+  list-style: none;
+  padding: 0;
+  margin-top: 24px;
+  display: grid;
+  gap: 12px;
+  max-width: 52ch;
+}
+
+.feature-points li {
+  padding-left: 20px;
+  position: relative;
+}
+
+.feature-points li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 10px;
+  height: 2px;
+  background: var(--accent);
+}
+
+/* itinerary builder artifact */
+
+.daylist { list-style: none; padding: 0; border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); }
+
+.dayrow {
+  display: grid;
+  grid-template-columns: auto auto 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+  font-size: var(--step--1);
+}
+
+.dayrow:last-child { border-bottom: 0; }
+
+.grip {
+  display: inline-grid;
+  gap: 3px;
+  width: 14px;
+}
+
+.grip i {
+  display: block;
+  height: 1px;
+  background: var(--muted);
+}
+
+.dayrow .num { color: var(--muted); }
+.dayrow .place { font-weight: 600; }
+.dayrow .meta { color: var(--muted); }
+
+.dayrow-active { box-shadow: inset 2px 0 0 var(--accent); }
+
+/* hazard divider: used exactly once */
+
+.hazard {
+  height: 10px;
+  background: repeating-linear-gradient(
+    45deg,
+    var(--accent-dim) 0 12px,
+    transparent 12px 24px
+  );
+  border-block: 1px solid var(--line);
+}
+
+/* budget ledger artifact */
+
+.ledger { border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); width: 100%; border-collapse: collapse; font-size: var(--step--1); }
+
+.ledger caption {
+  text-align: left;
+  padding: 12px 16px;
+  border: 1px solid var(--line);
+  border-bottom: 0;
+  background: var(--panel);
+}
+
+.ledger th, .ledger td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+
+.ledger th { font-weight: 600; color: var(--muted); font-size: var(--step--1); text-transform: uppercase; letter-spacing: 0.07em; }
+
+.ledger td.num, .ledger th.amt { text-align: right; }
+
+.ledger tfoot td { border-bottom: 0; border-top: 1px solid var(--accent); font-weight: 600; }
+
+.ledger tfoot .num { color: var(--accent); }
+
+/* ---------- pricing ---------- */
+
+.pricing-head { max-width: 52ch; }
+
+.tiers {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin-top: 48px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.tier {
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  border-right: 1px solid var(--line);
+}
+
+.tier:last-child { border-right: 0; }
+
+.tier-featured { background: var(--panel); box-shadow: inset 0 2px 0 var(--accent); }
+
+.tier h3 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: var(--step-2);
+  letter-spacing: 0.02em;
+}
+
+.tier .price {
+  font-size: var(--step-3);
+  line-height: 1;
+}
+
+.tier .price small {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: var(--step--1);
+  color: var(--muted);
+}
+
+.tier-desc { color: var(--muted); font-size: var(--step--1); }
+
+.tier ul {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+  font-size: var(--step--1);
+  flex-grow: 1;
+}
+
+.tier li {
+  padding-left: 18px;
+  position: relative;
+}
+
+.tier li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 8px;
+  height: 2px;
+  background: var(--muted);
+}
+
+.tier-featured li::before { background: var(--accent); }
+
+/* ---------- footer ---------- */
+
+.footer {
+  background: var(--footer-bg);
+  border-top: 1px solid var(--line);
+  padding-block: 64px 48px;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr));
+  gap: 32px;
+}
+
+.footer h4 {
+  font-size: var(--step--1);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+.footer ul { list-style: none; padding: 0; display: grid; gap: 4px; }
+
+.footer a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  text-decoration: none;
+  color: var(--text);
+  font-size: var(--step--1);
+  transition: color 250ms linear;
+}
+
+.footer a:hover { color: var(--accent); }
+
+.footer-blurb { margin-top: 16px; max-width: 34ch; }
+
+.footer-meta {
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  color: var(--muted);
+  font-size: var(--step--1);
+}
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 860px) {
+  .hero-grid, .cascade-left, .cascade-right { grid-template-columns: minmax(0, 1fr); }
+  .overlap { margin-top: 0; }
+  .section { padding-block: clamp(48px, 10vw, 96px); }
+  .tiers { grid-template-columns: minmax(0, 1fr); }
+  .tier { border-right: 0; border-bottom: 1px solid var(--line); }
+  .tier:last-child { border-bottom: 0; }
+  .footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .nav-links { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"></span>Wayfare</a>
+    <nav aria-label="Main">
+      <ul class="nav-links">
+        <li><a href="#itinerary">Itinerary</a></li>
+        <li><a href="#tracking">Tracking</a></li>
+        <li><a href="#budget">Budget</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+      </ul>
+    </nav>
+    <a class="btn btn-primary" href="#pricing">Start a trip</a>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- hero -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <p class="label">Trip operations for independent travelers</p>
+        <h1 class="display">Run your own route</h1>
+        <p class="hero-sub">Build the itinerary, watch every flight and train, and know what today can cost before you spend it.</p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="#pricing">Start a trip</a>
+          <a class="btn btn-ghost" href="#tracking">See how tracking works</a>
+        </div>
+      </div>
+
+      <!-- signature: departure-board spec panel, sample trip -->
+      <figure class="board" aria-label="Sample trip panel: Lisbon to Istanbul, day 4 of 12">
+        <div class="board-head">
+          <span class="label">Sample trip · Lisbon to Istanbul</span>
+          <span class="num">DAY 04/12</span>
+        </div>
+        <ul class="board-rows">
+          <li class="board-row">
+            <span class="num">07:55</span>
+            <span class="carrier num">IB 3117</span>
+            <span class="route num">LIS &gt; MAD</span>
+            <span class="num status-ok">ON TIME</span>
+          </li>
+          <li class="board-row">
+            <span class="num">12:20</span>
+            <span class="carrier num">AVE 3083</span>
+            <span class="route num">MAD &gt; BCN</span>
+            <span class="num status-delay">+00:23</span>
+          </li>
+          <li class="board-row">
+            <span class="num">18:05</span>
+            <span class="carrier num">WALK</span>
+            <span class="route num">SANTS &gt; HOSTEL</span>
+            <span class="num status-ok">1.2 KM</span>
+          </li>
+        </ul>
+        <div class="board-foot">
+          <span class="label">Day budget</span>
+          <span class="num">CAP 70.00 EUR · SPENT 41.30 · <strong>LEFT 28.70</strong></span>
+        </div>
+      </figure>
+    </div>
+  </section>
+
+  <!-- feature 1: itinerary builder (surface band, right-weighted, overlaps hero) -->
+  <section class="section band-surface" id="itinerary">
+    <div class="wrap cascade cascade-right">
+      <div class="overlap">
+        <ul class="daylist" aria-label="Example itinerary day list">
+          <li class="dayrow">
+            <span class="grip" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="num">D03</span>
+            <span class="place">Porto</span>
+            <span class="meta num">2 NIGHTS</span>
+          </li>
+          <li class="dayrow dayrow-active" aria-current="true">
+            <span class="grip" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="num">D04</span>
+            <span class="place">Madrid</span>
+            <span class="meta num">1 NIGHT</span>
+          </li>
+          <li class="dayrow">
+            <span class="grip" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="num">D05</span>
+            <span class="place">Barcelona</span>
+            <span class="meta num">3 NIGHTS</span>
+          </li>
+          <li class="dayrow">
+            <span class="grip" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="num">D08</span>
+            <span class="place">Marseille</span>
+            <span class="meta num">2 NIGHTS</span>
+          </li>
+        </ul>
+      </div>
+      <div>
+        <h2 class="display">The itinerary is the plan, not a wish list</h2>
+        <p class="lede">Lay out days, legs, and stays in one ordered list. Drag a city and every connection, booking window, and budget line downstream moves with it.</p>
+        <ul class="feature-points">
+          <li>Reorder days and Wayfare recalculates every onward connection.</li>
+          <li>Attach bookings, confirmation codes, and notes to each leg.</li>
+          <li>Gaps and impossible connections get flagged before you book them.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- feature 2: tracking (bg band, left-weighted, overlaps previous) -->
+  <section class="section" id="tracking">
+    <div class="wrap cascade cascade-left">
+      <div>
+        <h2 class="display">Flights and trains on one board</h2>
+        <p class="lede">Wayfare watches every leg you have booked: airline feeds and rail operator data in a single status column. A platform change in Barcelona shows up next to a gate change in Madrid.</p>
+        <ul class="feature-points">
+          <li>Live delay, gate, and platform updates for air and rail.</li>
+          <li>A missed connection re-plans the rest of the day, not just the leg.</li>
+          <li>Works offline with the last synced state when you lose signal.</li>
+        </ul>
+      </div>
+      <div class="overlap">
+        <figure class="board" aria-label="Example live status board">
+          <div class="board-head">
+            <span class="label">Today · live status</span>
+            <span class="num">SYNC 09:41</span>
+          </div>
+          <ul class="board-rows">
+            <li class="board-row">
+              <span class="num">10:05</span>
+              <span class="carrier num">VY 1002</span>
+              <span class="route num">BCN &gt; MRS</span>
+              <span class="num status-ok">GATE B22</span>
+            </li>
+            <li class="board-row">
+              <span class="num">12:20</span>
+              <span class="carrier num">AVE 3083</span>
+              <span class="route num">MAD &gt; BCN</span>
+              <span class="num status-delay">PLAT 7 · +00:23</span>
+            </li>
+            <li class="board-row">
+              <span class="num">16:40</span>
+              <span class="carrier num">TER 17482</span>
+              <span class="route num">MRS &gt; CASSIS</span>
+              <span class="num status-ok">ON TIME</span>
+            </li>
+          </ul>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <div class="hazard" role="presentation"></div>
+
+  <!-- feature 3: budget (surface band, right-weighted, overlaps previous) -->
+  <section class="section band-surface" id="budget">
+    <div class="wrap cascade cascade-right">
+      <div class="overlap">
+        <table class="ledger">
+          <caption class="label">Day 04 · Madrid · example ledger</caption>
+          <thead>
+            <tr>
+              <th scope="col">Time</th>
+              <th scope="col">Entry</th>
+              <th scope="col" class="amt">EUR</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="num">08:10</td>
+              <td>Coffee, Atocha kiosk</td>
+              <td class="num">2.60</td>
+            </tr>
+            <tr>
+              <td class="num">09:30</td>
+              <td>Metro 10-trip pass</td>
+              <td class="num">12.20</td>
+            </tr>
+            <tr>
+              <td class="num">13:45</td>
+              <td>Menu del dia, La Latina</td>
+              <td class="num">15.50</td>
+            </tr>
+            <tr>
+              <td class="num">17:20</td>
+              <td>Prado, reduced entry</td>
+              <td class="num">11.00</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="2">Left of 70.00 cap</td>
+              <td class="num">28.70</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      <div>
+        <h2 class="display">A daily cap, not a post-trip autopsy</h2>
+        <p class="lede">Set a spending cap per day and log entries in seconds, in any currency. Wayfare converts on the day's rate and shows what is left before dinner, not after the trip.</p>
+        <ul class="feature-points">
+          <li>Per-day caps with rollover: an underspent Tuesday funds a bigger Saturday.</li>
+          <li>Multi-currency entries converted at the day's rate.</li>
+          <li>End-of-trip export: every entry, leg, and rate as CSV.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- pricing -->
+  <section class="section" id="pricing">
+    <div class="wrap">
+      <div class="pricing-head">
+        <h2 class="display">Pricing</h2>
+        <p class="lede">Plan your first trip free. Pay when you travel enough to need more than one.</p>
+      </div>
+      <div class="tiers">
+        <div class="tier">
+          <h3>Scout</h3>
+          <p class="price num">0 <small>EUR / forever</small></p>
+          <p class="tier-desc">For the first trip, end to end.</p>
+          <ul>
+            <li>1 active trip, up to 21 days</li>
+            <li>Itinerary builder with connection checks</li>
+            <li>Daily budget with one currency</li>
+            <li>Manual status refresh</li>
+          </ul>
+          <a class="btn btn-ghost" href="#pricing">Start free</a>
+        </div>
+        <div class="tier tier-featured">
+          <h3>Wayfarer</h3>
+          <p class="price num">7 <small>EUR / month</small></p>
+          <p class="tier-desc">For people who are usually somewhere else.</p>
+          <ul>
+            <li>Unlimited trips and trip length</li>
+            <li>Live flight and train tracking with alerts</li>
+            <li>Multi-currency budgets with daily rates</li>
+            <li>Offline mode and CSV export</li>
+          </ul>
+          <a class="btn btn-primary" href="#pricing">Start 14-day trial</a>
+        </div>
+        <div class="tier">
+          <h3>Convoy</h3>
+          <p class="price num">14 <small>EUR / month</small></p>
+          <p class="tier-desc">For pairs and small groups splitting the road.</p>
+          <ul>
+            <li>Everything in Wayfarer</li>
+            <li>Shared itineraries for up to 6 travelers</li>
+            <li>Split expenses and settle-up totals</li>
+            <li>Per-person and shared budget caps</li>
+          </ul>
+          <a class="btn btn-ghost" href="#pricing">Start 14-day trial</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"></span>Wayfare</a>
+        <p class="tier-desc footer-blurb">Trip operations for independent travelers. Itineraries, live tracking, and daily budgets in one place.</p>
+      </div>
+      <nav aria-label="Product">
+        <h4>Product</h4>
+        <ul>
+          <li><a href="#itinerary">Itinerary builder</a></li>
+          <li><a href="#tracking">Flight and train tracking</a></li>
+          <li><a href="#budget">Budget tracking</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+        </ul>
+      </nav>
+      <nav aria-label="Company">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#top">About</a></li>
+          <li><a href="#top">Changelog</a></li>
+          <li><a href="#top">Contact</a></li>
+        </ul>
+      </nav>
+      <nav aria-label="Legal">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#top">Privacy</a></li>
+          <li><a href="#top">Terms</a></li>
+          <li><a href="#top">Data sources</a></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="footer-meta">
+      <span>© 2026 Wayfare. All routes your own.</span>
+      <span class="num">BUILD LIS &gt; IST · V1.0</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
