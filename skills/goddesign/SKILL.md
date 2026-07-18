@@ -58,14 +58,14 @@ Run this (works in bash and zsh):
 
 ```sh
 SEED=$(printf '%s' "$(basename "$PWD")$(date +%Y%m%d%H%M)" | cksum | cut -d' ' -f1)
-echo "seed=$SEED direction=$((SEED % 16)) structure=$((SEED / 29 % 12)) palette=$((SEED / 7 % 10)) typepair=$((SEED / 13 % 12)) jitterh=$((SEED / 37 % 25 - 12)) jitterl=$((SEED / 43 % 3 - 1)) jitterr=$((SEED / 47 % 3 - 1))"
+echo "seed=$SEED direction=$((SEED % 17)) structure=$((SEED / 29 % 12)) palette=$((SEED / 7 % 10)) typepair=$((SEED / 13 % 12)) jitterh=$((SEED / 37 % 25 - 12)) jitterl=$((SEED / 43 % 3 - 1)) jitterr=$((SEED / 47 % 3 - 1))"
 ```
 
-No shell available? Let N be the character count of the user's brief plus today's day of the month: direction = N % 16, structure = N % 12, palette = (N + 3) % 10, typepair = (N + 7) % 12, jitterh = (N % 25) - 12, jitterl = (N % 3) - 1, jitterr = ((N + 1) % 3) - 1.
+No shell available? Let N be the character count of the user's brief plus today's day of the month: direction = N % 17, structure = N % 12, palette = (N + 3) % 10, typepair = (N + 7) % 12, jitterh = (N % 25) - 12, jitterl = (N % 3) - 1, jitterr = ((N + 1) % 3) - 1.
 
 ### 3c. Resolve the picks
 
-- `direction` indexes `references/directions.md` (16 rows). The row is a complete package: colors, fonts, imports, radius, shadows, background, signature element, motion. It is the default for everything.
+- `direction` indexes `references/directions.md` (17 rows). The row is a complete package: colors, fonts, imports, radius, shadows, background, signature element, motion. It is the default for everything.
 - `structure` indexes `references/layouts.md` (12 macrostructures). This decides what the page IS.
 - `palette` (10 rows in `references/palettes.md`) and `typepair` (12 rows in `references/fonts.md`) are the REMIX indices. Use them only when: the brief constrains the direction's colors or type (brand color exists), the ledger rules disqualify part of the row, a reroll landed you somewhere the brief cannot support, or the Step 2 audience-and-tone verdict contradicts the row's mood (a warm approachable audience under a cold dramatic row is a brief constraint like any other; remix by index and say so, do not freestyle). Swapping is fine; blending three palettes is not.
 - Conflicts with the ledger or brief: advance the offending index by 1 (mod its deck size) until legal, and say so.
@@ -163,7 +163,7 @@ A page that has not passed the gate is not done. If someone could glance at the 
 
 ## Reference index
 
-- `references/directions.md`: the 16-row direction deck. Read at Step 3c.
+- `references/directions.md`: the 17-row direction deck (row 16 onward: human-genome rows derived from real human-built sites). Read at Step 3c.
 - `references/layouts.md`: 12 macrostructures, hero budget, section and responsive rules. Read at Step 3c.
 - `references/palettes.md`: 10 palette families, OKLCH ramp math, brand-hue adaptation. Read only when remixing colors.
 - `references/fonts.md`: 12 pairings with safe import lines and availability warnings. Read only when remixing type.

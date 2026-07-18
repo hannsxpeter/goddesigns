@@ -1,6 +1,6 @@
 # Direction Deck
 
-16 complete aesthetic directions, indexed 0-15. Pick the row your seed selected. Each row is a full package: execute it as written. Do not blend rows. Do not substitute values unless the user's brief or the reroll rule forces it; when it does, swap in a row from `palettes.md` or `fonts.md` by index and say so. One systematic exception: SKILL.md Step 3d's seeded jitter rotates the accent hue and nudges bg/surface lightness via the relative-color idiom below; the jittered values are the values you execute.
+17 complete aesthetic directions, indexed 0-16 (row 16 is the first human-genome row, derived from a real human-built site). Pick the row your seed selected. Each row is a full package: execute it as written. Do not blend rows. Do not substitute values unless the user's brief or the reroll rule forces it; when it does, swap in a row from `palettes.md` or `fonts.md` by index and say so. One systematic exception: SKILL.md Step 3d's seeded jitter rotates the accent hue and nudges bg/surface lightness via the relative-color idiom below; the jittered values are the values you execute.
 
 Colors are hex and are the source of truth. Derive hover/active shades with relative color: `oklch(from var(--accent) calc(l - 0.1) c h)`.
 
@@ -185,3 +185,15 @@ Fits: note apps, journals, education, personal tools.
 - Background: paper grain at 6%.
 - Signature: a scalloped or torn-paper section divider (SVG mask).
 - Motion: 300ms ease-out; one card tilts 2deg on hover, nothing else.
+
+## 16. Trade Counter
+
+Fits: local services, trades, shops, clinics, anything that lives on phone calls and trust. Genome: derived 2026-07 from a real human-built local trade site, the deck's first externally-sourced row; its human traits are the point, do not polish them away.
+- Colors: bg #F6F6F4, surface #ECECEA, text #17181A, muted #5E6065, accent #E42313 signal red. This row overrides the accent budget: the accent floods entire CTA bands at full coverage, plus buttons; everywhere else stays neutral.
+- Type: ONE family only: Poppins 300/500/700/800. No display face, no mono; hierarchy comes from weight and size alone. Single-family weight-driven type is the genome; adding a second face breaks the row.
+- Import: `https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700;800&display=swap`
+- Radius: 4px on buttons and cards; bands are sharp.
+- Background: flat white and gray utility bands separated by diagonal slash cuts (clip-path); one near-black band; one full-red band. No textures, no gradients, no tinted neutrals: raw utility grays are correct here.
+- Signature: the phone number as a first-class element: in a utility topbar (hours + email + tel) above the nav, in the header, and huge on the red band, all real tel: links. Secondary devices: one red corner triangle, a business-facts footer (address, hours, 24/7 line in plain columns).
+- Grammar: this row ships its own human grammar: two-tier header, no eyebrow ceremony anywhere (one plain-caps kicker line allowed on the red band only), uneven band densities (tight topbar, open hero, dense footer), a testimonial strip with real-sounding names labeled as sample.
+- Motion: hovers at 150ms only. Nothing animates on scroll or load.

@@ -19,9 +19,9 @@ A ban list alone cannot fix this: bans redirect probability mass to the next att
 
 ## The variance engine
 
-- A shell-derived seed indexes 16 aesthetic directions, 12 macrostructures, 10 palette families, and 12 type pairings. Rows are complete packages; blending is banned.
+- A shell-derived seed indexes 17 aesthetic directions, 12 macrostructures, 10 palette families, and 12 type pairings. Rows are complete packages; blending is banned.
 - A per-project run ledger (`.design-log.json`) forces rotation across runs.
-- **Seeded jitter** rotates the accent hue (-12 to 12 degrees), nudges paper lightness, and steps radius via CSS relative color, so two projects that land on the same row never ship identical values. This is the population-scale defense: the deck provides 16 looks, jitter makes them thousands.
+- **Seeded jitter** rotates the accent hue (-12 to 12 degrees), nudges paper lightness, and steps radius via CSS relative color, so two projects that land on the same row never ship identical values. This is the population-scale defense: the deck provides 17 looks, jitter makes them thousands.
 
 ## The DIRECTION LOCK
 

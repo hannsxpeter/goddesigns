@@ -21,7 +21,7 @@ goddesign counters both with mechanisms, not advice. Every rule in it traces to 
 
 1. **Mode check**: existing design systems get faithful extension, not reinvention.
 2. **Lane selection**: DIVERGE (taste-heavy models fight their own attractors via forced seeded picks) or EXPAND (literal models get every decision enumerated to a hex, a number, or a named row).
-3. **Variance engine**: a seed selects from 16 aesthetic directions, 12 macrostructures, 10 palettes, and 12 type pairings; a run ledger forces rotation between runs; seeded jitter rotates accent hue and nudges paper lightness so two projects landing on the same row never ship identical values.
+3. **Variance engine**: a seed selects from 17 aesthetic directions, 12 macrostructures, 10 palettes, and 12 type pairings; a run ledger forces rotation between runs; seeded jitter rotates accent hue and nudges paper lightness so two projects landing on the same row never ship identical values.
 4. **DIRECTION LOCK**: every visual decision is written down before any code, then executed exactly.
 5. **QA gate**: a six-axis self-critique, a greppable boolean sweep, and a measured audit (`scripts/audit.mjs`) that detects layout collisions, hidden-content reveal bugs, silent font fallbacks, overflow, and undersized touch targets, with a bounded self-correction loop (named failures only, lock frozen, maximum 3 cycles).
 
@@ -40,7 +40,7 @@ Then invoke `/goddesign <brief>` in Claude Code or `$goddesign <brief>` in Codex
 | Path | What it is |
 |---|---|
 | `skills/goddesign/SKILL.md` | The skill: lanes, variance engine, craft floor, banned list |
-| `skills/goddesign/references/` | The decks: 16 directions, 12 layouts, 10 palettes, 12 font pairings, motion recipes, imagery rules, the QA gate |
+| `skills/goddesign/references/` | The decks: 17 directions (including the first human-genome row), 12 layouts, 10 palettes, 12 font pairings, motion recipes, imagery rules, the QA gate |
 | `skills/goddesign/scripts/audit.mjs` | Measured visual audit: collisions, reveal bugs, font fallbacks, overflow, touch targets |
 | `skills/goddesign/scripts/codex-audit-loop.sh` | Operator wrapper for sandboxed Codex: build inside the sandbox, audit outside, feed failures back into the same session |
 | `skills/goddesign/scripts/genimage.sh` | Cross-host image generation: hosts without native image tools delegate to an installed image-capable CLI |

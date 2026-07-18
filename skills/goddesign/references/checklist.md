@@ -33,7 +33,7 @@ Typography
 - [ ] Webfonts actually load (the import URL is present and correct), not silently falling back; when network is available, `curl -sI` the import URL and expect 200 (sandboxed with no network: state the skip).
 
 Color
-- [ ] Accent occupies at most about 5% of any viewport and appears only on interactive or state elements.
+- [ ] Accent occupies at most about 5% of any viewport and appears only on interactive or state elements (a row that explicitly states full-coverage accent bands overrides this; verify the row states it).
 - [ ] Contrast: 4.5:1 body, 3:1 large text and UI boundaries and focus rings.
 - [ ] No pure #000/#FFF page background; neutrals carry 0.005+ chroma (row hexes and their Step 3d jittered derivatives are exempt); dark surfaces are not black.
 - [ ] No gold, brass, or bronze premium shorthand; metallics only when the locked row states them.
