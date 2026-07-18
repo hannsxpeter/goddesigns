@@ -28,4 +28,6 @@ Grammar breaks appeared declared and real in all three gd runs (container-escapi
 
 ## Verdict
 
-Mechanically: goddesign 12 of 12 external audits green across four comparative rounds with no repeated identity; frontend-design 0 of 12 with near-total concept/font/palette convergence per domain. This round is the first where the gd pages also carry the flesh the owner's verdicts demanded: atmosphere, substance, broken grammar. Owner ranking pending; it is the score that counts.
+Mechanically: goddesign 12 of 12 external audits green across four comparative rounds with no repeated identity; frontend-design 0 of 12 with near-total concept/font/palette convergence per domain. This round is the first where the gd pages also carry the flesh the owner's verdicts demanded: atmosphere, substance, broken grammar.
+
+**Owner verdict: gd-a WINS.** The first goddesign first-place across all comparative rounds, and it happened in the first round run under the complete owner-taught stack (subject test, substance gate, atmosphere layer, grammar breaks, rebalanced deck). The winning page pairs the boldest form (letterboxed cinematic dark, didone italics, ice accent rationed to money and status) with the round's deepest substance (hold-ladder calendar in real booking vocabulary, a settlement sheet computing an actual deal to an ACH payout, per-cap bar table), with declared grammar breaks and honest illustrative-data labeling throughout. The taste loop closed: three owner rankings became rules, and the fourth ranking crowned a page built under them.
