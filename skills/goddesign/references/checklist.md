@@ -99,7 +99,7 @@ If someone could glance at this and say "AI made that" without doubt, it failed.
 ## Persist the run
 
 1. First line of the main stylesheet: `/* goddesign | structure: <name> | direction: <name> | accent: <hue> */`
-2. `.design-log.json` at the project root is one JSON array of entry objects, newest last. Read it (treat a missing or unparseable file as `[]`), push this run's entry, keep only the last 20, and rewrite the whole file. Entry shape:
+2. `.design-log.json` at the project root is one JSON array of entry objects, newest last. Read it (treat a missing or unparseable file as `[]`), push this run's entry, keep only the last 20, and rewrite the whole file. Append the same entry to `~/.design-log.json` (the user-level cross-project ledger, same format, keep last 40) so rotation holds across projects, not just within one. Entry shape:
 
 ```json
 { "date": "<YYYY-MM-DD>", "structure": "<name>", "direction": "<name>", "paper": "dark|mid|light", "display": "serif|grotesque|mono|slab|display", "accent_hue_deg": "<0-359 or null>" }

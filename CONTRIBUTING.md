@@ -14,6 +14,7 @@ A tell is admitted only with evidence, not taste:
 ## Adding a direction row
 
 - Rows are complete packages: colors (hex), fonts with a working import line, radius, shadows, background treatment, one signature element, motion numbers. No field left as an adjective.
+- Accent distribution: no more than 2 rows per 30-degree accent hue band, and no two rows may share both a paper band and an accent hue band unless their saturation classes differ sharply (a candy pink and a deep oxblood are not confusable; two saturated red-oranges are). No two rows share a display font family or superfamily. The deck was rebalanced 2026-07-18 after the owner caught repeated pairings surviving the seed.
 - Verify the Google Fonts import URL answers 200.
 - Check the row against the entire Banned list; a banned pattern may appear only as the row's stated concept.
 - Update every seed modulus if a deck's size changes (`SKILL.md` Step 3b and its no-shell fallback): the moduli must always match deck sizes.

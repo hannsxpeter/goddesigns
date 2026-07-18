@@ -45,9 +45,10 @@ Unfamiliar subject? One quick web search for the domain's own vernacular (tool n
 
 ### 3a. Read the ledger
 
-If `.design-log.json` exists at the project root, read it. Constraints for this run:
+If `.design-log.json` exists at the project root, read it. Also read `~/.design-log.json` (the user-level ledger) if it exists; it tracks runs across ALL projects, because the person reviewing the work sees every project and recognizes repeats the per-project ledger cannot. Constraints for this run, applied against BOTH ledgers' recent entries:
 - The macrostructure must not match any of the last 3 entries.
 - The direction must differ from the previous entry on at least one of: paper band (dark, mid, light), display type class (serif, grotesque, mono, slab, display), accent hue band (warm 10-60, cool 200-300, neutral, other).
+- Additionally, against the user-level ledger only: if the last 2 entries share an accent hue band or a paper band, this run must not make it 3 in a row; advance the offending index until it differs.
 
 State the rotation in plain text: "Last runs: Workbench, Marquee Hero, Letter. Picking from the rest."
 

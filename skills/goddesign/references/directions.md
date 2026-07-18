@@ -24,7 +24,7 @@ Fits: product marketing, agencies, portfolios, docs. Discipline and clarity.
 ## 1. Industrial
 
 Fits: dev tools, infrastructure, hardware, logistics.
-- Colors: bg #12110E, surface #1A1A18, text #E6E6E2, muted #8A8A84, accent #FFB400
+- Colors: bg #12110E, surface #1A1A18, text #E6E6E2, muted #8A8A84, accent #FF4F00 (international safety orange; amber/gold on dark is a flagged tell, do not warm this toward yellow)
 - Type: display Big Shoulders 800 (condensed, uppercase), body IBM Plex Sans 400, numerals JetBrains Mono 500
 - Import: `https://fonts.googleapis.com/css2?family=Big+Shoulders:opsz,wght@10..72,800&family=IBM+Plex+Sans:wght@400;600&family=JetBrains+Mono:wght@500&display=swap`
 - Radius: 2px. Borders: 1px #2A2A26. Shadows: none.
@@ -35,9 +35,9 @@ Fits: dev tools, infrastructure, hardware, logistics.
 ## 2. Brutalist Raw
 
 Fits: statement sites, studios, events, personal sites.
-- Colors: bg #F2EFE9, surface #E7E2D8, text #151410, muted #5C5952, accent #EA431E
-- Type: display Archivo Black 400 at enormous sizes (12-20vw allowed, crop at container edges), body Libre Franklin 400, labels Libre Franklin 600 uppercase +8% tracking
-- Import: `https://fonts.googleapis.com/css2?family=Archivo+Black&family=Libre+Franklin:wght@400;600&display=swap`
+- Colors: bg #F2EFE9, surface #E7E2D8, text #151410, muted #5C5952, accent #D8008F (magenta; the red-orange it replaced collided with Swiss, do not drift back warm)
+- Type: display Syne 800 at enormous sizes (12-20vw allowed, crop at container edges), body Libre Franklin 400, labels Libre Franklin 600 uppercase +8% tracking
+- Import: `https://fonts.googleapis.com/css2?family=Syne:wght@800&family=Libre+Franklin:wght@400;600&display=swap`
 - Radius: 0. Borders: 2px solid #151410. Shadow: hard offset `4px 4px 0 #151410`, no blur.
 - Background: solid. Let type collide with edges and section boundaries on purpose.
 - Signature: one element that crosses a section boundary (a word, an image, a rule).
@@ -112,7 +112,7 @@ Fits: dashboards, analytics, trading, internal tools. Dense spacing scale.
 ## 9. Cinematic Dark
 
 Fits: film, photography, luxury tech, portfolio.
-- Colors: bg #0B0B0F, surface #14141C, text #EAE8E4, muted #8F8D96, accent #E63946
+- Colors: bg #0B0B0F, surface #14141C, text #EAE8E4, muted #8F8D96, accent #38B6FF (ice; the crimson it replaced clustered with Editorial and Playful, do not drift back red)
 - Type: display Cormorant Garamond 600 at large sizes only (56px+), body Public Sans 400, labels Public Sans 600 uppercase +10% tracking
 - Import: `https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=Public+Sans:wght@400;600&display=swap`
 - Radius: 8px. Shadows: soft layered, hue-tinted toward bg.
@@ -167,7 +167,7 @@ Fits: events, restaurants, bars, boutique brands.
 ## 14. Neobrutalist Web
 
 Fits: SaaS with attitude, indie tools, portfolios. Chosen deliberately, never as a reflex.
-- Colors: bg #F5F5F0, surface #FCFCF9, text #141310, muted #55555A, accent #4D61FC, secondary #FFDD33
+- Colors: bg #F5F5F0, surface #FCFCF9, text #141310, muted #55555A, accent #00D26A (green; the ultramarine it replaced twinned with Neo-Grotesque Poster), secondary #FFDD33
 - Type: display Darker Grotesque 800, body Jost 400, labels Jost 600 uppercase +8% tracking
 - Import: `https://fonts.googleapis.com/css2?family=Darker+Grotesque:wght@800&family=Jost:wght@400;600&display=swap`
 - Radius: 10px everywhere. Border: 3px solid #141310. Shadow: `5px 5px 0 #141310`.
