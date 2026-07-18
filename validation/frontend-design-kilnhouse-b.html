@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kilnhouse - Studio management for ceramics studios</title>
+<meta name="description" content="Kilnhouse runs class scheduling, the kiln firing queue, and member billing for ceramics studios, so the only thing you shape by hand is clay.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Schibsted+Grotesk:ital,wght@0,400;0,500;0,700;1,400&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --porcelain:#F4F4EE;
+    --porcelain-2:#ECEDE4;
+    --card:#FCFCF8;
+    --ink:#191A20;
+    --ink-soft:#50525C;
+    --ink-faint:#8B8D96;
+    --cobalt:#2440C0;
+    --cobalt-deep:#182A82;
+    --cobalt-wash:#E3E7F9;
+    --ember:#D9481F;
+    --ember-wash:#F9E4DB;
+    --celadon:#5E7D63;
+    --celadon-wash:#E2EAE0;
+    --line:#D9DACE;
+    --line-strong:#B9BAAE;
+    --serif:"Young Serif", Georgia, "Times New Roman", serif;
+    --sans:"Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+    --mono:"Spline Sans Mono", "SF Mono", Menlo, monospace;
+    --radius:16px;
+    --shadow-soft:0 1px 2px rgba(25,26,32,.06), 0 8px 28px rgba(25,26,32,.09);
+    --shadow-lift:0 2px 4px rgba(25,26,32,.08), 0 18px 48px rgba(24,42,130,.16);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:var(--sans);
+    background:var(--porcelain);
+    color:var(--ink);
+    line-height:1.6;
+    font-size:17px;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  /* iron-speckle grain over the whole page, like speckled porcelain */
+  body::after{
+    content:"";
+    position:fixed;
+    inset:0;
+    z-index:60;
+    pointer-events:none;
+    opacity:.30;
+    mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.35 0 0 0 0 0.35 0 0 0 0 0.33 0 0 0 0.55 0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)' opacity='0.16'/%3E%3C/svg%3E");
+  }
+  ::selection{background:var(--cobalt);color:var(--porcelain);}
+  a{color:inherit;text-decoration:none;}
+  img,svg{display:block;max-width:100%;}
+  :focus-visible{outline:2px solid var(--cobalt);outline-offset:3px;border-radius:4px;}
+
+  .wrap{width:min(1160px, calc(100% - 48px));margin-inline:auto;}
+
+  /* ---------- type ---------- */
+  h1,h2,h3,.display{font-family:var(--serif);font-weight:400;line-height:1.08;letter-spacing:-0.01em;}
+  .kicker{
+    display:inline-flex;align-items:center;gap:10px;
+    font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--cobalt);
+  }
+  .kicker svg{flex:none;}
+  .lede{color:var(--ink-soft);font-size:19px;line-height:1.65;}
+  .mono{font-family:var(--mono);font-feature-settings:"tnum";}
+
+  /* ---------- buttons ---------- */
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:9px;
+    padding:13px 26px;border-radius:999px;
+    font-family:var(--sans);font-weight:700;font-size:16px;line-height:1;
+    border:1px solid transparent;cursor:pointer;
+    transition:transform .18s ease, box-shadow .18s ease, background .18s ease, color .18s ease;
+  }
+  .btn-primary{background:var(--cobalt);color:var(--porcelain);box-shadow:0 2px 0 var(--cobalt-deep), 0 10px 26px rgba(36,64,192,.28);}
+  .btn-primary:hover{background:var(--cobalt-deep);transform:translateY(-2px);box-shadow:0 4px 0 #101c5c, 0 16px 34px rgba(36,64,192,.32);}
+  .btn-primary:active{transform:translateY(0);box-shadow:0 1px 0 var(--cobalt-deep);}
+  .btn-ghost{background:transparent;color:var(--ink);border-color:var(--line-strong);}
+  .btn-ghost:hover{border-color:var(--ink);transform:translateY(-2px);}
+  .btn-light{background:var(--porcelain);color:var(--cobalt-deep);box-shadow:0 2px 0 rgba(0,0,0,.25);}
+  .btn-light:hover{transform:translateY(-2px);background:#fff;}
+  .arrow{transition:transform .18s ease;}
+  .btn:hover .arrow, .textlink:hover .arrow{transform:translateX(4px);}
+  .textlink{display:inline-flex;align-items:center;gap:8px;font-weight:700;color:var(--cobalt);border-bottom:1px solid transparent;}
+  .textlink:hover{border-bottom-color:var(--cobalt);}
+
+  /* ---------- nav ---------- */
+  header.nav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(244,244,238,.86);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line);
+    transition:box-shadow .25s ease;
+  }
+  header.nav.scrolled{box-shadow:0 6px 24px rgba(25,26,32,.08);}
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:24px;height:72px;}
+  .brand{display:flex;align-items:center;gap:11px;font-family:var(--serif);font-size:23px;letter-spacing:-.01em;}
+  .brand-mark{width:34px;height:34px;border-radius:9px;background:var(--cobalt);display:grid;place-items:center;box-shadow:0 2px 0 var(--cobalt-deep);}
+  .nav-links{display:flex;align-items:center;gap:30px;font-size:15.5px;font-weight:500;}
+  .nav-links a{color:var(--ink-soft);position:relative;padding:4px 0;}
+  .nav-links a::after{content:"";position:absolute;left:0;right:100%;bottom:0;height:2px;background:var(--cobalt);transition:right .2s ease;}
+  .nav-links a:hover{color:var(--ink);}
+  .nav-links a:hover::after{right:0;}
+  .nav-cta{display:flex;align-items:center;gap:18px;}
+  .nav-cta .signin{font-weight:700;font-size:15.5px;color:var(--ink-soft);}
+  .nav-cta .signin:hover{color:var(--ink);}
+  .nav-cta .btn{padding:10px 20px;font-size:15px;}
+
+  /* ---------- hero ---------- */
+  .hero{position:relative;padding:84px 0 64px;overflow:visible;}
+  .hero::before{
+    content:"";position:absolute;inset:-72px 0 auto 0;height:640px;z-index:-1;
+    background:
+      radial-gradient(720px 420px at 78% 18%, rgba(36,64,192,.10), transparent 66%),
+      radial-gradient(560px 380px at 8% 78%, rgba(217,72,31,.06), transparent 70%);
+  }
+  .hero-grid{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,6fr);gap:56px;align-items:center;}
+  .hero h1{font-size:clamp(2.8rem, 5.4vw, 4.55rem);margin:22px 0 20px;}
+  .hero h1 .glaze{color:var(--cobalt);position:relative;white-space:nowrap;}
+  .hero h1 .glaze svg{position:absolute;left:0;right:0;bottom:-.14em;width:100%;height:.32em;overflow:visible;}
+  .hero .lede{max-width:34rem;}
+  .hero-ctas{display:flex;align-items:center;flex-wrap:wrap;gap:16px;margin:32px 0 14px;}
+  .hero-note{font-size:14.5px;color:var(--ink-faint);}
+  .hero-note .mono{font-size:13px;}
+
+  /* hero card stack */
+  .stack{position:relative;min-height:520px;}
+  .panel{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow-soft);
+  }
+  .stack .panel{position:absolute;}
+  .kiln-card{top:0;right:0;left:34px;padding:22px 22px 18px;box-shadow:var(--shadow-lift);z-index:3;}
+  .kiln-card:hover{transform:translateY(-3px);transition:transform .25s ease;}
+  .panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px;}
+  .panel-title{font-weight:700;font-size:15.5px;}
+  .panel-sub{font-size:13px;color:var(--ink-faint);}
+  .pill{
+    display:inline-flex;align-items:center;gap:7px;
+    font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+    padding:5px 11px;border-radius:999px;
+  }
+  .pill-firing{background:var(--ember-wash);color:var(--ember);}
+  .pill-ready{background:var(--cobalt-wash);color:var(--cobalt-deep);}
+  .pill-cool{background:var(--celadon-wash);color:var(--celadon);}
+  .pill-queued{background:var(--porcelain-2);color:var(--ink-soft);}
+  .dot{width:7px;height:7px;border-radius:50%;background:currentColor;}
+  .dot.pulse{animation:pulse 1.6s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.35;transform:scale(.72);}}
+  .temp-row{display:flex;align-items:baseline;gap:14px;margin:8px 0 4px;}
+  .temp-big{font-family:var(--mono);font-size:44px;font-weight:500;letter-spacing:-.02em;line-height:1;}
+  .temp-meta{font-size:13.5px;color:var(--ink-soft);}
+  .curve-wrap{margin:8px -4px 2px;}
+  .kiln-next{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    border-top:1px dashed var(--line-strong);margin-top:12px;padding-top:12px;
+    font-size:13.5px;color:var(--ink-soft);
+  }
+  .kiln-next strong{color:var(--ink);font-weight:700;}
+
+  .class-card{bottom:66px;left:0;width:min(300px,78%);padding:18px;z-index:4;}
+  .cap-bar{height:8px;border-radius:99px;background:var(--porcelain-2);overflow:hidden;margin:12px 0 8px;}
+  .cap-fill{height:100%;width:90%;border-radius:99px;background:linear-gradient(90deg,var(--cobalt),var(--cobalt-deep));}
+  .cap-meta{display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink-faint);}
+  .cap-meta b{color:var(--cobalt-deep);}
+
+  .pay-chip{
+    bottom:0;right:10px;z-index:2;
+    display:flex;align-items:center;gap:12px;
+    padding:14px 18px;border-radius:14px;
+  }
+  .pay-icon{width:36px;height:36px;border-radius:10px;background:var(--celadon-wash);display:grid;place-items:center;color:var(--celadon);flex:none;}
+  .pay-chip .amt{font-family:var(--mono);font-weight:500;font-size:16px;}
+  .pay-chip .lbl{font-size:12px;color:var(--ink-faint);line-height:1.35;}
+
+  /* floating animation for stack, disabled on reduced motion */
+  .float-a{animation:float 7s ease-in-out infinite;}
+  .float-b{animation:float 8.5s ease-in-out 1.2s infinite;}
+  @keyframes float{0%,100%{translate:0 0;}50%{translate:0 -8px;}}
+
+  /* ---------- ticker ---------- */
+  .ticker{
+    border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+    background:var(--porcelain-2);
+    overflow:hidden;white-space:nowrap;
+    padding:11px 0;
+  }
+  .ticker-track{display:inline-flex;gap:0;animation:ticker 46s linear infinite;}
+  .ticker:hover .ticker-track{animation-play-state:paused;}
+  @keyframes ticker{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+  .ticker span{font-family:var(--mono);font-size:12.5px;letter-spacing:.04em;color:var(--ink-soft);padding:0 26px;position:relative;}
+  .ticker span::after{content:"";position:absolute;right:-3px;top:50%;width:5px;height:5px;border-radius:50%;background:var(--line-strong);transform:translateY(-50%);}
+  .ticker b{color:var(--cobalt);font-weight:500;}
+  .ticker i{color:var(--ember);font-style:normal;}
+
+  /* ---------- stats ---------- */
+  .stats{padding:56px 0 8px;}
+  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-inline:1px solid var(--line);}
+  .stat{padding:8px 28px;border-left:1px solid var(--line);}
+  .stat:first-child{border-left:none;}
+  .stat .n{font-family:var(--serif);font-size:clamp(1.7rem,2.6vw,2.4rem);color:var(--ink);line-height:1.15;}
+  .stat .n em{font-style:normal;color:var(--cobalt);}
+  .stat .d{font-size:13.5px;color:var(--ink-faint);margin-top:6px;line-height:1.45;}
+
+  /* ---------- features ---------- */
+  .feature{padding:104px 0 0;}
+  .feature:last-of-type{padding-bottom:20px;}
+  .feature-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:64px;align-items:center;}
+  .feature-grid.flip .feature-copy{order:2;}
+  .feature h2{font-size:clamp(1.9rem,3.4vw,2.75rem);margin:18px 0 16px;}
+  .feature p{color:var(--ink-soft);max-width:32rem;}
+  .checks{list-style:none;margin:22px 0 26px;display:grid;gap:12px;}
+  .checks li{display:flex;gap:12px;align-items:flex-start;font-size:16px;color:var(--ink);}
+  .checks svg{flex:none;margin-top:4px;}
+  .checks small{display:block;color:var(--ink-faint);font-size:13.5px;line-height:1.5;}
+
+  .feature-panel{padding:24px;position:relative;}
+  .feature-panel .panel-head{margin-bottom:16px;}
+
+  /* week grid */
+  .week{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+  .day{display:flex;flex-direction:column;gap:8px;min-height:290px;}
+  .day-h{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);text-align:center;padding-bottom:6px;border-bottom:1px solid var(--line);}
+  .slot{
+    border-radius:10px;padding:9px 10px;font-size:12px;line-height:1.4;
+    border:1px solid transparent;
+    transition:transform .18s ease, box-shadow .18s ease;
+  }
+  .slot:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(25,26,32,.10);}
+  .slot b{display:block;font-size:12.5px;}
+  .slot .t{font-family:var(--mono);font-size:10.5px;opacity:.75;}
+  .slot-cobalt{background:var(--cobalt-wash);border-color:#C9D1F2;color:var(--cobalt-deep);}
+  .slot-ember{background:var(--ember-wash);border-color:#EFCDBF;color:#98351A;}
+  .slot-celadon{background:var(--celadon-wash);border-color:#C9D8C7;color:#3E5C44;}
+  .slot-ink{background:var(--porcelain-2);border-color:var(--line);color:var(--ink-soft);}
+  .tag{display:inline-block;margin-top:5px;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;background:#fff;border-radius:99px;padding:2px 8px;}
+  .tag-wait{color:var(--ember);}
+  .tag-full{color:var(--cobalt-deep);}
+  .tag-open{color:var(--celadon);}
+
+  /* firing queue table */
+  .queue{display:flex;flex-direction:column;}
+  .q-row{
+    display:grid;grid-template-columns:minmax(0,2.2fr) 78px minmax(0,1.6fr) 110px;
+    gap:14px;align-items:center;
+    padding:13px 6px;border-top:1px solid var(--line);
+    font-size:14px;
+    transition:background .15s ease;
+  }
+  .q-row:hover{background:var(--porcelain-2);}
+  .q-row:first-of-type{border-top:none;}
+  .q-name b{display:block;font-size:14.5px;}
+  .q-name span{font-size:12.5px;color:var(--ink-faint);}
+  .q-cone{font-family:var(--mono);font-size:13px;color:var(--ink-soft);}
+  .shelf{display:flex;align-items:center;gap:10px;}
+  .shelf-bar{flex:1;height:7px;border-radius:99px;background:var(--porcelain-2);overflow:hidden;}
+  .shelf-fill{height:100%;border-radius:99px;background:var(--cobalt);}
+  .shelf small{font-family:var(--mono);font-size:11px;color:var(--ink-faint);white-space:nowrap;}
+  .q-row .pill{justify-self:end;}
+  .q-foot{display:flex;align-items:center;gap:9px;border-top:1px dashed var(--line-strong);margin-top:4px;padding-top:14px;font-size:13px;color:var(--ink-soft);}
+
+  /* billing statement */
+  .statement{max-width:430px;margin-inline:auto;}
+  .st-lines{list-style:none;margin:14px 0 0;}
+  .st-lines li{display:flex;justify-content:space-between;gap:16px;padding:11px 2px;border-top:1px solid var(--line);font-size:14.5px;}
+  .st-lines li:first-child{border-top:none;}
+  .st-lines .desc small{display:block;color:var(--ink-faint);font-size:12px;}
+  .st-lines .amt{font-family:var(--mono);font-size:14px;white-space:nowrap;}
+  .st-total{display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ink);margin-top:4px;padding-top:14px;}
+  .st-total b{font-size:15px;}
+  .st-total .amt{font-family:var(--mono);font-size:22px;font-weight:500;}
+  .st-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;}
+  .st-chip{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:500;padding:6px 12px;border-radius:99px;border:1px solid var(--line);background:var(--porcelain);color:var(--ink-soft);}
+  .st-chip.good{border-color:#C9D8C7;background:var(--celadon-wash);color:#3E5C44;}
+  .st-chip.warn{border-color:#EFCDBF;background:var(--ember-wash);color:#98351A;}
+
+  /* ---------- band quote ---------- */
+  .band{margin-top:110px;background:var(--ink);color:var(--porcelain);padding:88px 0;position:relative;overflow:hidden;}
+  .band::before{
+    content:"";position:absolute;inset:0;
+    background:radial-gradient(640px 340px at 84% 30%, rgba(36,64,192,.4), transparent 68%),
+               radial-gradient(480px 300px at 10% 90%, rgba(217,72,31,.22), transparent 70%);
+    pointer-events:none;
+  }
+  .band blockquote{position:relative;font-family:var(--serif);font-size:clamp(1.5rem,3vw,2.3rem);line-height:1.3;max-width:19em;}
+  .band blockquote .q{color:#8FA2F2;}
+  .band figcaption{position:relative;margin-top:26px;font-size:15px;color:#A7A9B4;}
+  .band figcaption b{color:var(--porcelain);font-weight:700;display:block;}
+
+  /* ---------- pricing ---------- */
+  .pricing{padding:110px 0 40px;}
+  .pricing-head{max-width:44rem;margin-bottom:52px;}
+  .pricing-head h2{font-size:clamp(2rem,3.8vw,3rem);margin:18px 0 16px;}
+  .tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;align-items:stretch;}
+  .tier{
+    position:relative;display:flex;flex-direction:column;
+    padding:30px 28px;border-radius:20px;
+    background:var(--card);border:1px solid var(--line);
+    box-shadow:var(--shadow-soft);
+    transition:transform .22s ease, box-shadow .22s ease;
+  }
+  .tier:hover{transform:translateY(-6px);box-shadow:var(--shadow-lift);}
+  .tier-name{font-family:var(--serif);font-size:24px;}
+  .tier-tag{font-size:13.5px;color:var(--ink-faint);margin-top:4px;}
+  .price{display:flex;align-items:baseline;gap:6px;margin:22px 0 4px;}
+  .price .n{font-family:var(--serif);font-size:46px;line-height:1;}
+  .price .per{font-size:14px;color:var(--ink-faint);}
+  .tier-list{list-style:none;margin:20px 0 26px;display:grid;gap:11px;flex:1;}
+  .tier-list li{display:flex;gap:10px;align-items:flex-start;font-size:15px;color:var(--ink-soft);}
+  .tier-list svg{flex:none;margin-top:4px;}
+  .tier .btn{width:100%;}
+  .tier-mid{
+    background:var(--cobalt);border-color:var(--cobalt-deep);color:var(--porcelain);
+    box-shadow:0 3px 0 var(--cobalt-deep), 0 24px 56px rgba(36,64,192,.35);
+    transform:translateY(-10px);
+  }
+  .tier-mid:hover{transform:translateY(-16px);box-shadow:0 4px 0 var(--cobalt-deep), 0 30px 64px rgba(36,64,192,.4);}
+  .tier-mid .tier-tag,.tier-mid .price .per,.tier-mid .tier-list li{color:#C6CFF6;}
+  .tier-badge{
+    position:absolute;top:-13px;left:50%;transform:translateX(-50%);
+    background:var(--ember);color:#fff;
+    font-size:11px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;
+    padding:6px 14px;border-radius:99px;white-space:nowrap;
+    box-shadow:0 4px 12px rgba(217,72,31,.4);
+  }
+  .pricing-foot{margin-top:34px;text-align:center;font-size:14.5px;color:var(--ink-faint);}
+  .pricing-foot b{color:var(--ink-soft);}
+
+  /* ---------- footer ---------- */
+  footer{margin-top:100px;background:var(--ink);color:#A7A9B4;position:relative;overflow:hidden;}
+  footer::before{content:"";position:absolute;inset:0;background:radial-gradient(560px 300px at 12% 0%, rgba(36,64,192,.28), transparent 70%);pointer-events:none;}
+  .foot-inner{position:relative;padding:72px 0 0;}
+  .foot-grid{display:grid;grid-template-columns:minmax(0,5fr) repeat(3,minmax(0,2fr));gap:44px;padding-bottom:56px;}
+  .foot-brand .brand{color:var(--porcelain);font-size:26px;}
+  .foot-brand p{margin-top:16px;font-size:14.5px;max-width:24rem;line-height:1.65;}
+  .foot-col h4{font-size:12.5px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:#6E7080;margin-bottom:16px;}
+  .foot-col ul{list-style:none;display:grid;gap:10px;font-size:15px;}
+  .foot-col a{color:#C2C4CD;transition:color .15s ease;}
+  .foot-col a:hover{color:var(--porcelain);}
+  .foot-word{position:relative;font-family:var(--serif);font-size:clamp(4rem,13vw,10.5rem);line-height:.85;color:transparent;-webkit-text-stroke:1px #3A3C48;text-align:center;user-select:none;pointer-events:none;translate:0 18%;}
+  .foot-bottom{position:relative;display:flex;flex-wrap:wrap;gap:14px 28px;align-items:center;justify-content:space-between;border-top:1px solid #2A2C36;padding:22px 0 26px;font-size:13px;color:#6E7080;}
+  .foot-bottom .sweep{font-style:italic;}
+
+  /* ---------- reveal on scroll ---------- */
+  .reveal{opacity:0;transform:translateY(26px);transition:opacity .7s cubic-bezier(.2,.65,.25,1), transform .7s cubic-bezier(.2,.65,.25,1);}
+  .reveal.in{opacity:1;transform:none;}
+  .reveal[data-delay="1"]{transition-delay:.08s;}
+  .reveal[data-delay="2"]{transition-delay:.16s;}
+  .reveal[data-delay="3"]{transition-delay:.24s;}
+  .reveal[data-delay="4"]{transition-delay:.32s;}
+
+  /* hero load-in */
+  .rise{opacity:0;transform:translateY(24px);animation:rise .8s cubic-bezier(.2,.65,.25,1) forwards;}
+  .rise.d1{animation-delay:.05s;}.rise.d2{animation-delay:.15s;}.rise.d3{animation-delay:.25s;}
+  .rise.d4{animation-delay:.35s;}.rise.d5{animation-delay:.5s;}
+  @keyframes rise{to{opacity:1;transform:none;}}
+
+  /* curve draw */
+  .draw path.animatable{stroke-dasharray:1;stroke-dashoffset:1;}
+  .draw.in path.animatable{animation:draw 2.2s cubic-bezier(.4,0,.25,1) forwards;}
+  @keyframes draw{to{stroke-dashoffset:0;}}
+
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    .rise,.reveal{opacity:1;transform:none;animation:none;transition:none;}
+    .float-a,.float-b,.dot.pulse,.ticker-track{animation:none;}
+    .draw path.animatable{stroke-dasharray:none;stroke-dashoffset:0;}
+  }
+
+  /* ---------- responsive ---------- */
+  @media (max-width:1020px){
+    .hero-grid{grid-template-columns:1fr;gap:64px;}
+    .stack{min-height:500px;max-width:620px;margin-inline:auto;width:100%;}
+    .feature-grid{grid-template-columns:1fr;gap:40px;}
+    .feature-grid.flip .feature-copy{order:0;}
+    .stats-grid{grid-template-columns:repeat(2,1fr);border:none;row-gap:34px;}
+    .stat{border-left:none;padding-inline:0 20px;}
+    .foot-grid{grid-template-columns:1fr 1fr;}
+    .foot-brand{grid-column:1/-1;}
+  }
+  @media (max-width:700px){
+    body{font-size:16px;}
+    .nav-links{display:none;}
+    .hero{padding-top:56px;}
+    .tiers{grid-template-columns:1fr;}
+    .tier-mid{transform:none;}
+    .tier-mid:hover{transform:translateY(-6px);}
+    .q-row{grid-template-columns:minmax(0,2fr) 90px;}
+    .q-row .shelf{display:none;}
+    .week{grid-template-columns:repeat(3,1fr);}
+    .day:nth-child(n+4){display:none;}
+    .stats-grid{grid-template-columns:1fr 1fr;}
+    .class-card{bottom:40px;}
+    .pay-chip{right:0;}
+    .foot-grid{grid-template-columns:1fr;gap:34px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<header class="nav" id="top">
+  <div class="wrap nav-inner">
+    <a class="brand" href="#top" aria-label="Kilnhouse home">
+      <span class="brand-mark" aria-hidden="true">
+        <!-- pyrometric cone mark -->
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M10.6 2.2 L14.2 15 H4.4 Z" fill="#F4F4EE" transform="rotate(8 9 9)"/>
+        </svg>
+      </span>
+      Kilnhouse
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#scheduling">Scheduling</a>
+      <a href="#firing">Firing queue</a>
+      <a href="#billing">Billing</a>
+      <a href="#pricing">Pricing</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="signin" href="#pricing">Sign in</a>
+      <a class="btn btn-primary" href="#pricing">Start free</a>
+    </div>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="kicker rise d1">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+          <path d="M7.6 1.4 L10.6 11.4 H3 Z" fill="currentColor" transform="rotate(8 6.5 6.5)"/>
+        </svg>
+        Studio management for ceramics studios
+      </span>
+      <h1 class="rise d2">Everything but <span class="glaze">the throwing.
+        <svg viewBox="0 0 300 24" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M4 14 C 60 4, 120 22, 180 12 S 280 8, 296 14" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" opacity=".45"/>
+        </svg></span>
+      </h1>
+      <p class="lede rise d3">Kilnhouse runs the class roster, the firing queue, and member billing in one place, so the only thing your studio shapes by hand is clay.</p>
+      <div class="hero-ctas rise d4">
+        <a class="btn btn-primary" href="#pricing">Start your free month
+          <svg class="arrow" width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M2 7.5h10M8.5 3.5l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a class="btn btn-ghost" href="#firing">See the firing queue</a>
+      </div>
+      <p class="hero-note rise d4">No card required. Most studios are set up before the bisque cools.</p>
+    </div>
+
+    <!-- live studio stack -->
+    <div class="stack rise d5" aria-hidden="false">
+      <article class="panel kiln-card float-a" aria-label="Live kiln status example">
+        <div class="panel-head">
+          <div>
+            <div class="panel-title">Kiln 2 &middot; Skutt KM-1027</div>
+            <div class="panel-sub">Cone 6 glaze &middot; program: Slow Glaze 6</div>
+          </div>
+          <span class="pill pill-firing"><span class="dot pulse" aria-hidden="true"></span>Firing</span>
+        </div>
+        <div class="temp-row">
+          <span class="temp-big" id="tempReadout">1846&deg;F</span>
+          <span class="temp-meta">rising &middot; ramp 3 of 4<br>est. done <b>9:40 pm</b></span>
+        </div>
+        <div class="curve-wrap">
+          <svg class="draw" id="fireCurve" viewBox="0 0 520 190" role="img" aria-label="Firing curve, currently at 1846 degrees Fahrenheit on ramp 3 of 4">
+            <!-- grid -->
+            <g stroke="#E4E5DB" stroke-width="1">
+              <line x1="34" y1="30" x2="512" y2="30"/>
+              <line x1="34" y1="75" x2="512" y2="75"/>
+              <line x1="34" y1="120" x2="512" y2="120"/>
+              <line x1="34" y1="165" x2="512" y2="165"/>
+            </g>
+            <g font-family="Spline Sans Mono, monospace" font-size="9.5" fill="#8B8D96">
+              <text x="2" y="33">2200&deg;</text>
+              <text x="2" y="78">1500&deg;</text>
+              <text x="8" y="123">800&deg;</text>
+              <text x="8" y="168">100&deg;</text>
+            </g>
+            <!-- projected remainder -->
+            <path d="M330 52 C 360 44, 388 40, 420 39 L 452 39 C 478 60, 494 108, 506 158"
+                  fill="none" stroke="#B9BAAE" stroke-width="2" stroke-dasharray="3 6" stroke-linecap="round"/>
+            <!-- fired-so-far area -->
+            <path d="M34 164 C 70 160, 92 152, 116 138 C 150 118, 168 118, 196 106 C 232 90, 260 72, 296 60 C 308 56, 320 54, 330 52 L 330 165 L 34 165 Z"
+                  fill="rgba(36,64,192,.10)" stroke="none"/>
+            <!-- fired-so-far line -->
+            <path class="animatable" pathLength="1"
+                  d="M34 164 C 70 160, 92 152, 116 138 C 150 118, 168 118, 196 106 C 232 90, 260 72, 296 60 C 308 56, 320 54, 330 52"
+                  fill="none" stroke="#2440C0" stroke-width="2.6" stroke-linecap="round"/>
+            <!-- hold annotation -->
+            <g font-family="Spline Sans Mono, monospace" font-size="9.5" fill="#8B8D96">
+              <text x="410" y="30">hold 15m</text>
+              <text x="120" y="152">candle 2h</text>
+            </g>
+            <!-- current point -->
+            <circle cx="330" cy="52" r="9" fill="rgba(217,72,31,.18)">
+              <animate attributeName="r" values="6;11;6" dur="2s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="330" cy="52" r="4" fill="#D9481F"/>
+          </svg>
+        </div>
+        <div class="kiln-next">
+          <span>Next up: <strong>Bisque 04</strong> &middot; Sat 7:00 am &middot; 12 shelves claimed</span>
+          <span class="mono" style="font-size:12px;color:var(--ink-faint);">queue: 4</span>
+        </div>
+      </article>
+
+      <article class="panel class-card float-b" aria-label="Class enrollment example">
+        <div class="panel-head" style="margin-bottom:0;">
+          <div>
+            <div class="panel-title">Wheel Throwing II</div>
+            <div class="panel-sub">Tue 6:30 pm &middot; Marisol O.</div>
+          </div>
+        </div>
+        <div class="cap-bar" role="img" aria-label="9 of 10 seats filled"><div class="cap-fill"></div></div>
+        <div class="cap-meta"><span><b>9 / 10</b> enrolled</span><span>Waitlist: 4</span></div>
+      </article>
+
+      <article class="panel pay-chip" aria-label="Autopay summary example">
+        <span class="pay-icon" aria-hidden="true">
+          <svg width="17" height="17" viewBox="0 0 17 17" fill="none"><path d="M2.5 8.5l4 4 8-8.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <span>
+          <span class="amt">$4,210 collected</span><br>
+          <span class="lbl">Autopay ran overnight &middot; 2 cards retried, both cleared</span>
+        </span>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TICKER ============ -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track">
+    <span><b>KILN 1</b> cone 06 bisque, tonight 9:00 pm</span>
+    <span><i>KILN 2</i> firing now, 1846&deg;F rising</span>
+    <span><b>KILN 3</b> cooling, unload est. 2:15 pm</span>
+    <span>WHEEL THROWING II waitlist moved: 2 seats filled</span>
+    <span>RAKU SATURDAY 14 of 16 enrolled</span>
+    <span>AUTOPAY 128 memberships collected</span>
+    <span>SHELF REQUESTS 31 pieces queued for cone 6</span>
+    <span><b>KILN 1</b> cone 06 bisque, tonight 9:00 pm</span>
+    <span><i>KILN 2</i> firing now, 1846&deg;F rising</span>
+    <span><b>KILN 3</b> cooling, unload est. 2:15 pm</span>
+    <span>WHEEL THROWING II waitlist moved: 2 seats filled</span>
+    <span>RAKU SATURDAY 14 of 16 enrolled</span>
+    <span>AUTOPAY 128 memberships collected</span>
+    <span>SHELF REQUESTS 31 pieces queued for cone 6</span>
+  </div>
+</div>
+
+<!-- ============ STATS ============ -->
+<section class="stats">
+  <div class="wrap">
+    <div class="stats-grid">
+      <div class="stat reveal"><div class="n">140<em>+</em></div><div class="d">community and teaching studios run on Kilnhouse</div></div>
+      <div class="stat reveal" data-delay="1"><div class="n">38,214</div><div class="d">firings logged, every one with cone, load, and owner</div></div>
+      <div class="stat reveal" data-delay="2"><div class="n"><em>0</em></div><div class="d">double-booked kilns since we shipped the queue in 2023</div></div>
+      <div class="stat reveal" data-delay="3"><div class="n">96<em>%</em></div><div class="d">fewer "is my mug out yet" texts, by studio owner report</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FEATURE 1: SCHEDULING ============ -->
+<section class="feature" id="scheduling">
+  <div class="wrap feature-grid">
+    <div class="feature-copy reveal">
+      <span class="kicker">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><path d="M7.6 1.4 L10.6 11.4 H3 Z" fill="currentColor" transform="rotate(8 6.5 6.5)"/></svg>
+        Class scheduling
+      </span>
+      <h2>Classes that fill themselves.</h2>
+      <p>Publish a session and Kilnhouse handles the rest: enrollment, deposits, reminders, and the waitlist that quietly promotes people the moment a seat opens. Instructors see their roster; you see the whole term.</p>
+      <ul class="checks">
+        <li>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="7.2" fill="#E3E7F9"/><path d="M4.6 8.2l2.3 2.3 4.5-4.8" stroke="#2440C0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Waitlists that actually move<small>Open seat at 4:12 pm, next person offered by 4:13, paid by dinner.</small></span>
+        </li>
+        <li>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="7.2" fill="#E3E7F9"/><path d="M4.6 8.2l2.3 2.3 4.5-4.8" stroke="#2440C0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Instructor pay splits, computed<small>Per-head, flat rate, or percentage. Payout report at term end.</small></span>
+        </li>
+        <li>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="7.2" fill="#E3E7F9"/><path d="M4.6 8.2l2.3 2.3 4.5-4.8" stroke="#2440C0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Open studio hours, capped and counted<small>Members book benches like classes. No more Saturday crush.</small></span>
+        </li>
+      </ul>
+      <a class="textlink" href="#pricing">Explore scheduling
+        <svg class="arrow" width="14" height="14" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M2 7.5h10M8.5 3.5l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+
+    <article class="panel feature-panel reveal" data-delay="1" aria-label="Weekly schedule example">
+      <div class="panel-head">
+        <div>
+          <div class="panel-title">This week at Mudroom Collective</div>
+          <div class="panel-sub">Spring term, week 6 of 8</div>
+        </div>
+        <span class="pill pill-ready">214 seats filled</span>
+      </div>
+      <div class="week">
+        <div class="day">
+          <div class="day-h">Mon</div>
+          <div class="slot slot-cobalt"><b>Handbuilding I</b><span class="t">10:00a &middot; Ruth</span><span class="tag tag-full">Full</span></div>
+          <div class="slot slot-ink"><b>Open studio</b><span class="t">1:00 - 5:00p</span><span class="tag tag-open">11 benches</span></div>
+          <div class="slot slot-cobalt"><b>Wheel I</b><span class="t">6:30p &middot; Sam</span></div>
+        </div>
+        <div class="day">
+          <div class="day-h">Tue</div>
+          <div class="slot slot-ember"><b>Kids Clay Club</b><span class="t">4:00p &middot; Dana</span></div>
+          <div class="slot slot-cobalt"><b>Wheel II</b><span class="t">6:30p &middot; Marisol</span><span class="tag tag-wait">Waitlist 4</span></div>
+        </div>
+        <div class="day">
+          <div class="day-h">Wed</div>
+          <div class="slot slot-ink"><b>Open studio</b><span class="t">10:00a - 9:00p</span><span class="tag tag-open">6 benches</span></div>
+          <div class="slot slot-celadon"><b>Glaze Chemistry</b><span class="t">7:00p &middot; Priya</span></div>
+        </div>
+        <div class="day">
+          <div class="day-h">Thu</div>
+          <div class="slot slot-cobalt"><b>Wheel I</b><span class="t">10:00a &middot; Sam</span></div>
+          <div class="slot slot-ember"><b>Date Night Throw</b><span class="t">7:30p &middot; Marisol</span><span class="tag tag-full">Full</span></div>
+        </div>
+        <div class="day">
+          <div class="day-h">Sat</div>
+          <div class="slot slot-celadon"><b>Raku Saturday</b><span class="t">9:00a &middot; yard kiln</span></div>
+          <div class="slot slot-cobalt"><b>Handbuilding II</b><span class="t">1:00p &middot; Ruth</span></div>
+          <div class="slot slot-ink"><b>Open studio</b><span class="t">3:00 - 8:00p</span></div>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ============ FEATURE 2: FIRING QUEUE ============ -->
+<section class="feature" id="firing">
+  <div class="wrap feature-grid flip">
+    <div class="feature-copy reveal">
+      <span class="kicker">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><path d="M7.6 1.4 L10.6 11.4 H3 Z" fill="currentColor" transform="rotate(8 6.5 6.5)"/></svg>
+        Kiln firing queue
+      </span>
+      <h2>A firing queue the whole studio can see.</h2>
+      <p>Members claim shelf space from their phone. You schedule the firing, log the program, and Kilnhouse texts everyone when their ware is cool enough to touch. The kiln log writes itself, cone by cone.</p>
+      <ul class="checks">
+        <li>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="7.2" fill="#E3E7F9"/><path d="M4.6 8.2l2.3 2.3 4.5-4.8" stroke="#2440C0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Shelf claims with photos<small>Each piece tagged to its owner. Unloads stop being archaeology.</small></span>
+        </li>
+        <li>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="7.2" fill="#E3E7F9"/><path d="M4.6 8.2l2.3 2.3 4.5-4.8" stroke="#2440C0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Programs and cone history per kiln<small>Element hours tracked, so you replace them before a ruined glaze load.</small></span>
+        </li>
+        <li>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="7.2" fill="#E3E7F9"/><path d="M4.6 8.2l2.3 2.3 4.5-4.8" stroke="#2440C0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>"Your ware is ready" texts<small>Sent when the kiln crosses 150&deg;F on the way down. Not before.</small></span>
+        </li>
+      </ul>
+      <a class="textlink" href="#pricing">Explore the firing queue
+        <svg class="arrow" width="14" height="14" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M2 7.5h10M8.5 3.5l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+
+    <article class="panel feature-panel reveal" data-delay="1" aria-label="Firing queue example">
+      <div class="panel-head">
+        <div>
+          <div class="panel-title">Firing queue &middot; all kilns</div>
+          <div class="panel-sub">Drag to reorder. Members see this board too.</div>
+        </div>
+        <span class="pill pill-firing"><span class="dot pulse" aria-hidden="true"></span>1 firing</span>
+      </div>
+      <div class="queue">
+        <div class="q-row">
+          <div class="q-name"><b>Glaze, Slow 6</b><span>Kiln 2 &middot; started 11:05 am</span></div>
+          <div class="q-cone">&#9651; 6</div>
+          <div class="shelf"><div class="shelf-bar"><div class="shelf-fill" style="width:96%"></div></div><small>29/30 pc</small></div>
+          <span class="pill pill-firing"><span class="dot pulse" aria-hidden="true"></span>Firing</span>
+        </div>
+        <div class="q-row">
+          <div class="q-name"><b>Bisque 04</b><span>Kiln 3 &middot; done 6:40 am</span></div>
+          <div class="q-cone">&#9651; 04</div>
+          <div class="shelf"><div class="shelf-bar"><div class="shelf-fill" style="width:100%;background:var(--celadon);"></div></div><small>34/34 pc</small></div>
+          <span class="pill pill-cool">Cooling</span>
+        </div>
+        <div class="q-row">
+          <div class="q-name"><b>Bisque 04</b><span>Kiln 1 &middot; Sat 7:00 am</span></div>
+          <div class="q-cone">&#9651; 04</div>
+          <div class="shelf"><div class="shelf-bar"><div class="shelf-fill" style="width:62%"></div></div><small>21/34 pc</small></div>
+          <span class="pill pill-queued">Loading</span>
+        </div>
+        <div class="q-row">
+          <div class="q-name"><b>Glaze, Slow 6</b><span>Kiln 2 &middot; Mon 8:00 am</span></div>
+          <div class="q-cone">&#9651; 6</div>
+          <div class="shelf"><div class="shelf-bar"><div class="shelf-fill" style="width:34%"></div></div><small>11/32 pc</small></div>
+          <span class="pill pill-queued">Queued</span>
+        </div>
+        <div class="q-row">
+          <div class="q-name"><b>Raku, yard kiln</b><span>Sat 9:00 am &middot; with class</span></div>
+          <div class="q-cone">&#9651; 08</div>
+          <div class="shelf"><div class="shelf-bar"><div class="shelf-fill" style="width:88%"></div></div><small>14/16 pc</small></div>
+          <span class="pill pill-queued">Queued</span>
+        </div>
+      </div>
+      <div class="q-foot">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1.8c2 2.6 4.6 4.9 4.6 7.7A4.6 4.6 0 0 1 8 14.1a4.6 4.6 0 0 1-4.6-4.6C3.4 6.7 6 4.4 8 1.8Z" stroke="#D9481F" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        Kiln 3 crossed 150&deg;F at 1:52 pm. 34 members texted: "Your ware is ready."
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ============ FEATURE 3: BILLING ============ -->
+<section class="feature" id="billing">
+  <div class="wrap feature-grid">
+    <div class="feature-copy reveal">
+      <span class="kicker">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><path d="M7.6 1.4 L10.6 11.4 H3 Z" fill="currentColor" transform="rotate(8 6.5 6.5)"/></svg>
+        Member billing
+      </span>
+      <h2>Dues, clay, and firing fees. Settled without a spreadsheet.</h2>
+      <p>Memberships renew on autopay. Clay sells by the pound at the counter. Firing fees post when the kiln closes, priced by the half shelf or by volume, however your studio does it. One statement, one charge, zero chasing.</p>
+      <ul class="checks">
+        <li>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="7.2" fill="#E3E7F9"/><path d="M4.6 8.2l2.3 2.3 4.5-4.8" stroke="#2440C0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Failed cards handled politely<small>Smart retries, then a friendly nudge. You never send that email again.</small></span>
+        </li>
+        <li>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="7.2" fill="#E3E7F9"/><path d="M4.6 8.2l2.3 2.3 4.5-4.8" stroke="#2440C0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Firing fees post from the queue<small>Close the kiln log and every owner's share lands on their statement.</small></span>
+        </li>
+        <li>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="7.2" fill="#E3E7F9"/><path d="M4.6 8.2l2.3 2.3 4.5-4.8" stroke="#2440C0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Proration, pauses, and comps<small>Life happens. Pause a membership in two clicks, books stay clean.</small></span>
+        </li>
+      </ul>
+      <a class="textlink" href="#pricing">Explore billing
+        <svg class="arrow" width="14" height="14" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M2 7.5h10M8.5 3.5l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+
+    <article class="panel feature-panel reveal" data-delay="1" aria-label="Member statement example">
+      <div class="statement">
+        <div class="panel-head">
+          <div>
+            <div class="panel-title">Dana Kowalczyk</div>
+            <div class="panel-sub">Half-shelf member since 2022 &middot; June statement</div>
+          </div>
+          <span class="pill pill-ready">Autopay Thu</span>
+        </div>
+        <ul class="st-lines">
+          <li><span class="desc">Half-shelf membership<small>Renews monthly</small></span><span class="amt">$85.00</span></li>
+          <li><span class="desc">Clay, B-Mix 5 &times; 12.5 lb<small>Counter sale, June 9</small></span><span class="amt">$18.75</span></li>
+          <li><span class="desc">Firing fees &times; 3 loads<small>Cone 6 glaze, by half shelf</small></span><span class="amt">$21.00</span></li>
+          <li><span class="desc">Glaze locker<small>Small, wall B</small></span><span class="amt">$8.00</span></li>
+        </ul>
+        <div class="st-total"><b>Due June 26</b><span class="amt">$132.75</span></div>
+        <div class="st-chips">
+          <span class="st-chip good">
+            <svg width="12" height="12" viewBox="0 0 17 17" fill="none" aria-hidden="true"><path d="M2.5 8.5l4 4 8-8.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            May: paid on first try
+          </span>
+          <span class="st-chip warn">April: card retried, cleared</span>
+          <span class="st-chip">Receipts emailed automatically</span>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ============ QUOTE BAND ============ -->
+<section class="band">
+  <div class="wrap reveal">
+    <figure>
+      <blockquote>
+        <span class="q">&ldquo;</span>I used to spend Sunday nights with three spreadsheets and a stack of checks. Now I glaze on Sunday nights.<span class="q">&rdquo;</span>
+      </blockquote>
+      <figcaption><b>Renata Fields</b> Owner, Mudroom Collective, Providence RI &middot; 212 members, 3 kilns</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ============ PRICING ============ -->
+<section class="pricing" id="pricing">
+  <div class="wrap">
+    <div class="pricing-head reveal">
+      <span class="kicker">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><path d="M7.6 1.4 L10.6 11.4 H3 Z" fill="currentColor" transform="rotate(8 6.5 6.5)"/></svg>
+        Pricing
+      </span>
+      <h2>Priced like a shelf fee, not a second rent.</h2>
+      <p class="lede">Every plan includes unlimited classes, the member portal, and humans on support who know what a cone pack is. Try any plan free for 30 days.</p>
+    </div>
+
+    <div class="tiers">
+      <article class="tier reveal">
+        <h3 class="tier-name">Greenware</h3>
+        <p class="tier-tag">For the studio in your garage that got serious.</p>
+        <div class="price"><span class="n">$49</span><span class="per">/ month</span></div>
+        <ul class="tier-list">
+          <li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8.5l3.6 3.6 7.4-8" stroke="#2440C0" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>1 kiln on the firing queue</li>
+          <li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8.5l3.6 3.6 7.4-8" stroke="#2440C0" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>Up to 60 members</li>
+          <li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8.5l3.6 3.6 7.4-8" stroke="#2440C0" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>Class scheduling and rosters</li>
+          <li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8.5l3.6 3.6 7.4-8" stroke="#2440C0" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>Kiln log and cone history</li>
+          <li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8.5l3.6 3.6 7.4-8" stroke="#2440C0" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>Email support</li>
+        </ul>
+        <a class="btn btn-ghost" href="#top">Start free month</a>
+      </article>
+
+      <article class="tier tier-mid reveal" data-delay="1">
+        <span class="tier-badge">Most studios choose this</span>
+        <h3 class="tier-name">Bisque</h3>
+        <p class="tier-tag">For community studios with a waitlist at the door.</p>
+        <div class="price"><span class="n">$119</span><span class="per">/ month</span></div>
+        <ul class="tier-list">
+          <li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8.5l3.6 3.6 7.4-8" stroke="#F4F4EE" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>Up to 4 kilns, shelf claims with photos</li>
+          <li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8.5l3.6 3.6 7.4-8" stroke="#F4F4EE" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>Up to 250 members</li>
+          <li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8.5l3.6 3.6 7.4-8" stroke="#F4F4EE" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>Autopay billing, clay and firing fees</li>
+          <li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8.5l3.6 3.6 7.4-8" stroke="#F4F4EE" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>Waitlists and "ware is ready" texts</li>
+          <li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8.5l3.6 3.6 7.4-8" stroke="#F4F4EE" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>Instructor pay splits</li>
+          <li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8.5l3.6 3.6 7.4-8" stroke="#F4F4EE" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>Priority support, same day</li>
+        </ul>
+        <a class="btn btn-light" href="#top">Start free month</a>
+      </article>
+
+      <article class="tier reveal" data-delay="2">
+        <h3 class="tier-name">Stoneware</h3>
+        <p class="tier-tag">For multi-location studios and teaching centers.</p>
+        <div class="price"><span class="n">$249</span><span class="per">/ month</span></div>
+        <ul class="tier-list">
+          <li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8.5l3.6 3.6 7.4-8" stroke="#2440C0" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>Unlimited kilns and members</li>
+          <li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8.5l3.6 3.6 7.4-8" stroke="#2440C0" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>Multiple locations, one ledger</li>
+          <li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8.5l3.6 3.6 7.4-8" stroke="#2440C0" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>Payroll export and accounting sync</li>
+          <li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8.5l3.6 3.6 7.4-8" stroke="#2440C0" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>API access and custom reports</li>
+          <li><svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8.5l3.6 3.6 7.4-8" stroke="#2440C0" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>Onboarding with a real person</li>
+        </ul>
+        <a class="btn btn-ghost" href="#top">Start free month</a>
+      </article>
+    </div>
+
+    <p class="pricing-foot reveal">30 days free on every plan. <b>No card up front.</b> Import members and class history from a spreadsheet, we will help. Nonprofit and school studios take 20% off.</p>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap foot-inner">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="brand" href="#top" aria-label="Kilnhouse home">
+          <span class="brand-mark" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M10.6 2.2 L14.2 15 H4.4 Z" fill="#F4F4EE" transform="rotate(8 9 9)"/></svg>
+          </span>
+          Kilnhouse
+        </a>
+        <p>Studio management for ceramics studios. Built with the folks who load the last shelf, program the kiln, and lock up after open studio.</p>
+      </div>
+      <div class="foot-col">
+        <h4>Product</h4>
+        <ul>
+          <li><a href="#scheduling">Class scheduling</a></li>
+          <li><a href="#firing">Firing queue</a></li>
+          <li><a href="#billing">Member billing</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <h4>Studios</h4>
+        <ul>
+          <li><a href="#top">Switching guide</a></li>
+          <li><a href="#top">Member portal demo</a></li>
+          <li><a href="#top">Kiln log templates</a></li>
+          <li><a href="#top">Studio stories</a></li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#top">About</a></li>
+          <li><a href="#top">Support</a></li>
+          <li><a href="#top">Privacy</a></li>
+          <li><a href="#top">Terms</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-word" aria-hidden="true">Kilnhouse</div>
+    <div class="foot-bottom">
+      <span>&copy; 2026 Kilnhouse, Inc. All rights reserved.</span>
+      <span class="sweep">Made for the people who sweep the studio at close.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // sticky nav shadow
+  const nav = document.querySelector('header.nav');
+  const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 8);
+  window.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+
+  // scroll reveals + curve draw
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    }
+  }, {threshold:.18, rootMargin:'0px 0px -40px 0px'});
+  document.querySelectorAll('.reveal, .draw').forEach(el => io.observe(el));
+
+  // gentle live temperature drift on the hero readout
+  const readout = document.getElementById('tempReadout');
+  if (readout && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    let t = 1846;
+    setInterval(() => {
+      t += Math.random() < 0.82 ? 1 : 0;
+      readout.textContent = t.toLocaleString('en-US') + '°F';
+    }, 2600);
+  }
+</script>
+</body>
+</html>
