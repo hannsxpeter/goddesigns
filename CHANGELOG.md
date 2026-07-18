@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Automatic triggering: the skill description now enumerates concrete trigger phrases (landing page, dashboard, hero section, pricing page, mockup-to-code, restyle, "make it look better", any HTML/CSS/Tailwind/React styling) so hosts that auto-select skills fire it without the command; standing-instruction snippets for `CLAUDE.md` and `AGENTS.md` documented in `docs/INSTALL.md`.
+- README notes that the command is optional.
+
 ## v1.0.0 (2026-07-18)
 
 First public release.

@@ -33,7 +33,7 @@ ln -s "$PWD/goddesigns/skills/goddesign" ~/.claude/skills/goddesign   # Claude C
 ln -s "$PWD/goddesigns/skills/goddesign" ~/.agents/skills/goddesign   # Codex CLI
 ```
 
-Then invoke `/goddesign <brief>` in Claude Code or `$goddesign <brief>` in Codex. Full details, optional dependencies, and host notes: [docs/INSTALL.md](docs/INSTALL.md).
+Then invoke `/goddesign <brief>` in Claude Code or `$goddesign <brief>` in Codex. The command is optional: the skill also auto-triggers on frontend requests ("build me a signup page", "make this dashboard look better") via its description, and a one-paragraph standing instruction in `CLAUDE.md` or `AGENTS.md` makes that a guarantee. Full details, optional dependencies, auto-trigger setup, and host notes: [docs/INSTALL.md](docs/INSTALL.md).
 
 ## What is inside
 
