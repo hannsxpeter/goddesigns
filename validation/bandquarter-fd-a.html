@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bandquarter: Venue management for independent music rooms</title>
+<meta name="description" content="Booking calendar, artist settlement, and bar sales tracking built for independent music venues.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#121118;
+  --ink-2:#1a1922;
+  --ink-3:#232130;
+  --paper:#eeece4;
+  --paper-dim:#c9c6ba;
+  --red:#ff3b2f;
+  --red-deep:#d92a20;
+  --acid:#c8f04b;
+  --line:rgba(238,236,228,.14);
+  --line-strong:rgba(238,236,228,.28);
+  --display:"Anton",Impact,sans-serif;
+  --body:"Archivo","Helvetica Neue",sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--ink);
+  color:var(--paper);
+  font-family:var(--body);
+  font-size:16px;
+  line-height:1.55;
+  overflow-x:hidden;
+}
+body::before{
+  content:"";
+  position:fixed;inset:0;
+  pointer-events:none;z-index:999;
+  opacity:.5;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+::selection{background:var(--red);color:var(--paper)}
+a{color:inherit;text-decoration:none}
+img{max-width:100%}
+.wrap{max-width:1200px;margin:0 auto;padding:0 24px}
+h1,h2,h3,.disp{
+  font-family:var(--display);
+  font-weight:400;
+  text-transform:uppercase;
+  letter-spacing:.01em;
+  line-height:.95;
+}
+.tag{
+  display:inline-block;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  color:var(--acid);
+  border:1px solid rgba(200,240,75,.4);
+  padding:6px 14px;
+  border-radius:999px;
+  margin-bottom:22px;
+}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:var(--body);font-weight:700;font-size:15px;
+  letter-spacing:.04em;text-transform:uppercase;
+  padding:15px 28px;border-radius:4px;
+  border:2px solid var(--paper);
+  color:var(--paper);
+  cursor:pointer;background:transparent;
+  transition:transform .15s ease,background .2s ease,color .2s ease,box-shadow .2s ease;
+  position:relative;
+}
+.btn:hover{transform:translate(-2px,-2px);box-shadow:4px 4px 0 var(--acid)}
+.btn.primary{background:var(--red);border-color:var(--red);color:var(--paper)}
+.btn.primary:hover{box-shadow:4px 4px 0 var(--acid)}
+.btn .arrow{transition:transform .2s ease}
+.btn:hover .arrow{transform:translateX(4px)}
+
+/* ---------- NAV ---------- */
+header{
+  position:sticky;top:0;z-index:100;
+  background:rgba(18,17,24,.88);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line);
+}
+.nav{
+  display:flex;align-items:center;justify-content:space-between;
+  height:72px;
+}
+.logo{
+  font-family:var(--display);
+  font-size:24px;
+  letter-spacing:.02em;
+  text-transform:uppercase;
+  display:flex;align-items:center;gap:10px;
+}
+.logo .mark{
+  width:30px;height:30px;flex:none;
+  background:var(--red);
+  clip-path:polygon(0 0,100% 0,100% 70%,70% 100%,0 100%);
+  display:grid;place-items:center;
+}
+.logo .mark svg{width:16px;height:16px}
+.logo em{font-style:normal;color:var(--acid)}
+.nav-links{display:flex;gap:34px;font-size:14px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.nav-links a{position:relative;padding:4px 0;color:var(--paper-dim);transition:color .2s}
+.nav-links a::after{
+  content:"";position:absolute;left:0;bottom:0;height:2px;width:0;
+  background:var(--red);transition:width .25s ease;
+}
+.nav-links a:hover{color:var(--paper)}
+.nav-links a:hover::after{width:100%}
+.nav-cta{display:flex;gap:12px;align-items:center}
+.nav-cta .ghost{font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--paper-dim)}
+.nav-cta .ghost:hover{color:var(--paper)}
+.nav-cta .btn{padding:10px 20px;font-size:13px}
+@media(max-width:860px){.nav-links{display:none}}
+
+/* ---------- HERO ---------- */
+.hero{
+  position:relative;
+  padding:90px 0 70px;
+  overflow:hidden;
+}
+.hero::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(700px 420px at 85% 8%,rgba(255,59,47,.16),transparent 65%),
+    radial-gradient(520px 380px at 8% 90%,rgba(200,240,75,.07),transparent 60%);
+}
+.hero-grid{
+  position:relative;
+  display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);
+  gap:56px;align-items:center;
+}
+.hero h1{
+  font-size:clamp(52px,7.4vw,104px);
+  margin-bottom:26px;
+}
+.hero h1 .row{display:block}
+.hero h1 .accent{color:var(--red)}
+.hero h1 .outline{
+  color:transparent;
+  -webkit-text-stroke:2px var(--paper);
+}
+.hero p.lede{
+  font-size:19px;color:var(--paper-dim);max-width:52ch;margin-bottom:36px;
+}
+.hero p.lede strong{color:var(--paper);font-weight:600}
+.hero-actions{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:40px}
+.hero-proof{
+  display:flex;gap:36px;flex-wrap:wrap;
+  border-top:1px solid var(--line);padding-top:26px;
+}
+.proof b{
+  display:block;font-family:var(--display);font-size:30px;letter-spacing:.02em;color:var(--acid);
+}
+.proof span{font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--paper-dim)}
+
+/* hero calendar card */
+.stage-card{
+  position:relative;
+  background:var(--ink-2);
+  border:1px solid var(--line-strong);
+  border-radius:10px;
+  padding:22px;
+  box-shadow:14px 14px 0 rgba(255,59,47,.9);
+  transform:rotate(1.2deg);
+}
+.stage-card .card-head{
+  display:flex;justify-content:space-between;align-items:baseline;
+  margin-bottom:16px;
+}
+.stage-card .card-head h3{font-size:20px}
+.stage-card .card-head span{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--paper-dim)}
+.mini-cal{width:100%;border-collapse:collapse;table-layout:fixed}
+.mini-cal th{
+  font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--paper-dim);font-weight:600;padding:6px 0;text-align:center;
+}
+.mini-cal td{
+  border:1px solid var(--line);
+  height:52px;vertical-align:top;
+  padding:5px 6px;font-size:12px;color:var(--paper-dim);
+  position:relative;
+}
+.mini-cal td .gig{
+  display:block;margin-top:4px;
+  font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  padding:2px 5px;border-radius:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.gig.hold{background:rgba(238,236,228,.12);color:var(--paper)}
+.gig.conf{background:var(--red);color:var(--paper)}
+.gig.sold{background:var(--acid);color:var(--ink)}
+.mini-cal td.tonight{outline:2px solid var(--acid);outline-offset:-2px}
+.card-foot{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-top:16px;padding-top:14px;border-top:1px solid var(--line);
+  font-size:12px;color:var(--paper-dim);
+}
+.legend{display:flex;gap:14px}
+.legend i{
+  display:inline-flex;align-items:center;gap:6px;font-style:normal;
+  font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+}
+.legend i::before{content:"";width:9px;height:9px;border-radius:2px;background:var(--paper-dim)}
+.legend i.l-hold::before{background:rgba(238,236,228,.35)}
+.legend i.l-conf::before{background:var(--red)}
+.legend i.l-sold::before{background:var(--acid)}
+.stub{
+  position:absolute;top:-26px;right:26px;
+  background:var(--acid);color:var(--ink);
+  font-family:var(--display);font-size:13px;letter-spacing:.1em;text-transform:uppercase;
+  padding:8px 16px;transform:rotate(-3deg);
+  clip-path:polygon(0 0,100% 0,96% 50%,100% 100%,0 100%,4% 50%);
+  animation:bob 4s ease-in-out infinite;
+}
+@keyframes bob{0%,100%{transform:rotate(-3deg) translateY(0)}50%{transform:rotate(-3deg) translateY(-5px)}}
+@media(max-width:960px){
+  .hero-grid{grid-template-columns:1fr}
+  .stage-card{transform:none;box-shadow:8px 8px 0 rgba(255,59,47,.9)}
+}
+
+/* ---------- MARQUEE ---------- */
+.marquee{
+  border-top:1px solid var(--line-strong);
+  border-bottom:1px solid var(--line-strong);
+  background:var(--red);
+  color:var(--paper);
+  overflow:hidden;
+  padding:13px 0;
+  transform:rotate(-1deg) scale(1.02);
+  margin:36px 0 0;
+}
+.marquee-track{
+  display:flex;gap:0;white-space:nowrap;
+  animation:scroll 28s linear infinite;
+  width:max-content;
+}
+.marquee-track span{
+  font-family:var(--display);font-size:17px;letter-spacing:.1em;text-transform:uppercase;
+  padding:0 22px;display:inline-flex;align-items:center;gap:22px;
+}
+.marquee-track span::after{content:"\2726";font-size:12px}
+@keyframes scroll{to{transform:translateX(-50%)}}
+
+/* ---------- FEATURES ---------- */
+.features{padding:110px 0 30px}
+.sec-head{max-width:720px;margin-bottom:80px}
+.sec-head h2{font-size:clamp(38px,5vw,64px);margin-bottom:18px}
+.sec-head h2 em{font-style:normal;color:var(--red)}
+.sec-head p{font-size:18px;color:var(--paper-dim)}
+.feature{
+  display:grid;grid-template-columns:repeat(12,1fr);gap:32px;
+  align-items:center;
+  padding:64px 0;
+  border-top:1px solid var(--line);
+}
+.feature .copy{grid-column:span 5}
+.feature .visual{grid-column:span 7}
+.feature.flip .copy{grid-column:8/span 5;order:2}
+.feature.flip .visual{grid-column:1/span 7;order:1}
+.f-num{
+  font-family:var(--display);
+  font-size:15px;color:var(--ink);
+  background:var(--acid);
+  width:44px;height:44px;border-radius:50%;
+  display:grid;place-items:center;
+  margin-bottom:20px;
+}
+.feature h3{font-size:clamp(30px,3.4vw,44px);margin-bottom:16px}
+.feature p{color:var(--paper-dim);margin-bottom:22px;max-width:46ch}
+.f-list{list-style:none;display:grid;gap:11px}
+.f-list li{
+  display:flex;gap:12px;align-items:flex-start;
+  font-size:15px;color:var(--paper);
+}
+.f-list li::before{
+  content:"";flex:none;width:16px;height:16px;margin-top:3px;
+  background:var(--red);
+  clip-path:polygon(0 45%,35% 45%,35% 0,65% 0,65% 45%,100% 45%,100% 55%,65% 55%,65% 100%,35% 100%,35% 55%,0 55%);
+  transform:rotate(45deg);
+}
+.panel{
+  background:var(--ink-2);
+  border:1px solid var(--line-strong);
+  border-radius:10px;
+  padding:26px;
+  position:relative;
+  overflow:hidden;
+}
+.panel::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--red) 0 40%,var(--acid) 40% 55%,var(--red) 55%);
+}
+.panel h4{
+  font-family:var(--display);font-size:17px;letter-spacing:.05em;text-transform:uppercase;
+  margin-bottom:18px;display:flex;justify-content:space-between;align-items:baseline;
+}
+.panel h4 small{font-family:var(--body);font-size:11px;letter-spacing:.16em;color:var(--paper-dim);font-weight:600}
+
+/* feature 1 visual: week strip */
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
+.day{
+  background:var(--ink-3);
+  border:1px solid var(--line);
+  border-radius:6px;
+  min-height:150px;
+  padding:10px 9px;
+  transition:transform .2s ease,border-color .2s ease;
+}
+.day:hover{transform:translateY(-4px);border-color:var(--acid)}
+.day b{
+  display:block;font-family:var(--display);font-size:19px;font-weight:400;
+}
+.day span{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--paper-dim)}
+.slot{
+  margin-top:10px;border-radius:3px;padding:5px 6px;
+  font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;line-height:1.3;
+}
+.slot.s-hold{background:rgba(238,236,228,.1);color:var(--paper-dim);border:1px dashed var(--line-strong)}
+.slot.s-conf{background:var(--red);color:var(--paper)}
+.slot.s-sold{background:var(--acid);color:var(--ink)}
+.slot.s-open{border:1px dashed var(--line-strong);color:var(--paper-dim);text-align:center}
+@media(max-width:640px){.week{grid-template-columns:repeat(4,1fr)}.day:nth-child(n+5){display:none}}
+
+/* feature 2 visual: settlement sheet */
+.settle{width:100%;border-collapse:collapse;font-size:13.5px}
+.settle th{
+  text-align:left;font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--paper-dim);padding:8px 10px;border-bottom:1px solid var(--line-strong);font-weight:600;
+}
+.settle td{padding:10px;border-bottom:1px solid var(--line)}
+.settle td:last-child,.settle th:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.settle tr.total td{
+  font-weight:700;color:var(--acid);border-bottom:none;
+  border-top:2px solid var(--acid);font-size:15px;
+}
+.pay-chip{
+  display:inline-block;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  padding:3px 9px;border-radius:999px;
+  background:rgba(200,240,75,.15);color:var(--acid);border:1px solid rgba(200,240,75,.4);
+}
+.settle-foot{
+  margin-top:16px;display:flex;justify-content:space-between;align-items:center;
+  font-size:12px;color:var(--paper-dim);
+}
+.settle-foot .btn{padding:9px 16px;font-size:11px;border-width:1.5px}
+
+/* feature 3 visual: bar chart */
+.bars{
+  display:flex;align-items:flex-end;gap:14px;height:190px;
+  border-bottom:2px solid var(--line-strong);
+  padding:0 6px;
+}
+.bar{
+  flex:1;position:relative;border-radius:3px 3px 0 0;
+  background:linear-gradient(180deg,var(--red),var(--red-deep));
+  min-width:0;
+  transform-origin:bottom;
+  animation:rise .9s cubic-bezier(.2,.9,.3,1) both;
+}
+.bar.peak{background:linear-gradient(180deg,var(--acid),#9fc32c)}
+.bar i{
+  position:absolute;top:-24px;left:50%;transform:translateX(-50%);
+  font-style:normal;font-size:10.5px;font-weight:700;color:var(--paper-dim);
+  font-variant-numeric:tabular-nums;white-space:nowrap;
+}
+.bar.peak i{color:var(--acid)}
+@keyframes rise{from{transform:scaleY(0)}}
+.bar-x{display:flex;gap:14px;padding:8px 6px 0}
+.bar-x span{flex:1;text-align:center;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--paper-dim)}
+.bar-stats{display:flex;gap:26px;margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+.bar-stats b{display:block;font-family:var(--display);font-size:22px;color:var(--paper)}
+.bar-stats .up{color:var(--acid)}
+.bar-stats span{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--paper-dim)}
+
+@media(max-width:900px){
+  .feature{grid-template-columns:1fr;gap:28px}
+  .feature .copy,.feature .visual,
+  .feature.flip .copy,.feature.flip .visual{grid-column:1/-1;order:initial}
+}
+
+/* ---------- PRICING ---------- */
+.pricing{padding:110px 0;position:relative}
+.pricing::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(640px 420px at 50% 0,rgba(255,59,47,.1),transparent 65%);
+}
+.pricing .sec-head{margin-left:auto;margin-right:auto;text-align:center}
+.tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;position:relative}
+.tier{
+  background:var(--ink-2);
+  border:1px solid var(--line-strong);
+  border-radius:10px;
+  padding:34px 30px;
+  display:flex;flex-direction:column;
+  transition:transform .2s ease,border-color .2s ease;
+  position:relative;
+}
+.tier:hover{transform:translateY(-6px);border-color:var(--paper-dim)}
+.tier.featured{
+  background:var(--paper);color:var(--ink);
+  border:2px solid var(--acid);
+  box-shadow:12px 12px 0 var(--red);
+  transform:translateY(-14px);
+}
+.tier.featured:hover{transform:translateY(-20px)}
+.tier .t-name{font-family:var(--display);font-size:22px;letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px}
+.tier .t-for{font-size:13px;color:var(--paper-dim);margin-bottom:24px}
+.tier.featured .t-for{color:#5c5a52}
+.price{display:flex;align-items:baseline;gap:6px;margin-bottom:26px}
+.price b{font-family:var(--display);font-size:56px;font-weight:400;line-height:1}
+.price span{font-size:13px;color:var(--paper-dim)}
+.tier.featured .price span{color:#5c5a52}
+.t-list{list-style:none;display:grid;gap:12px;margin-bottom:32px;flex:1}
+.t-list li{display:flex;gap:11px;font-size:14.5px;align-items:flex-start}
+.t-list li::before{
+  content:"";flex:none;width:14px;height:14px;margin-top:3px;border-radius:50%;
+  background:var(--red);
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23000' d='M6.5 12.2 2.3 8l1.4-1.4 2.8 2.8 5.8-5.8L13.7 5z'/%3E%3C/svg%3E") center/contain no-repeat;
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23000' d='M6.5 12.2 2.3 8l1.4-1.4 2.8 2.8 5.8-5.8L13.7 5z'/%3E%3C/svg%3E") center/contain no-repeat;
+}
+.tier.featured .t-list li::before{background:var(--red-deep)}
+.tier .btn{justify-content:center;width:100%}
+.tier.featured .btn{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.tier.featured .btn:hover{box-shadow:4px 4px 0 var(--red)}
+.badge{
+  position:absolute;top:-15px;left:50%;transform:translateX(-50%) rotate(-2deg);
+  background:var(--acid);color:var(--ink);
+  font-family:var(--display);font-size:12px;letter-spacing:.12em;text-transform:uppercase;
+  padding:6px 16px;
+  clip-path:polygon(0 0,100% 0,96% 50%,100% 100%,0 100%,4% 50%);
+}
+.pricing-note{text-align:center;margin-top:44px;font-size:14px;color:var(--paper-dim)}
+.pricing-note a{color:var(--acid);border-bottom:1px solid rgba(200,240,75,.4)}
+.pricing-note a:hover{border-bottom-color:var(--acid)}
+@media(max-width:900px){
+  .tiers{grid-template-columns:1fr;max-width:460px;margin:0 auto}
+  .tier.featured{transform:none}
+  .tier.featured:hover{transform:translateY(-6px)}
+}
+
+/* ---------- CTA BAND ---------- */
+.cta-band{
+  background:var(--red);
+  padding:80px 0;
+  transform:rotate(-1deg) scale(1.02);
+  margin:20px 0 60px;
+}
+.cta-inner{transform:rotate(1deg);text-align:center}
+.cta-band h2{font-size:clamp(40px,5.6vw,74px);margin-bottom:16px}
+.cta-band p{font-size:17px;max-width:54ch;margin:0 auto 32px;color:rgba(238,236,228,.9)}
+.cta-band .btn{border-color:var(--ink);background:var(--ink);color:var(--paper)}
+.cta-band .btn:hover{box-shadow:4px 4px 0 var(--paper)}
+
+/* ---------- FOOTER ---------- */
+footer{border-top:1px solid var(--line-strong);padding:64px 0 36px;background:var(--ink)}
+.foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;margin-bottom:52px}
+.foot-grid h5{
+  font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--paper-dim);margin-bottom:18px;font-weight:700;
+}
+.foot-grid ul{list-style:none;display:grid;gap:10px;font-size:14px}
+.foot-grid ul a{color:var(--paper-dim);transition:color .15s}
+.foot-grid ul a:hover{color:var(--acid)}
+.foot-brand p{color:var(--paper-dim);font-size:14px;max-width:32ch;margin-top:14px}
+.foot-bottom{
+  display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;
+  border-top:1px solid var(--line);padding-top:26px;
+  font-size:12.5px;color:var(--paper-dim);
+}
+.foot-bottom .links{display:flex;gap:22px}
+.foot-bottom a:hover{color:var(--paper)}
+@media(max-width:820px){.foot-grid{grid-template-columns:1fr 1fr}}
+
+/* ---------- reveal ---------- */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s ease}
+.reveal.in{opacity:1;transform:none}
+.reveal.d1{transition-delay:.1s}
+.reveal.d2{transition-delay:.2s}
+.reveal.d3{transition-delay:.3s}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .reveal{opacity:1;transform:none}
+  html{scroll-behavior:auto}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a class="logo" href="#top" aria-label="Bandquarter home">
+      <span class="mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#eeece4" stroke-width="2.4" stroke-linecap="round"><path d="M4 18V9m5 9V5m5 13v-7m5 7V8"/></svg>
+      </span>
+      Band<em>quarter</em>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#booking">Booking</a>
+      <a href="#settlement">Settlement</a>
+      <a href="#bar">Bar Sales</a>
+      <a href="#pricing">Pricing</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="ghost" href="#">Sign in</a>
+      <a class="btn primary" href="#pricing">Book a demo</a>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="tag reveal in">Built for independent rooms</span>
+        <h1>
+          <span class="row reveal in">Run the room.</span>
+          <span class="row outline reveal in d1">Book the acts.</span>
+          <span class="row accent reveal in d2">Keep the money straight.</span>
+        </h1>
+        <p class="lede reveal in d2">
+          Bandquarter is venue management for the clubs that keep live music alive:
+          <strong>a booking calendar your whole team trusts, artist settlement that closes out in minutes, and bar sales tied to every show</strong>. No spreadsheets, no 2 a.m. math.
+        </p>
+        <div class="hero-actions reveal in d3">
+          <a class="btn primary" href="#pricing">Start free for 30 days <span class="arrow">&rarr;</span></a>
+          <a class="btn" href="#booking">See how it works</a>
+        </div>
+        <div class="hero-proof reveal in d3">
+          <div class="proof"><b>640+</b><span>Venues on board</span></div>
+          <div class="proof"><b>92k</b><span>Shows settled</span></div>
+          <div class="proof"><b>11 min</b><span>Avg. settlement time</span></div>
+        </div>
+      </div>
+
+      <div class="stage-card reveal in d2" aria-label="Sample booking calendar">
+        <span class="stub">Tonight: Sold Out</span>
+        <div class="card-head">
+          <h3>The Velvet Room</h3>
+          <span>Oct: Week 3</span>
+        </div>
+        <table class="mini-cal">
+          <thead>
+            <tr><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>13</td>
+              <td>14<span class="gig hold">Hold: Mokara</span></td>
+              <td>15<span class="gig conf">Night Owls</span></td>
+              <td>16<span class="gig hold">Hold: DJ Set</span></td>
+              <td class="tonight">17<span class="gig sold">Ratline: Sold</span></td>
+              <td>18<span class="gig conf">Copper Veins</span></td>
+              <td>19</td>
+            </tr>
+            <tr>
+              <td>20<span class="gig hold">Hold: Trivia</span></td>
+              <td>21</td>
+              <td>22<span class="gig conf">Small Hours</span></td>
+              <td>23<span class="gig conf">Petal Crush</span></td>
+              <td>24<span class="gig sold">Vega: Sold</span></td>
+              <td>25<span class="gig conf">The Wrens</span></td>
+              <td>26<span class="gig hold">Hold: Priv.</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="card-foot">
+          <div class="legend">
+            <i class="l-hold">Hold</i><i class="l-conf">Confirmed</i><i class="l-sold">Sold out</i>
+          </div>
+          <span>11 of 14 nights booked</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee-track">
+        <span>Booking calendar</span><span>Artist settlement</span><span>Bar sales</span><span>Payouts in 24h</span><span>Hold management</span><span>Door splits</span><span>Per-show P&amp;L</span>
+        <span>Booking calendar</span><span>Artist settlement</span><span>Bar sales</span><span>Payouts in 24h</span><span>Hold management</span><span>Door splits</span><span>Per-show P&amp;L</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <h2>Three jobs. One system. <em>Zero spreadsheets.</em></h2>
+        <p>Everything a talent buyer, a GM, and a bar manager touch on show night lives in one place, so the whole crew sees the same truth.</p>
+      </div>
+
+      <!-- Feature 1: Booking calendar -->
+      <article class="feature" id="booking">
+        <div class="copy reveal">
+          <div class="f-num">01</div>
+          <h3>A booking calendar built for holds</h3>
+          <p>Track first, second, and third holds per date, confirm with one click, and let agents see availability without another phone tag marathon.</p>
+          <ul class="f-list">
+            <li>Stacked holds with automatic expiry and challenge alerts</li>
+            <li>Shareable avail links for agents and promoters</li>
+            <li>Offer templates with guarantees, splits, and backend terms</li>
+            <li>Conflicts flagged across rooms, load-ins, and private events</li>
+          </ul>
+        </div>
+        <div class="visual reveal d1">
+          <div class="panel">
+            <h4>This week on stage <small>Main Room</small></h4>
+            <div class="week">
+              <div class="day"><b>13</b><span>Mon</span><div class="slot s-open">Open</div></div>
+              <div class="day"><b>14</b><span>Tue</span><div class="slot s-hold">H1: Mokara</div><div class="slot s-hold">H2: Dry Ice</div></div>
+              <div class="day"><b>15</b><span>Wed</span><div class="slot s-conf">Night Owls</div></div>
+              <div class="day"><b>16</b><span>Thu</span><div class="slot s-hold">H1: DJ Ferns</div></div>
+              <div class="day"><b>17</b><span>Fri</span><div class="slot s-sold">Ratline</div><div class="slot s-conf">+ Gutter Choir</div></div>
+              <div class="day"><b>18</b><span>Sat</span><div class="slot s-conf">Copper Veins</div></div>
+              <div class="day"><b>19</b><span>Sun</span><div class="slot s-open">Open</div></div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Feature 2: Settlement -->
+      <article class="feature flip" id="settlement">
+        <div class="copy reveal">
+          <div class="f-num">02</div>
+          <h3>Settlement that closes before last call</h3>
+          <p>Door counts, guarantees, splits, and deductions flow into one sheet. Sign off with the tour manager on a tablet and trigger payout instantly.</p>
+          <ul class="f-list">
+            <li>Auto-calculated guarantee vs. percentage, whichever is greater</li>
+            <li>Line-item deductions: production, catering, tax withholding</li>
+            <li>Digital sign-off with artist and venue signatures on file</li>
+            <li>ACH payouts land in the artist's account within 24 hours</li>
+          </ul>
+        </div>
+        <div class="visual reveal d1">
+          <div class="panel">
+            <h4>Settlement: Ratline <small>Fri Oct 17 &middot; Signed</small></h4>
+            <table class="settle">
+              <thead>
+                <tr><th>Line item</th><th>Terms</th><th>Amount</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Gross door (412 tickets)</td><td>$25 adv / $30 dos</td><td>$10,940.00</td></tr>
+                <tr><td>Guarantee</td><td>vs. 70% net</td><td>$4,500.00</td></tr>
+                <tr><td>70% of net door</td><td>after $1,120 costs</td><td>$6,874.00</td></tr>
+                <tr><td>Production deduction</td><td>backline rental</td><td>-$350.00</td></tr>
+                <tr class="total"><td>Artist payout</td><td><span class="pay-chip">ACH sent</span></td><td>$6,524.00</td></tr>
+              </tbody>
+            </table>
+            <div class="settle-foot">
+              <span>Signed by K. Ito (TM) &amp; venue at 12:41 AM</span>
+              <button class="btn" type="button">Export PDF</button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Feature 3: Bar sales -->
+      <article class="feature" id="bar">
+        <div class="copy reveal">
+          <div class="f-num">03</div>
+          <h3>Bar sales, tied to every show</h3>
+          <p>Sync your POS and see wet sales per act, per genre, per night of the week. Finally answer the question: which bands actually pay the rent?</p>
+          <ul class="f-list">
+            <li>POS integrations: Square, Toast, Clover, Lightspeed</li>
+            <li>Per-head spend and pour cost against every event</li>
+            <li>True show P&amp;L: door plus bar minus artist and staff costs</li>
+            <li>Rebooking scores that rank acts by total room revenue</li>
+          </ul>
+        </div>
+        <div class="visual reveal d1">
+          <div class="panel">
+            <h4>Bar revenue by night <small>Last 7 shows</small></h4>
+            <div class="bars" role="img" aria-label="Bar chart of bar revenue for the last seven shows, peaking at 8,904 dollars on Friday">
+              <div class="bar" style="height:34%;animation-delay:.05s"><i>$2.9k</i></div>
+              <div class="bar" style="height:46%;animation-delay:.12s"><i>$4.0k</i></div>
+              <div class="bar" style="height:41%;animation-delay:.19s"><i>$3.6k</i></div>
+              <div class="bar" style="height:58%;animation-delay:.26s"><i>$5.1k</i></div>
+              <div class="bar peak" style="height:100%;animation-delay:.33s"><i>$8.9k</i></div>
+              <div class="bar" style="height:83%;animation-delay:.40s"><i>$7.2k</i></div>
+              <div class="bar" style="height:37%;animation-delay:.47s"><i>$3.2k</i></div>
+            </div>
+            <div class="bar-x">
+              <span>Sat</span><span>Sun</span><span>Tue</span><span>Wed</span><span>Fri</span><span>Sat</span><span>Sun</span>
+            </div>
+            <div class="bar-stats">
+              <div><b>$34.9k</b><span>Wet sales / wk</span></div>
+              <div><b class="up">+18%</b><span>vs. last month</span></div>
+              <div><b>$21.60</b><span>Per-head spend</span></div>
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="pricing" id="pricing">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="tag">Pricing</span>
+        <h2>Priced like a bar tab, <em>not enterprise software</em></h2>
+        <p>Flat monthly rates. No per-ticket fees, no percentage of your door. Every plan starts with a 30-day free trial.</p>
+      </div>
+      <div class="tiers">
+        <div class="tier reveal">
+          <div class="t-name">Open Mic</div>
+          <div class="t-for">For single rooms finding their footing</div>
+          <div class="price"><b>$79</b><span>/ month</span></div>
+          <ul class="t-list">
+            <li>Booking calendar with 2-deep holds</li>
+            <li>Up to 20 events per month</li>
+            <li>Basic settlement sheets and PDF export</li>
+            <li>1 POS integration for bar sales</li>
+            <li>3 team seats</li>
+          </ul>
+          <a class="btn" href="#">Start free trial</a>
+        </div>
+        <div class="tier featured reveal d1">
+          <span class="badge">Most booked</span>
+          <div class="t-name">Headliner</div>
+          <div class="t-for">For busy rooms running 4+ nights a week</div>
+          <div class="price"><b>$189</b><span>/ month</span></div>
+          <ul class="t-list">
+            <li>Unlimited events and 3-deep holds</li>
+            <li>Full settlement with digital sign-off</li>
+            <li>24-hour ACH artist payouts</li>
+            <li>Per-show P&amp;L and rebooking scores</li>
+            <li>All POS integrations, unlimited seats</li>
+            <li>Agent avail links and offer templates</li>
+          </ul>
+          <a class="btn" href="#">Start free trial</a>
+        </div>
+        <div class="tier reveal d2">
+          <div class="t-name">Festival</div>
+          <div class="t-for">For multi-room venues and small groups</div>
+          <div class="price"><b>$449</b><span>/ month</span></div>
+          <ul class="t-list">
+            <li>Everything in Headliner, up to 5 rooms</li>
+            <li>Cross-venue calendar and conflict checks</li>
+            <li>Consolidated group reporting</li>
+            <li>Accounting exports: QuickBooks, Xero</li>
+            <li>Priority support with a named human</li>
+          </ul>
+          <a class="btn" href="#">Talk to us</a>
+        </div>
+      </div>
+      <p class="pricing-note">Nonprofit or all-ages DIY space? <a href="#">Ask about our community rate.</a></p>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-band">
+    <div class="wrap cta-inner">
+      <h2>Your next show deserves a cleaner close-out</h2>
+      <p>Set up your room in an afternoon. Import your calendar, connect your POS, and settle your first show this weekend.</p>
+      <a class="btn" href="#pricing">Book a 20-minute demo <span class="arrow">&rarr;</span></a>
+    </div>
+  </section>
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="logo" href="#top">
+          <span class="mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#eeece4" stroke-width="2.4" stroke-linecap="round"><path d="M4 18V9m5 9V5m5 13v-7m5 7V8"/></svg>
+          </span>
+          Band<em>quarter</em>
+        </a>
+        <p>Venue management software made by people who have closed a bar, counted a drawer, and settled a band at 1 a.m.</p>
+      </div>
+      <div>
+        <h5>Product</h5>
+        <ul>
+          <li><a href="#booking">Booking calendar</a></li>
+          <li><a href="#settlement">Artist settlement</a></li>
+          <li><a href="#bar">Bar sales</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Resources</h5>
+        <ul>
+          <li><a href="#">Settlement templates</a></li>
+          <li><a href="#">Venue operators guide</a></li>
+          <li><a href="#">POS integrations</a></li>
+          <li><a href="#">API docs</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Company</h5>
+        <ul>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Support</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>&copy; 2026 Bandquarter, Inc. Made loud in Memphis.</span>
+      <div class="links">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Status</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var els=document.querySelectorAll('.reveal:not(.in)');
+  if(!('IntersectionObserver' in window)){
+    els.forEach(function(el){el.classList.add('in')});
+    return;
+  }
+  var io=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}
+    });
+  },{threshold:.15,rootMargin:'0px 0px -40px 0px'});
+  els.forEach(function(el){io.observe(el)});
+})();
+</script>
+</body>
+</html>

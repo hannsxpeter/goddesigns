@@ -1,0 +1,679 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bandquarter, the back office for independent music venues</title>
+<meta name="description" content="Booking calendar, artist settlement and payouts, and bar sales tracking for independent music venues.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;1,6..96,500&family=Manrope:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+/* goddesign | structure: Marquee Hero | direction: Luxury Serif | accent: 258 */
+/* seed 1626398203 | direction 11 Luxury Serif | structure 0 Marquee Hero
+   Lock: bg oklch(from #0E0C08 l-0.01) | surface oklch(from #171410 l-0.01) | text #EFE9DC
+   muted #9C917C | accent oklch(from #C9CFDA h-4) | hairline #2E2A22 | radius 0
+   Bodoni Moda 500 display / Manrope 300,400,600 body+labels
+   Grammar: settlement band full-bleed 1440px (master 1100px); settlement has no heading;
+   calendar spanning cell + unequal pricing columns; bar section short; paddings 64/128/160 */
+
+:root {
+  --bg: oklch(from #0E0C08 calc(l - 0.01) c h);
+  --surface: oklch(from #171410 calc(l - 0.01) c h);
+  --panel: oklch(from #171410 calc(l + 0.025) c h);
+  --text: #EFE9DC;
+  --muted: #9C917C;
+  --accent: oklch(from #C9CFDA l c calc(h - 4));
+  --accent-hover: oklch(from var(--accent) calc(l - 0.1) c h);
+  --hairline: #2E2A22;
+  --hold: #6E6455;
+  --font-display: "Bodoni Moda", "Didot", "Bodoni MT", serif;
+  --font-body: "Manrope", "Avenir Next", "Segoe UI", sans-serif;
+  --s-1: 4px;  --s0: 8px;  --s1: 12px; --s2: 16px; --s3: 24px; --s4: 32px;
+  --s5: 48px; --s6: 64px; --s7: 96px; --s8: 128px; --s9: 160px;
+  --measure: 62ch;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 17px;
+  line-height: 1.6;
+  overflow-x: clip;
+}
+
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+p { text-wrap: pretty; margin: 0; }
+
+a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+a:hover { color: var(--accent-hover); }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.container { max-width: 1100px; margin-inline: auto; padding-inline: var(--s3); }
+.container-wide { max-width: 1440px; margin-inline: auto; padding-inline: var(--s3); }
+
+.label {
+  font-weight: 600;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+
+/* ---------- nav ---------- */
+
+.nav {
+  border-bottom: 1px solid var(--hairline);
+}
+.nav-inner {
+  display: flex;
+  align-items: center;
+  gap: var(--s4);
+  padding-block: var(--s3);
+}
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.5rem;
+  letter-spacing: 0.01em;
+  color: var(--text);
+  text-decoration: none;
+}
+.wordmark:hover { color: var(--accent); }
+.nav-links {
+  display: flex;
+  gap: var(--s4);
+  margin-left: auto;
+  list-style: none;
+  margin-block: 0;
+  padding: 0;
+}
+.nav-links a {
+  display: inline-block;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 0.95rem;
+  padding-block: var(--s1);
+  padding-inline: var(--s0);
+  margin-inline: calc(-1 * var(--s0));
+  transition: color 0.18s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.nav-links a:hover { color: var(--accent); }
+
+.btn {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 14px 28px;
+  min-height: 44px;
+  border: 1px solid var(--accent);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.18s cubic-bezier(0.25, 1, 0.5, 1),
+              color 0.18s cubic-bezier(0.25, 1, 0.5, 1),
+              border-color 0.18s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.btn-solid {
+  background: var(--accent);
+  color: var(--bg);
+}
+.btn-solid:hover { background: var(--accent-hover); border-color: var(--accent-hover); color: var(--bg); }
+.btn-solid:active { background: oklch(from var(--accent) calc(l - 0.16) c h); }
+.btn-ghost {
+  background: transparent;
+  color: var(--accent);
+}
+.btn-ghost:hover { color: var(--bg); background: var(--accent); }
+.btn-ghost:active { background: var(--accent-hover); border-color: var(--accent-hover); }
+.btn:disabled, .btn[aria-disabled="true"] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ---------- hero ---------- */
+
+.hero {
+  position: relative;
+  min-height: 88svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-block: var(--s8) 0;
+  isolation: isolate;
+}
+.hero::before {
+  /* atmosphere: single stage spotlight, lightness only */
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(ellipse 70% 55% at 32% 18%,
+              oklch(from var(--bg) calc(l + 0.05) c h) 0%, transparent 68%);
+  pointer-events: none;
+}
+.hero h1 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(3.2rem, 8.5vw, 6rem);
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  max-width: 18ch;
+}
+.hero-sub {
+  margin-top: var(--s4);
+  max-width: 46ch;
+  font-weight: 300;
+  font-size: 1.15rem;
+  color: var(--muted);
+}
+.hero-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+  margin-top: var(--s5);
+}
+
+.tonight {
+  margin-top: var(--s7);
+  border-top: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--s2) var(--s4);
+  padding-block: var(--s2);
+}
+.tonight-date {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 2rem;
+  line-height: 1.1;
+}
+.tonight-act {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.9rem;
+}
+.tonight-meta { color: var(--muted); font-size: 0.9rem; margin-left: auto; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .fade-in { animation: fade 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  .fade-in:nth-child(2) { animation-delay: 60ms; }
+  .fade-in:nth-child(3) { animation-delay: 120ms; }
+  .fade-in:nth-child(4) { animation-delay: 180ms; }
+  @keyframes fade { from { opacity: 0; } }
+}
+
+/* ---------- booking calendar (loud) ---------- */
+
+.booking { padding-block: var(--s9); }
+.booking-head { max-width: var(--measure); }
+.booking-head h2 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.15;
+  margin-top: var(--s2);
+}
+.booking-head p { margin-top: var(--s3); color: var(--muted); }
+
+.weekgrid {
+  margin-top: var(--s6);
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-top: 1px solid var(--hairline);
+  border-left: 1px solid var(--hairline);
+}
+.night {
+  border-right: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+  padding: var(--s3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s1);
+  min-height: 190px;
+}
+.night-span { grid-column: span 2; background: var(--surface); }
+.night-date {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 2.6rem;
+  line-height: 1;
+}
+.night-dow { color: var(--muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600; }
+.night-act {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.88rem;
+  margin-top: auto;
+}
+.night-status { font-size: 0.85rem; display: flex; align-items: center; gap: var(--s0); }
+.night-status::before {
+  content: "";
+  width: 7px; height: 7px;
+  background: currentcolor;
+  flex: none;
+}
+.st-onsale { color: var(--accent); }
+.st-sold { color: var(--text); }
+.st-sold::before { background: var(--text); }
+.st-hold { color: var(--hold); }
+.st-open { color: var(--muted); }
+.st-open::before { background: transparent; border: 1px solid var(--muted); }
+.night-open-note { color: var(--muted); font-size: 0.85rem; }
+.booking-foot { margin-top: var(--s4); color: var(--muted); font-size: 0.95rem; max-width: var(--measure); }
+
+/* ---------- settlement (full-bleed, no heading ceremony) ---------- */
+
+.settle {
+  background: var(--surface);
+  border-block: 1px solid var(--hairline);
+  padding-block: var(--s8);
+}
+.sheet {
+  background: var(--panel);
+  border: 1px solid var(--hairline);
+  padding: var(--s5) var(--s5) var(--s6);
+  position: relative;
+}
+.sheet-tag {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--s2);
+  padding-bottom: var(--s3);
+  border-bottom: 1px solid var(--hairline);
+}
+.sheet-lines {
+  margin: var(--s4) 0 0;
+  max-width: 56ch;
+}
+.sheet-lines dl { margin: 0; }
+.sheet-line {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s2);
+  padding-block: var(--s1);
+  border-bottom: 1px solid var(--hairline);
+}
+.sheet-line dt { font-weight: 300; }
+.sheet-line dd {
+  margin: 0 0 0 auto;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.15rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.sheet-line .neg::before { content: "\2212\00a0"; color: var(--muted); }
+.sheet-payout {
+  margin-top: var(--s5);
+  border-top: 1px solid var(--text);
+  padding-top: 0;
+}
+.payout-label { display: block; margin-top: var(--s2); }
+.payout-figure {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(3.4rem, 9vw, 8rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  margin-top: -0.5em; /* signature: the payout numeral overlaps the sheet's top rule */
+  background: var(--panel);
+  width: fit-content;
+  max-width: 100%;
+  padding-right: 0.25em;
+  overflow-wrap: anywhere;
+}
+.settle-notes {
+  margin-top: var(--s6);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--s5);
+  max-width: 1100px;
+}
+.settle-notes h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.35rem;
+}
+.settle-notes p { margin-top: var(--s1); color: var(--muted); font-size: 0.98rem; }
+
+/* ---------- bar (quiet, short) ---------- */
+
+.bar { padding-block: var(--s6); }
+.bar-claim {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(1.7rem, 3.2vw, 2.5rem);
+  line-height: 1.25;
+  max-width: 24ch;
+}
+.bar-rows { margin-top: var(--s5); max-width: 46rem; }
+.bar-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s2);
+  padding-block: var(--s2);
+  border-top: 1px solid var(--hairline);
+}
+.bar-row:last-child { border-bottom: 1px solid var(--hairline); }
+.bar-row .num {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.6rem;
+  min-width: 5.5ch;
+  font-variant-numeric: tabular-nums;
+}
+.bar-row .what { color: var(--muted); font-size: 0.98rem; }
+.bar-foot { margin-top: var(--s3); color: var(--muted); font-size: 0.9rem; }
+
+/* ---------- pricing ---------- */
+
+.pricing { padding-block: var(--s9); }
+.pricing h2 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(2rem, 4vw, 3rem);
+}
+.pricing-sub { margin-top: var(--s2); color: var(--muted); max-width: var(--measure); }
+.tiers {
+  margin-top: var(--s6);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start; /* columns keep their natural, unequal heights */
+  border-left: 1px solid var(--hairline);
+}
+.tier {
+  border-right: 1px solid var(--hairline);
+  padding: var(--s4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+}
+.tier-featured { background: var(--surface); border-top: 1px solid var(--accent); }
+.tier h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.4rem;
+}
+.tier-price {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 3.4rem;
+  line-height: 1;
+}
+.tier-price small {
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+.tier ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s1); }
+.tier li { padding-left: var(--s3); position: relative; font-size: 0.95rem; color: var(--muted); }
+.tier li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.72em;
+  width: 10px;
+  height: 1px;
+  background: var(--accent);
+}
+.tier .btn { align-self: start; margin-top: var(--s2); }
+.tier-note { color: var(--muted); font-size: 0.85rem; }
+
+/* ---------- footer ---------- */
+
+.footer {
+  border-top: 1px solid var(--hairline);
+  padding-block: var(--s6);
+}
+.footer-inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s4) var(--s6);
+  align-items: baseline;
+}
+.footer-line { color: var(--muted); font-size: 0.9rem; max-width: 44ch; }
+.footer-links { display: flex; gap: var(--s3); margin-left: auto; flex-wrap: wrap; }
+.footer-links a { display: inline-block; color: var(--muted); text-decoration: none; font-size: 0.9rem; padding-block: var(--s1); transition: color 0.18s cubic-bezier(0.25, 1, 0.5, 1); }
+.footer-links a:hover { color: var(--accent); }
+.footer-legal { margin-top: var(--s5); color: var(--muted); font-size: 0.8rem; }
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 900px) {
+  .weekgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tiers { grid-template-columns: 1fr; border-left: 0; }
+  .tier { border-right: 0; border-bottom: 1px solid var(--hairline); }
+  .tier:first-child { border-top: 1px solid var(--hairline); }
+  .tier-featured { border-top: 1px solid var(--accent); }
+}
+@media (max-width: 620px) {
+  .nav-links { display: none; }
+  .weekgrid { grid-template-columns: minmax(0, 1fr); }
+  .night-span { grid-column: auto; }
+  .sheet { padding: var(--s3) var(--s3) var(--s5); }
+  .hero { min-height: 70svh; }
+  .tonight-meta { margin-left: 0; width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-inner">
+    <a class="wordmark" href="#">Bandquarter</a>
+    <nav aria-label="Primary">
+      <ul class="nav-links">
+        <li><a href="#booking">Booking</a></li>
+        <li><a href="#settlement">Settlement</a></li>
+        <li><a href="#bar">Bar</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+      </ul>
+    </nav>
+    <a class="btn btn-solid" href="#pricing">Start free trial</a>
+  </div>
+</header>
+
+<main>
+
+  <section class="hero container" aria-label="Introduction">
+    <h1 class="fade-in">Book the night. Settle the band. Count the bar.</h1>
+    <p class="hero-sub fade-in">The back office for independent music venues: booking calendar, artist settlements, and bar sales in one place.</p>
+    <div class="hero-cta fade-in">
+      <a class="btn btn-solid" href="#pricing">Start free trial</a>
+      <a class="btn btn-ghost" href="#settlement">See a sample settlement</a>
+    </div>
+    <div class="tonight fade-in" role="note" aria-label="Tonight's show">
+      <span class="tonight-date">Fri 18</span>
+      <span class="tonight-act">Doors 7, show 8</span>
+      <span class="tonight-meta">Sample night. Your calendar replaces this the day you sign up.</span>
+    </div>
+  </section>
+
+  <section class="booking container" id="booking" aria-label="Booking calendar">
+    <div class="booking-head">
+      <span class="label">Booking</span>
+      <h2>The calendar is the venue</h2>
+      <p>Holds, confirms, and on-sales live on one grid. Drop a hold from an agent email, promote it to confirmed when the contract lands, and the on-sale link goes out without retyping a single date.</p>
+    </div>
+    <div class="weekgrid" role="list" aria-label="One sample week of shows">
+      <article class="night" role="listitem">
+        <span class="night-dow">Tuesday</span>
+        <span class="night-date">15</span>
+        <span class="night-act">Open date</span>
+        <span class="night-status st-open">Available</span>
+        <span class="night-open-note">Two agents holding, none confirmed</span>
+      </article>
+      <article class="night" role="listitem">
+        <span class="night-dow">Wednesday</span>
+        <span class="night-date">16</span>
+        <span class="night-act">Songwriter round</span>
+        <span class="night-status st-hold">Hold, expires Mon</span>
+      </article>
+      <article class="night" role="listitem">
+        <span class="night-dow">Thursday</span>
+        <span class="night-date">17</span>
+        <span class="night-act">Touring headliner + local support</span>
+        <span class="night-status st-onsale">On sale</span>
+      </article>
+      <article class="night" role="listitem">
+        <span class="night-dow">Friday</span>
+        <span class="night-date">18</span>
+        <span class="night-act">Album release show</span>
+        <span class="night-status st-sold">Sold out</span>
+      </article>
+      <article class="night night-span" role="listitem">
+        <span class="night-dow">Saturday and Sunday</span>
+        <span class="night-date">19&ndash;20</span>
+        <span class="night-act">Two-night residency, one contract</span>
+        <span class="night-status st-onsale">On sale, both nights</span>
+      </article>
+      <article class="night" role="listitem">
+        <span class="night-dow">Monday</span>
+        <span class="night-date">21</span>
+        <span class="night-act">Dark</span>
+        <span class="night-status st-open">Room closed</span>
+      </article>
+      <article class="night" role="listitem">
+        <span class="night-dow">Tuesday</span>
+        <span class="night-date">22</span>
+        <span class="night-act">Comedy night</span>
+        <span class="night-status st-hold">Hold, contract out</span>
+      </article>
+    </div>
+    <p class="booking-foot">Every cell carries its deal memo, ticket counts, and settlement status. A multi-night run is one booking, not four copies of the same paperwork.</p>
+  </section>
+
+  <section class="settle" id="settlement" aria-label="Artist settlement and payouts">
+    <div class="container-wide">
+      <article class="sheet" aria-label="Sample artist settlement sheet">
+        <div class="sheet-tag">
+          <span class="label">Sample settlement, Friday 18</span>
+          <span class="label">Deal: $1,500 guarantee vs 80% of net door</span>
+        </div>
+        <div class="sheet-lines">
+          <dl>
+            <div class="sheet-line"><dt>Tickets sold, 418 at $20</dt><dd>$8,360.00</dd></div>
+            <div class="sheet-line"><dt>House expenses: staff, sound, marketing</dt><dd class="neg">$1,610.00</dd></div>
+            <div class="sheet-line"><dt>Net door</dt><dd>$6,750.00</dd></div>
+            <div class="sheet-line"><dt>80% of net door, beats the guarantee</dt><dd>$5,400.00</dd></div>
+          </dl>
+        </div>
+        <p class="sheet-payout">
+          <span class="payout-figure">$5,400.00</span>
+          <span class="payout-label label">Artist payout, settled at load-out</span>
+        </p>
+      </article>
+      <div class="settle-notes">
+        <div>
+          <h3>The math is done before the encore</h3>
+          <p>Ticket counts flow in from your ticketing provider all night. When the band walks offstage, the sheet is already reconciled: guarantee versus percentage, expenses itemized, splits applied.</p>
+        </div>
+        <div>
+          <h3>Pay out the same night</h3>
+          <p>Send the payout by ACH before the van leaves the alley, or print the sheet for a cash settlement. Either way the tour manager signs once and both sides keep a copy forever.</p>
+        </div>
+        <div>
+          <h3>Every deal type, one sheet</h3>
+          <p>Flat guarantees, versus deals, door splits, co-promotes with a partner promoter. Bandquarter models the deal when you book it, so settlement night is confirmation, not negotiation.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="bar container" id="bar" aria-label="Bar sales tracking">
+    <p class="bar-claim">The bar knows how the show went before the door count does.</p>
+    <div class="bar-rows">
+      <div class="bar-row"><span class="num">$11.40</span><span class="what">bar spend per head on Friday's sold-out night, straight from your POS, matched to the show automatically</span></div>
+      <div class="bar-row"><span class="num">61 / 39</span><span class="what">door-to-bar revenue split for the month, so you know which bookings actually fill the register</span></div>
+      <div class="bar-row"><span class="num">9:41 pm</span><span class="what">the night's bar peak, ring by ring, so you staff the rail for the rush and not the soundcheck</span></div>
+    </div>
+    <p class="bar-foot">Figures above are from the sample night. Bandquarter connects to Square, Toast, and Clover.</p>
+  </section>
+
+  <section class="pricing container" id="pricing" aria-label="Pricing">
+    <h2>Pricing</h2>
+    <p class="pricing-sub">Every plan includes the booking calendar, settlement sheets, and bar reporting. Fourteen-day free trial, no card required, and your data exports any time.</p>
+    <div class="tiers">
+      <div class="tier">
+        <h3>House</h3>
+        <p class="tier-price">$59<small> per month</small></p>
+        <ul>
+          <li>One room, unlimited shows</li>
+          <li>Booking calendar with holds and confirms</li>
+          <li>Settlement sheets and printable payouts</li>
+          <li>Bar sales by night from one POS</li>
+        </ul>
+        <a class="btn btn-ghost" href="#pricing">Start free trial</a>
+      </div>
+      <div class="tier tier-featured">
+        <h3>Marquee</h3>
+        <p class="tier-price">$129<small> per month</small></p>
+        <ul>
+          <li>Everything in House</li>
+          <li>Same-night ACH artist payouts</li>
+          <li>Ticketing sync for live counts</li>
+          <li>Co-promote deals and revenue splits</li>
+          <li>Per-show door versus bar reporting</li>
+          <li>Roles for talent buyer, box office, and bar manager</li>
+        </ul>
+        <a class="btn btn-solid" href="#pricing">Start free trial</a>
+        <p class="tier-note">Most independent rooms run on Marquee.</p>
+      </div>
+      <div class="tier">
+        <h3>Promoter</h3>
+        <p class="tier-price">$279<small> per month</small></p>
+        <ul>
+          <li>Everything in Marquee</li>
+          <li>Up to five rooms on one calendar</li>
+          <li>Cross-venue routing and avails</li>
+          <li>Accounting export to QuickBooks and Xero</li>
+        </ul>
+        <a class="btn btn-ghost" href="#pricing">Start free trial</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <a class="wordmark" href="#">Bandquarter</a>
+    <p class="footer-line">Built for the rooms where bands earn their audiences: software for booking, settling, and pouring, made by people who have closed out a register at 2 am.</p>
+    <div class="footer-links">
+      <a href="#pricing">Pricing</a>
+      <a href="mailto:hello@bandquarter.example">hello@bandquarter.example</a>
+    </div>
+  </div>
+  <div class="container">
+    <p class="footer-legal">Bandquarter is a product demonstration page. Sample data throughout.</p>
+  </div>
+</footer>
+
+</body>
+</html>
