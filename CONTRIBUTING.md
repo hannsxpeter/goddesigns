@@ -24,7 +24,7 @@ A tell is admitted only with evidence, not taste:
 
 ## Validation bar for any substantive change
 
-Run the standard proof from [validation/kilnhouse-2026-07.md](validation/kilnhouse-2026-07.md): at least one baseline (expect tells), skill runs on both hosts (expect clean gates), two same-brief DIVERGE runs (expect zero shared ledger axes), screenshots or an honest DEGRADED. Add the artifacts and a dated summary to `validation/`.
+Run the standard proof from [validation/archive/2026-07-kilnhouse/kilnhouse-2026-07.md](validation/archive/2026-07-kilnhouse/kilnhouse-2026-07.md): at least one baseline (expect tells), skill runs on both hosts (expect clean gates), two same-brief DIVERGE runs (expect zero shared ledger axes), screenshots or an honest DEGRADED. Add the artifacts and a dated summary to `validation/`.
 
 ## Style
 

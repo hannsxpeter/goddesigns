@@ -23,5 +23,5 @@ First public release.
 
 ### Evidence
 - 346-comment verified public-sentiment study with per-quote source URLs and verification tiers (`validation/sentiment-evidence-2026-07.md`).
-- Full validation round: 7 distinct gate-passing skill runs vs 3 baseline runs reproducing the catalogued failures, all artifacts archived (`validation/kilnhouse-2026-07.md`).
+- Full validation round: 7 distinct gate-passing skill runs vs 3 baseline runs reproducing the catalogued failures, all artifacts archived (`validation/archive/2026-07-kilnhouse/kilnhouse-2026-07.md`).
 - Repeatable catalog-refresh protocol (`validation/sentiment-refresh-protocol.md`).

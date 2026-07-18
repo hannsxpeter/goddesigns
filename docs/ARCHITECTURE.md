@@ -1,6 +1,6 @@
 # Architecture
 
-How goddesign works and why each mechanism exists. Every design decision below traces to measured evidence: a 346-comment verified study of public sentiment about AI frontend design ([validation/sentiment-evidence-2026-07.md](../validation/sentiment-evidence-2026-07.md)) plus defects observed in real validation runs ([validation/kilnhouse-2026-07.md](../validation/kilnhouse-2026-07.md)).
+How goddesign works and why each mechanism exists. Every design decision below traces to measured evidence: a 346-comment verified study of public sentiment about AI frontend design ([validation/sentiment-evidence-2026-07.md](../validation/sentiment-evidence-2026-07.md)) plus defects observed in real validation runs ([validation/kilnhouse-2026-07.md](../validation/archive/2026-07-kilnhouse/kilnhouse-2026-07.md)).
 
 ## The problem, measured
 

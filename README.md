@@ -3,7 +3,7 @@
 [![Release](https://img.shields.io/github/v/release/hannsxpeter/goddesigns)](https://github.com/hannsxpeter/goddesigns/releases)
 [![License: MIT](https://img.shields.io/github/license/hannsxpeter/goddesigns)](LICENSE)
 [![Hosts](https://img.shields.io/badge/hosts-Claude%20Code%20%7C%20Codex%20CLI-blue)](docs/INSTALL.md)
-[![Validation](https://img.shields.io/badge/validation-7%2F7%20skill%20runs%20green-success)](validation/kilnhouse-2026-07.md)
+[![Validation](https://img.shields.io/badge/validation-7%2F7%20skill%20runs%20green-success)](validation/archive/2026-07-kilnhouse/kilnhouse-2026-07.md)
 [![Evidence](https://img.shields.io/badge/evidence-346%20sourced%20comments-informational)](validation/sentiment-evidence-2026-07.md)
 
 A cross-agent frontend design skill that produces distinctive, production-grade UI instead of recognizable AI slop. One skill, two model lanes: it runs identically in Claude Code (`/goddesign`) and OpenAI Codex CLI (`$goddesign`).
@@ -49,7 +49,7 @@ Then invoke `/goddesign <brief>` in Claude Code or `$goddesign <brief>` in Codex
 
 ## Validation
 
-Seven skill runs on one brief produced seven fully distinct, gate-passing directions (terminal letter, Swiss manifesto, luxury serif, machine-room data-dense, editorial print, art deco dashboard, chartreuse signup) while three unskilled baseline runs reproduced the catalogued failures, including two pages that render completely blank in static capture due to scroll-reveal bugs. The audit script caught defects human review missed. Full evidence with screenshots: [validation/kilnhouse-2026-07.md](validation/kilnhouse-2026-07.md).
+Seven skill runs on one brief produced seven fully distinct, gate-passing directions (terminal letter, Swiss manifesto, luxury serif, machine-room data-dense, editorial print, art deco dashboard, chartreuse signup) while three unskilled baseline runs reproduced the catalogued failures, including two pages that render completely blank in static capture due to scroll-reveal bugs. The audit script caught defects human review missed. Full evidence with screenshots: [validation/archive/2026-07-kilnhouse/kilnhouse-2026-07.md](validation/archive/2026-07-kilnhouse/kilnhouse-2026-07.md).
 
 The tells catalog is a living artifact. The repeatable method for refreshing it against current public discourse is documented in [validation/sentiment-refresh-protocol.md](validation/sentiment-refresh-protocol.md).
 
