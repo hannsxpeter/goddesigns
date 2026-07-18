@@ -45,6 +45,7 @@ Layout
 - [ ] No numbered chapter cadence, contents rails, or hr dividers; sections transition by background or density shifts.
 - [ ] At most one card grid per page; card radius and border weight come from the locked direction row, not kit defaults; no decorative abstract blobs unless the locked row states one.
 - [ ] The stated macrostructure is recognizable on the rendered page.
+- [ ] The page contains at least one structured artifact of the product working (a table, readout, ledger, document, queue, or state display, with plausible labeled demo data); a page of pure assertion fails this gate regardless of how beautiful its typography is.
 
 States
 - [ ] Every interactive element has visible :focus-visible (2px outline, never removed), hover, active, and disabled.
