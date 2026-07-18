@@ -1,0 +1,2515 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Kilnhouse brings class scheduling, kiln firing queues, and member billing into one calm workspace for ceramics studios.">
+  <meta name="theme-color" content="#f4f0e8">
+  <title>Kilnhouse | Run your ceramics studio with ease</title>
+  <style>
+    :root {
+      --ink: #1e2925;
+      --muted: #62706a;
+      --clay: #bd6248;
+      --clay-dark: #9f4b35;
+      --sage: #7c8f79;
+      --sage-dark: #566851;
+      --bone: #f4f0e8;
+      --paper: #fffdf8;
+      --sand: #ded5c5;
+      --line: rgba(30, 41, 37, 0.15);
+      --shadow: 0 24px 70px rgba(53, 43, 35, 0.14);
+      --radius-sm: 14px;
+      --radius-md: 22px;
+      --radius-lg: 32px;
+      --max: 1180px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bone);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    body.menu-open {
+      overflow: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button,
+    a {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button:focus-visible,
+    a:focus-visible {
+      outline: 3px solid rgba(189, 98, 72, 0.42);
+      outline-offset: 4px;
+    }
+
+    .skip-link {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      z-index: 100;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: var(--ink);
+      color: white;
+      transform: translateY(-160%);
+      transition: transform 180ms ease;
+    }
+
+    .skip-link:focus {
+      transform: translateY(0);
+    }
+
+    .container {
+      width: min(calc(100% - 40px), var(--max));
+      margin-inline: auto;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      border-bottom: 1px solid transparent;
+      background: rgba(244, 240, 232, 0.82);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      transition: border-color 180ms ease, box-shadow 180ms ease;
+    }
+
+    .site-header.is-scrolled {
+      border-color: var(--line);
+      box-shadow: 0 8px 24px rgba(53, 43, 35, 0.06);
+    }
+
+    .nav-shell {
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 28px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 11px;
+      font-size: 18px;
+      font-weight: 760;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-mark {
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      border-radius: 11px 11px 14px 14px;
+      background: var(--clay);
+      color: white;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 18px;
+      font-weight: 700;
+      box-shadow: inset 0 -4px 0 rgba(113, 47, 29, 0.16);
+    }
+
+    .desktop-nav {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+      margin-left: auto;
+    }
+
+    .nav-link {
+      color: #45524d;
+      font-size: 14px;
+      font-weight: 650;
+      transition: color 160ms ease;
+    }
+
+    .nav-link:hover {
+      color: var(--clay-dark);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .button {
+      min-height: 46px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      padding: 0 20px;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 720;
+      line-height: 1;
+      transition: transform 160ms ease, background 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+    }
+
+    .button-primary {
+      background: var(--ink);
+      color: white;
+      box-shadow: 0 10px 24px rgba(30, 41, 37, 0.18);
+    }
+
+    .button-primary:hover {
+      background: #101815;
+      box-shadow: 0 14px 30px rgba(30, 41, 37, 0.24);
+    }
+
+    .button-secondary {
+      border-color: var(--line);
+      background: rgba(255, 253, 248, 0.55);
+      color: var(--ink);
+    }
+
+    .button-secondary:hover {
+      border-color: rgba(30, 41, 37, 0.3);
+      background: var(--paper);
+    }
+
+    .button-clay {
+      background: var(--clay);
+      color: white;
+      box-shadow: 0 12px 28px rgba(159, 75, 53, 0.25);
+    }
+
+    .button-clay:hover {
+      background: var(--clay-dark);
+    }
+
+    .button-arrow {
+      position: relative;
+      width: 15px;
+      height: 10px;
+      transition: transform 160ms ease;
+    }
+
+    .button-arrow::before {
+      position: absolute;
+      top: 4px;
+      left: 0;
+      width: 13px;
+      height: 2px;
+      border-radius: 2px;
+      background: currentColor;
+      content: "";
+    }
+
+    .button-arrow::after {
+      position: absolute;
+      top: 2px;
+      right: 0;
+      width: 5px;
+      height: 5px;
+      border-top: 2px solid currentColor;
+      border-right: 2px solid currentColor;
+      content: "";
+      transform: rotate(45deg);
+    }
+
+    .button:hover .button-arrow {
+      transform: translateX(3px);
+    }
+
+    .menu-button {
+      width: 44px;
+      height: 44px;
+      display: none;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      background: rgba(255, 253, 248, 0.7);
+      color: var(--ink);
+      cursor: pointer;
+    }
+
+    .menu-lines,
+    .menu-lines::before,
+    .menu-lines::after {
+      width: 18px;
+      height: 2px;
+      display: block;
+      border-radius: 2px;
+      background: currentColor;
+      transition: transform 180ms ease, opacity 180ms ease;
+    }
+
+    .menu-lines {
+      position: relative;
+    }
+
+    .menu-lines::before,
+    .menu-lines::after {
+      position: absolute;
+      left: 0;
+      content: "";
+    }
+
+    .menu-lines::before {
+      top: -6px;
+    }
+
+    .menu-lines::after {
+      top: 6px;
+    }
+
+    .menu-button[aria-expanded="true"] .menu-lines {
+      background: transparent;
+    }
+
+    .menu-button[aria-expanded="true"] .menu-lines::before {
+      top: 0;
+      transform: rotate(45deg);
+    }
+
+    .menu-button[aria-expanded="true"] .menu-lines::after {
+      top: 0;
+      transform: rotate(-45deg);
+    }
+
+    .mobile-nav {
+      display: none;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 94px 0 88px;
+    }
+
+    .hero::before {
+      position: absolute;
+      width: 520px;
+      height: 520px;
+      top: -210px;
+      right: -170px;
+      border: 1px solid rgba(189, 98, 72, 0.16);
+      border-radius: 50%;
+      content: "";
+      box-shadow: 0 0 0 82px rgba(189, 98, 72, 0.035), 0 0 0 164px rgba(189, 98, 72, 0.025);
+      pointer-events: none;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 0.92fr) minmax(500px, 1.08fr);
+      align-items: center;
+      gap: 74px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--clay-dark);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      width: 25px;
+      height: 2px;
+      border-radius: 2px;
+      background: currentColor;
+      content: "";
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1,
+    h2 {
+      font-family: Georgia, "Times New Roman", serif;
+      font-weight: 500;
+      letter-spacing: -0.045em;
+    }
+
+    h1 {
+      max-width: 650px;
+      margin: 21px 0 25px;
+      font-size: clamp(55px, 6vw, 82px);
+      line-height: 0.96;
+    }
+
+    .clay-underline {
+      position: relative;
+      color: var(--clay-dark);
+      white-space: nowrap;
+    }
+
+    .clay-underline::after {
+      position: absolute;
+      right: 0;
+      bottom: 1px;
+      left: 0;
+      height: 6px;
+      border-radius: 999px 18px 999px 18px;
+      background: rgba(189, 98, 72, 0.28);
+      content: "";
+      transform: rotate(-1.5deg);
+    }
+
+    .hero-copy {
+      max-width: 570px;
+      margin-bottom: 31px;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.72;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .hero-actions .button {
+      min-height: 52px;
+      padding-inline: 24px;
+    }
+
+    .hero-trust {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      margin-top: 28px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .avatar-stack {
+      display: flex;
+      padding-left: 7px;
+    }
+
+    .avatar {
+      width: 31px;
+      height: 31px;
+      display: grid;
+      place-items: center;
+      margin-left: -7px;
+      border: 2px solid var(--bone);
+      border-radius: 50%;
+      color: white;
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .avatar:nth-child(1) { background: #a45e47; }
+    .avatar:nth-child(2) { background: #6b7e69; }
+    .avatar:nth-child(3) { background: #384b47; }
+
+    .product-stage {
+      position: relative;
+      min-width: 0;
+      padding: 22px 0 30px 28px;
+    }
+
+    .product-stage::before {
+      position: absolute;
+      inset: 4% -14% -4% 11%;
+      border-radius: 46% 46% 40% 40%;
+      background: #d8cdbb;
+      content: "";
+      transform: rotate(3deg);
+    }
+
+    .app-window {
+      position: relative;
+      z-index: 2;
+      overflow: hidden;
+      border: 1px solid rgba(30, 41, 37, 0.18);
+      border-radius: 24px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+      transform: rotate(-1.1deg);
+    }
+
+    .app-topbar {
+      height: 62px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .app-brand {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+
+    .app-brand-mark {
+      width: 24px;
+      height: 24px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px 8px 10px 10px;
+      background: var(--clay);
+      color: white;
+      font-family: Georgia, serif;
+    }
+
+    .app-tools {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .app-tool {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      color: var(--muted);
+      font-size: 9px;
+      font-weight: 800;
+    }
+
+    .app-body {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      min-height: 408px;
+    }
+
+    .app-sidebar {
+      padding: 21px 13px;
+      border-right: 1px solid var(--line);
+      background: #f7f3ec;
+    }
+
+    .app-nav-label {
+      margin: 0 7px 13px;
+      color: #8b958f;
+      font-size: 8px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .app-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 5px;
+      padding: 9px 8px;
+      border-radius: 8px;
+      color: #65716c;
+      font-size: 9px;
+      font-weight: 700;
+    }
+
+    .app-nav-item.active {
+      background: #ebe3d6;
+      color: var(--ink);
+    }
+
+    .nav-dot {
+      width: 7px;
+      height: 7px;
+      border: 1px solid currentColor;
+      border-radius: 50%;
+    }
+
+    .app-main {
+      min-width: 0;
+      padding: 26px 24px 22px;
+    }
+
+    .app-heading-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 15px;
+      margin-bottom: 21px;
+    }
+
+    .app-kicker {
+      margin-bottom: 4px;
+      color: #8a948f;
+      font-size: 8px;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .app-title {
+      font-family: Georgia, serif;
+      font-size: 25px;
+      letter-spacing: -0.04em;
+    }
+
+    .app-add {
+      padding: 8px 11px;
+      border-radius: 9px;
+      background: var(--ink);
+      color: white;
+      font-size: 9px;
+      font-weight: 800;
+    }
+
+    .schedule-days {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+    }
+
+    .day {
+      min-width: 0;
+      padding: 11px 8px 9px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: white;
+      text-align: center;
+    }
+
+    .day.active {
+      border-color: rgba(189, 98, 72, 0.42);
+      background: #fbf0eb;
+    }
+
+    .day-name {
+      color: #88928d;
+      font-size: 7px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .day-number {
+      display: block;
+      margin-top: 4px;
+      font-family: Georgia, serif;
+      font-size: 17px;
+    }
+
+    .class-list {
+      margin-top: 15px;
+    }
+
+    .class-row {
+      display: grid;
+      grid-template-columns: 47px 8px 1fr auto;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(30, 41, 37, 0.1);
+    }
+
+    .class-time {
+      color: var(--muted);
+      font-size: 8px;
+      font-weight: 700;
+    }
+
+    .class-color {
+      width: 7px;
+      height: 27px;
+      border-radius: 999px;
+      background: var(--clay);
+    }
+
+    .class-row:nth-child(2) .class-color {
+      background: var(--sage);
+    }
+
+    .class-row:nth-child(3) .class-color {
+      background: #c8a35a;
+    }
+
+    .class-name {
+      min-width: 0;
+      color: #34413c;
+      font-size: 9px;
+      font-weight: 750;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .class-meta {
+      display: block;
+      margin-top: 3px;
+      color: #8a948f;
+      font-size: 7px;
+      font-weight: 600;
+    }
+
+    .class-spots {
+      padding: 5px 7px;
+      border-radius: 999px;
+      background: #edf1eb;
+      color: var(--sage-dark);
+      font-size: 7px;
+      font-weight: 800;
+    }
+
+    .floating-card {
+      position: absolute;
+      z-index: 3;
+      border: 1px solid rgba(30, 41, 37, 0.14);
+      background: rgba(255, 253, 248, 0.96);
+      box-shadow: 0 16px 40px rgba(53, 43, 35, 0.18);
+      backdrop-filter: blur(8px);
+    }
+
+    .kiln-status-card {
+      right: -45px;
+      bottom: 0;
+      width: 192px;
+      padding: 15px;
+      border-radius: 17px;
+      transform: rotate(2deg);
+    }
+
+    .floating-label {
+      margin-bottom: 10px;
+      color: #78847e;
+      font-size: 8px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .kiln-status {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .kiln-temp {
+      font-family: Georgia, serif;
+      font-size: 29px;
+      letter-spacing: -0.05em;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 5px;
+      color: var(--sage-dark);
+      font-size: 8px;
+      font-weight: 800;
+    }
+
+    .status-pill::before {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #789170;
+      content: "";
+      box-shadow: 0 0 0 3px rgba(120, 145, 112, 0.14);
+    }
+
+    .kiln-ring {
+      width: 43px;
+      height: 43px;
+      display: grid;
+      place-items: center;
+      border: 5px solid #eaded1;
+      border-top-color: var(--clay);
+      border-right-color: var(--clay);
+      border-radius: 50%;
+      color: var(--clay-dark);
+      font-size: 8px;
+      font-weight: 850;
+      transform: rotate(-35deg);
+    }
+
+    .kiln-ring span {
+      transform: rotate(35deg);
+    }
+
+    .payment-card {
+      top: 64px;
+      left: -20px;
+      width: 171px;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 12px;
+      border-radius: 15px;
+      transform: rotate(-3deg);
+    }
+
+    .payment-check {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      flex: 0 0 auto;
+      place-items: center;
+      border-radius: 50%;
+      background: #e6eee4;
+      color: var(--sage-dark);
+    }
+
+    .payment-check::before {
+      width: 6px;
+      height: 11px;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      content: "";
+      transform: translateY(-1px) rotate(45deg);
+    }
+
+    .payment-copy strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 9px;
+    }
+
+    .payment-copy span {
+      color: #7b8781;
+      font-size: 8px;
+      font-weight: 600;
+    }
+
+    .proof-strip {
+      padding: 27px 0;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 253, 248, 0.32);
+    }
+
+    .proof-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 30px;
+    }
+
+    .proof-copy {
+      max-width: 230px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
+      line-height: 1.45;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .studio-list {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: clamp(27px, 4.6vw, 58px);
+      color: #65716c;
+      font-family: Georgia, serif;
+      font-size: 16px;
+      font-style: italic;
+      white-space: nowrap;
+    }
+
+    .section {
+      padding: 122px 0;
+    }
+
+    .section-heading {
+      max-width: 720px;
+      margin: 0 auto 70px;
+      text-align: center;
+    }
+
+    .section-heading h2 {
+      margin: 18px 0 20px;
+      font-size: clamp(43px, 5vw, 64px);
+      line-height: 1.03;
+    }
+
+    .section-heading p {
+      max-width: 610px;
+      margin: 0 auto;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.7;
+    }
+
+    .feature-row {
+      display: grid;
+      grid-template-columns: minmax(0, 0.86fr) minmax(520px, 1.14fr);
+      align-items: center;
+      gap: clamp(60px, 8vw, 112px);
+      padding: 62px 0;
+    }
+
+    .feature-row + .feature-row {
+      border-top: 1px solid var(--line);
+    }
+
+    .feature-row.reverse {
+      grid-template-columns: minmax(520px, 1.14fr) minmax(0, 0.86fr);
+    }
+
+    .feature-row.reverse .feature-copy {
+      order: 2;
+    }
+
+    .feature-row.reverse .feature-visual {
+      order: 1;
+    }
+
+    .feature-number {
+      display: inline-block;
+      margin-bottom: 27px;
+      color: var(--clay);
+      font-family: Georgia, serif;
+      font-size: 16px;
+      font-style: italic;
+    }
+
+    .feature-copy h3 {
+      max-width: 480px;
+      margin: 0 0 21px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(37px, 4vw, 52px);
+      font-weight: 500;
+      letter-spacing: -0.04em;
+      line-height: 1.04;
+    }
+
+    .feature-copy > p {
+      max-width: 500px;
+      margin-bottom: 26px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.75;
+    }
+
+    .feature-points {
+      display: grid;
+      gap: 13px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .feature-points li {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      color: #3e4c46;
+      font-size: 14px;
+      font-weight: 680;
+    }
+
+    .feature-points li::before {
+      width: 7px;
+      height: 12px;
+      flex: 0 0 auto;
+      margin: -3px 5px 0 3px;
+      border-right: 2px solid var(--sage-dark);
+      border-bottom: 2px solid var(--sage-dark);
+      content: "";
+      transform: rotate(45deg);
+    }
+
+    .feature-visual {
+      position: relative;
+      min-width: 0;
+      min-height: 480px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      border-radius: var(--radius-lg);
+      background: #e4d7c5;
+    }
+
+    .feature-visual.sage-surface {
+      background: #cbd3c7;
+    }
+
+    .feature-visual.clay-surface {
+      background: #dca993;
+    }
+
+    .feature-visual::before {
+      position: absolute;
+      width: 320px;
+      height: 320px;
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      border-radius: 50%;
+      content: "";
+      box-shadow: 0 0 0 54px rgba(255, 255, 255, 0.09), 0 0 0 108px rgba(255, 255, 255, 0.06);
+    }
+
+    .visual-panel {
+      position: relative;
+      z-index: 2;
+      width: min(calc(100% - 64px), 490px);
+      overflow: hidden;
+      border: 1px solid rgba(30, 41, 37, 0.15);
+      border-radius: 18px;
+      background: rgba(255, 253, 248, 0.96);
+      box-shadow: 0 22px 54px rgba(45, 39, 33, 0.18);
+    }
+
+    .visual-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 20px 21px 17px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .visual-panel-title {
+      font-family: Georgia, serif;
+      font-size: 20px;
+      letter-spacing: -0.025em;
+    }
+
+    .small-chip {
+      padding: 6px 9px;
+      border-radius: 999px;
+      background: #eee8dd;
+      color: #596660;
+      font-size: 8px;
+      font-weight: 800;
+    }
+
+    .schedule-board {
+      display: grid;
+      grid-template-columns: 50px repeat(4, 1fr);
+      padding: 0 15px 18px;
+    }
+
+    .schedule-cell {
+      position: relative;
+      min-height: 59px;
+      padding: 9px 6px;
+      border-bottom: 1px solid rgba(30, 41, 37, 0.08);
+      border-right: 1px solid rgba(30, 41, 37, 0.08);
+      color: #8c9591;
+      font-size: 7px;
+      font-weight: 700;
+    }
+
+    .schedule-cell:nth-child(5n) {
+      border-right: 0;
+    }
+
+    .schedule-cell.header-cell {
+      min-height: 37px;
+      color: #58655f;
+      font-weight: 850;
+      text-align: center;
+    }
+
+    .schedule-event {
+      position: absolute;
+      inset: 6px;
+      padding: 7px;
+      border-left: 3px solid var(--clay);
+      border-radius: 5px;
+      background: #f7e6df;
+      color: #714233;
+      font-size: 7px;
+      font-weight: 850;
+      line-height: 1.35;
+    }
+
+    .schedule-event.sage {
+      border-left-color: var(--sage-dark);
+      background: #e4ebe2;
+      color: #455441;
+    }
+
+    .queue-list {
+      padding: 8px 20px 20px;
+    }
+
+    .queue-item {
+      display: grid;
+      grid-template-columns: 35px 1fr auto;
+      align-items: center;
+      gap: 13px;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(30, 41, 37, 0.1);
+    }
+
+    .queue-item:last-child {
+      border-bottom: 0;
+    }
+
+    .queue-index {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      background: #eee8de;
+      color: #5f6c66;
+      font-family: Georgia, serif;
+      font-size: 13px;
+    }
+
+    .queue-info strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 10px;
+    }
+
+    .queue-info span {
+      color: #89938e;
+      font-size: 8px;
+      font-weight: 650;
+    }
+
+    .queue-state {
+      padding: 6px 8px;
+      border-radius: 999px;
+      background: #e5ece2;
+      color: #4e6248;
+      font-size: 7px;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    .queue-state.queued {
+      background: #f2e5d8;
+      color: #805a40;
+    }
+
+    .heat-card {
+      position: absolute;
+      right: 18px;
+      bottom: 19px;
+      z-index: 3;
+      width: 164px;
+      padding: 15px;
+      border-radius: 15px;
+      background: var(--ink);
+      color: white;
+      box-shadow: 0 14px 34px rgba(30, 41, 37, 0.28);
+    }
+
+    .heat-label {
+      margin-bottom: 6px;
+      color: rgba(255, 255, 255, 0.62);
+      font-size: 7px;
+      font-weight: 800;
+      letter-spacing: 0.11em;
+      text-transform: uppercase;
+    }
+
+    .heat-temp {
+      font-family: Georgia, serif;
+      font-size: 25px;
+    }
+
+    .heat-line {
+      height: 34px;
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      margin-top: 8px;
+    }
+
+    .heat-line span {
+      width: 100%;
+      border-radius: 2px 2px 0 0;
+      background: var(--clay);
+    }
+
+    .heat-line span:nth-child(1) { height: 13%; }
+    .heat-line span:nth-child(2) { height: 20%; }
+    .heat-line span:nth-child(3) { height: 24%; }
+    .heat-line span:nth-child(4) { height: 37%; }
+    .heat-line span:nth-child(5) { height: 44%; }
+    .heat-line span:nth-child(6) { height: 58%; }
+    .heat-line span:nth-child(7) { height: 70%; }
+    .heat-line span:nth-child(8) { height: 86%; }
+    .heat-line span:nth-child(9) { height: 96%; }
+    .heat-line span:nth-child(10) { height: 100%; }
+
+    .billing-grid {
+      display: grid;
+      grid-template-columns: 0.85fr 1.15fr;
+      gap: 13px;
+      padding: 19px;
+    }
+
+    .balance-card,
+    .billing-card {
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: white;
+    }
+
+    .balance-card {
+      padding: 17px;
+      background: var(--ink);
+      color: white;
+    }
+
+    .balance-label {
+      margin-bottom: 11px;
+      color: rgba(255, 255, 255, 0.58);
+      font-size: 8px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .balance-number {
+      font-family: Georgia, serif;
+      font-size: 29px;
+      letter-spacing: -0.04em;
+    }
+
+    .balance-detail {
+      margin-top: 30px;
+      color: rgba(255, 255, 255, 0.62);
+      font-size: 8px;
+      font-weight: 650;
+      line-height: 1.6;
+    }
+
+    .billing-card {
+      padding: 14px;
+    }
+
+    .billing-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      padding: 11px 2px;
+      border-bottom: 1px solid rgba(30, 41, 37, 0.09);
+    }
+
+    .billing-row:last-child {
+      border-bottom: 0;
+    }
+
+    .member {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .member-avatar {
+      width: 26px;
+      height: 26px;
+      display: grid;
+      flex: 0 0 auto;
+      place-items: center;
+      border-radius: 50%;
+      background: #e8e0d4;
+      color: #5a4a3f;
+      font-size: 7px;
+      font-weight: 850;
+    }
+
+    .member-name {
+      font-size: 8px;
+      font-weight: 800;
+    }
+
+    .member-name span {
+      display: block;
+      margin-top: 3px;
+      color: #919a95;
+      font-size: 7px;
+      font-weight: 650;
+    }
+
+    .billing-amount {
+      color: #46534d;
+      font-size: 8px;
+      font-weight: 850;
+    }
+
+    .billing-chart {
+      grid-column: 1 / -1;
+      min-height: 107px;
+      display: flex;
+      align-items: flex-end;
+      gap: 9px;
+      padding: 17px 15px 12px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: #f6f1e9;
+    }
+
+    .billing-bar {
+      position: relative;
+      width: 100%;
+      border-radius: 4px 4px 0 0;
+      background: var(--clay);
+    }
+
+    .billing-bar:nth-child(1) { height: 42%; opacity: 0.54; }
+    .billing-bar:nth-child(2) { height: 60%; opacity: 0.62; }
+    .billing-bar:nth-child(3) { height: 49%; opacity: 0.7; }
+    .billing-bar:nth-child(4) { height: 74%; opacity: 0.78; }
+    .billing-bar:nth-child(5) { height: 68%; opacity: 0.86; }
+    .billing-bar:nth-child(6) { height: 91%; }
+
+    .quote-band {
+      padding: 0 0 122px;
+    }
+
+    .quote-card {
+      position: relative;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: end;
+      gap: 50px;
+      padding: clamp(45px, 7vw, 80px);
+      border-radius: var(--radius-lg);
+      background: var(--ink);
+      color: white;
+    }
+
+    .quote-card::after {
+      position: absolute;
+      width: 390px;
+      height: 390px;
+      right: -160px;
+      bottom: -240px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 50%;
+      content: "";
+      box-shadow: 0 0 0 55px rgba(255, 255, 255, 0.03), 0 0 0 110px rgba(255, 255, 255, 0.02);
+    }
+
+    blockquote {
+      position: relative;
+      z-index: 1;
+      max-width: 790px;
+      margin: 0;
+      font-family: Georgia, serif;
+      font-size: clamp(30px, 4vw, 47px);
+      font-weight: 400;
+      letter-spacing: -0.035em;
+      line-height: 1.17;
+    }
+
+    .quote-mark {
+      display: block;
+      margin-bottom: 23px;
+      color: var(--clay);
+      font-size: 52px;
+      line-height: 0.7;
+    }
+
+    .quote-person {
+      position: relative;
+      z-index: 1;
+      min-width: 160px;
+      padding-bottom: 4px;
+    }
+
+    .quote-person strong {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 14px;
+    }
+
+    .quote-person span {
+      color: rgba(255, 255, 255, 0.56);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .pricing {
+      padding: 122px 0;
+      border-top: 1px solid var(--line);
+      background: #eee8dd;
+    }
+
+    .pricing .section-heading {
+      margin-bottom: 38px;
+    }
+
+    .billing-toggle {
+      width: fit-content;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin: 0 auto 55px;
+      padding: 5px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 253, 248, 0.6);
+    }
+
+    .toggle-option {
+      min-height: 36px;
+      padding: 0 15px;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .toggle-option.active {
+      background: var(--ink);
+      color: white;
+      box-shadow: 0 5px 15px rgba(30, 41, 37, 0.15);
+    }
+
+    .save-badge {
+      color: var(--clay-dark);
+      font-size: 10px;
+      font-weight: 850;
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      align-items: stretch;
+      gap: 18px;
+    }
+
+    .price-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      padding: 34px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: rgba(255, 253, 248, 0.72);
+    }
+
+    .price-card.featured {
+      border-color: var(--ink);
+      background: var(--paper);
+      box-shadow: 0 20px 48px rgba(55, 45, 38, 0.12);
+      transform: translateY(-12px);
+    }
+
+    .popular-label {
+      position: absolute;
+      top: 0;
+      right: 26px;
+      padding: 7px 12px;
+      border-radius: 0 0 9px 9px;
+      background: var(--clay);
+      color: white;
+      font-size: 9px;
+      font-weight: 850;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .tier-name {
+      margin-bottom: 13px;
+      font-family: Georgia, serif;
+      font-size: 26px;
+      letter-spacing: -0.03em;
+    }
+
+    .tier-copy {
+      min-height: 50px;
+      margin-bottom: 28px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .price {
+      display: flex;
+      align-items: baseline;
+      gap: 5px;
+      margin-bottom: 8px;
+    }
+
+    .currency {
+      align-self: flex-start;
+      padding-top: 8px;
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .price-value {
+      font-family: Georgia, serif;
+      font-size: 53px;
+      letter-spacing: -0.055em;
+      line-height: 1;
+    }
+
+    .price-period {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+    }
+
+    .annual-note {
+      min-height: 19px;
+      margin-bottom: 23px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 650;
+    }
+
+    .price-card .button {
+      width: 100%;
+      margin-bottom: 29px;
+    }
+
+    .tier-features {
+      display: grid;
+      gap: 13px;
+      margin: auto 0 0;
+      padding: 25px 0 0;
+      border-top: 1px solid var(--line);
+      list-style: none;
+    }
+
+    .tier-features li {
+      display: flex;
+      gap: 10px;
+      color: #45524d;
+      font-size: 12px;
+      font-weight: 650;
+      line-height: 1.45;
+    }
+
+    .tier-features li::before {
+      width: 6px;
+      height: 10px;
+      flex: 0 0 auto;
+      margin: 1px 3px 0 2px;
+      border-right: 2px solid var(--sage-dark);
+      border-bottom: 2px solid var(--sage-dark);
+      content: "";
+      transform: rotate(45deg);
+    }
+
+    .pricing-footnote {
+      margin: 29px 0 0;
+      color: var(--muted);
+      font-size: 11px;
+      text-align: center;
+    }
+
+    .final-cta {
+      padding: 122px 0;
+      text-align: center;
+    }
+
+    .final-cta h2 {
+      max-width: 730px;
+      margin: 0 auto 20px;
+      font-size: clamp(46px, 6vw, 70px);
+      line-height: 1.02;
+    }
+
+    .final-cta p {
+      max-width: 570px;
+      margin: 0 auto 31px;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.7;
+    }
+
+    .final-cta .button {
+      min-height: 54px;
+      padding-inline: 26px;
+    }
+
+    .site-footer {
+      padding: 65px 0 31px;
+      background: var(--ink);
+      color: white;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1.5fr repeat(3, 0.7fr);
+      gap: 50px;
+      padding-bottom: 60px;
+    }
+
+    .footer-brand .brand {
+      margin-bottom: 17px;
+    }
+
+    .footer-brand p {
+      max-width: 330px;
+      margin: 0;
+      color: rgba(255, 255, 255, 0.58);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .footer-heading {
+      margin-bottom: 20px;
+      color: rgba(255, 255, 255, 0.46);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .footer-links {
+      display: grid;
+      gap: 13px;
+    }
+
+    .footer-links a {
+      width: fit-content;
+      color: rgba(255, 255, 255, 0.76);
+      font-size: 12px;
+      font-weight: 650;
+      transition: color 160ms ease;
+    }
+
+    .footer-links a:hover {
+      color: white;
+    }
+
+    .footer-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 30px;
+      padding-top: 27px;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      color: rgba(255, 255, 255, 0.44);
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    .footer-legal {
+      display: flex;
+      gap: 20px;
+    }
+
+    .footer-legal a:hover {
+      color: white;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 650ms ease, transform 650ms ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 1060px) {
+      .hero {
+        padding-top: 70px;
+      }
+
+      .hero-grid {
+        grid-template-columns: 1fr;
+        gap: 64px;
+      }
+
+      .hero-copy,
+      h1 {
+        max-width: 760px;
+      }
+
+      .product-stage {
+        width: min(750px, 100%);
+        margin-inline: auto;
+      }
+
+      .feature-row,
+      .feature-row.reverse {
+        grid-template-columns: 1fr;
+        gap: 45px;
+      }
+
+      .feature-row.reverse .feature-copy,
+      .feature-row.reverse .feature-visual {
+        order: initial;
+      }
+
+      .feature-copy {
+        max-width: 700px;
+      }
+
+      .feature-visual {
+        min-height: 520px;
+      }
+
+      .quote-card {
+        grid-template-columns: 1fr;
+      }
+
+      .pricing-grid {
+        gap: 13px;
+      }
+
+      .price-card {
+        padding: 28px 24px;
+      }
+    }
+
+    @media (max-width: 820px) {
+      .desktop-nav,
+      .nav-actions .button-secondary {
+        display: none;
+      }
+
+      .nav-actions {
+        margin-left: auto;
+      }
+
+      .menu-button {
+        display: grid;
+      }
+
+      .mobile-nav {
+        position: fixed;
+        top: 76px;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 49;
+        display: grid;
+        align-content: start;
+        gap: 4px;
+        padding: 25px 20px;
+        border-top: 1px solid var(--line);
+        background: var(--bone);
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(-10px);
+        transition: opacity 180ms ease, transform 180ms ease;
+      }
+
+      .mobile-nav.open {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateY(0);
+      }
+
+      .mobile-nav a {
+        padding: 15px 10px;
+        border-bottom: 1px solid var(--line);
+        font-family: Georgia, serif;
+        font-size: 24px;
+      }
+
+      .mobile-nav .button {
+        margin-top: 18px;
+        font-family: inherit;
+        font-size: 14px;
+      }
+
+      .proof-inner {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .studio-list {
+        width: 100%;
+        justify-content: space-between;
+        gap: 15px;
+        overflow: hidden;
+      }
+
+      .pricing-grid {
+        grid-template-columns: 1fr;
+        gap: 18px;
+      }
+
+      .price-card.featured {
+        transform: none;
+      }
+
+      .tier-copy {
+        min-height: 0;
+      }
+
+      .footer-grid {
+        grid-template-columns: 1.5fr 1fr 1fr;
+      }
+
+      .footer-brand {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .container {
+        width: min(calc(100% - 28px), var(--max));
+      }
+
+      .nav-shell {
+        min-height: 68px;
+      }
+
+      .nav-actions .button-primary {
+        display: none;
+      }
+
+      .mobile-nav {
+        top: 68px;
+      }
+
+      .hero {
+        padding: 54px 0 61px;
+      }
+
+      h1 {
+        font-size: clamp(50px, 15vw, 66px);
+      }
+
+      .hero-copy {
+        font-size: 16px;
+      }
+
+      .hero-actions {
+        flex-direction: column;
+      }
+
+      .hero-actions .button {
+        width: 100%;
+      }
+
+      .product-stage {
+        padding: 8px 0 38px;
+      }
+
+      .app-window {
+        border-radius: 18px;
+        transform: none;
+      }
+
+      .app-body {
+        grid-template-columns: 1fr;
+        min-height: 360px;
+      }
+
+      .app-sidebar {
+        display: none;
+      }
+
+      .app-main {
+        padding: 21px 14px 18px;
+      }
+
+      .app-topbar {
+        height: 52px;
+        padding-inline: 13px;
+      }
+
+      .schedule-days {
+        gap: 4px;
+      }
+
+      .day {
+        padding-inline: 3px;
+      }
+
+      .class-row {
+        grid-template-columns: 40px 6px 1fr auto;
+        gap: 7px;
+      }
+
+      .kiln-status-card {
+        right: 7px;
+        width: 169px;
+      }
+
+      .payment-card {
+        top: 47px;
+        left: -7px;
+      }
+
+      .studio-list span:nth-child(4) {
+        display: none;
+      }
+
+      .section,
+      .pricing,
+      .final-cta {
+        padding: 86px 0;
+      }
+
+      .section-heading {
+        margin-bottom: 45px;
+      }
+
+      .section-heading h2 {
+        font-size: 43px;
+      }
+
+      .feature-row {
+        padding: 45px 0;
+      }
+
+      .feature-copy h3 {
+        font-size: 40px;
+      }
+
+      .feature-visual {
+        min-height: 410px;
+        border-radius: 24px;
+      }
+
+      .visual-panel {
+        width: calc(100% - 28px);
+      }
+
+      .schedule-board {
+        grid-template-columns: 38px repeat(4, 1fr);
+        padding-inline: 8px;
+      }
+
+      .schedule-cell {
+        min-height: 50px;
+        padding-inline: 2px;
+      }
+
+      .queue-list {
+        padding-inline: 14px;
+      }
+
+      .queue-item {
+        grid-template-columns: 30px 1fr auto;
+        gap: 8px;
+      }
+
+      .queue-index {
+        width: 30px;
+        height: 30px;
+      }
+
+      .heat-card {
+        right: 4px;
+        bottom: 11px;
+      }
+
+      .billing-grid {
+        grid-template-columns: 1fr;
+        padding: 13px;
+      }
+
+      .billing-card {
+        grid-column: 1;
+      }
+
+      .balance-detail {
+        margin-top: 17px;
+      }
+
+      .quote-band {
+        padding-bottom: 86px;
+      }
+
+      .quote-card {
+        gap: 35px;
+        padding: 43px 27px;
+        border-radius: 24px;
+      }
+
+      blockquote {
+        font-size: 30px;
+      }
+
+      .pricing .section-heading {
+        margin-bottom: 29px;
+      }
+
+      .billing-toggle {
+        margin-bottom: 38px;
+      }
+
+      .price-card {
+        padding: 29px 25px;
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 42px 25px;
+      }
+
+      .footer-bottom {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+      }
+
+      .reveal {
+        opacity: 1;
+        transform: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header" id="site-header">
+    <div class="container nav-shell">
+      <a class="brand" href="#top" aria-label="Kilnhouse home">
+        <span class="brand-mark" aria-hidden="true">K</span>
+        <span>Kilnhouse</span>
+      </a>
+
+      <nav class="desktop-nav" aria-label="Primary navigation">
+        <a class="nav-link" href="#features">Features</a>
+        <a class="nav-link" href="#pricing">Pricing</a>
+        <a class="nav-link" href="#studios">For studios</a>
+      </nav>
+
+      <div class="nav-actions">
+        <a class="button button-secondary" href="mailto:hello@kilnhouse.app?subject=Kilnhouse%20demo">Book a demo</a>
+        <a class="button button-primary" href="#pricing">Start free</a>
+        <button class="menu-button" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav">
+          <span class="menu-lines" aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+
+    <nav class="mobile-nav" id="mobile-nav" aria-label="Mobile navigation">
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#studios">For studios</a>
+      <a class="button button-primary" href="#pricing">Start free</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top">
+      <div class="container hero-grid">
+        <div class="hero-content reveal">
+          <div class="eyebrow">Made for ceramicists</div>
+          <h1>Your studio, <span class="clay-underline">beautifully</span> organized.</h1>
+          <p class="hero-copy">Kilnhouse brings classes, kiln firings, and member payments into one calm workspace, so you can spend less time sorting spreadsheets and more time shaping clay.</p>
+          <div class="hero-actions">
+            <a class="button button-clay" href="#pricing">Start your free trial <span class="button-arrow" aria-hidden="true"></span></a>
+            <a class="button button-secondary" href="mailto:hello@kilnhouse.app?subject=Kilnhouse%20demo">See how it works</a>
+          </div>
+          <div class="hero-trust">
+            <span class="avatar-stack" aria-hidden="true">
+              <span class="avatar">AW</span>
+              <span class="avatar">MS</span>
+              <span class="avatar">CP</span>
+            </span>
+            <span>Loved by independent studios and community arts spaces</span>
+          </div>
+        </div>
+
+        <div class="product-stage reveal" aria-label="Preview of the Kilnhouse studio schedule">
+          <div class="app-window">
+            <div class="app-topbar">
+              <div class="app-brand">
+                <span class="app-brand-mark" aria-hidden="true">K</span>
+                <span>Kilnhouse</span>
+              </div>
+              <div class="app-tools" aria-hidden="true">
+                <span class="app-tool">?</span>
+                <span class="app-tool">AP</span>
+              </div>
+            </div>
+            <div class="app-body">
+              <aside class="app-sidebar" aria-hidden="true">
+                <div class="app-nav-label">Workspace</div>
+                <div class="app-nav-item active"><span class="nav-dot"></span>Overview</div>
+                <div class="app-nav-item"><span class="nav-dot"></span>Schedule</div>
+                <div class="app-nav-item"><span class="nav-dot"></span>Kilns</div>
+                <div class="app-nav-item"><span class="nav-dot"></span>Members</div>
+                <div class="app-nav-item"><span class="nav-dot"></span>Billing</div>
+              </aside>
+              <div class="app-main">
+                <div class="app-heading-row">
+                  <div>
+                    <div class="app-kicker">Good morning, Ana</div>
+                    <div class="app-title">Studio schedule</div>
+                  </div>
+                  <div class="app-add">+ New class</div>
+                </div>
+                <div class="schedule-days" aria-hidden="true">
+                  <div class="day"><span class="day-name">Mon</span><span class="day-number">12</span></div>
+                  <div class="day active"><span class="day-name">Tue</span><span class="day-number">13</span></div>
+                  <div class="day"><span class="day-name">Wed</span><span class="day-number">14</span></div>
+                  <div class="day"><span class="day-name">Thu</span><span class="day-number">15</span></div>
+                  <div class="day"><span class="day-name">Fri</span><span class="day-number">16</span></div>
+                </div>
+                <div class="class-list" aria-hidden="true">
+                  <div class="class-row">
+                    <span class="class-time">9:30 AM</span>
+                    <span class="class-color"></span>
+                    <span class="class-name">Wheel foundations<span class="class-meta">Studio A · Mila Chen</span></span>
+                    <span class="class-spots">2 spots</span>
+                  </div>
+                  <div class="class-row">
+                    <span class="class-time">1:00 PM</span>
+                    <span class="class-color"></span>
+                    <span class="class-name">Open studio<span class="class-meta">Main floor · 14 members</span></span>
+                    <span class="class-spots">Open</span>
+                  </div>
+                  <div class="class-row">
+                    <span class="class-time">6:30 PM</span>
+                    <span class="class-color"></span>
+                    <span class="class-name">Handbuilding<span class="class-meta">Studio B · Theo James</span></span>
+                    <span class="class-spots">Full</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="floating-card payment-card" aria-hidden="true">
+            <span class="payment-check"></span>
+            <span class="payment-copy"><strong>Payment received</strong><span>Maya R. · Studio member</span></span>
+          </div>
+
+          <div class="floating-card kiln-status-card" aria-hidden="true">
+            <div class="floating-label">Kiln 02 · Bisque</div>
+            <div class="kiln-status">
+              <div>
+                <div class="kiln-temp">1,276°</div>
+                <div class="status-pill">Firing normally</div>
+              </div>
+              <div class="kiln-ring"><span>68%</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="proof-strip" id="studios" aria-label="Studios using Kilnhouse">
+      <div class="container proof-inner">
+        <p class="proof-copy">Trusted by studios where good work gets made</p>
+        <div class="studio-list" aria-label="Customer studios">
+          <span>Common Form</span>
+          <span>Earthroom</span>
+          <span>Soft Fire</span>
+          <span>Clay Society</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="features">
+      <div class="container">
+        <div class="section-heading reveal">
+          <div class="eyebrow">Everything in its place</div>
+          <h2>Studio admin that feels as considered as your craft.</h2>
+          <p>Built around the real rhythm of ceramics studios, from the first booking to the final glaze firing.</p>
+        </div>
+
+        <article class="feature-row">
+          <div class="feature-copy reveal">
+            <span class="feature-number">01 / Scheduling</span>
+            <h3>Classes that practically run themselves.</h3>
+            <p>Publish workshops, manage waitlists, assign instructors, and keep every student in the loop. Your schedule stays current everywhere, without the message chase.</p>
+            <ul class="feature-points">
+              <li>Online bookings and automatic waitlists</li>
+              <li>Instructor, room, and equipment management</li>
+              <li>Smart reminders that reduce no-shows</li>
+            </ul>
+          </div>
+          <div class="feature-visual reveal" aria-label="Kilnhouse class scheduling preview">
+            <div class="visual-panel">
+              <div class="visual-panel-header">
+                <span class="visual-panel-title">April schedule</span>
+                <span class="small-chip">Week view</span>
+              </div>
+              <div class="schedule-board" aria-hidden="true">
+                <div class="schedule-cell header-cell"></div>
+                <div class="schedule-cell header-cell">Mon 12</div>
+                <div class="schedule-cell header-cell">Tue 13</div>
+                <div class="schedule-cell header-cell">Wed 14</div>
+                <div class="schedule-cell header-cell">Thu 15</div>
+                <div class="schedule-cell">9 AM</div>
+                <div class="schedule-cell"><span class="schedule-event">Wheel 101<br>8 / 10</span></div>
+                <div class="schedule-cell"></div>
+                <div class="schedule-cell"><span class="schedule-event sage">Open studio<br>12 members</span></div>
+                <div class="schedule-cell"></div>
+                <div class="schedule-cell">1 PM</div>
+                <div class="schedule-cell"></div>
+                <div class="schedule-cell"><span class="schedule-event sage">Handbuilding<br>6 / 8</span></div>
+                <div class="schedule-cell"></div>
+                <div class="schedule-cell"><span class="schedule-event">Glaze lab<br>4 / 6</span></div>
+                <div class="schedule-cell">6 PM</div>
+                <div class="schedule-cell"><span class="schedule-event sage">Open studio<br>9 members</span></div>
+                <div class="schedule-cell"></div>
+                <div class="schedule-cell"><span class="schedule-event">Wheel II<br>Full</span></div>
+                <div class="schedule-cell"></div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="feature-row reverse">
+          <div class="feature-copy reveal">
+            <span class="feature-number">02 / Kiln queue</span>
+            <h3>Every firing, tracked from shelf to cool-down.</h3>
+            <p>Replace paper slips and group chats with one clear kiln queue. Members submit work, technicians build loads, and everyone knows what is firing next.</p>
+            <ul class="feature-points">
+              <li>Visual queues by clay body, cone, and kiln</li>
+              <li>Load sheets with piece-level tracking</li>
+              <li>Automatic ready-for-pickup notifications</li>
+            </ul>
+          </div>
+          <div class="feature-visual sage-surface reveal" aria-label="Kilnhouse kiln queue preview">
+            <div class="visual-panel">
+              <div class="visual-panel-header">
+                <span class="visual-panel-title">Kiln queue</span>
+                <span class="small-chip">18 pieces waiting</span>
+              </div>
+              <div class="queue-list" aria-hidden="true">
+                <div class="queue-item">
+                  <span class="queue-index">01</span>
+                  <span class="queue-info"><strong>Skutt 1027 · Bisque</strong><span>Cone 06 · 21 pieces · 78% full</span></span>
+                  <span class="queue-state">Loading</span>
+                </div>
+                <div class="queue-item">
+                  <span class="queue-index">02</span>
+                  <span class="queue-info"><strong>L&amp;L e28S · Glaze</strong><span>Cone 6 · 14 pieces · 52% full</span></span>
+                  <span class="queue-state queued">Queued</span>
+                </div>
+                <div class="queue-item">
+                  <span class="queue-index">03</span>
+                  <span class="queue-info"><strong>Olympic 2327 · Bisque</strong><span>Cone 04 · 9 pieces · 31% full</span></span>
+                  <span class="queue-state queued">Queued</span>
+                </div>
+              </div>
+            </div>
+            <div class="heat-card" aria-hidden="true">
+              <div class="heat-label">Live temperature</div>
+              <div class="heat-temp">1,276°F</div>
+              <div class="heat-line">
+                <span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span><span></span>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="feature-row">
+          <div class="feature-copy reveal">
+            <span class="feature-number">03 / Member billing</span>
+            <h3>Payments that keep up with your studio.</h3>
+            <p>Collect memberships, class fees, firing charges, and materials in one place. Kilnhouse handles the repeat work and gives you a clean financial picture.</p>
+            <ul class="feature-points">
+              <li>Recurring memberships and class passes</li>
+              <li>Firing fees charged by weight or piece</li>
+              <li>Automatic receipts and failed payment follow-up</li>
+            </ul>
+          </div>
+          <div class="feature-visual clay-surface reveal" aria-label="Kilnhouse member billing preview">
+            <div class="visual-panel">
+              <div class="visual-panel-header">
+                <span class="visual-panel-title">Member billing</span>
+                <span class="small-chip">This month</span>
+              </div>
+              <div class="billing-grid" aria-hidden="true">
+                <div class="balance-card">
+                  <div class="balance-label">Collected</div>
+                  <div class="balance-number">$8,420</div>
+                  <div class="balance-detail">94% paid on time<br>42 active members</div>
+                </div>
+                <div class="billing-card">
+                  <div class="billing-row">
+                    <span class="member"><span class="member-avatar">LR</span><span class="member-name">Lena R.<span>Studio monthly</span></span></span>
+                    <span class="billing-amount">$185</span>
+                  </div>
+                  <div class="billing-row">
+                    <span class="member"><span class="member-avatar">JM</span><span class="member-name">Jon M.<span>10 class pass</span></span></span>
+                    <span class="billing-amount">$240</span>
+                  </div>
+                  <div class="billing-row">
+                    <span class="member"><span class="member-avatar">AK</span><span class="member-name">Amira K.<span>Firing fees</span></span></span>
+                    <span class="billing-amount">$48</span>
+                  </div>
+                </div>
+                <div class="billing-chart">
+                  <span class="billing-bar"></span><span class="billing-bar"></span><span class="billing-bar"></span>
+                  <span class="billing-bar"></span><span class="billing-bar"></span><span class="billing-bar"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="quote-band">
+      <div class="container">
+        <div class="quote-card reveal">
+          <blockquote>
+            <span class="quote-mark" aria-hidden="true">“</span>
+            Kilnhouse gave us our evenings back. The schedule is clear, the kiln room is calmer, and members finally know exactly where their work is.
+          </blockquote>
+          <div class="quote-person">
+            <strong>Rosa Alvarez</strong>
+            <span>Founder, Soft Fire<br>Portland, Oregon</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="pricing" id="pricing">
+      <div class="container">
+        <div class="section-heading reveal">
+          <div class="eyebrow">Simple pricing</div>
+          <h2>Room to grow, without the guesswork.</h2>
+          <p>Start with a 14-day free trial. Every plan includes unlimited instructors, data import help, and friendly support.</p>
+        </div>
+
+        <div class="billing-toggle reveal" aria-label="Billing frequency">
+          <button class="toggle-option active" type="button" data-billing="monthly" aria-pressed="true">Monthly</button>
+          <button class="toggle-option" type="button" data-billing="annual" aria-pressed="false">Annual</button>
+          <span class="save-badge">Save 20%</span>
+        </div>
+
+        <div class="pricing-grid">
+          <article class="price-card reveal">
+            <div class="tier-name">Small Studio</div>
+            <p class="tier-copy">For intimate studios building their member community.</p>
+            <div class="price"><span class="currency">$</span><span class="price-value" data-monthly="49" data-annual="39">49</span><span class="price-period">/ month</span></div>
+            <div class="annual-note" data-note>Paid monthly</div>
+            <a class="button button-secondary" href="mailto:hello@kilnhouse.app?subject=Start%20Small%20Studio%20trial">Start free</a>
+            <ul class="tier-features">
+              <li>Up to 75 active members</li>
+              <li>Class scheduling and waitlists</li>
+              <li>One kiln queue</li>
+              <li>Member billing and passes</li>
+              <li>Email support</li>
+            </ul>
+          </article>
+
+          <article class="price-card featured reveal">
+            <span class="popular-label">Most popular</span>
+            <div class="tier-name">Growing Studio</div>
+            <p class="tier-copy">For busy studios ready to connect every part of the operation.</p>
+            <div class="price"><span class="currency">$</span><span class="price-value" data-monthly="99" data-annual="79">99</span><span class="price-period">/ month</span></div>
+            <div class="annual-note" data-note>Paid monthly</div>
+            <a class="button button-clay" href="mailto:hello@kilnhouse.app?subject=Start%20Growing%20Studio%20trial">Start free</a>
+            <ul class="tier-features">
+              <li>Up to 250 active members</li>
+              <li>Everything in Small Studio</li>
+              <li>Unlimited kiln queues and load sheets</li>
+              <li>Automated firing fee billing</li>
+              <li>Reports and studio analytics</li>
+              <li>Priority support</li>
+            </ul>
+          </article>
+
+          <article class="price-card reveal">
+            <div class="tier-name">Community Studio</div>
+            <p class="tier-copy">For multi-room spaces and large membership programs.</p>
+            <div class="price"><span class="currency">$</span><span class="price-value" data-monthly="189" data-annual="151">189</span><span class="price-period">/ month</span></div>
+            <div class="annual-note" data-note>Paid monthly</div>
+            <a class="button button-secondary" href="mailto:hello@kilnhouse.app?subject=Talk%20about%20Community%20Studio">Talk to us</a>
+            <ul class="tier-features">
+              <li>Unlimited active members</li>
+              <li>Everything in Growing Studio</li>
+              <li>Multiple locations and rooms</li>
+              <li>Custom roles and permissions</li>
+              <li>Dedicated onboarding</li>
+            </ul>
+          </article>
+        </div>
+        <p class="pricing-footnote">Prices shown in USD. Payment processing fees are billed separately.</p>
+      </div>
+    </section>
+
+    <section class="final-cta">
+      <div class="container reveal">
+        <h2>Less admin. More clay on the wheel.</h2>
+        <p>Bring your schedule, kiln room, and member billing together in a studio system that feels good to use.</p>
+        <a class="button button-clay" href="#pricing">Start your 14-day trial <span class="button-arrow" aria-hidden="true"></span></a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a class="brand" href="#top" aria-label="Kilnhouse home">
+            <span class="brand-mark" aria-hidden="true">K</span>
+            <span>Kilnhouse</span>
+          </a>
+          <p>The calm operating system for ceramics studios, built by people who understand the rhythm of making.</p>
+        </div>
+        <div>
+          <div class="footer-heading">Product</div>
+          <nav class="footer-links" aria-label="Product links">
+            <a href="#features">Scheduling</a>
+            <a href="#features">Kiln queue</a>
+            <a href="#features">Billing</a>
+            <a href="#pricing">Pricing</a>
+          </nav>
+        </div>
+        <div>
+          <div class="footer-heading">Company</div>
+          <nav class="footer-links" aria-label="Company links">
+            <a href="mailto:hello@kilnhouse.app?subject=About%20Kilnhouse">About</a>
+            <a href="mailto:hello@kilnhouse.app?subject=Kilnhouse%20demo">Book a demo</a>
+            <a href="mailto:hello@kilnhouse.app">Contact</a>
+          </nav>
+        </div>
+        <div>
+          <div class="footer-heading">Resources</div>
+          <nav class="footer-links" aria-label="Resource links">
+            <a href="mailto:hello@kilnhouse.app?subject=Kilnhouse%20support">Help center</a>
+            <a href="mailto:hello@kilnhouse.app?subject=Kilnhouse%20migration">Migration help</a>
+            <a href="mailto:hello@kilnhouse.app?subject=Kilnhouse%20updates">Product updates</a>
+          </nav>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© <span id="year">2026</span> Kilnhouse, Inc. All rights reserved.</span>
+        <div class="footer-legal">
+          <a href="mailto:hello@kilnhouse.app?subject=Kilnhouse%20privacy">Privacy</a>
+          <a href="mailto:hello@kilnhouse.app?subject=Kilnhouse%20terms">Terms</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const header = document.querySelector("#site-header");
+    const menuButton = document.querySelector(".menu-button");
+    const mobileNav = document.querySelector("#mobile-nav");
+    const billingButtons = document.querySelectorAll("[data-billing]");
+    const priceValues = document.querySelectorAll(".price-value");
+    const annualNotes = document.querySelectorAll("[data-note]");
+
+    const setHeaderState = () => {
+      header.classList.toggle("is-scrolled", window.scrollY > 8);
+    };
+
+    const closeMenu = () => {
+      menuButton.setAttribute("aria-expanded", "false");
+      menuButton.setAttribute("aria-label", "Open menu");
+      mobileNav.classList.remove("open");
+      document.body.classList.remove("menu-open");
+    };
+
+    menuButton.addEventListener("click", () => {
+      const open = menuButton.getAttribute("aria-expanded") === "true";
+      menuButton.setAttribute("aria-expanded", String(!open));
+      menuButton.setAttribute("aria-label", open ? "Open menu" : "Close menu");
+      mobileNav.classList.toggle("open", !open);
+      document.body.classList.toggle("menu-open", !open);
+    });
+
+    mobileNav.querySelectorAll("a").forEach((link) => link.addEventListener("click", closeMenu));
+
+    window.addEventListener("resize", () => {
+      if (window.innerWidth > 820) closeMenu();
+    });
+
+    window.addEventListener("scroll", setHeaderState, { passive: true });
+    setHeaderState();
+
+    billingButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const billing = button.dataset.billing;
+
+        billingButtons.forEach((item) => {
+          const isActive = item === button;
+          item.classList.toggle("active", isActive);
+          item.setAttribute("aria-pressed", String(isActive));
+        });
+
+        priceValues.forEach((price) => {
+          price.textContent = price.dataset[billing];
+        });
+
+        annualNotes.forEach((note) => {
+          note.textContent = billing === "annual" ? "Billed annually" : "Paid monthly";
+        });
+      });
+    });
+
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const revealItems = document.querySelectorAll(".reveal");
+
+    if (reducedMotion || !("IntersectionObserver" in window)) {
+      revealItems.forEach((item) => item.classList.add("visible"));
+    } else {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1, rootMargin: "0px 0px -35px" });
+
+      revealItems.forEach((item) => observer.observe(item));
+    }
+
+    document.querySelector("#year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

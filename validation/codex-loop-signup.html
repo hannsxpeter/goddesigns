@@ -1,0 +1,1214 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Kilnhouse keeps kiln schedules, firing records, memberships, and studio communication in one focused workspace.">
+  <title>Kilnhouse | Studio management for ceramics studios</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@600&amp;family=IBM+Plex+Mono:wght@500&amp;family=IBM+Plex+Sans:wght@400;600&amp;display=swap" rel="stylesheet">
+  <style>
+    /* goddesign | structure: Photographic | direction: Data-Dense Pro | accent: chartreuse with hue jitter -4deg */
+    /* seed 4260641896 | bg and surface L+0.01 | radius 4px | kiln cutaway signature */
+    :root {
+      color-scheme: dark;
+      --bg: oklch(from #1A1815 calc(l + 0.01) c h);
+      --surface: oklch(from #22201C calc(l + 0.01) c h);
+      --text: #EDEDE6;
+      --muted: #9A9A8E;
+      --accent: oklch(from #FAFF69 l c calc(h - 4));
+      --positive: #4ADE80;
+      --negative: #F87171;
+      --rule: #2E2E2A;
+      --transparent: transparent;
+      --accent-hover: oklch(from var(--accent) calc(l - 0.08) c h);
+      --accent-active: oklch(from var(--accent) calc(l - 0.14) c h);
+      --accent-soft: color-mix(in oklab, var(--accent) 12%, var(--transparent));
+      --accent-line: color-mix(in oklab, var(--accent) 34%, var(--transparent));
+      --text-soft: color-mix(in oklab, var(--text) 72%, var(--transparent));
+      --surface-raised: color-mix(in oklab, var(--surface) 96%, var(--text) 4%);
+      --positive-soft: color-mix(in oklab, var(--positive) 12%, var(--transparent));
+      --negative-soft: color-mix(in oklab, var(--negative) 12%, var(--transparent));
+      --disabled: color-mix(in oklab, var(--muted) 46%, var(--bg));
+      --font-display: "Familjen Grotesk", sans-serif;
+      --font-body: "IBM Plex Sans", sans-serif;
+      --font-numeral: "IBM Plex Mono", monospace;
+      --radius: 4px;
+      --s1: 2px;
+      --s2: 4px;
+      --s3: 8px;
+      --s4: 12px;
+      --s5: 16px;
+      --s6: 24px;
+      --target: 44px;
+      --content: 1440px;
+      --type-micro: 12px;
+      --type-small: 14px;
+      --type-body: 16px;
+      --type-lede: 19px;
+      --type-title: 23px;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-width: 320px;
+      margin: 0;
+      overflow-x: clip;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: var(--type-body);
+      line-height: 1.55;
+      text-rendering: optimizeLegibility;
+    }
+
+    button,
+    input,
+    summary {
+      font: inherit;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    svg {
+      display: block;
+    }
+
+    [hidden] {
+      display: none;
+    }
+
+    .skip-link {
+      position: fixed;
+      z-index: 10;
+      top: var(--s3);
+      left: var(--s3);
+      padding: var(--s4) var(--s5);
+      transform: translateY(-160%);
+      border-radius: var(--radius);
+      background: var(--accent);
+      color: var(--bg);
+      font-weight: 600;
+    }
+
+    .skip-link:focus {
+      transform: translateY(0);
+    }
+
+    .skip-link:hover {
+      background: var(--accent-hover);
+    }
+
+    .skip-link:active {
+      background: var(--accent-active);
+    }
+
+    .site-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 56px;
+      padding: var(--s3) var(--s6);
+      border-bottom: 1px solid var(--rule);
+      background: var(--bg);
+    }
+
+    .wordmark,
+    .header-link,
+    .text-link,
+    .footer-link {
+      min-height: var(--target);
+      border-radius: var(--radius);
+      text-decoration: none;
+    }
+
+    .wordmark {
+      display: inline-flex;
+      align-items: center;
+      font-family: var(--font-display);
+      font-size: var(--type-title);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      transition: color 160ms linear, background-color 160ms linear;
+    }
+
+    .wordmark:hover {
+      color: var(--accent);
+    }
+
+    .wordmark:active {
+      background: var(--accent-soft);
+    }
+
+    .wordmark-mark {
+      width: 12px;
+      height: 12px;
+      margin-right: var(--s3);
+      border: 2px solid var(--accent);
+      border-radius: 50% 50% var(--radius) var(--radius);
+    }
+
+    .header-link {
+      display: inline-flex;
+      gap: var(--s3);
+      align-items: center;
+      padding: var(--s3) var(--s4);
+      color: var(--muted);
+      font-size: var(--type-micro);
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: color 160ms linear, background-color 160ms linear;
+    }
+
+    .header-link svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+    }
+
+    .header-link:hover {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .header-link:active {
+      background: var(--accent-line);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.62fr) minmax(360px, 1fr);
+      grid-template-rows: auto 1fr;
+      min-height: calc(100svh - 56px);
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .story-stage,
+    .signup-panel,
+    .hero-copy,
+    .kiln-figure {
+      min-width: 0;
+    }
+
+    .story-stage {
+      display: contents;
+    }
+
+    .hero-copy {
+      grid-column: 2;
+      grid-row: 1;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--s6);
+      align-items: end;
+      padding: var(--s6);
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .eyebrow {
+      grid-column: 1 / -1;
+      margin: 0;
+      color: var(--accent);
+      font-size: var(--type-micro);
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      text-wrap: pretty;
+    }
+
+    h1,
+    h2,
+    h3 {
+      text-wrap: balance;
+    }
+
+    h1 {
+      max-width: 9ch;
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(3rem, 6vw, 6rem);
+      font-weight: 600;
+      letter-spacing: -0.04em;
+      line-height: 1.1;
+    }
+
+    .hero-lede {
+      max-width: 30ch;
+      margin: 0;
+      color: var(--text-soft);
+      font-size: var(--type-body);
+      line-height: 1.55;
+    }
+
+    .kiln-figure {
+      grid-column: 1;
+      grid-row: 1 / 3;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      min-height: 0;
+      margin: 0;
+      padding: var(--s4) var(--s6) var(--s5);
+      border-right: 1px solid var(--rule);
+      background: var(--surface);
+    }
+
+    .figure-header,
+    .figure-caption {
+      display: flex;
+      gap: var(--s4);
+      align-items: center;
+      justify-content: space-between;
+      font-family: var(--font-numeral);
+      font-size: var(--type-micro);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .figure-header {
+      color: var(--accent);
+    }
+
+    .figure-caption {
+      color: var(--muted);
+    }
+
+    .cycle-key {
+      display: flex;
+      gap: var(--s5);
+      align-items: center;
+    }
+
+    .cycle-key span {
+      display: inline-flex;
+      gap: var(--s3);
+      align-items: center;
+    }
+
+    .cycle-key i {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .kiln-art {
+      width: 100%;
+      height: 100%;
+      min-height: 360px;
+      color: var(--text);
+    }
+
+    .art-grid,
+    .art-callout {
+      stroke: var(--rule);
+      stroke-width: 1;
+    }
+
+    .art-ring {
+      fill: none;
+      stroke: var(--accent-line);
+      stroke-width: 1;
+    }
+
+    .art-shell {
+      fill: var(--bg);
+      stroke: var(--text-soft);
+      stroke-width: 2;
+    }
+
+    .art-chamber {
+      fill: var(--surface-raised);
+      stroke: var(--rule);
+      stroke-width: 2;
+    }
+
+    .art-heat-soft {
+      fill: var(--accent-soft);
+    }
+
+    .art-heat {
+      fill: var(--accent);
+      opacity: 0.7;
+    }
+
+    .art-coil {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 5;
+      stroke-linecap: round;
+      stroke-dasharray: 4 12;
+    }
+
+    .art-shelf {
+      stroke: var(--text-soft);
+      stroke-width: 8;
+      stroke-linecap: round;
+    }
+
+    .art-pot {
+      fill: var(--surface);
+      stroke: var(--text-soft);
+      stroke-width: 2;
+    }
+
+    .art-label {
+      fill: var(--muted);
+      font-family: var(--font-body);
+      font-size: var(--type-micro);
+      font-weight: 600;
+      letter-spacing: 0.1em;
+    }
+
+    .art-label-accent {
+      fill: var(--accent);
+      font-family: var(--font-numeral);
+      font-size: var(--type-micro);
+      letter-spacing: 0.08em;
+    }
+
+    .signup-panel {
+      grid-column: 2;
+      grid-row: 2;
+      display: grid;
+      align-content: center;
+      padding: var(--s6);
+      background: var(--bg);
+    }
+
+    .signup-inner {
+      width: min(100%, 420px);
+      margin-inline: auto;
+    }
+
+    .form-heading {
+      display: grid;
+      gap: var(--s3);
+      margin-bottom: var(--s6);
+    }
+
+    .form-heading h2,
+    .success-state h2,
+    .faq-heading h2 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+    }
+
+    .form-heading h2,
+    .success-state h2 {
+      font-size: clamp(2rem, 4vw, 3rem);
+    }
+
+    .form-heading p,
+    .success-state p,
+    .faq-heading p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .signup-form {
+      display: grid;
+      gap: var(--s5);
+    }
+
+    .field {
+      display: grid;
+      gap: var(--s3);
+    }
+
+    .field-row {
+      display: flex;
+      gap: var(--s4);
+      align-items: baseline;
+      justify-content: space-between;
+    }
+
+    .field label {
+      font-size: var(--type-small);
+      font-weight: 600;
+    }
+
+    .field-status {
+      color: var(--muted);
+      font-family: var(--font-numeral);
+      font-size: var(--type-micro);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .field input {
+      width: 100%;
+      min-height: 50px;
+      padding: var(--s4) var(--s5);
+      border: 1px solid var(--muted);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      font-size: var(--type-body);
+      transition: border-color 160ms linear, background-color 160ms linear;
+    }
+
+    .field input::placeholder {
+      color: var(--disabled);
+    }
+
+    .field input:hover {
+      border-color: var(--muted);
+      background: var(--surface-raised);
+    }
+
+    .field input:focus {
+      border-color: var(--accent);
+      background: var(--surface-raised);
+    }
+
+    .field input:active {
+      border-color: var(--accent-hover);
+    }
+
+    .field input:disabled {
+      cursor: not-allowed;
+      border-color: var(--rule);
+      background: var(--surface);
+      color: var(--disabled);
+    }
+
+    .field[data-state="valid"] .field-status {
+      color: var(--positive);
+    }
+
+    .field[data-state="valid"] input {
+      border-color: var(--positive);
+      background: var(--positive-soft);
+    }
+
+    .field[data-state="invalid"] .field-status,
+    .field-error {
+      color: var(--negative);
+    }
+
+    .field[data-state="invalid"] input {
+      border-color: var(--negative);
+      background: var(--negative-soft);
+    }
+
+    .field-error {
+      min-height: 0;
+      margin: 0;
+      font-size: var(--type-small);
+      line-height: 1.45;
+    }
+
+    .field[data-state="empty"] .field-error,
+    .field[data-state="valid"] .field-error {
+      display: none;
+    }
+
+    .form-status {
+      min-height: 22px;
+      margin: 0;
+      color: var(--muted);
+      font-size: var(--type-small);
+    }
+
+    .form-status[data-state="error"] {
+      color: var(--negative);
+    }
+
+    .primary-button {
+      display: inline-flex;
+      gap: var(--s3);
+      align-items: center;
+      justify-content: center;
+      min-height: 52px;
+      padding: var(--s4) var(--s5);
+      border: 1px solid var(--accent);
+      border-radius: var(--radius);
+      background: var(--accent);
+      color: var(--bg);
+      cursor: pointer;
+      font-weight: 600;
+      transition: transform 160ms linear, background-color 160ms linear, border-color 160ms linear;
+    }
+
+    .primary-button:hover {
+      border-color: var(--accent-hover);
+      background: var(--accent-hover);
+    }
+
+    .primary-button:active {
+      transform: scale(0.97);
+      border-color: var(--accent-active);
+      background: var(--accent-active);
+    }
+
+    .primary-button:disabled {
+      cursor: wait;
+      border-color: var(--disabled);
+      background: var(--disabled);
+      color: var(--surface);
+    }
+
+    .button-spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid currentColor;
+      border-right-color: var(--transparent);
+      border-radius: 50%;
+    }
+
+    .signup-form:not([data-state="loading"]) .button-loading,
+    .signup-form:not([data-state="loading"]) .button-spinner,
+    .signup-form[data-state="loading"] .button-default {
+      display: none;
+    }
+
+    .form-note {
+      margin: 0;
+      color: var(--muted);
+      font-size: var(--type-small);
+      line-height: 1.5;
+    }
+
+    .text-link,
+    .footer-link {
+      display: inline-flex;
+      align-items: center;
+      color: var(--text-soft);
+      text-decoration-color: var(--rule);
+      text-decoration-line: underline;
+      text-underline-offset: 3px;
+      transition: color 160ms linear, background-color 160ms linear;
+    }
+
+    .text-link:hover,
+    .footer-link:hover {
+      color: var(--accent);
+    }
+
+    .text-link:active,
+    .footer-link:active {
+      background: var(--accent-soft);
+    }
+
+    .success-state {
+      display: grid;
+      gap: var(--s5);
+      padding: var(--s6) 0;
+    }
+
+    .success-mark {
+      display: grid;
+      width: 56px;
+      height: 56px;
+      place-items: center;
+      border: 1px solid var(--positive);
+      border-radius: 50%;
+      background: var(--positive-soft);
+      color: var(--positive);
+    }
+
+    .success-mark svg {
+      width: 28px;
+      height: 28px;
+      stroke: currentColor;
+    }
+
+    .success-meta {
+      display: grid;
+      gap: var(--s2);
+      padding: var(--s4);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+
+    .success-meta span:first-child {
+      color: var(--muted);
+      font-size: var(--type-micro);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .success-email {
+      overflow-wrap: anywhere;
+      font-family: var(--font-numeral);
+      font-size: var(--type-small);
+    }
+
+    .faq-section {
+      display: grid;
+      grid-template-columns: minmax(220px, 0.62fr) minmax(0, 1.38fr);
+      gap: var(--s6);
+      max-width: var(--content);
+      margin-inline: auto;
+      padding: var(--s6);
+    }
+
+    .faq-heading {
+      display: grid;
+      align-content: start;
+      gap: var(--s3);
+    }
+
+    .faq-heading h2 {
+      font-size: clamp(2rem, 4vw, 4rem);
+    }
+
+    .faq-list {
+      border-top: 1px solid var(--rule);
+    }
+
+    .faq-item {
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .faq-item summary {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: var(--s5);
+      align-items: center;
+      min-height: 60px;
+      padding: var(--s4) var(--s3);
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-family: var(--font-display);
+      font-size: var(--type-lede);
+      font-weight: 600;
+      list-style: none;
+      transition: color 160ms linear, background-color 160ms linear;
+    }
+
+    .faq-item summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .faq-item summary:hover {
+      background: var(--surface);
+      color: var(--accent);
+    }
+
+    .faq-item summary:active {
+      background: var(--accent-soft);
+    }
+
+    .faq-item summary svg {
+      width: 18px;
+      height: 18px;
+      color: var(--muted);
+      stroke: currentColor;
+      transition: transform 160ms linear, color 160ms linear;
+    }
+
+    .faq-item[open] summary svg {
+      transform: rotate(45deg);
+      color: var(--accent);
+    }
+
+    .faq-item:not([open]) > .faq-answer {
+      display: none;
+    }
+
+    .faq-answer {
+      max-width: 65ch;
+      margin: 0;
+      padding: 0 var(--s3) var(--s5);
+      color: var(--muted);
+    }
+
+    .site-footer {
+      display: flex;
+      gap: var(--s5);
+      align-items: center;
+      justify-content: space-between;
+      max-width: var(--content);
+      min-height: 64px;
+      margin-inline: auto;
+      padding: var(--s3) var(--s6);
+      border-top: 1px solid var(--rule);
+      color: var(--muted);
+      font-size: var(--type-small);
+    }
+
+    .footer-nav {
+      display: flex;
+      gap: var(--s5);
+      align-items: center;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .signup-form[data-state="loading"] .button-spinner {
+        animation: spin 700ms linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(1turn);
+        }
+      }
+    }
+
+    @media (max-width: 1040px) {
+      .hero {
+        grid-template-columns: minmax(0, 1.38fr) minmax(340px, 1fr);
+      }
+
+      .hero-copy {
+        grid-template-columns: 1fr;
+      }
+
+      .eyebrow {
+        grid-column: auto;
+      }
+
+      .hero-lede {
+        max-width: 52ch;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .site-header {
+        padding-inline: var(--s5);
+      }
+
+      .header-link {
+        padding-inline: var(--s3);
+      }
+
+      .hero {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: auto;
+      }
+
+      .story-stage {
+        display: grid;
+        grid-column: 1;
+        grid-row: auto;
+        grid-template-rows: auto minmax(420px, 62svh);
+      }
+
+      .hero-copy,
+      .kiln-figure,
+      .signup-panel {
+        grid-column: auto;
+        grid-row: auto;
+      }
+
+      .hero-copy,
+      .kiln-figure,
+      .signup-panel,
+      .faq-section {
+        padding-inline: var(--s5);
+      }
+
+      .hero-copy {
+        gap: var(--s5);
+        padding-block: var(--s6);
+      }
+
+      h1 {
+        font-size: clamp(3rem, 15vw, 5.4rem);
+      }
+
+      .kiln-figure {
+        padding-block: var(--s4);
+        border-right: 0;
+      }
+
+      .cycle-key span:first-child {
+        display: none;
+      }
+
+      .kiln-art {
+        min-height: 340px;
+      }
+
+      .signup-panel {
+        min-height: 100svh;
+        align-content: center;
+        padding-block: var(--s6);
+        border-top: 1px solid var(--rule);
+      }
+
+      .faq-section {
+        grid-template-columns: minmax(0, 1fr);
+        padding-block: var(--s6);
+      }
+
+      .site-footer {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: var(--s5);
+      }
+
+      .footer-nav {
+        flex-wrap: wrap;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .field-row {
+        align-items: flex-start;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to signup</a>
+  <header class="site-header">
+    <a class="wordmark" href="#main" aria-label="Kilnhouse home">
+      <span class="wordmark-mark" aria-hidden="true"></span>
+      Kilnhouse
+    </a>
+    <a class="header-link" href="#signup">
+      Studio access
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M5 12h14M13 6l6 6-6 6" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"></path>
+      </svg>
+    </a>
+  </header>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="story-stage">
+        <div class="hero-copy">
+          <p class="eyebrow">Studio operations, centered</p>
+          <h1 id="hero-title">Every kiln, in rhythm.</h1>
+          <p class="hero-lede">Manage kiln schedules, firing logs, memberships, and studio communication without the spreadsheet shuffle.</p>
+        </div>
+
+        <figure class="kiln-figure">
+          <div class="figure-header">
+            <span>Kiln cycle view</span>
+            <span class="cycle-key">
+              <span><i aria-hidden="true"></i> Heat</span>
+              <span>Live workspace</span>
+            </span>
+          </div>
+
+          <svg class="kiln-art" viewBox="0 0 760 580" role="img" aria-labelledby="kiln-title kiln-desc">
+            <title id="kiln-title">A technical cutaway drawing of a ceramics kiln</title>
+            <desc id="kiln-desc">The kiln chamber contains shelves and pots, surrounded by heat coils and firing stage labels.</desc>
+            <defs>
+              <clipPath id="chamber-clip">
+                <path d="M275 470V214c0-75 47-124 105-124s105 49 105 124v256z"></path>
+              </clipPath>
+            </defs>
+
+            <g aria-hidden="true">
+              <path class="art-grid" d="M0 72h760M0 164h760M0 256h760M0 348h760M0 440h760M94 0v580M190 0v580M286 0v580M382 0v580M478 0v580M574 0v580M670 0v580"></path>
+              <circle class="art-ring" cx="380" cy="296" r="248"></circle>
+              <circle class="art-ring" cx="380" cy="296" r="204"></circle>
+
+              <path class="art-callout" d="M66 146h134l76 74M560 184h120M485 286h172M90 428h126l59-54"></path>
+              <text class="art-label" x="66" y="132">RAMP</text>
+              <text class="art-label-accent" x="66" y="158">Controlled rise</text>
+              <text class="art-label" x="570" y="170">HOLD</text>
+              <text class="art-label-accent" x="570" y="196">Even heatwork</text>
+              <text class="art-label" x="570" y="272">COOL</text>
+              <text class="art-label-accent" x="570" y="298">Logged cycle</text>
+              <text class="art-label" x="90" y="414">LOAD</text>
+              <text class="art-label-accent" x="90" y="440">Shelf by shelf</text>
+
+              <path class="art-shell" d="M242 492V208c0-101 61-166 138-166s138 65 138 166v284z"></path>
+              <path class="art-chamber" d="M275 470V214c0-75 47-124 105-124s105 49 105 124v256z"></path>
+
+              <g clip-path="url(#chamber-clip)">
+                <rect class="art-heat-soft" x="275" y="90" width="210" height="128"></rect>
+                <rect class="art-heat-soft" x="275" y="308" width="210" height="162"></rect>
+                <rect class="art-heat" x="275" y="218" width="210" height="90"></rect>
+                <path class="art-coil" d="M294 158h172M294 194h172M294 336h172M294 372h172M294 408h172"></path>
+              </g>
+
+              <path class="art-shelf" d="M304 270h152M304 386h152"></path>
+              <path class="art-pot" d="M331 262l-9-59h50l-9 59zM403 262l-7-41h38l-7 41zM322 378l-8-47h42l-8 47zM378 378l-10-68h52l-10 68zM432 378l-7-39h35l-7 39z"></path>
+              <path class="art-callout" d="M244 492h272M262 516h236"></path>
+              <text class="art-label-accent" x="342" y="548">FIRING RECORD</text>
+            </g>
+          </svg>
+
+          <figcaption class="figure-caption">
+            <span>Schedule</span>
+            <span>Load</span>
+            <span>Fire</span>
+            <span>Record</span>
+          </figcaption>
+        </figure>
+      </div>
+
+      <aside class="signup-panel" id="signup" aria-labelledby="signup-title">
+        <div class="signup-inner">
+          <div class="form-heading">
+            <h2 id="signup-title">Start your studio</h2>
+            <p>Three details. Then your Kilnhouse setup can begin.</p>
+          </div>
+
+          <form class="signup-form" id="signup-form" action="/signup" method="post" novalidate>
+            <div class="field" data-state="empty">
+              <div class="field-row">
+                <label for="studio-name">Studio name</label>
+                <span class="field-status" id="studio-name-status">Required</span>
+              </div>
+              <input id="studio-name" name="studioName" type="text" autocomplete="organization" minlength="2" maxlength="80" placeholder="Your studio name" aria-describedby="studio-name-error studio-name-status" required>
+              <p class="field-error" id="studio-name-error" aria-live="polite"></p>
+            </div>
+
+            <div class="field" data-state="empty">
+              <div class="field-row">
+                <label for="email">Work email</label>
+                <span class="field-status" id="email-status">Required</span>
+              </div>
+              <input id="email" name="email" type="email" autocomplete="email" inputmode="email" maxlength="254" placeholder="you@studio.com" aria-describedby="email-error email-status" required>
+              <p class="field-error" id="email-error" aria-live="polite"></p>
+            </div>
+
+            <div class="field" data-state="empty">
+              <div class="field-row">
+                <label for="kiln-count">Kiln count</label>
+                <span class="field-status" id="kiln-count-status">Required</span>
+              </div>
+              <input id="kiln-count" name="kilnCount" type="number" inputmode="numeric" min="1" max="99" step="1" placeholder="2" aria-describedby="kiln-count-error kiln-count-status" required>
+              <p class="field-error" id="kiln-count-error" aria-live="polite"></p>
+            </div>
+
+            <p class="form-status" id="form-status" role="alert" aria-live="assertive"></p>
+
+            <button class="primary-button" type="submit">
+              <span class="button-default">Create my studio</span>
+              <span class="button-spinner" aria-hidden="true"></span>
+              <span class="button-loading">Creating studio</span>
+            </button>
+
+            <p class="form-note">By continuing, you agree to the <a class="text-link" href="/terms">terms</a> and <a class="text-link" href="/privacy">privacy policy</a>.</p>
+          </form>
+
+          <div class="success-state" id="success-state" hidden>
+            <div class="success-mark" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M5 12.5l4 4L19 7" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"></path>
+              </svg>
+            </div>
+            <h2 tabindex="-1">Your studio is ready for the next step.</h2>
+            <p>Check your inbox to continue setting up Kilnhouse.</p>
+            <div class="success-meta">
+              <span>Setup email</span>
+              <span class="success-email" id="success-email"></span>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="faq-section" aria-labelledby="faq-title">
+      <div class="faq-heading">
+        <h2 id="faq-title">Before the first firing</h2>
+        <p>Short answers for studio managers.</p>
+      </div>
+
+      <div class="faq-list">
+        <details class="faq-item">
+          <summary>
+            What does Kilnhouse keep together?
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M12 5v14M5 12h14" stroke-width="1.75" stroke-linecap="round"></path>
+            </svg>
+          </summary>
+          <p class="faq-answer">Kiln schedules, firing records, studio memberships, and operational communication live in one workspace instead of separate sheets and threads.</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>
+            Can I manage more than one kiln?
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M12 5v14M5 12h14" stroke-width="1.75" stroke-linecap="round"></path>
+            </svg>
+          </summary>
+          <p class="faq-answer">Yes. Your signup starts with a kiln count so your workspace can reflect the equipment your studio manages.</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>
+            What kinds of studios is it for?
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M12 5v14M5 12h14" stroke-width="1.75" stroke-linecap="round"></path>
+            </svg>
+          </summary>
+          <p class="faq-answer">Kilnhouse is designed for independent, cooperative, teaching, and community ceramics studios that need a shared operating picture.</p>
+        </details>
+
+        <details class="faq-item">
+          <summary>
+            What happens after I sign up?
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M12 5v14M5 12h14" stroke-width="1.75" stroke-linecap="round"></path>
+            </svg>
+          </summary>
+          <p class="faq-answer">We use your studio details to prepare the workspace, then send the next setup step to your work email.</p>
+        </details>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>Copyright 2026 Kilnhouse</span>
+    <nav class="footer-nav" aria-label="Footer navigation">
+      <a class="footer-link" href="/login">Sign in</a>
+      <a class="footer-link" href="/privacy">Privacy</a>
+      <a class="footer-link" href="/terms">Terms</a>
+    </nav>
+  </footer>
+
+  <script>
+    const form = document.querySelector('#signup-form');
+    const formStatus = document.querySelector('#form-status');
+    const successState = document.querySelector('#success-state');
+    const successEmail = document.querySelector('#success-email');
+    const submitButton = form.querySelector('button[type="submit"]');
+    const fields = [...form.querySelectorAll('input')];
+    const touched = new Set();
+
+    function fieldMessage(input) {
+      const value = input.value.trim();
+
+      if (!value) {
+        if (input.id === 'studio-name') return 'Enter the name your members know your studio by.';
+        if (input.id === 'email') return 'Enter the email you use for studio operations.';
+        return 'Enter how many kilns your studio currently manages.';
+      }
+
+      if (input.id === 'studio-name' && value.length < 2) {
+        return 'Use at least 2 characters for the studio name.';
+      }
+
+      if (input.id === 'email' && input.validity.typeMismatch) {
+        return 'Enter a complete email address, such as name@studio.com.';
+      }
+
+      if (input.id === 'kiln-count') {
+        const count = Number(value);
+        if (!Number.isInteger(count)) return 'Use a whole number for the kiln count.';
+        if (count < 1) return 'Enter at least 1 kiln.';
+        if (count > 99) return 'For more than 99 kilns, contact us for a tailored setup.';
+      }
+
+      if (!input.validity.valid) {
+        return 'Review this field and enter a valid value.';
+      }
+
+      return '';
+    }
+
+    function validateField(input) {
+      const field = input.closest('.field');
+      const error = document.querySelector(`#${input.id}-error`);
+      const status = document.querySelector(`#${input.id}-status`);
+      const message = fieldMessage(input);
+
+      if (message) {
+        field.dataset.state = 'invalid';
+        input.setAttribute('aria-invalid', 'true');
+        error.textContent = message;
+        status.textContent = 'Needs attention';
+        return false;
+      }
+
+      field.dataset.state = 'valid';
+      input.setAttribute('aria-invalid', 'false');
+      error.textContent = '';
+      status.textContent = 'Ready';
+      return true;
+    }
+
+    fields.forEach((input) => {
+      input.addEventListener('blur', () => {
+        touched.add(input);
+        validateField(input);
+      });
+
+      input.addEventListener('input', () => {
+        formStatus.textContent = '';
+        formStatus.removeAttribute('data-state');
+        if (touched.has(input)) validateField(input);
+      });
+    });
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      let isValid = true;
+
+      fields.forEach((input) => {
+        touched.add(input);
+        if (!validateField(input)) isValid = false;
+      });
+
+      if (!isValid) {
+        formStatus.dataset.state = 'error';
+        formStatus.textContent = 'Fix the highlighted fields, then create your studio again.';
+        fields.find((input) => input.getAttribute('aria-invalid') === 'true')?.focus();
+        return;
+      }
+
+      form.dataset.state = 'loading';
+      formStatus.removeAttribute('data-state');
+      formStatus.textContent = 'Creating your studio setup.';
+      submitButton.disabled = true;
+      fields.forEach((input) => input.disabled = true);
+
+      fetch(form.action, {
+        method: 'POST',
+        headers: { Accept: 'application/json' },
+        body: new FormData(form)
+      }).then((response) => {
+        if (!response.ok) throw new Error('Signup request failed');
+        successEmail.textContent = document.querySelector('#email').value.trim();
+        form.hidden = true;
+        successState.hidden = false;
+        successState.querySelector('h2').focus();
+      }).catch(() => {
+        form.removeAttribute('data-state');
+        formStatus.dataset.state = 'error';
+        formStatus.textContent = 'We could not create your studio. Check your connection and try again.';
+        submitButton.disabled = false;
+        fields.forEach((input) => input.disabled = false);
+      });
+    });
+  </script>
+</body>
+</html>

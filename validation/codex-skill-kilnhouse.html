@@ -1,0 +1,1121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Kilnhouse keeps ceramics studio scheduling, kiln firings, and member billing in one calm workspace.">
+  <title>Kilnhouse | Ceramics studio management</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500&amp;family=Manrope:wght@300;400;600&amp;display=swap" rel="stylesheet">
+  <style>
+    /* goddesign | structure: Bento Anchor | direction: Luxury Serif | accent: platinum 267deg */
+    /* Seed 4282451803 | jitter h+3 L+0.01 r+0 */
+    /* Lock: Bodoni Moda 500 / Manrope 300 400 600; solid warm dark paper; platinum accent; radius 0; opacity motion only. */
+    :root {
+      color-scheme: dark;
+      --bg-source: #0E0C08;
+      --surface-source: #171410;
+      --text: #EFE9DC;
+      --muted: #9C917C;
+      --accent-source: #C9CFDA;
+      --hairline: #2E2A22;
+      --bg: oklch(from var(--bg-source) calc(l + 0.01) c h);
+      --surface: oklch(from var(--surface-source) calc(l + 0.01) c h);
+      --surface-raised: oklch(from var(--surface) calc(l + 0.035) c h);
+      --accent: oklch(from var(--accent-source) l c calc(h + 3));
+      --accent-hover: oklch(from var(--accent) calc(l - 0.1) c h);
+      --accent-soft: color-mix(in oklch, var(--accent) 14%, transparent);
+      --text-soft: color-mix(in oklch, var(--text) 72%, var(--bg));
+      --focus: color-mix(in oklch, var(--accent) 82%, var(--text));
+      --display: "Bodoni Moda", Georgia, serif;
+      --body: "Manrope", "Avenir Next", sans-serif;
+      --s1: 4px;
+      --s2: 8px;
+      --s3: 12px;
+      --s4: 16px;
+      --s5: 24px;
+      --s6: 32px;
+      --s7: 48px;
+      --s8: 64px;
+      --s9: 96px;
+      --s10: 128px;
+      --s11: 160px;
+      --page: min(100% - 32px, 1280px);
+      --rule: 1px solid var(--hairline);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      overflow-x: clip;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--body);
+      font-size: 17px;
+      font-weight: 300;
+      line-height: 1.6;
+      text-rendering: optimizeLegibility;
+    }
+
+    body::before {
+      display: block;
+      height: var(--s1);
+      background: var(--accent);
+      content: "";
+    }
+
+    a {
+      color: inherit;
+      text-decoration-thickness: 1px;
+      text-underline-offset: var(--s1);
+    }
+
+    a:focus-visible,
+    button:focus-visible {
+      outline: 2px solid var(--focus);
+      outline-offset: var(--s1);
+    }
+
+    a:active,
+    button:active {
+      opacity: 0.72;
+    }
+
+    button:disabled,
+    .button[aria-disabled="true"] {
+      cursor: not-allowed;
+      opacity: 0.42;
+      pointer-events: none;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1,
+    h2,
+    h3 {
+      text-wrap: balance;
+    }
+
+    p {
+      text-wrap: pretty;
+    }
+
+    svg {
+      display: block;
+      max-width: 100%;
+    }
+
+    .skip-link {
+      display: block;
+      width: var(--page);
+      height: 0;
+      margin-inline: auto;
+      overflow: hidden;
+      background: var(--accent);
+      color: var(--bg);
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .skip-link:focus {
+      height: auto;
+      padding: var(--s3) var(--s4);
+    }
+
+    .skip-link:hover {
+      background: var(--accent-hover);
+    }
+
+    .shell {
+      width: var(--page);
+      margin-inline: auto;
+    }
+
+    .site-header {
+      border-bottom: var(--rule);
+      background: color-mix(in oklch, var(--bg) 92%, transparent);
+    }
+
+    .nav {
+      min-height: var(--s8);
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: var(--s6);
+    }
+
+    .brand {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--s3);
+      font-size: 0.92rem;
+      font-weight: 600;
+      letter-spacing: 0.13em;
+      text-decoration: none;
+      text-transform: uppercase;
+      transition: color 180ms ease;
+    }
+
+    .brand:hover {
+      color: var(--accent);
+    }
+
+    .brand-mark {
+      width: var(--s5);
+      height: var(--s5);
+      border: 1px solid var(--accent);
+      border-radius: 50%;
+      box-shadow: inset 0 0 0 var(--s1) var(--bg), inset 0 0 0 5px var(--accent-soft);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--s6);
+    }
+
+    .nav-links a,
+    .footer-links a {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      color: var(--text-soft);
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-decoration: none;
+      text-transform: uppercase;
+      transition: color 180ms ease;
+    }
+
+    .nav-links a:hover,
+    .footer-links a:hover {
+      color: var(--accent);
+    }
+
+    .button {
+      min-height: 48px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--s2);
+      padding: var(--s3) var(--s5);
+      border: 1px solid var(--accent);
+      background: var(--accent);
+      color: var(--bg);
+      cursor: pointer;
+      font-family: var(--body);
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      line-height: 1;
+      text-decoration: none;
+      text-transform: uppercase;
+      transition: background-color 180ms ease, border-color 180ms ease, opacity 180ms ease;
+    }
+
+    .button:hover {
+      border-color: var(--accent-hover);
+      background: var(--accent-hover);
+    }
+
+    .button-secondary {
+      background: transparent;
+      color: var(--accent);
+    }
+
+    .button-secondary:hover {
+      background: var(--accent-soft);
+      color: var(--text);
+    }
+
+    .label {
+      color: var(--accent);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      line-height: 1.4;
+      text-transform: uppercase;
+    }
+
+    .hero {
+      min-height: min(820px, calc(100svh - 68px));
+      display: grid;
+      grid-template-columns: minmax(0, 7fr) minmax(280px, 5fr);
+      grid-template-areas: "copy visual";
+      align-items: center;
+      gap: var(--s8);
+      padding-block: var(--s10);
+      border-bottom: var(--rule);
+    }
+
+    .hero-copy {
+      grid-area: copy;
+      min-width: 0;
+      display: grid;
+      gap: var(--s6);
+      align-content: center;
+    }
+
+    .hero h1 {
+      max-width: 10ch;
+      font-family: var(--display);
+      font-size: clamp(4.25rem, 9vw, 8.75rem);
+      font-weight: 500;
+      letter-spacing: -0.045em;
+      line-height: 1.1;
+    }
+
+    .hero-intro {
+      max-width: 58ch;
+      color: var(--text-soft);
+      font-size: clamp(1rem, 1.5vw, 1.2rem);
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--s3);
+    }
+
+    .kiln-visual {
+      grid-area: visual;
+      min-width: 0;
+      display: grid;
+      justify-items: center;
+      gap: var(--s5);
+      color: var(--accent);
+    }
+
+    .kiln-visual svg {
+      width: min(100%, 430px);
+      aspect-ratio: 1;
+    }
+
+    .kiln-ring,
+    .kiln-shelf,
+    .kiln-cone {
+      fill: none;
+      stroke: currentColor;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .kiln-ring {
+      stroke-width: 1;
+    }
+
+    .kiln-shelf {
+      stroke-width: 0.45;
+      opacity: 0.52;
+    }
+
+    .kiln-cone {
+      fill: var(--accent-soft);
+      stroke-width: 1;
+    }
+
+    .kiln-caption {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: var(--s2) var(--s5);
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.09em;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .kiln-caption strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .operations {
+      padding-block: var(--s11);
+    }
+
+    .section-heading {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 0.62fr);
+      gap: var(--s8);
+      align-items: end;
+      padding-bottom: var(--s9);
+    }
+
+    .section-heading h2,
+    .pricing-heading h2 {
+      max-width: 12ch;
+      font-family: var(--display);
+      font-size: clamp(3rem, 6vw, 6rem);
+      font-weight: 500;
+      letter-spacing: -0.04em;
+      line-height: 1.1;
+    }
+
+    .section-heading p,
+    .pricing-heading p {
+      max-width: 54ch;
+      color: var(--muted);
+    }
+
+    .bento {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      grid-auto-flow: dense;
+      gap: 1px;
+      background: var(--hairline);
+      border: var(--rule);
+    }
+
+    .feature {
+      min-width: 0;
+      display: grid;
+      align-content: start;
+      gap: var(--s6);
+      padding: var(--s7);
+      background: var(--surface);
+    }
+
+    .feature-anchor {
+      min-height: 720px;
+      grid-column: span 7;
+      grid-row: span 2;
+      grid-template-rows: auto auto 1fr;
+      background: var(--surface-raised);
+    }
+
+    .feature-queue {
+      min-height: 360px;
+      grid-column: span 5;
+    }
+
+    .feature-billing {
+      min-height: 359px;
+      grid-column: span 5;
+      background: var(--bg);
+    }
+
+    .feature h3 {
+      max-width: 12ch;
+      font-family: var(--display);
+      font-size: clamp(2.25rem, 4vw, 4.75rem);
+      font-weight: 500;
+      letter-spacing: -0.035em;
+      line-height: 1.1;
+    }
+
+    .feature-copy {
+      max-width: 48ch;
+      color: var(--muted);
+    }
+
+    .schedule-example {
+      align-self: end;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      border-top: var(--rule);
+      border-left: var(--rule);
+    }
+
+    .day {
+      min-width: 0;
+      min-height: 150px;
+      display: grid;
+      align-content: space-between;
+      gap: var(--s4);
+      padding: var(--s4);
+      border-right: var(--rule);
+      border-bottom: var(--rule);
+    }
+
+    .day-name {
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .class-name {
+      font-family: var(--display);
+      font-size: clamp(1.2rem, 2vw, 1.65rem);
+      line-height: 1.05;
+    }
+
+    .class-meta {
+      color: var(--accent);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .queue-list,
+    .billing-list {
+      display: grid;
+      gap: var(--s1);
+      margin-top: auto;
+    }
+
+    .queue-item,
+    .billing-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: var(--s3);
+      padding-block: var(--s3);
+      border-bottom: var(--rule);
+      font-size: 0.88rem;
+    }
+
+    .queue-item:last-child,
+    .billing-item:last-child {
+      border-bottom: 0;
+    }
+
+    .status-mark {
+      width: var(--s2);
+      height: var(--s2);
+      border: 1px solid currentColor;
+      border-radius: 50%;
+      color: var(--accent);
+    }
+
+    .status-text {
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    .operations-note {
+      grid-column: 8 / -1;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: var(--s5);
+      align-items: start;
+      padding-top: var(--s7);
+      color: var(--muted);
+    }
+
+    .note-rule {
+      width: var(--s8);
+      height: 1px;
+      margin-top: var(--s3);
+      background: var(--accent);
+    }
+
+    .operations-note p {
+      max-width: 42ch;
+    }
+
+    .pricing {
+      padding-block: var(--s11);
+      background: var(--surface);
+    }
+
+    .pricing-heading {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 0.62fr);
+      align-items: end;
+      gap: var(--s8);
+      padding-bottom: var(--s9);
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      border-top: var(--rule);
+      border-bottom: var(--rule);
+    }
+
+    .plan {
+      min-width: 0;
+      display: grid;
+      grid-template-rows: auto auto auto 1fr auto;
+      gap: var(--s5);
+      padding: var(--s7);
+      border-right: var(--rule);
+    }
+
+    .plan:last-child {
+      border-right: 0;
+    }
+
+    .plan-featured {
+      background: var(--bg);
+    }
+
+    .plan-name {
+      font-size: 0.76rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .price {
+      display: flex;
+      align-items: start;
+      color: var(--accent);
+      font-family: var(--display);
+      font-size: clamp(4.5rem, 8vw, 8.5rem);
+      font-weight: 500;
+      letter-spacing: -0.06em;
+      line-height: 1.1;
+    }
+
+    .currency {
+      padding-top: var(--s2);
+      font-family: var(--body);
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0;
+    }
+
+    .billing-cycle {
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .plan ul {
+      display: grid;
+      align-content: start;
+      gap: var(--s3);
+      margin: 0;
+      padding: 0;
+      color: var(--text-soft);
+      list-style: none;
+    }
+
+    .plan li {
+      display: grid;
+      grid-template-columns: var(--s4) minmax(0, 1fr);
+      gap: var(--s2);
+    }
+
+    .plan li::before {
+      color: var(--accent);
+      content: "/";
+      font-weight: 600;
+    }
+
+    .plan .button {
+      width: 100%;
+      margin-top: var(--s5);
+    }
+
+    .pricing-note {
+      max-width: 62ch;
+      padding-top: var(--s5);
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .site-footer {
+      padding-block: var(--s10) var(--s7);
+    }
+
+    .footer-lead {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end;
+      gap: var(--s8);
+      padding-bottom: var(--s10);
+    }
+
+    .footer-lead h2 {
+      max-width: 11ch;
+      font-family: var(--display);
+      font-size: clamp(3.4rem, 7vw, 7rem);
+      font-weight: 500;
+      letter-spacing: -0.045em;
+      line-height: 1.1;
+    }
+
+    .footer-bottom {
+      min-height: var(--s8);
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: var(--s6);
+      padding-top: var(--s5);
+      border-top: var(--rule);
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: var(--s6);
+    }
+
+    .copyright {
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .hero-copy,
+      .kiln-visual {
+        animation: fade-in 500ms ease both;
+      }
+
+      .kiln-visual {
+        animation-delay: 80ms;
+      }
+
+      @keyframes fade-in {
+        from { opacity: 0; }
+      }
+    }
+
+    @media (max-width: 960px) {
+      :root {
+        --page: min(100% - 32px, 768px);
+      }
+
+      .hero {
+        min-height: auto;
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "copy"
+          "visual";
+        gap: var(--s9);
+        padding-block: var(--s9);
+      }
+
+      .hero h1 {
+        max-width: 11ch;
+      }
+
+      .kiln-visual svg {
+        width: min(72vw, 420px);
+      }
+
+      .section-heading,
+      .pricing-heading {
+        grid-template-columns: 1fr;
+        gap: var(--s5);
+      }
+
+      .feature-anchor {
+        grid-column: 1 / -1;
+      }
+
+      .feature-queue,
+      .feature-billing {
+        grid-column: span 6;
+      }
+
+      .operations-note {
+        grid-column: 1 / -1;
+      }
+
+      .pricing-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .plan {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        grid-template-rows: auto auto 1fr;
+        border-right: 0;
+        border-bottom: var(--rule);
+      }
+
+      .plan:last-child {
+        border-bottom: 0;
+      }
+
+      .plan-name,
+      .price,
+      .billing-cycle {
+        grid-column: 1;
+      }
+
+      .plan ul {
+        grid-column: 2;
+        grid-row: 1 / span 2;
+      }
+
+      .plan .button {
+        grid-column: 2;
+        grid-row: 3;
+        align-self: end;
+      }
+    }
+
+    @media (max-width: 700px) {
+      :root {
+        --page: min(100% - 24px, 560px);
+      }
+
+      body {
+        font-size: 16px;
+      }
+
+      .nav {
+        gap: var(--s3);
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .nav .button {
+        grid-column: 3;
+        min-height: 44px;
+        padding-inline: var(--s4);
+      }
+
+      .hero {
+        gap: var(--s8);
+        padding-block: var(--s8) var(--s9);
+      }
+
+      .hero h1 {
+        font-size: clamp(3.7rem, 18vw, 5.4rem);
+      }
+
+      .hero-actions {
+        display: grid;
+      }
+
+      .operations,
+      .pricing {
+        padding-block: var(--s9);
+      }
+
+      .section-heading,
+      .pricing-heading {
+        padding-bottom: var(--s8);
+      }
+
+      .bento {
+        grid-template-columns: 1fr;
+      }
+
+      .feature,
+      .feature-anchor,
+      .feature-queue,
+      .feature-billing {
+        min-height: auto;
+        grid-column: 1;
+        grid-row: auto;
+        padding: var(--s5);
+      }
+
+      .feature-anchor {
+        gap: var(--s7);
+      }
+
+      .schedule-example {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .day {
+        min-height: 132px;
+      }
+
+      .day:last-child {
+        grid-column: 1 / -1;
+      }
+
+      .operations-note {
+        grid-template-columns: 1fr;
+        gap: var(--s3);
+      }
+
+      .note-rule {
+        width: var(--s7);
+      }
+
+      .plan {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+        padding: var(--s5);
+      }
+
+      .plan-name,
+      .price,
+      .billing-cycle,
+      .plan ul,
+      .plan .button {
+        grid-column: 1;
+        grid-row: auto;
+      }
+
+      .price {
+        font-size: clamp(5rem, 28vw, 7.4rem);
+      }
+
+      .site-footer {
+        padding-block: var(--s9) var(--s6);
+      }
+
+      .footer-lead {
+        grid-template-columns: 1fr;
+        gap: var(--s6);
+        padding-bottom: var(--s9);
+      }
+
+      .footer-lead .button {
+        width: 100%;
+      }
+
+      .footer-bottom {
+        grid-template-columns: 1fr;
+        gap: var(--s3);
+      }
+
+      .footer-links {
+        justify-content: start;
+        flex-wrap: wrap;
+        gap: var(--s2) var(--s5);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body id="top">
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header class="site-header">
+    <nav class="nav shell" aria-label="Primary navigation">
+      <a class="brand" href="#top" aria-label="Kilnhouse home">
+        <span class="brand-mark" aria-hidden="true"></span>
+        Kilnhouse
+      </a>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#contact">Contact</a>
+      </div>
+      <a class="button" href="#pricing">Start a trial</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero shell" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="label">Studio operations, centered</p>
+        <h1 id="hero-title">Keep the studio in rhythm.</h1>
+        <p class="hero-intro">Classes, kiln firings, and member billing stay coordinated in one calm workspace built for clay communities.</p>
+        <div class="hero-actions">
+          <a class="button" href="#pricing">Start a trial</a>
+          <a class="button button-secondary" href="#features">See how it works</a>
+        </div>
+      </div>
+
+      <figure class="kiln-visual" aria-labelledby="kiln-caption">
+        <svg viewBox="0 0 420 420" role="img" aria-label="Top view diagram of a loaded ceramics kiln">
+          <circle class="kiln-ring" cx="210" cy="210" r="186"></circle>
+          <circle class="kiln-shelf" cx="210" cy="210" r="152"></circle>
+          <circle class="kiln-shelf" cx="210" cy="210" r="116"></circle>
+          <circle class="kiln-shelf" cx="210" cy="210" r="78"></circle>
+          <path class="kiln-shelf" d="M210 24v372M24 210h372M78.5 78.5l263 263M341.5 78.5l-263 263"></path>
+          <path class="kiln-cone" d="M194 226l16-44 16 44z"></path>
+        </svg>
+        <figcaption class="kiln-caption" id="kiln-caption">
+          <span>Firing view, example</span>
+          <strong>Cone 6</strong>
+          <span>Cooling</span>
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="operations shell" id="features" aria-labelledby="features-title">
+      <header class="section-heading">
+        <h2 id="features-title">One studio. Three moving parts.</h2>
+        <p>Kilnhouse keeps the operational work connected without making the studio feel like an office.</p>
+      </header>
+
+      <div class="bento">
+        <section class="feature feature-anchor" aria-labelledby="schedule-title">
+          <p class="label">Class scheduling</p>
+          <div>
+            <h3 id="schedule-title">A calendar built around wheels, rooms, and instructors.</h3>
+            <p class="feature-copy">Publish sessions, track capacity, manage waitlists, and see resource conflicts before they reach the front desk.</p>
+          </div>
+          <div class="schedule-example" aria-label="Example weekly class schedule">
+            <div class="day">
+              <span class="day-name">Monday</span>
+              <span class="class-name">Wheel I</span>
+              <span class="class-meta">6:00 pm</span>
+            </div>
+            <div class="day">
+              <span class="day-name">Tuesday</span>
+              <span class="class-name">Open studio</span>
+              <span class="class-meta">2:00 pm</span>
+            </div>
+            <div class="day">
+              <span class="day-name">Wednesday</span>
+              <span class="class-name">Handbuilding</span>
+              <span class="class-meta">6:30 pm</span>
+            </div>
+            <div class="day">
+              <span class="day-name">Thursday</span>
+              <span class="class-name">Wheel II</span>
+              <span class="class-meta">6:00 pm</span>
+            </div>
+            <div class="day">
+              <span class="day-name">Saturday</span>
+              <span class="class-name">Family clay</span>
+              <span class="class-meta">10:00 am</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="feature feature-queue" aria-labelledby="queue-title">
+          <div>
+            <h3 id="queue-title">A firing queue everyone can trust.</h3>
+            <p class="feature-copy">Log pieces, group loads, assign programs, and keep members informed from greenware to pickup.</p>
+          </div>
+          <div class="queue-list" aria-label="Example kiln queue">
+            <div class="queue-item">
+              <span class="status-mark" aria-hidden="true"></span>
+              <span>Bisque load</span>
+              <span class="status-text">Ready</span>
+            </div>
+            <div class="queue-item">
+              <span class="status-mark" aria-hidden="true"></span>
+              <span>Mid-fire glaze</span>
+              <span class="status-text">Loading</span>
+            </div>
+            <div class="queue-item">
+              <span class="status-mark" aria-hidden="true"></span>
+              <span>Low-fire test</span>
+              <span class="status-text">Queued</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="feature feature-billing" aria-labelledby="billing-title">
+          <div>
+            <h3 id="billing-title">Billing that follows membership.</h3>
+            <p class="feature-copy">Handle recurring dues, class passes, materials, and pauses from the same member record.</p>
+          </div>
+          <div class="billing-list" aria-label="Example billing automations">
+            <div class="billing-item">
+              <span class="status-mark" aria-hidden="true"></span>
+              <span>Recurring dues</span>
+              <span class="status-text">Automatic</span>
+            </div>
+            <div class="billing-item">
+              <span class="status-mark" aria-hidden="true"></span>
+              <span>Class credits</span>
+              <span class="status-text">Tracked</span>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <aside class="operations-note" aria-label="Studio workflow note">
+        <span class="note-rule" aria-hidden="true"></span>
+        <p>When a class fills, the room plan updates. When a firing moves, members know. When membership changes, billing follows.</p>
+      </aside>
+    </section>
+
+    <section class="pricing" id="pricing" aria-labelledby="pricing-title">
+      <div class="shell">
+        <header class="pricing-heading">
+          <h2 id="pricing-title">A plan for the studio you run.</h2>
+          <p>Every plan covers scheduling, the firing queue, and member billing. Choose by the scale of your operation.</p>
+        </header>
+
+        <div class="pricing-grid">
+          <article class="plan">
+            <p class="plan-name">Essentials</p>
+            <p class="price"><span class="currency">$</span>49</p>
+            <p class="billing-cycle">per studio, monthly</p>
+            <ul>
+              <li>One studio location</li>
+              <li>Class and workshop scheduling</li>
+              <li>Kiln firing queue</li>
+              <li>Recurring member billing</li>
+            </ul>
+            <a class="button button-secondary" href="#contact">Choose Essentials</a>
+          </article>
+
+          <article class="plan plan-featured">
+            <p class="plan-name">Studio</p>
+            <p class="price"><span class="currency">$</span>99</p>
+            <p class="billing-cycle">per studio, monthly</p>
+            <ul>
+              <li>Everything in Essentials</li>
+              <li>Staff roles and permissions</li>
+              <li>Automated member notices</li>
+              <li>Resource and room planning</li>
+            </ul>
+            <a class="button" href="#contact">Choose Studio</a>
+          </article>
+
+          <article class="plan">
+            <p class="plan-name">Collective</p>
+            <p class="price"><span class="currency">$</span>179</p>
+            <p class="billing-cycle">per organization, monthly</p>
+            <ul>
+              <li>Everything in Studio</li>
+              <li>Multiple studio locations</li>
+              <li>Consolidated reporting</li>
+              <li>Priority onboarding</li>
+            </ul>
+            <a class="button button-secondary" href="#contact">Choose Collective</a>
+          </article>
+        </div>
+        <p class="pricing-note">All prices are shown in USD. Payment processing fees are separate.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer shell" id="contact">
+    <div class="footer-lead">
+      <h2>Make room for the work.</h2>
+      <a class="button" href="mailto:hello@kilnhouse.app?subject=Kilnhouse%20trial">Start with Kilnhouse</a>
+    </div>
+    <div class="footer-bottom">
+      <a class="brand" href="#top" aria-label="Kilnhouse home">
+        <span class="brand-mark" aria-hidden="true"></span>
+        Kilnhouse
+      </a>
+      <div class="footer-links">
+        <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
+        <a href="mailto:hello@kilnhouse.app">Contact</a>
+      </div>
+      <p class="copyright">&copy; 2026 Kilnhouse</p>
+    </div>
+  </footer>
+</body>
+</html>

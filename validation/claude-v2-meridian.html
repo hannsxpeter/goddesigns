@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Meridian, a slow travel planning studio</title>
+<meta name="description" content="Meridian is a boutique travel planning studio for slow, deliberate trips: fewer stops, longer stays, routes shaped by planners who have walked them.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='10' fill='%23FFC53D' stroke='%23201A33' stroke-width='2'/%3E%3Cellipse cx='12' cy='12' rx='4.5' ry='10' fill='none' stroke='%23201A33' stroke-width='2'/%3E%3Cline x1='2' y1='12' x2='22' y2='12' stroke='%23201A33' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Karla:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* goddesign | structure: Catalogue | direction: Playful Pop | accent: 15 */
+/* seed 45936938 | tokens: bg #FFF8EF surface #FFEFD9 text #201A33 muted #6E6680
+   accent #FF4D6D secondary #2EC4B6 highlight #FFC53D
+   type: Bricolage Grotesque 800 display / Karla 400 body / Karla 700 caps labels
+   radius 16 | border 2px #201A33 | shadow 6px 6px 0 #201A33 | spring 250ms */
+
+:root {
+  --bg: #FFF8EF;
+  --surface: #FFEFD9;
+  --text: #201A33;
+  --muted: #6E6680;
+  --accent: #FF4D6D;
+  --accent-down: oklch(from var(--accent) calc(l - 0.08) c h);
+  --secondary: #2EC4B6;
+  --secondary-deep: oklch(from var(--secondary) calc(l - 0.18) c h);
+  --highlight: #FFC53D;
+  --cream-soft: color-mix(in oklab, var(--bg) 76%, var(--text));
+  --tint-teal-1: color-mix(in oklab, var(--secondary) 20%, var(--bg));
+  --tint-teal-2: color-mix(in oklab, var(--secondary) 46%, var(--bg));
+  --tint-sun-1: color-mix(in oklab, var(--highlight) 26%, var(--bg));
+  --tint-pink-1: color-mix(in oklab, var(--accent) 20%, var(--bg));
+  --line: 2px solid var(--text);
+  --radius: 16px;
+  --shadow: 6px 6px 0 var(--text);
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --settle: cubic-bezier(0.22, 1, 0.36, 1);
+  --font-display: "Bricolage Grotesque", "Karla", system-ui, sans-serif;
+  --font-body: "Karla", system-ui, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body { overflow-x: clip; }
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  line-height: 1.55;
+  color: var(--text);
+  background: var(--bg);
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  margin: 0;
+}
+
+p { margin: 0; text-wrap: pretty; overflow-wrap: anywhere; }
+
+img, svg { max-width: 100%; height: auto; }
+
+[hidden] { display: none !important; }
+
+.wrap {
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: clamp(16px, 4vw, 48px);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.skip-link {
+  position: absolute;
+  left: 16px;
+  top: -64px;
+  z-index: 50;
+  background: var(--highlight);
+  color: var(--text);
+  border: var(--line);
+  border-radius: 12px;
+  padding: 8px 16px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.skip-link:focus-visible { top: 12px; }
+
+/* ---------- header ---------- */
+
+.site-head {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--bg);
+  border-bottom: var(--line);
+}
+.head-in {
+  display: flex;
+  align-items: center;
+  gap: 12px 24px;
+  flex-wrap: wrap;
+  padding-block: 12px;
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.33rem;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  text-decoration: none;
+}
+.site-nav { margin-left: auto; }
+.site-nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px 8px;
+  flex-wrap: wrap;
+}
+.site-nav a:not(.btn) {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text);
+  text-decoration: none;
+  transition: background-color 0.18s;
+}
+.site-nav a:not(.btn):hover { background: var(--surface); }
+.site-nav a:not(.btn):active { background: var(--tint-sun-1); }
+
+/* ---------- buttons ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 12px 24px;
+  background: var(--accent);
+  color: var(--text);
+  border: var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 1rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.25s var(--spring), background-color 0.18s;
+}
+.btn:hover { transform: translate(-2px, -2px); background: var(--accent-down); }
+.btn:active { transform: translate(2px, 2px) scale(0.98); }
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+.btn-small { min-height: 40px; padding: 8px 16px; font-size: 0.95rem; }
+
+.link-quiet {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 8px 4px;
+  font-weight: 700;
+  color: var(--text);
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 3px;
+  text-underline-offset: 5px;
+  transition: text-decoration-color 0.18s;
+}
+.link-quiet:hover { text-decoration-color: var(--secondary); }
+.link-quiet:active { color: var(--muted); }
+
+/* ---------- hero ---------- */
+
+.hero { padding-block: clamp(64px, 10vw, 128px); }
+.hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  align-items: center;
+  gap: 48px;
+}
+.hero h1 {
+  font-size: clamp(2.6rem, 1.4rem + 5.5vw, 6rem);
+  max-width: 13ch;
+}
+.lede {
+  margin-top: 24px;
+  font-size: clamp(1.0625rem, 1rem + 0.5vw, 1.33rem);
+  line-height: 1.5;
+  max-width: 46ch;
+}
+.cta-row {
+  margin-top: 32px;
+  display: flex;
+  align-items: center;
+  gap: 12px 24px;
+  flex-wrap: wrap;
+}
+.hero-art { justify-self: center; }
+.hero-art svg {
+  width: min(330px, 68vw);
+  display: block;
+  transform: rotate(-8deg);
+}
+.stk-base { fill: var(--highlight); stroke: var(--text); stroke-width: 3; }
+.stk-dash { fill: none; stroke: var(--text); stroke-width: 2; stroke-dasharray: 2 7; }
+.stk-text {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 19.5px;
+  letter-spacing: 0.3em;
+  fill: var(--text);
+}
+.stk-star1 { fill: var(--accent); stroke: var(--text); stroke-width: 3; stroke-linejoin: round; }
+.stk-star2 { fill: var(--secondary); stroke: var(--text); stroke-width: 3; stroke-linejoin: round; }
+.stk-hub { fill: var(--bg); stroke: var(--text); stroke-width: 3; }
+
+/* ---------- sections ---------- */
+
+section { padding-block: clamp(64px, 9vw, 128px); }
+
+.kicker {
+  font-weight: 700;
+  font-size: 0.8rem;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+.section-head h2 { font-size: clamp(2.08rem, 1.4rem + 2.4vw, 3.24rem); max-width: 22ch; }
+.section-lede { margin-top: 16px; color: var(--muted); max-width: 58ch; }
+
+/* ---------- route library ---------- */
+
+.routes { padding-top: clamp(48px, 6vw, 96px); }
+
+.filters {
+  margin-top: 48px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 48px;
+}
+.filter-group {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.filter-label {
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-right: 4px;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 8px 16px;
+  background: transparent;
+  color: var(--text);
+  border: var(--line);
+  border-radius: var(--radius);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: transform 0.25s var(--spring), background-color 0.18s, color 0.18s;
+}
+.chip:hover { background: var(--surface); transform: translateY(-2px); }
+.chip:active { transform: scale(0.96); }
+.chip[aria-pressed="true"] { background: var(--text); color: var(--bg); }
+.chip:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+.route-count {
+  margin-top: 16px;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+.route-grid {
+  list-style: none;
+  margin: 32px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  gap: 32px;
+}
+.route-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: clip;
+  transition: transform 0.25s var(--spring);
+}
+.route-card:hover { transform: translate(-2px, -2px); }
+.route-art { margin: 0; display: block; border-bottom: var(--line); background: var(--bg); }
+.route-art svg { display: block; width: 100%; }
+.route-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  padding: 24px;
+}
+.route-chip {
+  align-self: flex-start;
+  background: var(--secondary);
+  color: var(--text);
+  border: var(--line);
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.route-card h3 { font-size: 1.33rem; margin-top: 4px; }
+.route-where { color: var(--muted); font-size: 0.95rem; }
+.route-meta { font-size: 0.95rem; }
+.route-go {
+  margin-top: auto;
+  align-self: flex-start;
+  padding: 8px 0 4px;
+  background: none;
+  border: none;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text);
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 2.5px;
+  text-underline-offset: 4px;
+  cursor: pointer;
+  transition: text-decoration-color 0.18s;
+}
+.route-go:hover { text-decoration-color: var(--secondary); }
+.route-go:active { color: var(--muted); }
+
+.route-empty {
+  margin-top: 32px;
+  padding: 48px 24px;
+  text-align: center;
+  background: var(--surface);
+  border: var(--line);
+  border-radius: var(--radius);
+}
+.route-empty h3 { font-size: 1.66rem; }
+.route-empty p { margin: 12px auto 24px; max-width: 46ch; color: var(--muted); }
+
+/* card illustration fills */
+.f-sun { fill: var(--highlight); }
+.f-pink { fill: var(--accent); }
+.f-teal { fill: var(--secondary); }
+.f-deep { fill: var(--secondary-deep); }
+.f-t1 { fill: var(--tint-teal-1); }
+.f-t2 { fill: var(--tint-teal-2); }
+.f-h1 { fill: var(--tint-sun-1); }
+.f-p1 { fill: var(--tint-pink-1); }
+.f-cream { fill: var(--bg); }
+.f-ink { fill: var(--text); }
+.s-ink { stroke: var(--text); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+.no-fill { fill: none; }
+
+/* ---------- how a trip comes together ---------- */
+
+.plan {
+  background: var(--surface);
+  border-block: var(--line);
+}
+.phase-list {
+  margin-top: 48px;
+  display: grid;
+  gap: 48px;
+  container-type: inline-size;
+}
+.phase {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: 12px 48px;
+  align-items: start;
+}
+.phase h3 { font-size: clamp(1.66rem, 1.3rem + 1.1vw, 2.08rem); max-width: 14ch; }
+.phase p { max-width: 58ch; }
+@container (max-width: 680px) {
+  .phase { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ---------- studio ---------- */
+
+.studio-inner { max-width: 720px; }
+.studio-inner h2 { font-size: clamp(2.08rem, 1.4rem + 2.4vw, 3.24rem); }
+.studio-inner p { margin-top: 24px; max-width: 62ch; }
+
+/* ---------- call band ---------- */
+
+.call {
+  background: var(--text);
+  color: var(--bg);
+}
+.call h2 {
+  color: var(--bg);
+  font-size: clamp(2.08rem, 1.4rem + 3vw, 4.05rem);
+  max-width: 18ch;
+}
+.call .section-lede { color: var(--cream-soft); }
+.call-form {
+  margin-top: 48px;
+  max-width: 560px;
+  display: grid;
+  gap: 24px;
+}
+.field { display: grid; gap: 8px; }
+.field label { font-weight: 700; font-size: 0.95rem; }
+.field input,
+.field textarea {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--text);
+  background: var(--bg);
+  border: 2px solid var(--bg);
+  border-radius: 12px;
+  padding: 12px 16px;
+  width: 100%;
+}
+.field textarea { resize: vertical; min-height: 112px; }
+.field input[aria-invalid="true"],
+.field textarea[aria-invalid="true"] { border-color: var(--accent); }
+.field-error { color: var(--accent); font-size: 0.95rem; font-weight: 700; }
+.form-note { color: var(--cream-soft); font-size: 0.95rem; max-width: 46ch; }
+.form-success {
+  margin-top: 48px;
+  max-width: 560px;
+  padding: 32px;
+  border: 2px solid var(--secondary);
+  border-radius: var(--radius);
+  background: color-mix(in oklab, var(--secondary) 14%, var(--text));
+}
+.form-success h3 { color: var(--bg); font-size: 1.66rem; }
+.form-success p { margin-top: 12px; color: var(--cream-soft); }
+
+/* ---------- footer ---------- */
+
+.site-foot {
+  background: var(--text);
+  color: var(--cream-soft);
+  border-top: 2px solid color-mix(in oklab, var(--bg) 25%, var(--text));
+  padding-block: 48px;
+}
+.foot-in {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.foot-brand {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.33rem;
+  color: var(--bg);
+}
+.foot-nav { display: flex; flex-wrap: wrap; gap: 8px 24px; list-style: none; margin: 0; padding: 0; }
+.foot-nav a {
+  color: var(--cream-soft);
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+  padding-block: 8px;
+  display: inline-flex;
+  transition: color 0.18s;
+}
+.foot-nav a:hover { color: var(--bg); text-decoration: underline; text-underline-offset: 4px; }
+.foot-note { margin-top: 24px; font-size: 0.8rem; }
+
+/* ---------- motion ---------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+  .reveal { animation: rise 0.45s var(--settle) both; }
+  .reveal-2 { animation-delay: 40ms; }
+  .reveal-3 { animation-delay: 80ms; }
+  .reveal-4 { animation-delay: 120ms; }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(12px); }
+  }
+  .hero-art.reveal-4 { animation-name: rise-tilt; }
+  @keyframes rise-tilt {
+    from { opacity: 0; transform: translateY(12px); }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+  html { scroll-behavior: auto; }
+}
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 880px) {
+  .hero-grid { grid-template-columns: minmax(0, 1fr); }
+  .hero-art { justify-self: start; }
+  .hero-art svg { width: min(240px, 60vw); }
+}
+@media (max-width: 560px) {
+  .site-head { position: static; }
+}
+@media (pointer: coarse) {
+  .chip, .route-go, .site-nav a:not(.btn), .link-quiet { min-height: 44px; }
+}
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-head">
+  <div class="wrap head-in">
+    <a class="brand" href="#main" aria-label="Meridian, back to top">
+      <svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <circle cx="12" cy="12" r="10" fill="var(--highlight)" stroke="var(--text)" stroke-width="2"/>
+        <ellipse cx="12" cy="12" rx="4.5" ry="10" fill="none" stroke="var(--text)" stroke-width="2"/>
+        <line x1="2" y1="12" x2="22" y2="12" stroke="var(--text)" stroke-width="2"/>
+      </svg>
+      Meridian
+    </a>
+    <nav class="site-nav" aria-label="Main">
+      <ul>
+        <li><a href="#routes">Route library</a></li>
+        <li><a href="#plan">How we plan</a></li>
+        <li><a href="#studio">The studio</a></li>
+        <li><a class="btn btn-small" href="#call">Book a call</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- hero: one composition -->
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="wrap hero-grid">
+      <div>
+        <h1 id="hero-title" class="reveal">Trips that refuse to hurry.</h1>
+        <p class="lede reveal reveal-2">A boutique planning studio for slow travel: fewer stops, longer stays, routes shaped by people who have walked them.</p>
+        <div class="cta-row reveal reveal-3">
+          <a class="btn" href="#call">Book a planning call</a>
+          <a class="link-quiet" href="#routes">Browse the route library</a>
+        </div>
+      </div>
+      <div class="hero-art reveal reveal-4">
+        <svg viewBox="0 0 340 340" role="img" aria-label="Round sticker badge with a compass star, reading slow by design, Meridian travel studio">
+          <defs>
+            <path id="stk-circ" d="M170,170 m-136,0 a136,136 0 1,1 272,0 a136,136 0 1,1 -272,0"/>
+          </defs>
+          <circle class="stk-base" cx="170" cy="170" r="162"/>
+          <circle class="stk-dash" cx="170" cy="170" r="112"/>
+          <text class="stk-text">
+            <textPath href="#stk-circ" textLength="852" lengthAdjust="spacingAndGlyphs">SLOW BY DESIGN &#183; MERIDIAN TRAVEL STUDIO &#183;</textPath>
+          </text>
+          <polygon class="stk-star2" transform="rotate(45 170 170)"
+            points="170,80 183,157 260,170 183,183 170,260 157,183 80,170 157,157"/>
+          <polygon class="stk-star1"
+            points="170,75 184,156 265,170 184,184 170,265 156,184 75,170 156,156"/>
+          <circle class="stk-hub" cx="170" cy="170" r="12"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- catalogue: the route library -->
+  <section class="routes" id="routes" aria-labelledby="routes-title">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="kicker">The route library</p>
+        <h2 id="routes-title">Journeys we keep going back to.</h2>
+        <p class="section-lede">Every route below has been walked, ridden, or sailed by the planner who drew it. Each one is a starting point: we redraw it around your pace.</p>
+      </div>
+
+      <div class="filters">
+        <div class="filter-group" role="group" aria-label="Filter routes by region">
+          <span class="filter-label" aria-hidden="true">Region</span>
+          <button class="chip" type="button" data-filter="region" data-value="all" aria-pressed="true">All regions</button>
+          <button class="chip" type="button" data-filter="region" data-value="asia" aria-pressed="false">Asia</button>
+          <button class="chip" type="button" data-filter="region" data-value="europe" aria-pressed="false">Europe</button>
+          <button class="chip" type="button" data-filter="region" data-value="americas" aria-pressed="false">Americas</button>
+        </div>
+        <div class="filter-group" role="group" aria-label="Filter routes by way of travelling">
+          <span class="filter-label" aria-hidden="true">Travel by</span>
+          <button class="chip" type="button" data-filter="mode" data-value="all" aria-pressed="true">Any way</button>
+          <button class="chip" type="button" data-filter="mode" data-value="foot" aria-pressed="false">On foot</button>
+          <button class="chip" type="button" data-filter="mode" data-value="rail" aria-pressed="false">By rail</button>
+          <button class="chip" type="button" data-filter="mode" data-value="water" aria-pressed="false">By water</button>
+          <button class="chip" type="button" data-filter="mode" data-value="road" aria-pressed="false">By road</button>
+        </div>
+      </div>
+
+      <p class="route-count" id="route-count" aria-live="polite">Showing all 6 routes.</p>
+
+      <ul class="route-grid" id="route-grid">
+
+        <li class="route-card" data-region="asia" data-mode="foot">
+          <figure class="route-art">
+            <svg viewBox="0 0 400 260" aria-hidden="true" focusable="false">
+              <rect width="400" height="260" class="f-h1"/>
+              <circle cx="330" cy="54" r="30" class="f-sun s-ink"/>
+              <polygon points="0,192 95,78 190,192" class="f-t1 s-ink"/>
+              <polygon points="115,192 230,58 345,192" class="f-t2 s-ink"/>
+              <polygon points="262,192 330,112 400,192 400,192" class="f-t1 s-ink"/>
+              <rect x="0" y="190" width="400" height="70" class="f-cream"/>
+              <path d="M40,238 C130,214 250,232 364,206" class="no-fill s-ink" stroke-width="4" stroke-dasharray="1 11"/>
+              <rect x="86" y="200" width="9" height="34" class="f-pink s-ink"/>
+              <rect x="117" y="200" width="9" height="34" class="f-pink s-ink"/>
+              <rect x="76" y="192" width="60" height="9" class="f-pink s-ink"/>
+              <rect x="84" y="210" width="44" height="6" class="f-pink s-ink"/>
+            </svg>
+          </figure>
+          <div class="route-body">
+            <span class="route-chip">On foot</span>
+            <h3>The Kii Peninsula on foot</h3>
+            <p class="route-where">Kumano Kodo, Japan &#183; best in autumn</p>
+            <p class="route-meta">12 days, village to village, nights in family-run inns</p>
+            <button class="route-go" type="button" data-route="The Kii Peninsula on foot">Start from this route</button>
+          </div>
+        </li>
+
+        <li class="route-card" data-region="europe" data-mode="rail">
+          <figure class="route-art">
+            <svg viewBox="0 0 400 260" aria-hidden="true" focusable="false">
+              <rect width="400" height="260" class="f-t1"/>
+              <circle cx="62" cy="56" r="26" class="f-sun s-ink"/>
+              <ellipse cx="100" cy="212" rx="170" ry="76" class="f-h1 s-ink"/>
+              <ellipse cx="330" cy="226" rx="170" ry="86" class="f-t2 s-ink"/>
+              <path d="M0,238 L400,226" class="no-fill s-ink" stroke-width="5"/>
+              <path d="M0,246 L400,234" class="no-fill s-ink" stroke-width="3" stroke-dasharray="4 10"/>
+              <rect x="146" y="186" width="116" height="38" rx="9" class="f-pink s-ink"/>
+              <rect x="158" y="196" width="20" height="16" rx="3" class="f-cream s-ink" stroke-width="2"/>
+              <rect x="188" y="196" width="20" height="16" rx="3" class="f-cream s-ink" stroke-width="2"/>
+              <rect x="218" y="196" width="20" height="16" rx="3" class="f-cream s-ink" stroke-width="2"/>
+              <circle cx="170" cy="228" r="7" class="f-ink"/>
+              <circle cx="238" cy="228" r="7" class="f-ink"/>
+            </svg>
+          </figure>
+          <div class="route-body">
+            <span class="route-chip">By rail</span>
+            <h3>Lisbon to Porto, the long way</h3>
+            <p class="route-where">Portugal &#183; best in early summer</p>
+            <p class="route-meta">10 days, regional trains only, long stops in Coimbra and the Douro</p>
+            <button class="route-go" type="button" data-route="Lisbon to Porto, the long way">Start from this route</button>
+          </div>
+        </li>
+
+        <li class="route-card" data-region="americas" data-mode="foot">
+          <figure class="route-art">
+            <svg viewBox="0 0 400 260" aria-hidden="true" focusable="false">
+              <rect width="400" height="260" class="f-h1"/>
+              <circle cx="200" cy="84" r="46" class="f-sun s-ink"/>
+              <path d="M0,128 Q100,106 200,124 T400,116 V260 H0 Z" class="f-t1 s-ink"/>
+              <path d="M0,172 Q100,152 200,168 T400,160 V260 H0 Z" class="f-t2 s-ink"/>
+              <path d="M0,214 Q100,196 200,210 T400,204 V260 H0 Z" class="f-teal s-ink"/>
+            </svg>
+          </figure>
+          <div class="route-body">
+            <span class="route-chip">On foot</span>
+            <h3>The Sacred Valley, unhurried</h3>
+            <p class="route-where">Peru &#183; best May to September</p>
+            <p class="route-meta">14 days at altitude-friendly pace, market days planned around, not past</p>
+            <button class="route-go" type="button" data-route="The Sacred Valley, unhurried">Start from this route</button>
+          </div>
+        </li>
+
+        <li class="route-card" data-region="asia" data-mode="water">
+          <figure class="route-art">
+            <svg viewBox="0 0 400 260" aria-hidden="true" focusable="false">
+              <rect width="400" height="260" class="f-t2"/>
+              <path d="M0,0 H400 V72 Q300,94 200,78 T0,88 Z" class="f-h1 s-ink"/>
+              <path d="M0,260 H400 V206 Q300,186 200,200 T0,192 Z" class="f-h1 s-ink"/>
+              <path d="M60,142 q14,-8 28,0" class="no-fill s-ink" stroke-width="3"/>
+              <path d="M300,166 q14,-8 28,0" class="no-fill s-ink" stroke-width="3"/>
+              <path d="M154,138 Q200,166 246,138 L236,128 H164 Z" class="f-ink"/>
+              <rect x="176" y="104" width="48" height="22" rx="7" class="f-pink s-ink"/>
+              <line x1="182" y1="126" x2="182" y2="138" class="s-ink"/>
+              <line x1="218" y1="126" x2="218" y2="138" class="s-ink"/>
+            </svg>
+          </figure>
+          <div class="route-body">
+            <span class="route-chip">By water</span>
+            <h3>Slow boats down the Mekong</h3>
+            <p class="route-where">Laos &#183; best in the cool season</p>
+            <p class="route-meta">9 days on the river, two nights minimum in every town that asks for it</p>
+            <button class="route-go" type="button" data-route="Slow boats down the Mekong">Start from this route</button>
+          </div>
+        </li>
+
+        <li class="route-card" data-region="europe" data-mode="water">
+          <figure class="route-art">
+            <svg viewBox="0 0 400 260" aria-hidden="true" focusable="false">
+              <rect width="400" height="260" class="f-h1"/>
+              <circle cx="200" cy="128" r="34" class="f-sun s-ink"/>
+              <ellipse cx="84" cy="152" rx="74" ry="28" class="f-deep s-ink"/>
+              <ellipse cx="322" cy="158" rx="64" ry="22" class="f-deep s-ink"/>
+              <rect x="0" y="160" width="400" height="100" class="f-t2"/>
+              <path d="M0,160 Q50,150 100,160 T200,160 T300,160 T400,160" class="no-fill s-ink" stroke-width="3"/>
+              <rect x="150" y="132" width="62" height="20" rx="4" class="f-cream s-ink"/>
+              <rect x="206" y="118" width="13" height="16" class="f-ink"/>
+              <path d="M142,152 H262 L246,176 H158 Z" class="f-pink s-ink"/>
+              <path d="M80,206 q16,-9 32,0 M270,220 q16,-9 32,0 M170,232 q16,-9 32,0" class="no-fill s-ink" stroke-width="3"/>
+            </svg>
+          </figure>
+          <div class="route-body">
+            <span class="route-chip">By water</span>
+            <h3>The Hebrides by ferry</h3>
+            <p class="route-where">Scotland &#183; best in late spring</p>
+            <p class="route-meta">11 days island-hopping on the ferry timetable, weather days built in</p>
+            <button class="route-go" type="button" data-route="The Hebrides by ferry">Start from this route</button>
+          </div>
+        </li>
+
+        <li class="route-card" data-region="europe" data-mode="road">
+          <figure class="route-art">
+            <svg viewBox="0 0 400 260" aria-hidden="true" focusable="false">
+              <rect width="400" height="260" class="f-t1"/>
+              <circle cx="338" cy="52" r="26" class="f-sun s-ink"/>
+              <path d="M0,132 Q200,104 400,136 V260 H0 Z" class="f-h1 s-ink"/>
+              <circle cx="60" cy="180" r="10" class="f-teal s-ink"/>
+              <circle cx="120" cy="196" r="10" class="f-teal s-ink"/>
+              <circle cx="184" cy="182" r="10" class="f-teal s-ink"/>
+              <circle cx="70" cy="228" r="10" class="f-teal s-ink"/>
+              <circle cx="140" cy="238" r="10" class="f-teal s-ink"/>
+              <circle cx="206" cy="226" r="10" class="f-teal s-ink"/>
+              <polygon points="296,148 330,100 364,148" class="f-p1 s-ink"/>
+              <rect x="302" y="148" width="56" height="42" class="f-cream s-ink"/>
+              <rect x="322" y="166" width="16" height="24" class="f-ink"/>
+            </svg>
+          </figure>
+          <div class="route-body">
+            <span class="route-chip">By road</span>
+            <h3>Puglia at harvest</h3>
+            <p class="route-where">Italy &#183; best in October</p>
+            <p class="route-meta">8 days between masserie, one town per day at most, olive presses open</p>
+            <button class="route-go" type="button" data-route="Puglia at harvest">Start from this route</button>
+          </div>
+        </li>
+
+      </ul>
+
+      <div class="route-empty" id="route-empty" hidden>
+        <h3>No routes cross that combination yet.</h3>
+        <p>We have not field-checked one there, and we do not publish routes we have not travelled. Clear the filters, or tell us where you want to go and we will walk it first.</p>
+        <button class="btn" type="button" id="clear-filters">Clear the filters</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- quiet band: process, cardless, no numerals -->
+  <section class="plan" id="plan" aria-labelledby="plan-title">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="plan-title">How a trip comes together.</h2>
+      </div>
+      <div class="phase-list">
+        <div class="phase">
+          <h3>The long conversation</h3>
+          <p>Planning starts with an unhurried call about pace, not places. How you like mornings. Whether you read on trains. What ruined your last holiday. Destinations come later; they are the easy part.</p>
+        </div>
+        <div class="phase">
+          <h3>The field-checked draft</h3>
+          <p>Your planner drafts a route built only from places we have slept, eaten, and gotten lost in ourselves. You push back, we redraw. The draft is done when nothing in it feels like a checklist.</p>
+        </div>
+        <div class="phase">
+          <h3>On the road, on call</h3>
+          <p>While you travel, the planner who drew your route stays reachable. A ferry cancelled, a village festival worth rerouting for: you message, we replan, the trip keeps its pace.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- studio note -->
+  <section class="studio" id="studio" aria-labelledby="studio-title">
+    <div class="wrap studio-inner">
+      <h2 id="studio-title">A small studio, on purpose.</h2>
+      <p>Meridian takes on a handful of trips each season, because a route drawn carefully takes weeks and we will not draw one any other way. Every planner travels the regions they plan, on the trains and ferries and footpaths they recommend, in the seasons they recommend them.</p>
+      <p>We take no commissions from hotels, guides, or operators. Planning fees are our only income, which means every recommendation in your route is there because we would choose it ourselves.</p>
+    </div>
+  </section>
+
+  <!-- CTA band -->
+  <section class="call" id="call" aria-labelledby="call-title">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="call-title">Tell us where you want to go slowly.</h2>
+        <p class="section-lede">A planning call is a conversation, not a pitch. Bring a vague idea; vague ideas make the best trips.</p>
+      </div>
+      <form class="call-form" id="call-form" method="post" action="#call">
+        <div class="field">
+          <label for="f-name">Your name</label>
+          <input id="f-name" name="name" type="text" autocomplete="name" required>
+          <p class="field-error" id="f-name-error" hidden>Add your name so we know who we are calling back.</p>
+        </div>
+        <div class="field">
+          <label for="f-email">Email address</label>
+          <input id="f-email" name="email" type="email" autocomplete="email" required>
+          <p class="field-error" id="f-email-error" hidden>That email address looks incomplete. Check for an @ and a domain, like you@example.com.</p>
+        </div>
+        <div class="field">
+          <label for="f-trip">Where are you drawn to? (optional)</label>
+          <textarea id="f-trip" name="trip" rows="4"></textarea>
+        </div>
+        <div>
+          <button class="btn" type="submit" id="call-submit">Request a planning call</button>
+        </div>
+        <p class="form-note">We read every request and reply personally. Demo note: this page has no server, so nothing is sent anywhere.</p>
+      </form>
+      <div class="form-success" id="form-success" role="status" hidden>
+        <h3>Request noted.</h3>
+        <p id="form-success-body">On a live site this would now be in the studio inbox. This is a self-contained demo page, so nothing was actually sent; the form above is wired for a real backend.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <div class="foot-in">
+      <span class="foot-brand">Meridian</span>
+      <ul class="foot-nav">
+        <li><a href="#routes">Route library</a></li>
+        <li><a href="#plan">How we plan</a></li>
+        <li><a href="#studio">The studio</a></li>
+        <li><a href="#call">Book a call</a></li>
+      </ul>
+    </div>
+    <p class="foot-note">Meridian is a fictional studio built as a design study. No routes, fees, or promises here are real, except the opinion that trips should slow down.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var motionOK = window.matchMedia("(prefers-reduced-motion: no-preference)").matches;
+
+  /* ---------- route filtering ---------- */
+
+  var state = { region: "all", mode: "all" };
+  var chips = Array.prototype.slice.call(document.querySelectorAll(".chip[data-filter]"));
+  var cards = Array.prototype.slice.call(document.querySelectorAll(".route-card"));
+  var grid = document.getElementById("route-grid");
+  var emptyEl = document.getElementById("route-empty");
+  var countEl = document.getElementById("route-count");
+  var total = cards.length;
+
+  function applyFilters() {
+    var visible = 0;
+    cards.forEach(function (card) {
+      var match =
+        (state.region === "all" || card.dataset.region === state.region) &&
+        (state.mode === "all" || card.dataset.mode === state.mode);
+      card.hidden = !match;
+      if (match) visible++;
+    });
+    grid.hidden = visible === 0;
+    emptyEl.hidden = visible !== 0;
+    countEl.textContent =
+      visible === total
+        ? "Showing all " + total + " routes."
+        : visible === 0
+          ? "No routes match those filters."
+          : "Showing " + visible + " of " + total + " routes.";
+  }
+
+  chips.forEach(function (chip) {
+    chip.addEventListener("click", function () {
+      var kind = chip.dataset.filter;
+      state[kind] = chip.dataset.value;
+      chips.forEach(function (other) {
+        if (other.dataset.filter === kind) {
+          other.setAttribute("aria-pressed", other === chip ? "true" : "false");
+        }
+      });
+      applyFilters();
+    });
+  });
+
+  document.getElementById("clear-filters").addEventListener("click", function () {
+    state.region = "all";
+    state.mode = "all";
+    chips.forEach(function (chip) {
+      chip.setAttribute("aria-pressed", chip.dataset.value === "all" ? "true" : "false");
+    });
+    applyFilters();
+    var first = document.querySelector('.chip[data-filter="region"][data-value="all"]');
+    if (first) first.focus();
+  });
+
+  /* ---------- start from a route ---------- */
+
+  var tripField = document.getElementById("f-trip");
+  Array.prototype.forEach.call(document.querySelectorAll(".route-go"), function (btn) {
+    btn.addEventListener("click", function () {
+      tripField.value = "I keep thinking about: " + btn.dataset.route + ".";
+      document.getElementById("call").scrollIntoView({ behavior: motionOK ? "smooth" : "auto" });
+      tripField.focus({ preventScroll: true });
+    });
+  });
+
+  /* ---------- form: validation, loading, success ---------- */
+
+  var form = document.getElementById("call-form");
+  form.setAttribute("novalidate", "");
+
+  var nameInput = document.getElementById("f-name");
+  var emailInput = document.getElementById("f-email");
+  var submitBtn = document.getElementById("call-submit");
+  var successEl = document.getElementById("form-success");
+  var successBody = document.getElementById("form-success-body");
+
+  function setFieldError(input, errorEl, hasError) {
+    errorEl.hidden = !hasError;
+    if (hasError) {
+      input.setAttribute("aria-invalid", "true");
+      input.setAttribute("aria-describedby", errorEl.id);
+    } else {
+      input.removeAttribute("aria-invalid");
+      input.removeAttribute("aria-describedby");
+    }
+  }
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var nameBad = nameInput.value.trim() === "";
+    var emailBad = !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value.trim());
+    setFieldError(nameInput, document.getElementById("f-name-error"), nameBad);
+    setFieldError(emailInput, document.getElementById("f-email-error"), emailBad);
+    if (nameBad) { nameInput.focus(); return; }
+    if (emailBad) { emailInput.focus(); return; }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Sending request…";
+    window.setTimeout(function () {
+      form.hidden = true;
+      successBody.textContent =
+        "Thanks, " + nameInput.value.trim() + ". On a live site this would now be in the studio inbox. " +
+        "This is a self-contained demo page, so nothing was actually sent; the form is wired for a real backend.";
+      successEl.hidden = false;
+      successEl.focus && successEl.setAttribute("tabindex", "-1");
+      successEl.focus();
+    }, 900);
+  });
+})();
+</script>
+
+</body>
+</html>

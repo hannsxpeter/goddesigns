@@ -1,0 +1,806 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kilnhouse, studio management for ceramics studios</title>
+<meta name="description" content="Kilnhouse is studio management software for ceramics studios: class scheduling, kiln firing queues, and member billing in one place.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@600&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+/* goddesign | structure: Marquee Hero | direction: Data-Dense Pro | accent: 113 */
+/* DIRECTION LOCK | seed 3096780295 | direction 8 Data-Dense Pro (override reroll from 7) |
+   structure 0 Marquee Hero (advanced from 11) | jitter h+2 L+0.01 r+1 -> radius 6px |
+   Familjen Grotesk 600 / IBM Plex Sans 400,600 / IBM Plex Mono 500 numerals |
+   dense scale 2,4,8,12,16,24,32,48,64 | motion 140ms linear state changes only */
+
+:root {
+  --bg: oklch(from #1A1815 calc(l + 0.01) c h);
+  --surface: oklch(from #22201C calc(l + 0.01) c h);
+  --text: #EDEDE6;
+  --muted: #9A9A8E;
+  --accent: oklch(from #FAFF69 l c calc(h + 2));
+  --positive: #4ADE80;
+  --rule: #2E2E2A;
+
+  --accent-hover: oklch(from var(--accent) calc(l - 0.08) c h);
+  --surface-raised: oklch(from var(--surface) calc(l + 0.03) c h);
+
+  --font-display: "Familjen Grotesk", "Helvetica Neue", sans-serif;
+  --font-body: "IBM Plex Sans", "Helvetica Neue", sans-serif;
+  --font-mono: "IBM Plex Mono", "SFMono-Regular", monospace;
+
+  --radius: 6px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  --measure: 58ch;
+  --speed: 140ms;
+}
+
+* { box-sizing: border-box; margin: 0; }
+
+html {
+  color-scheme: dark;
+  scroll-padding-top: 84px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.55;
+  overflow-x: clip;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+p { text-wrap: pretty; }
+
+.mono {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.label {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.container {
+  max-width: 1120px;
+  margin-inline: auto;
+  padding-inline: var(--space-5);
+}
+
+a { color: var(--text); }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.skip-link {
+  position: absolute;
+  left: var(--space-5);
+  top: var(--space-3);
+  background: var(--surface);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius);
+  transform: translateY(-200%);
+  z-index: 20;
+}
+
+.skip-link:focus-visible { transform: none; }
+
+/* ---------- nav ---------- */
+
+.site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--bg);
+  border-bottom: 1px solid var(--rule);
+}
+
+.site-nav .container {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  min-height: 60px;
+}
+
+.wordmark {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.1875rem;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  text-transform: uppercase;
+  padding-block: var(--space-2);
+}
+
+.nav-links {
+  display: flex;
+  gap: var(--space-5);
+  list-style: none;
+  padding: 0;
+  margin-inline-start: auto;
+}
+
+.nav-links a {
+  display: inline-block;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 1rem;
+  padding-block: var(--space-3);
+  transition: color var(--speed) linear;
+}
+
+.nav-links a:hover { color: var(--accent); }
+.nav-links a:active { color: var(--text); }
+
+@media (max-width: 720px) {
+  html { scroll-padding-top: 124px; }
+  .site-nav .container {
+    flex-wrap: wrap;
+    column-gap: var(--space-5);
+    padding-block: var(--space-2);
+  }
+  .wordmark { margin-inline-end: auto; }
+  .nav-links {
+    flex-basis: 100%;
+    order: 3;
+    flex-wrap: wrap;
+    gap: 0 var(--space-4);
+    margin-inline-start: 0;
+  }
+}
+
+/* ---------- buttons ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 1rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color var(--speed) linear, border-color var(--speed) linear,
+    color var(--speed) linear, transform var(--speed) linear;
+}
+
+.btn:active { transform: scale(0.97); }
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.btn-primary:hover { background: var(--accent-hover); }
+
+.btn-ghost {
+  background: transparent;
+  border-color: var(--muted);
+  color: var(--text);
+}
+
+.btn-ghost:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  background: var(--surface);
+  border-color: var(--rule);
+  color: var(--muted);
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ---------- hero ---------- */
+
+.hero {
+  display: grid;
+  grid-template-areas: "headline" "support" "cta" "strip";
+  align-content: center;
+  gap: var(--space-5);
+  min-height: calc(100svh - 61px);
+  padding-block: var(--space-8);
+}
+
+.hero h1 {
+  grid-area: headline;
+  font-size: clamp(2.2rem, 7.5vw, 6rem);
+  max-width: 15ch;
+}
+
+.hero h1 span { display: block; }
+
+.hero-support {
+  grid-area: support;
+  color: var(--muted);
+  font-size: 1.1875rem;
+  max-width: 46ch;
+}
+
+.hero-cta {
+  grid-area: cta;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.readout {
+  grid-area: strip;
+  margin-top: var(--space-7);
+  border-top: 1px solid var(--rule);
+  padding-top: var(--space-4);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: var(--space-5);
+  row-gap: var(--space-2);
+  font-size: 1rem;
+}
+
+.readout .mono { color: var(--text); }
+.readout-kiln { color: var(--text); font-weight: 600; }
+.readout-note {
+  color: var(--muted);
+  font-size: 0.8125rem;
+  flex-basis: 100%;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.status::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.status.is-positive::before { background: var(--positive); }
+
+/* ---------- sections ---------- */
+
+.section { padding-block: var(--space-7); }
+
+@media (min-width: 768px) {
+  .section { padding-block: var(--space-8); }
+}
+
+.band { background: var(--surface); }
+
+.section h2 {
+  font-size: clamp(1.75rem, 3.2vw, 2.5rem);
+  max-width: 22ch;
+}
+
+.section-intro {
+  color: var(--muted);
+  max-width: var(--measure);
+  margin-top: var(--space-4);
+}
+
+.feature-grid {
+  display: grid;
+  gap: var(--space-6);
+}
+
+@media (min-width: 900px) {
+  .feature-grid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: var(--space-8);
+    align-items: start;
+  }
+}
+
+.spec-list {
+  list-style: none;
+  padding: 0;
+}
+
+.spec-list li {
+  padding-block: var(--space-4);
+  border-top: 1px solid var(--rule);
+  max-width: var(--measure);
+}
+
+.spec-list li:last-child { border-bottom: 1px solid var(--rule); }
+
+.spec-list strong {
+  display: block;
+  font-weight: 600;
+  margin-bottom: var(--space-1);
+}
+
+.spec-list span { color: var(--muted); }
+
+/* ---------- firing queue table ---------- */
+
+.queue-panel {
+  margin-top: var(--space-6);
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.table-scroll {
+  overflow-x: auto;
+  border-radius: var(--radius);
+}
+
+table {
+  width: 100%;
+  min-width: 720px;
+  border-collapse: collapse;
+  font-size: 1rem;
+}
+
+caption {
+  caption-side: bottom;
+  text-align: left;
+  color: var(--muted);
+  font-size: 0.8125rem;
+  padding: var(--space-3) var(--space-4) var(--space-4);
+}
+
+th, td {
+  text-align: left;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--rule);
+}
+
+thead th {
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+tbody th {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+tbody th small {
+  display: block;
+  color: var(--muted);
+  font-weight: 400;
+  font-size: 0.8125rem;
+}
+
+td.num {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+tbody tr:last-child th,
+tbody tr:last-child td { border-bottom: none; }
+
+/* ---------- pricing ---------- */
+
+.pricing-head {
+  display: grid;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.tiers-wrap { container-type: inline-size; }
+
+.tiers {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  overflow: clip;
+}
+
+.tier {
+  padding: var(--space-6) var(--space-5);
+  display: grid;
+  gap: var(--space-4);
+  align-content: start;
+  border-inline-start: 1px solid var(--rule);
+}
+
+.tier:first-child { border-inline-start: none; }
+
+.tier-featured { background: var(--surface-raised); }
+
+.tier h3 { font-size: 1.4375rem; }
+
+.tier-tag { color: var(--muted); }
+
+.price {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.price small {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 1rem;
+  color: var(--muted);
+}
+
+.tier-blurb { color: var(--muted); font-size: 1rem; }
+
+.tier-specs {
+  list-style: none;
+  padding: 0;
+  font-size: 1rem;
+}
+
+.tier-specs li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-block: var(--space-2);
+  border-top: 1px solid var(--rule);
+}
+
+.tier-specs .mono { color: var(--text); }
+.tier-specs span:first-child { color: var(--muted); }
+
+.tier .btn { justify-self: start; }
+
+@container (max-width: 799px) {
+  .tiers { grid-template-columns: 1fr; }
+  .tier {
+    border-inline-start: none;
+    border-top: 1px solid var(--rule);
+  }
+  .tier:first-child { border-top: none; }
+}
+
+/* ---------- footer ---------- */
+
+.site-footer { padding-block: var(--space-8) var(--space-7); }
+
+.footer-grid {
+  display: grid;
+  gap: var(--space-6);
+}
+
+@media (min-width: 768px) {
+  .footer-grid {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+  }
+}
+
+.footer-line {
+  color: var(--muted);
+  font-size: 1rem;
+  max-width: 40ch;
+  margin-top: var(--space-2);
+}
+
+.footer-nav ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4) var(--space-5);
+}
+
+.footer-nav a {
+  display: inline-block;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 1rem;
+  padding-block: var(--space-3);
+  transition: color var(--speed) linear;
+}
+
+.footer-nav a:hover { color: var(--accent); }
+
+.fine-print {
+  margin-top: var(--space-7);
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+
+/* ---------- reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-nav">
+  <div class="container">
+    <a class="wordmark" href="#top">Kilnhouse</a>
+    <nav aria-label="Site">
+      <ul class="nav-links">
+        <li><a href="#scheduling">Scheduling</a></li>
+        <li><a href="#firing">Firing queue</a></li>
+        <li><a href="#billing">Billing</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+      </ul>
+    </nav>
+    <a class="btn btn-ghost" href="#pricing">Start free trial</a>
+  </div>
+</header>
+
+<main id="main">
+
+  <section class="container hero" id="top" aria-label="Introduction">
+    <h1>
+      <span>Classes booked.</span>
+      <span>Kilns loaded.</span>
+      <span>Members billed.</span>
+    </h1>
+    <p class="hero-support">
+      Kilnhouse is the operations system for ceramics studios: scheduling, the
+      firing queue, and billing in one place.
+    </p>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="#pricing">Start free trial</a>
+      <a class="btn btn-ghost" href="#firing">See the firing queue</a>
+    </div>
+    <p class="readout">
+      <span class="readout-kiln">East kiln</span>
+      <span class="mono">Glaze &middot; cone 6</span>
+      <span class="mono">1987&deg;F &rarr; 2232&deg;F</span>
+      <span class="status mono">Ramp 3 of 5</span>
+      <span class="mono">Unload Thu 6:10 am</span>
+      <span class="readout-note">Live kiln readout, demo data.</span>
+    </p>
+  </section>
+
+  <section class="section" id="scheduling" aria-labelledby="scheduling-h">
+    <div class="container feature-grid">
+      <div>
+        <h2 id="scheduling-h">Eight wheels, twelve seats, one calendar</h2>
+        <p class="section-intro">
+          Set a class once and Kilnhouse runs it: repeating sessions, capacity
+          that matches your floor, and a waitlist that manages itself.
+        </p>
+      </div>
+      <ul class="spec-list">
+        <li>
+          <strong>Recurring sessions</strong>
+          <span>Build Tuesday wheel throwing once. It repeats every week until
+          you end it, holidays excluded.</span>
+        </li>
+        <li>
+          <strong>Capacity from your floor</strong>
+          <span>Seats equal wheels. When someone drops, the waitlist promotes
+          the next member and tells them.</span>
+        </li>
+        <li>
+          <strong>Member self-serve</strong>
+          <span>Members book, reschedule, and cancel on their own, inside the
+          window you allow.</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section band" id="firing" aria-labelledby="firing-h">
+    <div class="container">
+      <h2 id="firing-h">One queue for every kiln</h2>
+      <p class="section-intro">
+        Members submit pieces, staff build loads by shelf space, and every kiln
+        keeps its own program library. When a firing ends, the people with work
+        inside hear about it first.
+      </p>
+      <div class="queue-panel">
+        <div class="table-scroll" tabindex="0" role="region" aria-labelledby="firing-h">
+          <table>
+            <caption>Demo data. Cone targets assume a 108&deg;F per hour final ramp.</caption>
+            <thead>
+              <tr>
+                <th scope="col">Kiln</th>
+                <th scope="col">Firing</th>
+                <th scope="col">Cone</th>
+                <th scope="col">Target</th>
+                <th scope="col">Stage</th>
+                <th scope="col">Unload</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">East kiln <small>10 cu ft</small></th>
+                <td>Glaze</td>
+                <td class="num">6</td>
+                <td class="num">2232&deg;F</td>
+                <td><span class="status">Firing, ramp 3 of 5</span></td>
+                <td class="num">Thu 6:10 am</td>
+              </tr>
+              <tr>
+                <th scope="row">Test kiln <small>0.7 cu ft</small></th>
+                <td>Luster</td>
+                <td class="num">018</td>
+                <td class="num">1319&deg;F</td>
+                <td><span class="status is-positive">Cooling</span></td>
+                <td class="num">Today 4:30 pm</td>
+              </tr>
+              <tr>
+                <th scope="row">North kiln <small>7 cu ft</small></th>
+                <td>Bisque</td>
+                <td class="num">04</td>
+                <td class="num">1945&deg;F</td>
+                <td>Loading</td>
+                <td class="num">Fri 9:00 pm</td>
+              </tr>
+              <tr>
+                <th scope="row">West kiln <small>10 cu ft</small></th>
+                <td>Glaze</td>
+                <td class="num">10</td>
+                <td class="num">2345&deg;F</td>
+                <td>Queued</td>
+                <td class="num">Sat morning</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="billing" aria-labelledby="billing-h">
+    <div class="container feature-grid">
+      <div>
+        <h2 id="billing-h">One invoice: membership, shelf, firings</h2>
+        <p class="section-intro">
+          Everything a member owes lands on a single monthly invoice, priced by
+          rules you set once.
+        </p>
+      </div>
+      <ul class="spec-list">
+        <li>
+          <strong>Membership autopay</strong>
+          <span>Monthly billing with proration for mid-month starts and
+          pauses for injuries or travel.</span>
+        </li>
+        <li>
+          <strong>Shelf rental</strong>
+          <span>A line item on the same invoice, not a second charge on a
+          different day.</span>
+        </li>
+        <li>
+          <strong>Firing fees</strong>
+          <span>Priced by the half shelf or by weight, logged straight from
+          the firing queue.</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section band" id="pricing" aria-labelledby="pricing-h">
+    <div class="container">
+      <div class="pricing-head">
+        <h2 id="pricing-h">Every plan gets the whole product</h2>
+        <p class="section-intro">
+          Scheduling, the firing queue, and billing are in every tier. You pay
+          for kilns and members, not features. Every trial runs 30 days, no
+          card required.
+        </p>
+      </div>
+      <div class="tiers-wrap">
+        <div class="tiers">
+          <div class="tier">
+            <h3>Home studio</h3>
+            <p class="price mono">$29<small> per month</small></p>
+            <p class="tier-blurb">For teaching out of a garage or a spare
+            room.</p>
+            <ul class="tier-specs">
+              <li><span>Kilns</span> <span class="mono">1</span></li>
+              <li><span>Members</span> <span class="mono">25</span></li>
+              <li><span>Staff accounts</span> <span class="mono">2</span></li>
+            </ul>
+            <a class="btn btn-ghost" href="#pricing">Start free trial</a>
+          </div>
+          <div class="tier tier-featured">
+            <p class="label tier-tag">Most studios</p>
+            <h3>Studio</h3>
+            <p class="price mono">$79<small> per month</small></p>
+            <p class="tier-blurb">For the neighborhood studio with a class
+            program.</p>
+            <ul class="tier-specs">
+              <li><span>Kilns</span> <span class="mono">4</span></li>
+              <li><span>Members</span> <span class="mono">150</span></li>
+              <li><span>Staff accounts</span> <span class="mono">10</span></li>
+            </ul>
+            <a class="btn btn-primary" href="#pricing">Start free trial</a>
+          </div>
+          <div class="tier">
+            <h3>Campus</h3>
+            <p class="price mono">$189<small> per month</small></p>
+            <p class="tier-blurb">For university and community programs with
+            many rooms.</p>
+            <ul class="tier-specs">
+              <li><span>Kilns</span> <span class="mono">12</span></li>
+              <li><span>Members</span> <span class="mono">500</span></li>
+              <li><span>Staff accounts</span> <span class="mono">30</span></li>
+            </ul>
+            <a class="btn btn-ghost" href="#pricing">Start free trial</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <a class="wordmark" href="#top">Kilnhouse</a>
+        <p class="footer-line">Studio management for ceramics studios:
+        scheduling, firing queues, and billing.</p>
+      </div>
+      <nav class="footer-nav" aria-label="Footer">
+        <ul>
+          <li><a href="#scheduling">Scheduling</a></li>
+          <li><a href="#firing">Firing queue</a></li>
+          <li><a href="#billing">Billing</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+        </ul>
+      </nav>
+    </div>
+    <p class="fine-print">&copy; 2026 Kilnhouse. All prices in USD.</p>
+  </div>
+</footer>
+</body>
+</html>

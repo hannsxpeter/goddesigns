@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kilnhouse · Studio operations</title>
+<meta name="description" content="Kilnhouse operations dashboard: today's classes, live kiln firing queue, and member billing for the studio.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poiret+One&family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+/* goddesign | structure: Stat-Led | direction: Art Deco Geometric | accent: 85 */
+/*
+  goddesign DIRECTION LOCK (restated)
+  Seed 484407021 | Direction 13 Art Deco Geometric | Structure 3 Stat-Led
+  Jitter h-6 L-0.01 r+1 (radius stays 0: row identity)
+  --bg oklch(from #101C1C l-0.01) | --surface oklch(from #162626 l-0.01)
+  --text #EAE3CF | --muted #93998C | --accent oklch(from #D4AF37 h-6) | --jade #1F6F5C
+  Type: Poiret One 400 display / Josefin Sans 300,400,600
+  Signature: fan divider draw-in; sunburst hero band; one chamfered panel; radius 0
+  Motion: one draw-in 500ms once; 150-180ms state changes elsewhere
+*/
+:root {
+  --bg: oklch(from #101C1C calc(l - 0.01) c h);
+  --surface: oklch(from #162626 calc(l - 0.01) c h);
+  --text: #EAE3CF;
+  --muted: #93998C;
+  --accent: oklch(from #D4AF37 l c calc(h - 6));
+  --jade: #1F6F5C;
+
+  --accent-hover: oklch(from var(--accent) calc(l - 0.09) c h);
+  --accent-dim: color-mix(in oklab, var(--accent) 45%, var(--bg));
+  --accent-faint: color-mix(in oklab, var(--accent) 8%, transparent);
+  --jade-text: oklch(from var(--jade) 0.78 0.09 h);
+  --danger: oklch(from var(--accent) 0.7 0.13 calc(h - 55));
+  --hairline: color-mix(in oklab, var(--text) 14%, transparent);
+  --hairline-soft: color-mix(in oklab, var(--text) 8%, transparent);
+  --surface-2: oklch(from var(--surface) calc(l + 0.03) c h);
+  --row-hover: color-mix(in oklab, var(--text) 5%, transparent);
+  --text-dim: color-mix(in oklab, var(--text) 72%, var(--muted));
+
+  --font-display: "Poiret One", "Josefin Sans", sans-serif;
+  --font-body: "Josefin Sans", "Trebuchet MS", sans-serif;
+
+  --ease: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-settle: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.55;
+  overflow-x: clip;
+  min-height: 100vh;
+}
+
+p { text-wrap: pretty; }
+h1, h2, h3 { text-wrap: balance; }
+
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+::selection { background: var(--accent-dim); color: var(--text); }
+
+/* ---------- top bar ---------- */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  padding: 12px 32px;
+  border-bottom: 3px double var(--accent-dim);
+  flex-wrap: wrap;
+}
+
+.wordmark {
+  font-family: var(--font-display);
+  font-size: 23px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text);
+  text-decoration: none;
+}
+.wordmark:hover { color: var(--accent); transition: color 0.15s var(--ease); }
+
+.topnav { display: flex; gap: 4px; flex-wrap: wrap; }
+.topnav a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 8px 12px;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s var(--ease), border-color 0.15s var(--ease);
+}
+.topnav a:hover { color: var(--text); }
+.topnav a:active { color: var(--accent); }
+.topnav a[aria-current="page"] {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+
+.topbar-meta {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.clock {
+  font-size: 13px;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- buttons ---------- */
+
+.btn {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 12px 16px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--bg);
+  cursor: pointer;
+  transition: background-color 0.18s var(--ease), border-color 0.18s var(--ease), transform 0.18s var(--ease);
+}
+.btn:hover { background: var(--accent-hover); border-color: var(--accent-hover); transform: translateY(-1px); }
+.btn:active { transform: scale(0.97); }
+.btn:disabled {
+  background: transparent;
+  border-color: var(--hairline);
+  color: var(--muted);
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-quiet {
+  background: transparent;
+  border-color: var(--hairline);
+  color: var(--text);
+}
+.btn-quiet:hover { background: var(--row-hover); border-color: var(--muted); color: var(--text); }
+
+.btn-small { padding: 8px 12px; font-size: 13px; }
+
+.textlink {
+  display: inline-block;
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid var(--accent-dim);
+  padding: 4px 0;
+  transition: border-color 0.15s var(--ease), color 0.15s var(--ease);
+}
+.textlink:hover { border-bottom-color: var(--accent); }
+.textlink:active { color: var(--accent-hover); }
+
+/* ---------- hero: the number is the page ---------- */
+
+.hero {
+  text-align: center;
+  padding: 48px 32px 32px;
+  background-image:
+    repeating-conic-gradient(
+      from 245deg at 50% 132%,
+      var(--accent-faint) 0deg 0.9deg,
+      transparent 0.9deg 6.4deg
+    );
+}
+
+.hero-inner { max-width: 60ch; margin-inline: auto; }
+
+.hero-kicker {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+}
+.hero-kicker .sep { color: var(--muted); }
+
+.hero-figure {
+  font-family: var(--font-display);
+  font-size: clamp(3.25rem, 7vw, 6rem);
+  line-height: 1.1;
+  letter-spacing: 0.05em;
+  margin-top: 8px;
+  font-variant-numeric: tabular-nums;
+}
+.hero-figure .unit {
+  font-size: 0.4em;
+  letter-spacing: 0.12em;
+  color: var(--text-dim);
+}
+
+.hero-support {
+  color: var(--text-dim);
+  max-width: 46ch;
+  margin: 8px auto 0;
+}
+
+.hero-cta {
+  margin-top: 24px;
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* ---------- fan divider (signature) ---------- */
+
+.fan {
+  display: block;
+  margin: 4px auto 0;
+  color: var(--accent);
+}
+.fan path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .fan path {
+    animation: draw 0.5s var(--ease-settle) both;
+  }
+  .fan path:nth-child(2) { animation-delay: 40ms; }
+  .fan path:nth-child(3) { animation-delay: 80ms; }
+  .fan path:nth-child(4) { animation-delay: 120ms; }
+  .fan path:nth-child(5) { animation-delay: 160ms; }
+  .fan path:nth-child(6) { animation-delay: 200ms; }
+  .fan path:nth-child(7) { animation-delay: 240ms; }
+  @keyframes draw {
+    from { stroke-dashoffset: 1; }
+    to { stroke-dashoffset: 0; }
+  }
+}
+
+/* ---------- panel grid ---------- */
+
+.deck {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 24px;
+  padding: 24px 32px 48px;
+  max-width: 1440px;
+  margin-inline: auto;
+  align-items: start;
+}
+
+.panel {
+  background: var(--surface);
+  padding: 24px;
+  container-type: inline-size;
+  min-width: 0;
+}
+.panel-schedule { grid-column: span 5; }
+.panel-kilns { grid-column: span 4; }
+.panel-billing { grid-column: span 3; }
+
+.panel-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--hairline);
+  margin-bottom: 12px;
+}
+.panel-head h2 {
+  font-size: 16px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+.panel-sub { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* ---------- schedule table ---------- */
+
+.sched {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+}
+.sched th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  padding: 8px;
+  border-bottom: 1px solid var(--hairline-soft);
+}
+.sched td {
+  padding: 8px;
+  border-bottom: 1px solid var(--hairline-soft);
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+.sched tbody tr { transition: background-color 0.15s var(--ease); }
+.sched tbody tr:hover { background: var(--row-hover); }
+.sched .t { white-space: nowrap; color: var(--text-dim); }
+.sched .who { display: block; font-size: 13px; color: var(--muted); }
+.sched .seats { white-space: nowrap; }
+.sched .done td { color: var(--muted); }
+.sched .done .who { color: color-mix(in oklab, var(--muted) 70%, var(--bg)); }
+
+.now-rule td {
+  padding: 0 8px;
+  border-bottom: none;
+}
+.now-rule .now-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+.now-rule .now-line::after {
+  content: "";
+  flex: 1;
+  border-top: 1px solid var(--accent-dim);
+}
+
+.sched-foot {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--muted);
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* ---------- chips ---------- */
+
+.chip {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  line-height: 1.5;
+  padding: 2px 8px;
+  border: 1px solid var(--hairline);
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+.chip-live { color: var(--jade-text); border-color: color-mix(in oklab, var(--jade-text) 45%, transparent); }
+.chip-fire { color: var(--accent); border-color: color-mix(in oklab, var(--accent) 50%, transparent); }
+.chip-warn { color: var(--danger); border-color: color-mix(in oklab, var(--danger) 45%, transparent); }
+.chip-mute { color: var(--muted); }
+
+/* ---------- kiln queue ---------- */
+
+.kiln-list { display: grid; gap: 12px; }
+
+.kiln {
+  background: var(--surface-2);
+  padding: 16px;
+  display: grid;
+  gap: 8px;
+}
+
+.kiln-anchor {
+  clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px);
+  padding: 24px;
+}
+
+.kiln-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.kiln-name { font-size: 19px; font-weight: 600; letter-spacing: 0.02em; }
+.kiln-model { font-size: 13px; color: var(--muted); letter-spacing: 0.04em; }
+
+.kiln-read {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-variant-numeric: tabular-nums;
+}
+.kiln-temp {
+  font-family: var(--font-display);
+  font-size: 34px;
+  line-height: 1.1;
+  letter-spacing: 0.04em;
+}
+.kiln-target { font-size: 13px; color: var(--muted); }
+
+.bar {
+  height: 4px;
+  background: var(--hairline-soft);
+}
+.bar i { display: block; height: 100%; background: var(--accent); }
+.bar-cool i { background: var(--jade-text); }
+.bar-vulcan i { width: 96%; }
+.bar-ember i { width: 24%; }
+.bar-atlas i { width: 58%; }
+.bar-collect i { width: 95%; background: var(--jade-text); }
+
+.kiln-meta {
+  font-size: 13px;
+  color: var(--muted);
+  display: flex;
+  gap: 4px 16px;
+  flex-wrap: wrap;
+  font-variant-numeric: tabular-nums;
+}
+.kiln-meta b { color: var(--text-dim); font-weight: 400; }
+
+.kiln-note { font-size: 13px; color: var(--danger); }
+
+.kiln-empty { color: var(--muted); font-size: 13px; }
+.kiln-empty p { max-width: 40ch; }
+.kiln-empty .btn { margin-top: 12px; }
+
+.queue-head {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin: 24px 0 8px;
+}
+.queue-list { list-style: none; }
+.queue-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--hairline-soft);
+  flex-wrap: wrap;
+}
+.queue-list .q-when { color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+/* ---------- billing ---------- */
+
+.bill-stats {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+@container (min-width: 340px) {
+  .bill-stats { grid-template-columns: 1fr 1fr; }
+  .stat-wide { grid-column: span 2; }
+}
+
+.stat .stat-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+.stat .stat-value {
+  font-family: var(--font-display);
+  font-size: 28px;
+  line-height: 1.15;
+  letter-spacing: 0.03em;
+  font-variant-numeric: tabular-nums;
+}
+.stat .stat-note { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.stat .bar { margin-top: 8px; }
+
+.bill-list { list-style: none; margin-top: 6px; }
+.bill-list li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--hairline-soft);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  transition: background-color 0.15s var(--ease);
+}
+.bill-list li:hover { background: var(--row-hover); }
+.bill-list .b-name { overflow-wrap: anywhere; }
+.bill-list .b-amt { text-align: right; }
+.bill-list .b-plan { grid-column: 1; font-size: 11px; color: var(--muted); }
+.bill-list .b-status { grid-column: 2; justify-self: end; }
+
+.bill-actions {
+  margin-top: 16px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.bill-export { margin-top: 16px; font-size: 13px; }
+.bill-hint { font-size: 13px; color: var(--muted); margin-top: 8px; max-width: 38ch; }
+
+/* ---------- footer ---------- */
+
+.foot {
+  border-top: 1px solid var(--hairline-soft);
+  padding: 12px 32px 16px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 1100px) {
+  .panel-schedule { grid-column: span 12; }
+  .panel-kilns { grid-column: span 7; }
+  .panel-billing { grid-column: span 5; }
+}
+
+@media (max-width: 760px) {
+  .topbar { padding: 12px 16px; gap: 12px; }
+  .topbar-meta { margin-left: 0; }
+  .hero { padding: 32px 16px 24px; }
+  .deck { padding: 16px 16px 32px; gap: 16px; }
+  .panel-kilns, .panel-billing { grid-column: span 12; }
+  .btn { min-height: 44px; }
+  .topnav a { padding: 12px; }
+  .textlink { padding: 12px 0; }
+}
+
+@media (max-width: 560px) {
+  .col-room { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<h1 class="visually-hidden">Kilnhouse studio operations, Friday 18 July 2026</h1>
+
+<header class="topbar">
+  <a class="wordmark" href="#">Kilnhouse</a>
+  <nav class="topnav" aria-label="Primary">
+    <a href="#" aria-current="page">Overview</a>
+    <a href="#">Schedule</a>
+    <a href="#">Kilns</a>
+    <a href="#">Members</a>
+    <a href="#">Billing</a>
+  </nav>
+  <div class="topbar-meta">
+    <span class="clock">Fri 18 Jul · 10:42</span>
+    <button type="button" class="btn btn-quiet btn-small">Log a firing</button>
+  </div>
+</header>
+
+<main>
+  <section class="hero" aria-labelledby="hero-label">
+    <div class="hero-inner">
+      <p class="hero-kicker" id="hero-label">
+        Kiln 2 · Vulcan <span class="sep">·</span> glaze, cone 6 <span class="sep">·</span> est. complete 15:05
+      </p>
+      <p class="hero-figure">1186<span class="unit">°C</span></p>
+      <p class="hero-support">Climbing 84° per hour with 36° to top temp, then a 12 minute hold and natural cool.</p>
+      <div class="hero-cta">
+        <button type="button" class="btn">Open firing log</button>
+        <a class="textlink" href="#kilns">See all four kilns</a>
+      </div>
+    </div>
+    <svg class="fan" width="132" height="30" viewBox="0 0 132 30" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4">
+      <path pathLength="1" d="M 66 28 L 12 8" />
+      <path pathLength="1" d="M 66 28 L 34 4" />
+      <path pathLength="1" d="M 66 28 L 66 2" />
+      <path pathLength="1" d="M 66 28 L 98 4" />
+      <path pathLength="1" d="M 66 28 L 120 8" />
+      <path pathLength="1" d="M 22 12 A 52 52 0 0 1 110 12" />
+      <path pathLength="1" d="M 40 9 A 34 34 0 0 1 92 9" />
+    </svg>
+  </section>
+
+  <div class="deck">
+
+    <section class="panel panel-schedule" aria-labelledby="sched-h">
+      <div class="panel-head">
+        <h2 id="sched-h">Today's classes</h2>
+        <p class="panel-sub">6 sessions · 77 of 90 seats</p>
+      </div>
+      <table class="sched">
+        <thead>
+          <tr>
+            <th scope="col">Time</th>
+            <th scope="col">Class</th>
+            <th scope="col" class="col-room">Room</th>
+            <th scope="col">Seats</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="done">
+            <td class="t">08:00</td>
+            <td>Wheel I: Centering <span class="who">R. Calloway</span></td>
+            <td class="col-room">Studio A</td>
+            <td class="seats">10 / 12</td>
+            <td><span class="chip chip-mute">Complete</span></td>
+          </tr>
+          <tr>
+            <td class="t">10:00</td>
+            <td>Handbuilding: Coil vessels <span class="who">M. Ito</span></td>
+            <td class="col-room">Studio B</td>
+            <td class="seats">12 / 12</td>
+            <td><span class="chip chip-live">In session</span></td>
+          </tr>
+          <tr>
+            <td class="t">10:30</td>
+            <td>Wheel II: Lidded forms <span class="who">R. Calloway</span></td>
+            <td class="col-room">Studio A</td>
+            <td class="seats">9 / 12</td>
+            <td><span class="chip chip-live">In session</span></td>
+          </tr>
+          <tr class="now-rule" aria-hidden="true">
+            <td colspan="5"><span class="now-line">10:42</span></td>
+          </tr>
+          <tr>
+            <td class="t">13:00</td>
+            <td>Kids camp: Creature week <span class="who">T. Adeyemi</span></td>
+            <td class="col-room">Studio B</td>
+            <td class="seats">14 / 14</td>
+            <td><span class="chip chip-warn">Waitlist 3</span></td>
+          </tr>
+          <tr>
+            <td class="t">15:30</td>
+            <td>Glaze chemistry lab <span class="who">S. Whitfield</span></td>
+            <td class="col-room">Glaze room</td>
+            <td class="seats">8 / 10</td>
+            <td><span class="chip">Upcoming</span></td>
+          </tr>
+          <tr>
+            <td class="t">18:00</td>
+            <td>Open studio, members <span class="who">J. Marsh on desk</span></td>
+            <td class="col-room">All studios</td>
+            <td class="seats">24 / 30</td>
+            <td><span class="chip">Upcoming</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="sched-foot">
+        <span>Raku night moved to Sat 19 Jul, yard permit.</span>
+        <a class="textlink" href="#">Open full roster</a>
+      </div>
+    </section>
+
+    <section class="panel panel-kilns" id="kilns" aria-labelledby="kilns-h">
+      <div class="panel-head">
+        <h2 id="kilns-h">Kilns · firing queue</h2>
+        <p class="panel-sub">2 active · 1 loading · 1 open</p>
+      </div>
+
+      <div class="kiln-list">
+        <article class="kiln kiln-anchor">
+          <div class="kiln-top">
+            <span class="kiln-name">K2 · Vulcan <span class="kiln-model">Geil DD-18 gas</span></span>
+            <span class="chip chip-fire">Firing</span>
+          </div>
+          <div class="kiln-read">
+            <span class="kiln-temp">1186°</span>
+            <span class="kiln-target">target 1222° · cone 6</span>
+          </div>
+          <div class="bar bar-vulcan" role="img" aria-label="96 percent of target temperature"><i></i></div>
+          <p class="kiln-meta">
+            <span>Segment <b>4 of 5</b></span>
+            <span>Climb <b>84°/hr</b></span>
+            <span>Started <b>04:10</b></span>
+            <span>Unload <b>Sat 07:15</b></span>
+          </p>
+          <p class="kiln-meta"><span>Load: glaze, member shelves B + C, <b>84 pieces</b></span></p>
+        </article>
+
+        <article class="kiln">
+          <div class="kiln-top">
+            <span class="kiln-name">K1 · Ember <span class="kiln-model">Skutt KM-1027</span></span>
+            <span class="chip chip-live">Cooling</span>
+          </div>
+          <div class="kiln-read">
+            <span class="kiln-temp">412°</span>
+            <span class="kiln-target">falling · bisque cone 04 done 03:20</span>
+          </div>
+          <div class="bar bar-cool bar-ember" role="img" aria-label="cooling, 412 degrees"><i></i></div>
+          <p class="kiln-meta">
+            <span>Unload <b>16:30</b> when below 150°</span>
+            <span>Load: <b>62 pieces</b>, Wheel I + II</span>
+          </p>
+        </article>
+
+        <article class="kiln">
+          <div class="kiln-top">
+            <span class="kiln-name">K3 · Atlas <span class="kiln-model">L&amp;L e23T</span></span>
+            <span class="chip">Loading</span>
+          </div>
+          <div class="kiln-read">
+            <span class="kiln-temp">58%</span>
+            <span class="kiln-target">shelf space packed · slow bisque 04</span>
+          </div>
+          <div class="bar bar-atlas" role="img" aria-label="58 percent packed"><i></i></div>
+          <p class="kiln-meta">
+            <span>Starts <b>18:30</b></span>
+            <span>Est. complete <b>Sat 06:50</b></span>
+          </p>
+          <p class="kiln-note">Thermocouple 2 drifting +9°, firing on TC1 until replaced.</p>
+        </article>
+
+        <article class="kiln kiln-empty">
+          <div class="kiln-top">
+            <span class="kiln-name">K4 · Sprout <span class="kiln-model">Skutt KM-614 test</span></span>
+            <span class="chip chip-mute">Open</span>
+          </div>
+          <p>No load assigned. Next reserved slot: glaze tests for S. Whitfield, Mon 21 Jul.</p>
+          <div><button type="button" class="btn btn-quiet btn-small">Assign a load</button></div>
+        </article>
+      </div>
+
+      <p class="queue-head" id="queue-h">Waiting to fire</p>
+      <ul class="queue-list" aria-labelledby="queue-h">
+        <li><span>Glaze · community shelf D · 41 pieces · needs K2</span> <span class="q-when">est. Sun 20 Jul</span></li>
+        <li><span>Bisque · kids camp creatures · 39 pieces · needs K3</span> <span class="q-when">est. Tue 22 Jul</span></li>
+      </ul>
+    </section>
+
+    <section class="panel panel-billing" aria-labelledby="bill-h">
+      <div class="panel-head">
+        <h2 id="bill-h">Member billing</h2>
+        <p class="panel-sub">July cycle</p>
+      </div>
+
+      <div class="bill-stats">
+        <div class="stat stat-wide">
+          <p class="stat-label">Collected this month</p>
+          <p class="stat-value">$11,240</p>
+          <p class="stat-note">of $11,835 billed · 95%</p>
+          <div class="bar bar-collect" role="img" aria-label="95 percent collected"><i></i></div>
+        </div>
+        <div class="stat">
+          <p class="stat-label">Active members</p>
+          <p class="stat-value">148</p>
+          <p class="stat-note">+3 in July</p>
+        </div>
+        <div class="stat">
+          <p class="stat-label">Autopay enrolled</p>
+          <p class="stat-value">131</p>
+          <p class="stat-note">89% of members</p>
+        </div>
+        <div class="stat">
+          <p class="stat-label">Firing fees accrued</p>
+          <p class="stat-value">$642</p>
+          <p class="stat-note">$380 invoiced so far</p>
+        </div>
+        <div class="stat">
+          <p class="stat-label">Renewals in 30 days</p>
+          <p class="stat-value">8</p>
+          <p class="stat-note">2 annual, 6 quarterly</p>
+        </div>
+      </div>
+
+      <p class="queue-head" id="due-h">Outstanding · 4 members · $460.50</p>
+      <ul class="bill-list" aria-labelledby="due-h">
+        <li>
+          <span class="b-name">D. Okonkwo</span>
+          <span class="b-amt">$96.00</span>
+          <span class="b-plan">Clay club monthly</span>
+          <span class="b-status"><span class="chip chip-warn">12 days</span></span>
+        </li>
+        <li>
+          <span class="b-name">L. Ferreira</span>
+          <span class="b-amt">$210.00</span>
+          <span class="b-plan">Shelf rental + firing fees</span>
+          <span class="b-status"><span class="chip chip-warn">9 days</span></span>
+        </li>
+        <li>
+          <span class="b-name">P. Nakamura</span>
+          <span class="b-amt">$58.50</span>
+          <span class="b-plan">Firing fees</span>
+          <span class="b-status"><span class="chip chip-warn">6 days</span></span>
+        </li>
+        <li>
+          <span class="b-name">A. Voss</span>
+          <span class="b-amt">$96.00</span>
+          <span class="b-plan">Clay club monthly</span>
+          <span class="b-status"><span class="chip chip-warn">3 days</span></span>
+        </li>
+        <li>
+          <span class="b-name">C. Marsh</span>
+          <span class="b-amt">$96.00</span>
+          <span class="b-plan">Clay club monthly</span>
+          <span class="b-status"><span class="chip">Retrying</span></span>
+        </li>
+      </ul>
+
+      <div class="bill-actions">
+        <button type="button" class="btn btn-small">Send 4 reminders</button>
+        <button type="button" class="btn btn-small" disabled>Retry autopay</button>
+      </div>
+      <p class="bill-hint">Autopay retry for C. Marsh is already queued for 11:00; a second retry unlocks after it settles.</p>
+      <p class="bill-export"><a class="textlink" href="#">Export July statement</a></p>
+    </section>
+
+  </div>
+</main>
+
+<footer class="foot">
+  <span>Telemetry updated 10:42:18 · programs synced from both controllers</span>
+  <span>Kilnhouse 2.4 · Fern Street studio</span>
+</footer>
+
+</body>
+</html>

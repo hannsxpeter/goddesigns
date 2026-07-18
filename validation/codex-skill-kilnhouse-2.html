@@ -1,0 +1,1373 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Kilnhouse brings class scheduling, kiln firing, and member billing together for ceramics studios.">
+  <title>Kilnhouse | Run your ceramics studio in one place</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,600&amp;family=Source+Serif+4:opsz,wght@8..60,400&amp;family=Archivo:wght@600&amp;display=swap" rel="stylesheet">
+  <script>document.documentElement.classList.add('js');</script>
+  <style>
+    /* goddesign | structure: Stat-Led | direction: Editorial Magazine | accent: oxblood h-1 */
+    /* seed 2722297607 | bg/surface L-0.01 | accent h-1 | radius 0 | Newsreader + Source Serif 4 + Archivo */
+    :root {
+      --bg-source: #FBFAF7;
+      --surface-source: #F1EFE8;
+      --text-source: #16150F;
+      --muted-source: #6B685C;
+      --accent-source: #B01C2E;
+      --bg: var(--bg-source);
+      --bg: oklch(from var(--bg-source) calc(l - 0.01) c h);
+      --surface: var(--surface-source);
+      --surface: oklch(from var(--surface-source) calc(l - 0.01) c h);
+      --text: var(--text-source);
+      --muted: var(--muted-source);
+      --accent: var(--accent-source);
+      --accent: oklch(from var(--accent-source) l c calc(h - 1));
+      --accent-hover: color-mix(in oklch, var(--accent) 82%, var(--text));
+      --accent-hover: oklch(from var(--accent) calc(l - 0.08) c h);
+      --accent-active: color-mix(in oklch, var(--accent) 70%, var(--text));
+      --accent-active: oklch(from var(--accent) calc(l - 0.14) c h);
+      --accent-soft: color-mix(in oklch, var(--accent) 11%, var(--bg));
+      --accent-on-dark: color-mix(in oklch, var(--accent) 58%, var(--bg));
+      --accent-on-dark: oklch(from var(--accent) 0.78 calc(c * 0.7) h);
+      --on-dark-muted: color-mix(in oklch, var(--bg) 68%, transparent);
+      --rule: color-mix(in oklch, var(--text) 28%, transparent);
+      --rule-light: color-mix(in oklch, var(--bg) 32%, transparent);
+      --font-display: "Newsreader", Georgia, serif;
+      --font-body: "Source Serif 4", Georgia, serif;
+      --font-label: "Archivo", "Helvetica Neue", sans-serif;
+      --radius: 0px;
+      --s1: 0.25rem;
+      --s2: 0.5rem;
+      --s3: 0.75rem;
+      --s4: 1rem;
+      --s6: 1.5rem;
+      --s8: 2rem;
+      --s12: 3rem;
+      --s16: 4rem;
+      --s24: 6rem;
+      --s32: 8rem;
+      --type-label: 0.75rem;
+      --type-small: 0.875rem;
+      --type-body: 1rem;
+      --type-body-large: 1.125rem;
+      --type-lead: 1.25rem;
+      --type-subhead: 1.5rem;
+      --type-title: 2rem;
+      --type-section: 2.75rem;
+      --type-tier-max: 3rem;
+      --type-hero: 3.25rem;
+      --type-mobile-max: 4rem;
+      --type-section-max: 5rem;
+      --type-pull-max: 5.5rem;
+      --type-display-max: 6rem;
+      --type-drop: 4.65em;
+      --type-stat-small: 14rem;
+      --type-stat-base: 18rem;
+      --type-stat-mobile-max: 20rem;
+      --type-stat-tablet-max: 22rem;
+      --type-stat-wide: 36rem;
+      --target: 2.75rem;
+      --page: min(100% - 2rem, 80rem);
+      --ease: cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-width: 20rem;
+      overflow-x: clip;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: clamp(var(--type-body), 0.96rem + 0.2vw, var(--type-body-large));
+      line-height: 1.56;
+      text-rendering: optimizeLegibility;
+    }
+
+    body.nav-open {
+      overflow: hidden;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button,
+    a {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    img,
+    svg {
+      display: block;
+      max-width: 100%;
+    }
+
+    h1,
+    h2,
+    h3,
+    p,
+    ul,
+    ol,
+    figure,
+    blockquote {
+      margin: 0;
+    }
+
+    ul,
+    ol {
+      padding: 0;
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-family: var(--font-display);
+      font-weight: 600;
+      line-height: 1.08;
+      letter-spacing: -0.035em;
+      text-wrap: balance;
+    }
+
+    p,
+    li {
+      text-wrap: pretty;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 4px;
+    }
+
+    ::selection {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    .skip-link {
+      position: fixed;
+      z-index: 20;
+      inset-block-start: var(--s4);
+      inset-inline-start: var(--s4);
+      padding: var(--s3) var(--s4);
+      background: var(--text);
+      color: var(--bg);
+      font-family: var(--font-label);
+      font-size: var(--type-small);
+      text-decoration: none;
+      transform: translateY(-200%);
+    }
+
+    .skip-link:focus {
+      transform: translateY(0);
+    }
+
+    .skip-link:hover {
+      background: var(--accent-hover);
+    }
+
+    .skip-link:active {
+      background: var(--accent-active);
+      opacity: 0.82;
+    }
+
+    .shell {
+      width: var(--page);
+      margin-inline: auto;
+    }
+
+    .label {
+      font-family: var(--font-label);
+      font-size: var(--type-label);
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      line-height: 1.3;
+      text-transform: uppercase;
+    }
+
+    .button {
+      display: inline-flex;
+      min-height: var(--target);
+      align-items: center;
+      justify-content: center;
+      gap: var(--s2);
+      padding: var(--s3) var(--s6);
+      border: 1px solid var(--accent);
+      border-radius: var(--radius);
+      background: var(--accent);
+      color: var(--bg);
+      font-family: var(--font-label);
+      font-size: var(--type-label);
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      line-height: 1;
+      text-align: center;
+      text-decoration: none;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background-color 250ms var(--ease), border-color 250ms var(--ease), color 250ms var(--ease), opacity 250ms var(--ease);
+    }
+
+    .button:hover {
+      border-color: var(--accent-hover);
+      background: var(--accent-hover);
+    }
+
+    .button:active {
+      border-color: var(--accent-active);
+      background: var(--accent-active);
+      opacity: 0.82;
+    }
+
+    .button.secondary {
+      background: transparent;
+      color: var(--text);
+    }
+
+    .button.secondary:hover {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      color: var(--accent-hover);
+    }
+
+    .button.secondary:active {
+      background: var(--surface);
+      color: var(--accent-active);
+    }
+
+    .button:disabled,
+    .button[aria-disabled="true"] {
+      border-color: var(--rule);
+      background: var(--surface);
+      color: var(--muted);
+      cursor: not-allowed;
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .site-header {
+      border-block-end: 4px double var(--text);
+    }
+
+    .nav-bar {
+      display: grid;
+      min-height: calc(var(--s16) + var(--s4));
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: var(--s8);
+    }
+
+    .brand {
+      display: inline-flex;
+      min-height: var(--target);
+      align-items: center;
+      gap: var(--s3);
+      font-family: var(--font-label);
+      font-size: var(--type-lead);
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      text-decoration: none;
+      transition: color 250ms var(--ease), opacity 250ms var(--ease);
+    }
+
+    .brand:hover {
+      color: var(--accent);
+    }
+
+    .brand:active {
+      color: var(--accent-active);
+      opacity: 0.72;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: calc(var(--s4) + var(--s3));
+      height: calc(var(--s4) + var(--s3));
+      place-items: center;
+      border: 1px solid var(--text);
+      background: var(--accent);
+      color: var(--bg);
+      font-family: var(--font-label);
+      font-size: var(--type-label);
+      letter-spacing: 0.04em;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--s8);
+      list-style: none;
+    }
+
+    .nav-link {
+      display: inline-flex;
+      min-height: var(--target);
+      align-items: center;
+      font-family: var(--font-label);
+      font-size: var(--type-label);
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      text-transform: uppercase;
+      transition: color 250ms var(--ease), opacity 250ms var(--ease);
+    }
+
+    .nav-link:hover {
+      color: var(--accent);
+    }
+
+    .nav-link:active {
+      color: var(--accent-active);
+      opacity: 0.7;
+    }
+
+    .menu-button {
+      display: none;
+      width: var(--target);
+      height: var(--target);
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--text);
+      border-radius: var(--radius);
+      background: transparent;
+      color: var(--text);
+      cursor: pointer;
+      transition: background-color 250ms var(--ease), color 250ms var(--ease), opacity 250ms var(--ease);
+    }
+
+    .menu-button:hover {
+      background: var(--surface);
+      color: var(--accent);
+    }
+
+    .menu-button:active {
+      opacity: 0.7;
+    }
+
+    .menu-button:disabled {
+      border-color: var(--rule);
+      background: var(--surface);
+      color: var(--muted);
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .menu-button svg {
+      width: calc(var(--s4) + var(--s1));
+      height: calc(var(--s4) + var(--s1));
+    }
+
+    .hero {
+      display: grid;
+      min-height: calc(100svh - var(--s16) - var(--s4) - var(--s1));
+      grid-template-areas:
+        "number intro"
+        "number actions";
+      grid-template-columns: minmax(0, 0.92fr) minmax(18rem, 1.08fr);
+      grid-template-rows: 1fr auto;
+      column-gap: clamp(var(--s8), 5vw, var(--s16));
+      padding-block: var(--s12) var(--s16);
+    }
+
+    .hero-number {
+      grid-area: number;
+      align-self: center;
+      color: var(--text);
+      font-family: var(--font-display);
+      font-size: clamp(var(--type-stat-base), 42vw, var(--type-stat-wide));
+      font-weight: 600;
+      letter-spacing: -0.1em;
+      line-height: 0.68;
+      transform: translateX(-0.055em);
+      user-select: none;
+    }
+
+    .hero-copy {
+      display: grid;
+      grid-area: intro;
+      align-content: end;
+      gap: var(--s6);
+      padding-block-start: var(--s16);
+    }
+
+    .hero-kicker {
+      display: flex;
+      align-items: center;
+      gap: var(--s4);
+      color: var(--muted);
+    }
+
+    .hero-kicker::before {
+      width: var(--s8);
+      height: 2px;
+      background: var(--rule);
+      content: "";
+    }
+
+    .hero h1 {
+      max-width: 15ch;
+      font-size: clamp(var(--type-hero), 7.4vw, var(--type-display-max));
+    }
+
+    .hero-deck {
+      max-width: 38ch;
+      color: var(--muted);
+      font-size: clamp(var(--type-body-large), 1rem + 0.6vw, var(--type-subhead));
+      line-height: 1.42;
+    }
+
+    .hero-actions {
+      display: flex;
+      grid-area: actions;
+      flex-wrap: wrap;
+      gap: var(--s3);
+      align-self: end;
+      padding-block-start: var(--s8);
+    }
+
+    .rule-note {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      border-block: 4px double var(--text);
+    }
+
+    .rule-note p {
+      padding: var(--s6) var(--s4);
+      color: var(--muted);
+      font-size: var(--type-body);
+      text-align: center;
+    }
+
+    .rule-note p + p {
+      border-inline-start: 1px solid var(--rule);
+    }
+
+    .section {
+      padding-block: var(--s24);
+    }
+
+    .section-heading {
+      font-size: clamp(var(--type-section), 5vw, var(--type-section-max));
+    }
+
+    .feature {
+      container-type: inline-size;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr);
+      align-items: start;
+      gap: var(--s16);
+    }
+
+    .feature-copy {
+      display: grid;
+      gap: var(--s6);
+    }
+
+    .feature-copy .label {
+      color: var(--muted);
+    }
+
+    .feature-copy p {
+      max-width: 44ch;
+      color: var(--muted);
+    }
+
+    .dropcap::first-letter {
+      float: left;
+      margin-block: 0.06em -0.1em;
+      margin-inline-end: var(--s3);
+      color: var(--text);
+      font-family: var(--font-display);
+      font-size: var(--type-drop);
+      line-height: 0.78;
+    }
+
+    .schedule-board {
+      border-block-start: 4px double var(--text);
+    }
+
+    .schedule-head,
+    .schedule-row {
+      display: grid;
+      grid-template-columns: minmax(6rem, 0.72fr) minmax(0, 1.55fr) minmax(6rem, 0.73fr);
+      align-items: center;
+      gap: var(--s4);
+    }
+
+    .schedule-head {
+      min-height: var(--s12);
+      color: var(--muted);
+    }
+
+    .schedule-row {
+      min-height: calc(var(--s16) + var(--s4));
+      border-block-start: 1px solid var(--rule);
+    }
+
+    .schedule-time,
+    .schedule-place,
+    .queue-meta,
+    .ledger-meta {
+      color: var(--muted);
+      font-size: var(--type-body);
+    }
+
+    .schedule-title {
+      font-family: var(--font-body);
+      font-size: var(--type-lead);
+      line-height: 1.2;
+    }
+
+    .schedule-place {
+      text-align: end;
+    }
+
+    .feature-firing {
+      background: var(--text);
+      color: var(--bg);
+    }
+
+    .feature-firing .feature-copy p,
+    .feature-firing .queue-meta {
+      color: var(--on-dark-muted);
+    }
+
+    .queue-board {
+      border-block-start: 4px double var(--bg);
+    }
+
+    .queue-row {
+      display: grid;
+      min-height: calc(var(--s16) + var(--s6));
+      grid-template-columns: minmax(3.5rem, 0.34fr) minmax(0, 1.2fr) minmax(7rem, 0.72fr);
+      align-items: center;
+      gap: var(--s4);
+      border-block-end: 1px solid var(--rule-light);
+    }
+
+    .queue-id {
+      font-family: var(--font-display);
+      font-size: var(--type-title);
+      line-height: 1;
+    }
+
+    .queue-title {
+      font-family: var(--font-body);
+      font-size: var(--type-lead);
+      line-height: 1.2;
+    }
+
+    .queue-status {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: var(--s2);
+      font-family: var(--font-label);
+      font-size: var(--type-label);
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent-on-dark);
+    }
+
+    .queue-status::before {
+      width: var(--s2);
+      height: var(--s2);
+      border: 1px solid currentColor;
+      border-radius: 50%;
+      background: currentColor;
+      content: "";
+    }
+
+    .pull-quote {
+      display: grid;
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+      gap: var(--s16);
+      align-items: start;
+      padding-block: var(--s16) var(--s8);
+    }
+
+    .pull-quote blockquote {
+      grid-column: 1 / -1;
+      max-width: 18ch;
+      color: var(--bg);
+      font-family: var(--font-display);
+      font-size: clamp(var(--type-section), 6vw, var(--type-pull-max));
+      line-height: 1.04;
+      letter-spacing: -0.04em;
+    }
+
+    .pull-quote blockquote::before {
+      color: var(--bg);
+      content: "“";
+    }
+
+    .pull-quote blockquote::after {
+      color: var(--bg);
+      content: "”";
+    }
+
+    .billing-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(18rem, 0.9fr);
+      gap: var(--s16);
+      align-items: end;
+    }
+
+    .ledger {
+      border-block: 4px double var(--text);
+    }
+
+    .ledger-row {
+      display: grid;
+      min-height: calc(var(--s16) + var(--s2));
+      grid-template-columns: minmax(0, 1.4fr) minmax(7rem, 0.6fr);
+      align-items: center;
+      gap: var(--s4);
+    }
+
+    .ledger-row + .ledger-row {
+      border-block-start: 1px solid var(--rule);
+    }
+
+    .ledger-title {
+      font-family: var(--font-body);
+      font-size: var(--type-lead);
+    }
+
+    .ledger-state {
+      justify-self: end;
+      color: var(--accent);
+      font-family: var(--font-label);
+      font-size: var(--type-label);
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .ledger-state::before {
+      margin-inline-end: var(--s2);
+      content: "•";
+    }
+
+    .billing-copy {
+      display: grid;
+      gap: var(--s6);
+    }
+
+    .billing-copy p {
+      color: var(--muted);
+    }
+
+    .pricing {
+      background: var(--surface);
+    }
+
+    .pricing-intro {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.7fr);
+      gap: var(--s12);
+      align-items: end;
+      margin-block-end: var(--s16);
+    }
+
+    .pricing-intro p {
+      max-width: 42ch;
+      color: var(--muted);
+    }
+
+    .tiers {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      border-block-start: 4px double var(--text);
+      border-block-end: 4px double var(--text);
+    }
+
+    .tier {
+      display: grid;
+      min-width: 0;
+      grid-template-rows: auto auto 1fr auto;
+      gap: var(--s6);
+      padding: var(--s8);
+    }
+
+    .tier + .tier {
+      border-inline-start: 1px solid var(--rule);
+    }
+
+    .tier.featured {
+      background: var(--bg);
+    }
+
+    .tier-heading {
+      display: flex;
+      min-height: var(--s8);
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--s3);
+    }
+
+    .tier-heading .label {
+      color: var(--text);
+    }
+
+    .tier h3 {
+      font-size: clamp(var(--type-title), 3.2vw, var(--type-tier-max));
+    }
+
+    .tier-summary {
+      color: var(--muted);
+    }
+
+    .tier-details {
+      display: grid;
+      align-content: start;
+      gap: var(--s4);
+    }
+
+    .tier-list {
+      display: grid;
+      align-content: start;
+      gap: var(--s3);
+      list-style: none;
+    }
+
+    .tier-list li {
+      display: grid;
+      grid-template-columns: var(--s4) minmax(0, 1fr);
+      gap: var(--s3);
+      font-size: var(--type-body);
+    }
+
+    .tier-list li::before {
+      color: var(--text);
+      content: "+";
+      font-family: var(--font-label);
+      font-weight: 600;
+    }
+
+    .tier .button {
+      align-self: end;
+    }
+
+    .pricing-note {
+      margin-block-start: var(--s6);
+      color: var(--muted);
+      font-size: var(--type-body);
+    }
+
+    .closing {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(18rem, 0.75fr);
+      gap: var(--s16);
+      align-items: end;
+    }
+
+    .closing h2 {
+      max-width: 12ch;
+      font-size: clamp(var(--type-hero), 7vw, var(--type-display-max));
+    }
+
+    .closing-action {
+      display: grid;
+      gap: var(--s6);
+    }
+
+    .closing-action p {
+      color: var(--muted);
+    }
+
+    .closing-action .button {
+      justify-self: start;
+    }
+
+    .site-footer {
+      border-block-start: 4px double var(--text);
+      padding-block: var(--s12) var(--s8);
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) repeat(2, minmax(8rem, 0.5fr));
+      gap: var(--s8);
+    }
+
+    .footer-brand {
+      display: grid;
+      gap: var(--s4);
+    }
+
+    .footer-brand p {
+      max-width: 34ch;
+      color: var(--muted);
+    }
+
+    .footer-nav {
+      display: grid;
+      align-content: start;
+      gap: var(--s3);
+      list-style: none;
+    }
+
+    .footer-nav a {
+      display: inline-flex;
+      min-height: var(--s8);
+      align-items: center;
+      color: var(--muted);
+      text-decoration-color: transparent;
+      text-underline-offset: 0.22em;
+      transition: color 250ms var(--ease), text-decoration-color 250ms var(--ease), opacity 250ms var(--ease);
+    }
+
+    .footer-nav a:hover {
+      color: var(--accent);
+      text-decoration-color: currentColor;
+    }
+
+    .footer-nav a:active {
+      color: var(--accent-active);
+      opacity: 0.7;
+    }
+
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      gap: var(--s6);
+      margin-block-start: var(--s12);
+      padding-block-start: var(--s4);
+      border-block-start: 1px solid var(--rule);
+      color: var(--muted);
+      font-size: var(--type-small);
+    }
+
+    @container (max-width: 52rem) {
+      .feature-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 56rem) {
+      :root {
+        --page: min(100% - 2rem, 48rem);
+      }
+
+      body.nav-open .site-header {
+        min-height: 100svh;
+      }
+
+      .nav-bar {
+        grid-template-columns: 1fr auto;
+        gap: var(--s4);
+      }
+
+      .js .menu-button {
+        display: inline-flex;
+      }
+
+      .header-cta {
+        display: none;
+      }
+
+      .nav-links {
+        display: grid;
+        grid-column: 1 / -1;
+        align-items: stretch;
+        justify-content: start;
+        gap: 0;
+        padding-block: var(--s4) var(--s8);
+      }
+
+      .js .nav-links {
+        display: none;
+      }
+
+      .js .nav-links.open {
+        display: grid;
+      }
+
+      .nav-link {
+        min-height: calc(var(--s12) + var(--s2));
+        border-block-end: 1px solid var(--rule);
+        font-size: var(--type-small);
+      }
+
+      .hero {
+        min-height: auto;
+        grid-template-areas:
+          "number intro"
+          "actions actions";
+        grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr);
+        padding-block: var(--s12);
+      }
+
+      .hero-number {
+        font-size: clamp(var(--type-stat-small), 46vw, var(--type-stat-tablet-max));
+      }
+
+      .hero-copy {
+        padding-block-start: var(--s8);
+      }
+
+      .rule-note {
+        grid-template-columns: 1fr;
+      }
+
+      .rule-note p + p {
+        border-block-start: 1px solid var(--rule);
+        border-inline-start: 0;
+      }
+
+      .billing-grid,
+      .pricing-intro,
+      .closing {
+        grid-template-columns: 1fr;
+      }
+
+      .tiers {
+        grid-template-columns: 1fr;
+      }
+
+      .tier + .tier {
+        border-block-start: 1px solid var(--rule);
+        border-inline-start: 0;
+      }
+
+      .footer-grid {
+        grid-template-columns: minmax(0, 1.3fr) repeat(2, minmax(8rem, 0.7fr));
+      }
+    }
+
+    @media (max-width: 40rem) {
+      :root {
+        --page: min(100% - 1.5rem, 36rem);
+      }
+
+      .section {
+        padding-block: var(--s16);
+      }
+
+      .hero {
+        grid-template-areas:
+          "number"
+          "intro"
+          "actions";
+        grid-template-columns: minmax(0, 1fr);
+        gap: var(--s6);
+        padding-block: var(--s8) var(--s12);
+      }
+
+      .hero-number {
+        font-size: clamp(var(--type-stat-small), 78vw, var(--type-stat-mobile-max));
+        justify-self: center;
+        transform: translateX(-0.04em);
+      }
+
+      .hero-copy {
+        padding-block-start: 0;
+      }
+
+      .hero h1 {
+        font-size: clamp(var(--type-tier-max), 13vw, var(--type-mobile-max));
+      }
+
+      .hero-actions,
+      .hero-actions .button {
+        width: 100%;
+      }
+
+      .feature-grid,
+      .pull-quote,
+      .billing-grid {
+        gap: var(--s8);
+      }
+
+      .schedule-head {
+        display: none;
+      }
+
+      .schedule-row {
+        grid-template-columns: minmax(5rem, 0.55fr) minmax(0, 1.45fr);
+        padding-block: var(--s3);
+      }
+
+      .schedule-place {
+        grid-column: 2;
+        text-align: start;
+      }
+
+      .queue-row {
+        grid-template-columns: minmax(3rem, 0.3fr) minmax(0, 1.7fr);
+        padding-block: var(--s3);
+      }
+
+      .queue-status {
+        grid-column: 2;
+        justify-content: flex-start;
+      }
+
+      .pull-quote {
+        padding-block: var(--s12) var(--s4);
+      }
+
+      .ledger-row {
+        grid-template-columns: minmax(0, 1fr);
+        gap: var(--s2);
+        padding-block: var(--s3);
+      }
+
+      .ledger-state {
+        justify-self: start;
+      }
+
+      .tier {
+        padding: var(--s8) 0;
+      }
+
+      .tier.featured {
+        margin-inline: calc(var(--s3) * -1);
+        padding-inline: var(--s3);
+      }
+
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .footer-brand {
+        grid-column: 1 / -1;
+      }
+
+      .footer-bottom {
+        flex-direction: column;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <nav class="nav-bar shell" aria-label="Primary navigation">
+      <a class="brand" href="#top" aria-label="Kilnhouse home">
+        <span class="brand-mark" aria-hidden="true">K</span>
+        <span>Kilnhouse</span>
+      </a>
+
+      <button class="menu-button" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Open navigation">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" aria-hidden="true">
+          <path d="M4 7h16M4 12h16M4 17h16"></path>
+        </svg>
+      </button>
+
+      <ul class="nav-links" id="nav-links">
+        <li><a class="nav-link" href="#scheduling">Scheduling</a></li>
+        <li><a class="nav-link" href="#firing">Firing queue</a></li>
+        <li><a class="nav-link" href="#billing">Billing</a></li>
+        <li><a class="nav-link" href="#pricing">Pricing</a></li>
+      </ul>
+
+      <a class="button header-cta" href="#pricing">Start your trial</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero shell" id="top" aria-labelledby="hero-title">
+      <div class="hero-number" aria-hidden="true">3</div>
+      <div class="hero-copy">
+        <p class="hero-kicker label">One calm studio system</p>
+        <h1 id="hero-title">Run the studio. Keep the clay moving.</h1>
+        <p class="hero-deck">Classes, kiln work, and member billing, connected in one studio system.</p>
+      </div>
+      <div class="hero-actions">
+        <a class="button" href="#pricing">Start your trial</a>
+        <a class="button secondary" href="#scheduling">Tour the workflows</a>
+      </div>
+    </section>
+
+    <aside class="rule-note shell" aria-label="Kilnhouse workflow summary">
+      <p>See every class and open seat.</p>
+      <p>Know what fires next and why.</p>
+      <p>Keep member accounts current.</p>
+    </aside>
+
+    <section class="section feature" id="scheduling" aria-labelledby="scheduling-title">
+      <div class="feature-grid shell">
+        <div class="feature-copy">
+          <p class="label">Class scheduling</p>
+          <h2 class="section-heading" id="scheduling-title">A calendar built for clay time.</h2>
+          <p class="dropcap">Build classes, set capacity, assign instructors, and keep waitlists moving without stitching together forms and spreadsheets.</p>
+        </div>
+
+        <div class="schedule-board" aria-label="Example class schedule">
+          <div class="schedule-head label" aria-hidden="true">
+            <span>Time</span>
+            <span>Class</span>
+            <span>Studio</span>
+          </div>
+          <div class="schedule-row">
+            <p class="schedule-time">Tue, 6:00 pm</p>
+            <p class="schedule-title">Wheel foundations</p>
+            <p class="schedule-place">Main room</p>
+          </div>
+          <div class="schedule-row">
+            <p class="schedule-time">Wed, 10:00 am</p>
+            <p class="schedule-title">Open handbuilding</p>
+            <p class="schedule-place">Loft tables</p>
+          </div>
+          <div class="schedule-row">
+            <p class="schedule-time">Sat, 1:30 pm</p>
+            <p class="schedule-title">Surface and slip</p>
+            <p class="schedule-place">Glaze room</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section feature feature-firing" id="firing" aria-labelledby="firing-title">
+      <div class="shell">
+        <div class="feature-grid">
+          <div class="feature-copy">
+            <h2 class="section-heading" id="firing-title">Every shelf has a clear next step.</h2>
+            <p>Track work from intake to unload. Group pieces by clay body and firing type, assign kiln loads, and give staff one shared source of truth.</p>
+          </div>
+
+          <div class="queue-board" aria-label="Example firing queue">
+            <div class="queue-row">
+              <p class="queue-id">A</p>
+              <div>
+                <p class="queue-title">Bisque, mixed stoneware</p>
+                <p class="queue-meta">Sorted by shelf and member</p>
+              </div>
+              <p class="queue-status">Ready to load</p>
+            </div>
+            <div class="queue-row">
+              <p class="queue-id">B</p>
+              <div>
+                <p class="queue-title">Cone six glaze</p>
+                <p class="queue-meta">Load plan in progress</p>
+              </div>
+              <p class="queue-status">Being grouped</p>
+            </div>
+            <div class="queue-row">
+              <p class="queue-id">C</p>
+              <div>
+                <p class="queue-title">Low-fire color test</p>
+                <p class="queue-meta">Cooling before unload</p>
+              </div>
+              <p class="queue-status">In kiln</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="pull-quote" aria-label="Firing workflow benefit">
+          <blockquote>No more mystery shelves.</blockquote>
+        </div>
+      </div>
+    </section>
+
+    <section class="section feature" id="billing" aria-labelledby="billing-title">
+      <div class="billing-grid shell">
+        <div class="ledger" aria-label="Example member account statuses">
+          <div class="ledger-row">
+            <div>
+              <p class="ledger-title">Studio membership</p>
+              <p class="ledger-meta">Recurring plan</p>
+            </div>
+            <p class="ledger-state">Current</p>
+          </div>
+          <div class="ledger-row">
+            <div>
+              <p class="ledger-title">Class registration</p>
+              <p class="ledger-meta">Attached to member profile</p>
+            </div>
+            <p class="ledger-state">Recorded</p>
+          </div>
+          <div class="ledger-row">
+            <div>
+              <p class="ledger-title">Firing charge</p>
+              <p class="ledger-meta">Ready for next statement</p>
+            </div>
+            <p class="ledger-state">Queued</p>
+          </div>
+        </div>
+
+        <div class="billing-copy">
+          <h2 class="section-heading" id="billing-title">Accounts that match studio life.</h2>
+          <p>Keep memberships, class purchases, and firing charges together. Staff can answer account questions without hunting across systems.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section pricing" id="pricing" aria-labelledby="pricing-title">
+      <div class="shell">
+        <div class="pricing-intro">
+          <h2 class="section-heading" id="pricing-title">Choose your studio shape.</h2>
+          <p>Each tier starts with the same connected foundation. Select the fit that matches how your studio teaches, fires, and grows.</p>
+        </div>
+
+        <div class="tiers">
+          <article class="tier">
+            <div class="tier-heading">
+              <p class="label">Essential</p>
+            </div>
+            <h3>For the teaching studio</h3>
+            <div class="tier-details">
+              <p class="tier-summary">The core tools for a focused class program.</p>
+              <ul class="tier-list">
+                <li>Class calendar and registration</li>
+                <li>Shared firing queue</li>
+                <li>Member directory</li>
+                <li>Studio-wide activity view</li>
+              </ul>
+            </div>
+            <a class="button secondary" href="/signup?plan=essential">Choose Essential</a>
+          </article>
+
+          <article class="tier featured">
+            <div class="tier-heading">
+              <p class="label">Studio</p>
+              <span class="label">Most complete</span>
+            </div>
+            <h3>For the member studio</h3>
+            <div class="tier-details">
+              <p class="tier-summary">Operations and accounts in one daily workspace.</p>
+              <ul class="tier-list">
+                <li>Everything in Essential</li>
+                <li>Recurring member billing</li>
+                <li>Firing charges and statements</li>
+                <li>Instructor and staff permissions</li>
+              </ul>
+            </div>
+            <a class="button" href="/signup?plan=studio">Choose Studio</a>
+          </article>
+
+          <article class="tier">
+            <div class="tier-heading">
+              <p class="label">Collective</p>
+            </div>
+            <h3>For the growing operation</h3>
+            <div class="tier-details">
+              <p class="tier-summary">Shared standards across teams and locations.</p>
+              <ul class="tier-list">
+                <li>Everything in Studio</li>
+                <li>Multiple studio locations</li>
+                <li>Central team oversight</li>
+                <li>Guided studio setup</li>
+              </ul>
+            </div>
+            <a class="button secondary" href="/signup?plan=collective">Choose Collective</a>
+          </article>
+        </div>
+
+        <p class="pricing-note">Plan details can be confirmed before your studio goes live.</p>
+      </div>
+    </section>
+
+    <section class="section shell closing" aria-labelledby="closing-title">
+      <h2 id="closing-title">More time for people, pots, and practice.</h2>
+      <div class="closing-action">
+        <p>Bring your studio schedule, firing flow, and member accounts into Kilnhouse.</p>
+        <a class="button" href="#pricing">Start your trial</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a class="brand" href="#top" aria-label="Kilnhouse home">
+            <span class="brand-mark" aria-hidden="true">K</span>
+            <span>Kilnhouse</span>
+          </a>
+          <p>Studio management for the particular rhythm of ceramics.</p>
+        </div>
+
+        <div>
+          <p class="label">Product</p>
+          <ul class="footer-nav">
+            <li><a href="#scheduling">Scheduling</a></li>
+            <li><a href="#firing">Firing queue</a></li>
+            <li><a href="#billing">Billing</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <p class="label">Explore</p>
+          <ul class="footer-nav">
+            <li><a href="#pricing">Pricing</a></li>
+            <li><a href="/login">Log in</a></li>
+            <li><a href="/signup">Start a trial</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>© <span id="year">2026</span> Kilnhouse.</p>
+        <p>Made for working ceramics studios.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const menuButton = document.querySelector('.menu-button');
+    const navLinks = document.querySelector('.nav-links');
+
+    function closeMenu() {
+      menuButton.setAttribute('aria-expanded', 'false');
+      menuButton.setAttribute('aria-label', 'Open navigation');
+      navLinks.classList.remove('open');
+      document.body.classList.remove('nav-open');
+    }
+
+    menuButton.addEventListener('click', () => {
+      const isOpen = menuButton.getAttribute('aria-expanded') === 'true';
+      menuButton.setAttribute('aria-expanded', String(!isOpen));
+      menuButton.setAttribute('aria-label', isOpen ? 'Open navigation' : 'Close navigation');
+      navLinks.classList.toggle('open', !isOpen);
+      document.body.classList.toggle('nav-open', !isOpen);
+    });
+
+    navLinks.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeMenu));
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 896) closeMenu();
+    });
+
+    document.getElementById('year').textContent = String(new Date().getFullYear());
+  </script>
+</body>
+</html>
