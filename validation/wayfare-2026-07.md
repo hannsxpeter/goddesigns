@@ -29,6 +29,10 @@ This round's structured report added a "substance" field (where does the page sh
 - **Organic imagery trigger.** gd-a's seeded Photographic macrostructure legitimately fired the imagery pipeline for the first time in any run: genimage produced a viaduct panorama, the run compressed 2.1MB PNG to a 119KB webp per the 200KB rule, embedded it once, used it as the direction states (re-cropped full-bleed bands), and disclosed "Photograph is a generated illustration" in the footer. Archived as wayfare-gd-a-viaduct.webp.
 - **Substance gate, first round enforced:** all three goddesign runs shipped 3-4 labeled artifacts of use (tickets, boards, ledgers, itineraries); none shipped an assertion-only page. The gd-a page that the taste model predicts should rank highest pairs the boldest form with the densest substance.
 
+## Owner verdict, recorded without spin
+
+The owner judged that frontend-design beat goddesign IN EVERY CATEGORY this round, and separately that all runs of both skills still read as "typical Claude sites, all clean presentation". Two conclusions stand: (1) mechanical superiority (9 of 9 green audits, zero repeated identities across rounds, honest data) did not buy appeal; correctness and variance are necessary and insufficient. (2) The appeal gap is diagnosable: the fd pages ship an atmosphere layer (paper textures, tilted overlapping cards, glow, grain) that goddesign's restraint rules sanded off, leaving correct, distinct, schematic pages of flat bands and rectangular panels. Fixed same day: the atmosphere layer is now mandatory ground treatment exempt from the signature budget (SKILL.md 4c) with a matching boolean gate. The band-stack grammar investigation (separate forensics) addresses the deeper "all look alike" half.
+
 ## Verdict
 
 Three rounds, three domains, one pattern: goddesign 9 of 9 externally-verified green with no repeated identity; frontend-design 0 of 9 with a persistent font attractor and shared device recipe; controls in catalogued attractors every time. Owner ranking of this round's renders pending; artifacts: wayfare-{gd,fd}-{a,b,c}.html/png, wayfare-base.html/png.
