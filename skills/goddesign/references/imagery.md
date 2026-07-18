@@ -27,6 +27,23 @@ no photorealistic human faces
 
 The negative clauses are mandatory: the default AI-image look (glossy 3D, neon gradients, uncanny people, baked-in gibberish text) is a recognized tell that undoes everything else the skill enforces.
 
+## Comp-first mode (the image model as muse, the code model as craftsman)
+
+When an image tool is available (native, or via genimage.sh), a run may generate ONE design comp after the DIRECTION LOCK and before any code: a mockup of what the page should look like, which the build then replicates. This plays to a measured strength: literal-execution models reproduce a given design far better than they invent one, and an image model's aesthetic distribution is different DNA from a code model's. Recommended by default on the EXPAND lane; optional on DIVERGE.
+
+The comp prompt derives from the lock, like every image prompt:
+
+```
+flat full-page website mockup, straight-on screenshot, no device frame, no browser
+chrome, no perspective, <macrostructure in one clause>, <subject> as the content world
+with <its artifacts named>, palette strictly limited to <locked hexes named>,
+<display class> headlines, greeked placeholder text acceptable, <the row's atmosphere>,
+<the declared grammar breaks, e.g. one full-bleed band, uneven section rhythm>,
+no glassmorphism, no purple-blue gradients, no glossy 3d render look, no watermark
+```
+
+Rules of authority: the comp governs composition, proportions, density rhythm, and atmosphere; the LOCK stays authoritative for exact hexes, font families, spacing tokens, and all copy. Comp text may come out legible and even coherent (validated in testing: correct settlement math, plausible band names), but never transcribe it into the build; treat it as layout-weight evidence only, and write real copy fresh. Where comp and lock conflict, the lock wins. One comp, maximum one regeneration, then build. At Phase 3, the comp is the run's own reference: the reference-match gate compares the rendered page against it side by side, and layout drift from the comp needs the same stated justification as any reference mismatch. Save the comp next to the page as comp.png; it ships with the run's artifacts.
+
 ## Rules
 
 - One generated composition per page maximum; it lives inside the hero budget or the row's stated image slot.

@@ -74,7 +74,7 @@ Responsive
 
 Brief
 - [ ] The brief re-read as a checklist: every requested page, section, state, and behavior exists in the build; nothing silently trimmed.
-- [ ] If the brief supplied a reference (image, mockup, URL, existing screens), the render was compared against it side by side; it matches on layout, spacing, and color, or the deviations are stated and justified.
+- [ ] If the brief supplied a reference (image, mockup, URL, existing screens), or the run generated its own comp (comp-first mode), the render was compared against it side by side; it matches on layout, spacing, and color, or the deviations are stated and justified.
 
 Honesty
 - [ ] No invented metrics, fake testimonials, fake logos, or fake company names; placeholders labeled as placeholders.
