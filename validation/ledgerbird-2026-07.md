@@ -32,6 +32,10 @@ fd-b's hero claims "Trusted by 12,400+ designers, writers, photographers": a fab
 2. gd-c drew Cinematic Dark + Cormorant Garamond, the same row the kilnhouse round's third run drew. Cross-project row repetition is expected at 16-row deck scale (this is exactly what Step 3d jitter exists for, and it worked: accent hue 9 here vs 20 there, different structures worn). A future consideration: an optional user-level ledger for cross-project rotation.
 3. gd-b consumed all 3 of its bounded fix cycles before going green; the cap held and the lock stayed frozen.
 
+## Owner preference ranking (the metric the audit does not measure)
+
+The project owner reviewed the renders and ranked fd-b FIRST on visual appeal, with the goddesign runs at 2-4. This is recorded as ground truth, not explained away. Diagnosis: fd-b's concept is subject-embodied (the page IS a ledger: ruled paper, red margin rule, ledger table as the hero object, product shown working), warm and audience-fit, while the goddesign runs wore their seeded directions handsomely but imposed them on the subject (the didone manifesto could sell any luxury product) and all three landed dark against an audience that reads warmer. The catch: fd-b's winning move is the same subject-to-obvious-concept mapping that made all three fd runs identical and put Young Serif in 5 of 6, and fd-b still fabricated a trust stat and failed target sizes. Lesson encoded into the skill same day: the Step 4b Subject test (signature and at least one motif must be artifacts of the subject's world drawn in the locked direction's formal language; show the product working), a sharpened Specificity axis, and an explicit audience-fit remix trigger in Step 3c. Seed keeps supplying the form; the subject must now supply the matter.
+
 ## Verdict
 
 The round-2 result reproduces on a hostile domain: goddesign 3 of 3 externally-verified green with three distinct committed directions; frontend-design 0 of 3 (one near-miss) with total concept-and-font convergence; the control fell into the exact catalogued attractor. Artifacts: ledgerbird-{gd,fd}-{a,b,c}.html/png, ledgerbird-base.html/png alongside this file.

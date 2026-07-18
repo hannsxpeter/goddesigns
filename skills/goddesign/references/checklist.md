@@ -11,7 +11,7 @@ Score your build 1-5 on each axis. Any score below 3 forces a revision pass befo
 1. **Philosophy**: does the page have one clear point of view a viewer could name?
 2. **Hierarchy**: does the eye land on the single most important thing first?
 3. **Execution**: are spacing, alignment, and states consistent to the token scale?
-4. **Specificity**: could this design only belong to THIS product, or would it fit any product?
+4. **Specificity**: could this design only belong to THIS product, or would it fit any product? Test: with the copy stripped, do the visuals alone identify the product's world, and does the page show the product working somewhere (an artifact of use, not just assertion)?
 5. **Restraint**: is there exactly one signature risk, with everything around it quiet?
 6. **Variety**: does it differ from this project's previous runs (check `.design-log.json`)?
 

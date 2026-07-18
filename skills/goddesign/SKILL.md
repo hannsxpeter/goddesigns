@@ -66,7 +66,7 @@ No shell available? Let N be the character count of the user's brief plus today'
 
 - `direction` indexes `references/directions.md` (16 rows). The row is a complete package: colors, fonts, imports, radius, shadows, background, signature element, motion. It is the default for everything.
 - `structure` indexes `references/layouts.md` (12 macrostructures). This decides what the page IS.
-- `palette` (10 rows in `references/palettes.md`) and `typepair` (12 rows in `references/fonts.md`) are the REMIX indices. Use them only when: the brief constrains the direction's colors or type (brand color exists), the ledger rules disqualify part of the row, or a reroll landed you somewhere the brief cannot support. Swapping is fine; blending three palettes is not.
+- `palette` (10 rows in `references/palettes.md`) and `typepair` (12 rows in `references/fonts.md`) are the REMIX indices. Use them only when: the brief constrains the direction's colors or type (brand color exists), the ledger rules disqualify part of the row, a reroll landed you somewhere the brief cannot support, or the Step 2 audience-and-tone verdict contradicts the row's mood (a warm approachable audience under a cold dramatic row is a brief constraint like any other; remix by index and say so, do not freestyle). Swapping is fine; blending three palettes is not.
 - Conflicts with the ledger or brief: advance the offending index by 1 (mod its deck size) until legal, and say so.
 
 Read `references/directions.md` and `references/layouts.md` now; read `references/palettes.md` or `references/fonts.md` only if you are remixing.
@@ -107,6 +107,8 @@ Motion: one marquee 30s linear; hovers 180ms; nothing else
 ### 4b. Anti-cliche critique
 
 One paragraph: imagine the generic output an unskilled AI would produce for this same brief. Name three things it would do. Confirm your lock shares none of them. If it shares any, fix the lock now. Second-order check: the "tasteful" cream-serif-terracotta look is itself now a cliche; if your lock resembles it and the seed did not select it, reroll.
+
+Subject test (the direction supplies the form; the subject must supply the matter): strip the copy in your head and ask whether the visuals alone say what world this product lives in. The signature element and at least one supporting motif must be artifacts of the subject's world (its documents, tools, instruments, readouts, marks) drawn in the locked direction's formal language: a ledger's red margin rule as a Swiss rule, a kiln readout as a mono spec block, a boarding pass as a bento panel. A signature that could ship on any product in any industry is decoration, not a signature; replace it before building. Show the product working somewhere on the page: one concrete artifact of use beats a paragraph of assertion.
 
 ### 4c. Build rules
 
