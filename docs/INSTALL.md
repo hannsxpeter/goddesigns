@@ -46,6 +46,26 @@ sh skills/goddesign/scripts/codex-audit-loop.sh <project-dir> "<design brief>"
 
 A sandboxed run that cannot audit also writes `./audit-handoff.sh` into the project directory so automation can pick up the exact command mechanically.
 
+## Automatic triggering (no command needed)
+
+The skill fires without anyone typing `/goddesign` through two layers:
+
+1. **The description is the trigger.** Hosts that auto-select skills (Claude Code does) match requests against the skill's `description`, which enumerates concrete trigger phrases: landing page, dashboard, hero section, pricing page, mockup-to-code, restyle, "make it look better", any HTML/CSS/Tailwind/React styling. A request like "build me a signup page" invokes the skill by itself.
+2. **Standing instructions.** For a guarantee across sessions, add one paragraph to the file your host always loads:
+
+For Claude Code, in `~/.claude/CLAUDE.md` (global) or a project `CLAUDE.md`:
+
+```
+# Frontend work: always use the goddesign skill
+For any frontend, UI, or visual web task, invoke the goddesign skill first and
+follow it fully, even when the request does not say "design" and does not name
+the skill. Do not hand-design frontend work without it unless told to skip it.
+```
+
+For Codex CLI, the same paragraph in `~/.codex/AGENTS.md` (global) or a project `AGENTS.md`, with `$goddesign` as the invocation and a note to re-invoke per task (Codex skills are turn-scoped).
+
+A third, fully deterministic layer is available in Claude Code: a `UserPromptSubmit` hook in `settings.json` that matches frontend keywords in the prompt and injects a reminder to invoke the skill. Most setups do not need it; the two layers above cover normal use.
+
 ## Updating
 
 ```sh
