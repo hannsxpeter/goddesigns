@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bandquarter: venue management for live rooms</title>
+<meta name="description" content="Bandquarter runs the booking calendar, the artist settlement, and the bar closeout from one ledger. Shown here with a sample show night.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Public+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* goddesign | structure: comp-first offset hero + ledger stack | direction: Backstage Ledger (comp lock) | accent: 240 */
+/* LOCK: --bg #0B0B0F | --surface #14141C | --text #EAE8E4 | --muted #8F8D96 | --accent #38B6FF
+   Type: Cormorant Garamond 600 display / Public Sans 400 body, 600 caps labels / tabular-nums figures
+   Accent budget: money figures, status, one primary button. Jitter skipped: tokens pinned by comp-first lock. */
+
+:root {
+  --bg: #0B0B0F;
+  --surface: #14141C;
+  --text: #EAE8E4;
+  --muted: #8F8D96;
+  --accent: #38B6FF;
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans: 'Public Sans', 'Helvetica Neue', Helvetica, sans-serif;
+  --line: color-mix(in oklab, var(--text) 10%, transparent);
+  --line-strong: color-mix(in oklab, var(--text) 24%, transparent);
+  --muted-dim: color-mix(in oklab, var(--muted) 55%, var(--bg));
+  --surface-2: color-mix(in oklab, var(--surface) 88%, var(--text));
+  --accent-hover: color-mix(in oklab, var(--accent) 82%, white);
+  --accent-wash: color-mix(in oklab, var(--accent) 7%, transparent);
+  --row-wash: color-mix(in oklab, var(--surface) 60%, transparent);
+  --shadow: 0 1px 2px hsl(240 20% 2% / 0.5), 0 4px 8px hsl(240 20% 2% / 0.35), 0 16px 40px hsl(240 24% 2% / 0.45);
+  --ease: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+* { box-sizing: border-box; margin: 0; }
+
+html { color-scheme: dark; }
+
+body {
+  font-family: var(--sans);
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--text);
+  background:
+    radial-gradient(1000px 620px at 12% -6%, var(--accent-wash), transparent 62%),
+    var(--bg);
+  overflow-x: clip;
+}
+
+img { max-width: 100%; }
+
+h1, h2 { text-wrap: balance; }
+p { text-wrap: pretty; }
+
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+}
+
+.container { max-width: 1200px; margin-inline: auto; padding-inline: 32px; }
+
+/* ---------- caps label system (locked: Public Sans 600 caps) ---------- */
+
+.caps {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.meta { composes: none; }
+
+/* ---------- hero ---------- */
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(250px, 300px) 1fr;
+  gap: 64px;
+  padding-top: 48px;
+  align-items: start;
+}
+
+.hero-copy { padding-top: 96px; }
+
+h1 {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: clamp(2.75rem, 5vw, 4.25rem);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+.hero-rule { width: 48px; height: 1px; background: var(--line-strong); margin: 32px 0 24px; }
+
+.lede { color: var(--text); max-width: 26ch; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 32px;
+  padding: 16px 24px;
+  min-height: 44px;
+  background: var(--accent);
+  color: var(--bg);
+  border: 0;
+  border-radius: 2px;
+  font-family: var(--sans);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.18s var(--ease), background-color 0.18s var(--ease);
+}
+.btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
+.btn:active { transform: scale(0.97); }
+.btn[aria-disabled="true"], .btn:disabled { opacity: 0.4; pointer-events: none; }
+
+.venue {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  column-gap: 12px;
+  align-items: center;
+  margin-top: 96px;
+}
+.venue svg { grid-row: span 2; color: var(--muted); }
+.venue-name { font-family: var(--serif); font-weight: 600; font-size: 1.1875rem; line-height: 1.2; }
+.venue-loc { color: var(--muted); font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; }
+.venue-note { grid-column: 2; color: var(--muted-dim); font-size: 0.6875rem; margin-top: 4px; }
+
+/* ---------- booking calendar (the hero object) ---------- */
+
+.hero-cal { position: relative; z-index: 2; min-width: 0; }
+.hero-copy, .settle-right, .settle-left { min-width: 0; }
+
+.panel-label {
+  font-family: var(--sans);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+.panel-label .tag { color: var(--muted-dim); font-weight: 600; letter-spacing: 0.14em; margin-left: 12px; }
+
+.cal-panel {
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  box-shadow: var(--shadow);
+}
+
+.cal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line-strong);
+}
+.cal-nav { display: flex; align-items: center; gap: 8px; }
+.cal-month { font-weight: 600; font-size: 1rem; margin-left: 8px; }
+.cal-tools { display: flex; align-items: center; gap: 8px; }
+
+.iconbtn, .ghostbtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  cursor: pointer;
+  font-family: var(--sans);
+  transition: border-color 0.18s var(--ease), background-color 0.18s var(--ease);
+}
+.iconbtn { width: 36px; height: 36px; }
+.ghostbtn {
+  height: 36px;
+  padding-inline: 12px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.iconbtn:hover, .ghostbtn:hover { border-color: var(--line-strong); background: var(--row-wash); }
+.iconbtn:active, .ghostbtn:active { transform: scale(0.97); }
+.iconbtn:disabled, .ghostbtn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+.cal-scroll { overflow-x: auto; position: relative; }
+
+.calendar {
+  width: 100%;
+  min-width: 680px;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.calendar th {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: center;
+  padding: 12px 8px;
+  border-bottom: 1px solid var(--line);
+}
+.calendar td {
+  vertical-align: top;
+  height: 104px;
+  padding: 8px;
+  border-top: 1px solid var(--line);
+  font-size: 0.6875rem;
+  line-height: 1.45;
+}
+.calendar td + td, .calendar th + th { border-inline-start: 1px solid var(--line); }
+
+.day { font-weight: 600; font-size: 0.6875rem; color: var(--text); }
+td.off .day { color: var(--muted-dim); }
+td.off .ev { opacity: 0.55; }
+
+.ev { margin-top: 8px; display: grid; gap: 2px; }
+.ev-name {
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+.ev-line { color: var(--muted); font-variant-numeric: tabular-nums; }
+.ev-status { color: var(--accent); font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; }
+.ev-quiet { color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; }
+
+td.featured { box-shadow: inset 0 0 0 1.5px var(--accent); }
+
+.ev.hold {
+  border: 1px dashed var(--line-strong);
+  border-radius: 2px;
+  padding: 6px;
+}
+.ev.hold .ev-name { color: var(--muted); }
+
+/* ---------- photo band (full-bleed, no heading ceremony) ---------- */
+
+.photo-band {
+  position: relative;
+  margin: -80px 0 0;
+}
+.photo-band img {
+  display: block;
+  width: 100%;
+  height: clamp(280px, 36vw, 480px);
+  object-fit: cover;
+  filter: grayscale(1) contrast(1.06);
+}
+.photo-band::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, var(--bg) 0%, transparent 22%, transparent 74%, var(--bg) 100%);
+  pointer-events: none;
+}
+
+/* ---------- artist settlement ---------- */
+
+.settlement {
+  display: grid;
+  grid-template-columns: minmax(250px, 320px) 1fr;
+  gap: 64px;
+  padding-top: 96px;
+  padding-bottom: 48px;
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+.eyebrow::after { content: ""; width: 56px; height: 1px; background: var(--line-strong); }
+
+.artist {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: clamp(2.5rem, 4.5vw, 4rem);
+  line-height: 1.1;
+  margin-top: 16px;
+}
+
+.show-meta { margin-top: 24px; display: grid; gap: 8px; }
+.show-meta p {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.show-meta p b { color: var(--text); font-weight: 600; }
+
+.setlist {
+  margin-top: 48px;
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  padding: 24px;
+  max-width: 260px;
+}
+.setlist h3 {
+  font-family: var(--sans);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+.setlist ol {
+  margin-top: 16px;
+  padding-left: 24px;
+  font-size: 0.8125rem;
+  color: var(--text);
+  display: grid;
+  gap: 8px;
+}
+.setlist li::marker { color: var(--muted); font-variant-numeric: tabular-nums; }
+
+.sheet {
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  padding: 24px 32px 32px;
+  box-shadow: var(--shadow);
+}
+.sheet-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line-strong);
+}
+.sheet-head h3, .sheet-head span {
+  font-family: var(--sans);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.sheet-head span { color: var(--muted); }
+
+.lines { margin-top: 16px; }
+.lines .row {
+  display: flex;
+  align-items: baseline;
+  padding: 6px 0;
+  font-size: 0.8125rem;
+}
+.lines dt { color: var(--text); display: flex; align-items: baseline; flex: 1; }
+.lines dt::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px dotted color-mix(in oklab, var(--text) 22%, transparent);
+  margin: 0 12px;
+  transform: translateY(-3px);
+}
+.lines dd { font-variant-numeric: tabular-nums; }
+.lines .neg dd { color: var(--muted); }
+
+.lines .row.total { border-top: 1px solid var(--line); margin-top: 8px; padding-top: 12px; }
+.lines .row.total dt, .lines .row.total dd { font-weight: 700; color: var(--text); }
+.lines .row.total dt::after { border-bottom: 0; }
+
+.lines .gap { height: 24px; }
+
+.lines .row.grand {
+  border-top: 1px solid var(--line-strong);
+  border-bottom: 1px solid var(--line-strong);
+  margin-top: 8px;
+  padding: 12px 0;
+}
+.lines .row.grand dt, .lines .row.grand dd {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+.lines .row.grand dt::after { border-bottom: 0; }
+
+.payout {
+  margin-top: 24px;
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  padding: 32px;
+  box-shadow: var(--shadow), 0 0 48px var(--accent-wash);
+}
+.payout-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.payout-main h3 {
+  font-family: var(--sans);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.payout-fig {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: clamp(3rem, 6vw, 5rem);
+  line-height: 1.1;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+.payout-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 48px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.payout-meta p {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.payout-meta b { color: var(--text); font-weight: 600; }
+.payout-meta .status { color: var(--accent); font-weight: 700; }
+
+/* ---------- bar closeout ---------- */
+
+.closeout { padding-top: 64px; padding-bottom: 96px; }
+
+.closeout-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+.closeout-head h2 {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-family: var(--sans);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.closeout-head h2::after { content: ""; width: 56px; height: 1px; background: var(--line-strong); }
+.closeout-date {
+  margin-top: 8px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.tools { display: flex; gap: 24px; }
+.toollink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: color 0.18s var(--ease);
+}
+.toollink svg { color: var(--muted); transition: color 0.18s var(--ease); }
+.toollink:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 4px; }
+.toollink:hover svg { color: var(--accent); }
+.toollink:active { color: var(--accent-hover); }
+
+.table-panel {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  box-shadow: var(--shadow);
+  overflow-x: auto;
+}
+
+.bar-table {
+  width: 100%;
+  min-width: 900px;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+}
+.bar-table th, .bar-table td { padding: 10px 16px; text-align: right; }
+.bar-table th + th, .bar-table td + td { border-inline-start: 1px solid var(--line); }
+
+.bar-table thead th {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-bottom: 1px solid var(--line-strong);
+  padding-top: 16px;
+  padding-bottom: 12px;
+}
+.bar-table thead th.left { text-align: left; }
+
+.bar-table tbody th[scope="rowgroup"] {
+  text-align: left;
+  vertical-align: top;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text);
+  padding-top: 14px;
+}
+.bar-table tbody td.item { text-align: left; color: var(--text); }
+.bar-table tbody td { color: var(--muted); }
+.bar-table tbody td.item, .bar-table tbody td.profit { color: var(--text); }
+.bar-table tbody tr:first-child td { padding-top: 14px; }
+.bar-table tbody tr:last-child td, .bar-table tbody tr:last-child th { padding-bottom: 14px; }
+.bar-table tbody + tbody tr:first-child th,
+.bar-table tbody + tbody tr:first-child td { border-top: 1px solid var(--line); }
+.bar-table tbody tr:hover td, .bar-table tbody tr:hover th { background: var(--row-wash); }
+
+.bar-table tfoot th, .bar-table tfoot td {
+  border-top: 1px solid var(--line-strong);
+  padding-top: 14px;
+  padding-bottom: 16px;
+  font-weight: 700;
+  color: var(--accent);
+}
+.bar-table tfoot th { text-align: left; font-size: 0.6875rem; letter-spacing: 0.14em; text-transform: uppercase; }
+
+/* ---------- footer ---------- */
+
+.foot { padding-top: 32px; padding-bottom: 32px; border-top: 1px solid var(--line); }
+.foot p { color: var(--muted); font-size: 0.8125rem; }
+.foot b { color: var(--text); font-weight: 600; }
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 960px) {
+  .hero { grid-template-columns: 1fr; gap: 48px; }
+  .hero-copy { padding-top: 32px; }
+  .venue { margin-top: 48px; }
+  .photo-band { margin-top: 48px; }
+  .settlement { grid-template-columns: 1fr; gap: 48px; padding-top: 64px; }
+  .setlist { max-width: 100%; }
+}
+
+@media (max-width: 640px) {
+  .container { padding-inline: 24px; }
+  .sheet { padding: 16px 16px 24px; }
+  .payout { padding: 24px 16px; }
+  .iconbtn { width: 44px; height: 44px; }
+  .ghostbtn { height: 44px; }
+  .cal-head { flex-wrap: wrap; }
+}
+
+/* ---------- reduced motion (the one allowed !important kill switch) ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
+</head>
+<body>
+<main>
+
+  <section class="hero container" aria-label="Bandquarter overview">
+    <div class="hero-copy">
+      <h1>The whole night on one ledger.</h1>
+      <div class="hero-rule" aria-hidden="true"></div>
+      <p class="lede">Bookings, artist settlements, and the bar closeout, reconciled to the penny.</p>
+      <a class="btn" href="#settlement">Open a sample night</a>
+      <div class="venue">
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <path d="M6 31h24M8 31V15h20v16M8 15l-3-6h26l-3 6M12 31v-7h5v7M21 20h4v4h-4z"/>
+          <path d="M12 9V5m6 4V5m6 4V5"/>
+        </svg>
+        <p class="venue-name">The Meridian Room</p>
+        <p class="venue-loc">Portland, Oregon</p>
+        <p class="venue-note">Sample venue, sample data</p>
+      </div>
+    </div>
+
+    <div class="hero-cal">
+      <h2 class="panel-label" id="cal-label">Booking calendar <span class="tag">Sample data</span></h2>
+      <div class="cal-panel" role="group" aria-labelledby="cal-label">
+        <div class="cal-head">
+          <div class="cal-nav">
+            <button class="iconbtn" type="button" disabled aria-label="Previous month (unavailable in this sample)">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M9 2 4 7l5 5"/></svg>
+            </button>
+            <button class="iconbtn" type="button" aria-label="Next month">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m5 2 5 5-5 5"/></svg>
+            </button>
+            <span class="cal-month">September 2026</span>
+          </div>
+          <div class="cal-tools">
+            <button class="ghostbtn" type="button">Today</button>
+            <button class="ghostbtn" type="button" aria-haspopup="listbox" aria-expanded="false">
+              Month
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m2 4 4 4 4-4"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="cal-scroll">
+          <table class="calendar">
+            <caption class="sr-only">Booking calendar for September 2026 at The Meridian Room. Sample data.</caption>
+            <thead>
+              <tr>
+                <th scope="col"><span aria-hidden="true">Sun</span><span class="sr-only">Sunday</span></th>
+                <th scope="col"><span aria-hidden="true">Mon</span><span class="sr-only">Monday</span></th>
+                <th scope="col"><span aria-hidden="true">Tue</span><span class="sr-only">Tuesday</span></th>
+                <th scope="col"><span aria-hidden="true">Wed</span><span class="sr-only">Wednesday</span></th>
+                <th scope="col"><span aria-hidden="true">Thu</span><span class="sr-only">Thursday</span></th>
+                <th scope="col"><span aria-hidden="true">Fri</span><span class="sr-only">Friday</span></th>
+                <th scope="col"><span aria-hidden="true">Sat</span><span class="sr-only">Saturday</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="off"><div class="day">30</div></td>
+                <td class="off"><div class="day">31</div></td>
+                <td><div class="day">1</div></td>
+                <td><div class="day">2</div>
+                  <div class="ev"><span class="ev-name">Marigold Static</span><span class="ev-line">8:00 PM</span><span class="ev-line">Doors 7:00</span><span class="ev-line">$15 adv</span></div>
+                </td>
+                <td><div class="day">3</div></td>
+                <td><div class="day">4</div>
+                  <div class="ev"><span class="ev-name">The Foxglove Affair</span><span class="ev-line">8:30 PM</span><span class="ev-line">Doors 7:30</span><span class="ev-line">$18 adv</span></div>
+                </td>
+                <td><div class="day">5</div>
+                  <div class="ev"><span class="ev-name">DJ Night</span><span class="ev-line">10:00 PM</span><span class="ev-line">Free</span></div>
+                </td>
+              </tr>
+              <tr>
+                <td><div class="day">6</div></td>
+                <td><div class="day">7</div>
+                  <div class="ev"><span class="ev-quiet">Closed</span><span class="ev-line">Holiday</span></div>
+                </td>
+                <td><div class="day">8</div></td>
+                <td><div class="day">9</div>
+                  <div class="ev"><span class="ev-name">Junie and the Wires</span><span class="ev-line">8:00 PM</span><span class="ev-line">Doors 7:00</span><span class="ev-line">$14 adv</span></div>
+                </td>
+                <td><div class="day">10</div>
+                  <div class="ev"><span class="ev-name">Old Coast Choir</span><span class="ev-line">8:00 PM</span><span class="ev-line">Doors 7:00</span><span class="ev-line">$16 adv</span></div>
+                </td>
+                <td><div class="day">11</div>
+                  <div class="ev hold"><span class="ev-name">Hold: Fault Creek</span><span class="ev-line">Pending confirm</span></div>
+                </td>
+                <td><div class="day">12</div>
+                  <div class="ev"><span class="ev-quiet">Private event</span></div>
+                </td>
+              </tr>
+              <tr>
+                <td><div class="day">13</div></td>
+                <td><div class="day">14</div></td>
+                <td><div class="day">15</div>
+                  <div class="ev"><span class="ev-name">Songwriter Rounds</span><span class="ev-line">7:00 PM</span><span class="ev-line">Doors 6:30</span><span class="ev-line">Free</span></div>
+                </td>
+                <td><div class="day">16</div></td>
+                <td><div class="day">17</div>
+                  <div class="ev"><span class="ev-name">The Analog Hearts</span><span class="ev-line">8:00 PM</span><span class="ev-line">Doors 7:00</span><span class="ev-line">$17 adv</span></div>
+                </td>
+                <td class="featured"><div class="day">18</div>
+                  <div class="ev"><span class="ev-name">Vesper Line</span><span class="sr-only">Featured show, settled below.</span><span class="ev-line">8:30 PM</span><span class="ev-line">Doors 7:30</span><span class="ev-line">$20 adv</span></div>
+                </td>
+                <td><div class="day">19</div>
+                  <div class="ev"><span class="ev-name">DJ Night</span><span class="ev-line">10:00 PM</span><span class="ev-line">Free</span></div>
+                </td>
+              </tr>
+              <tr>
+                <td><div class="day">20</div></td>
+                <td><div class="day">21</div></td>
+                <td><div class="day">22</div>
+                  <div class="ev"><span class="ev-quiet">Maintenance</span><span class="ev-line">Closed</span></div>
+                </td>
+                <td><div class="day">23</div>
+                  <div class="ev"><span class="ev-name">Prairie Dial</span><span class="ev-line">8:00 PM</span><span class="ev-line">Doors 7:00</span><span class="ev-line">$15 adv</span></div>
+                </td>
+                <td><div class="day">24</div></td>
+                <td><div class="day">25</div>
+                  <div class="ev"><span class="ev-name">Cassette Winter</span><span class="ev-status">Sold out</span><span class="ev-line">Doors 7:00</span></div>
+                </td>
+                <td><div class="day">26</div>
+                  <div class="ev"><span class="ev-name">Velvet Almanac</span><span class="ev-line">8:30 PM</span><span class="ev-line">Doors 7:30</span><span class="ev-line">$22 adv</span></div>
+                </td>
+              </tr>
+              <tr>
+                <td><div class="day">27</div></td>
+                <td><div class="day">28</div></td>
+                <td><div class="day">29</div></td>
+                <td><div class="day">30</div>
+                  <div class="ev"><span class="ev-name">Hollow Pines</span><span class="ev-line">8:00 PM</span><span class="ev-line">Doors 7:00</span><span class="ev-line">$15 adv</span></div>
+                </td>
+                <td class="off"><div class="day">1</div></td>
+                <td class="off"><div class="day">2</div>
+                  <div class="ev"><span class="ev-name">DJ Night</span><span class="ev-line">10:00 PM</span><span class="ev-line">Free</span></div>
+                </td>
+                <td class="off"><div class="day">3</div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <figure class="photo-band">
+    <img src="band.webp" alt="Black and white photo of a four-piece band on a club stage, light beams cutting through haze above silhouetted crowd heads. AI-generated illustration." width="1600" height="533" decoding="async">
+  </figure>
+
+  <section class="settlement container" id="settlement" aria-label="Artist settlement, sample">
+    <div class="settle-left">
+      <p class="eyebrow">Artist settlement</p>
+      <h2 class="artist">Vesper Line</h2>
+      <div class="show-meta">
+        <p><b>Friday, September 18, 2026</b></p>
+        <p>Doors 7:30 PM &middot; Show 8:30 PM</p>
+        <p>Capacity: 650 &middot; Tickets: 587</p>
+        <p>Deal: door split, self promoted</p>
+      </div>
+      <div class="setlist">
+        <h3>Set list</h3>
+        <ol>
+          <li>Cold Open</li>
+          <li>Static Bloom</li>
+          <li>Riverbed</li>
+          <li>Half a House</li>
+          <li>Glass Season</li>
+          <li>Undertow</li>
+          <li>Marion</li>
+          <li>The Long Way Down</li>
+          <li>Last of the Light</li>
+          <li>Vesper</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="settle-right">
+      <div class="sheet">
+        <div class="sheet-head">
+          <h3>Settlement summary</h3>
+          <span>Amount</span>
+        </div>
+        <dl class="lines">
+          <div class="row"><dt>Gross ticket sales</dt><dd>$13,872.00</dd></div>
+          <div class="row neg"><dt>Ticketing fees (8%)</dt><dd>($1,109.76)</dd></div>
+          <div class="row"><dt>Net ticket sales</dt><dd>$12,762.24</dd></div>
+          <div class="row"><dt>Merchandise settlement</dt><dd>$1,615.00</dd></div>
+          <div class="row"><dt>Door settlement</dt><dd>$884.00</dd></div>
+          <div class="row"><dt>Other income (parking, coat check)</dt><dd>$260.00</dd></div>
+          <div class="row total"><dt>Total gross</dt><dd>$15,521.24</dd></div>
+          <div class="gap" aria-hidden="true"></div>
+          <div class="row neg"><dt>Production advance (recouped)</dt><dd>($1,500.00)</dd></div>
+          <div class="row neg"><dt>Venue rent</dt><dd>($2,500.00)</dd></div>
+          <div class="row neg"><dt>Production costs (sound, lights)</dt><dd>($1,175.00)</dd></div>
+          <div class="row neg"><dt>Hospitality</dt><dd>($214.50)</dd></div>
+          <div class="row neg"><dt>Marketing spend</dt><dd>($331.74)</dd></div>
+          <div class="row grand"><dt>Total deductions</dt><dd>($5,721.24)</dd></div>
+        </dl>
+      </div>
+
+      <div class="payout">
+        <div class="payout-main">
+          <h3>Amount due to artist</h3>
+          <p class="payout-fig">$9,800.00</p>
+        </div>
+        <div class="payout-meta">
+          <p>Payment method: <b>ACH</b></p>
+          <p>Payment date: <b>Sep 21, 2026</b></p>
+          <p>Status: <span class="status">Pending</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="closeout" aria-label="Bar closeout, sample">
+    <div class="container closeout-head">
+      <div>
+        <h2>Bar closeout</h2>
+        <p class="closeout-date">Friday, September 18, 2026 &middot; Sample data</p>
+      </div>
+      <div class="tools">
+        <a class="toollink" href="#settlement">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M7 1v8m0 0 3-3M7 9 4 6m-2 5v2h10v-2"/></svg>
+          Export
+        </a>
+        <a class="toollink" href="#settlement">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 5V1h6v4M4 11H2V5h10v6h-2m-6-2h6v4H4z"/></svg>
+          Print closeout
+        </a>
+      </div>
+    </div>
+    <div class="container">
+      <div class="table-panel">
+        <table class="bar-table">
+          <caption class="sr-only">Bar closeout for Friday, September 18, 2026. Sample data with itemized sales by category.</caption>
+          <thead>
+            <tr>
+              <th scope="col" class="left">Category</th>
+              <th scope="col" class="left">Item</th>
+              <th scope="col">Qty sold</th>
+              <th scope="col">Unit price</th>
+              <th scope="col">Gross sales</th>
+              <th scope="col">Discounts</th>
+              <th scope="col">Net sales</th>
+              <th scope="col">Cost of goods</th>
+              <th scope="col">Gross profit</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="rowgroup" rowspan="5">Beer</th>
+              <td class="item">House Lager Tallboy</td><td>131</td><td>$5.00</td><td>$655.00</td><td>$15.00</td><td>$640.00</td><td>$209.60</td><td class="profit">$430.40</td>
+            </tr>
+            <tr><td class="item">Local Hazy IPA</td><td>92</td><td>$7.00</td><td>$644.00</td><td>$0.00</td><td>$644.00</td><td>$220.80</td><td class="profit">$423.20</td></tr>
+            <tr><td class="item">Mexican Lager</td><td>74</td><td>$6.00</td><td>$444.00</td><td>$0.00</td><td>$444.00</td><td>$151.70</td><td class="profit">$292.30</td></tr>
+            <tr><td class="item">Oat Stout (16 oz)</td><td>41</td><td>$7.50</td><td>$307.50</td><td>$0.00</td><td>$307.50</td><td>$106.60</td><td class="profit">$200.90</td></tr>
+            <tr><td class="item">Light Lager</td><td>58</td><td>$5.00</td><td>$290.00</td><td>$10.00</td><td>$280.00</td><td>$84.10</td><td class="profit">$195.90</td></tr>
+          </tbody>
+          <tbody>
+            <tr>
+              <th scope="rowgroup" rowspan="4">Cocktails</th>
+              <td class="item">House Margarita</td><td>96</td><td>$11.00</td><td>$1,056.00</td><td>$22.00</td><td>$1,034.00</td><td>$225.60</td><td class="profit">$808.40</td>
+            </tr>
+            <tr><td class="item">Old Fashioned</td><td>58</td><td>$12.00</td><td>$696.00</td><td>$0.00</td><td>$696.00</td><td>$168.20</td><td class="profit">$527.80</td></tr>
+            <tr><td class="item">Vodka Soda</td><td>61</td><td>$9.00</td><td>$549.00</td><td>$0.00</td><td>$549.00</td><td>$91.50</td><td class="profit">$457.50</td></tr>
+            <tr><td class="item">Espresso Martini</td><td>33</td><td>$13.00</td><td>$429.00</td><td>$0.00</td><td>$429.00</td><td>$102.30</td><td class="profit">$326.70</td></tr>
+          </tbody>
+          <tbody>
+            <tr>
+              <th scope="rowgroup" rowspan="3">Wine</th>
+              <td class="item">House Red</td><td>34</td><td>$9.00</td><td>$306.00</td><td>$0.00</td><td>$306.00</td><td>$95.20</td><td class="profit">$210.80</td>
+            </tr>
+            <tr><td class="item">House White</td><td>29</td><td>$9.00</td><td>$261.00</td><td>$0.00</td><td>$261.00</td><td>$81.20</td><td class="profit">$179.80</td></tr>
+            <tr><td class="item">Sparkling</td><td>15</td><td>$11.00</td><td>$165.00</td><td>$0.00</td><td>$165.00</td><td>$54.00</td><td class="profit">$111.00</td></tr>
+          </tbody>
+          <tbody>
+            <tr>
+              <th scope="rowgroup" rowspan="3">Non-alc</th>
+              <td class="item">Sparkling Water</td><td>48</td><td>$3.00</td><td>$144.00</td><td>$0.00</td><td>$144.00</td><td>$36.00</td><td class="profit">$108.00</td>
+            </tr>
+            <tr><td class="item">Cola</td><td>35</td><td>$3.00</td><td>$105.00</td><td>$0.00</td><td>$105.00</td><td>$19.25</td><td class="profit">$85.75</td></tr>
+            <tr><td class="item">Energy Drink</td><td>19</td><td>$4.00</td><td>$76.00</td><td>$0.00</td><td>$76.00</td><td>$20.90</td><td class="profit">$55.10</td></tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <th scope="row" colspan="2">Totals</th>
+              <td>824</td>
+              <td></td>
+              <td>$6,127.50</td>
+              <td>$47.00</td>
+              <td>$6,080.50</td>
+              <td>$1,666.95</td>
+              <td>$4,413.55</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot container">
+  <p><b>Bandquarter</b> &middot; Venue management for live rooms. Every venue, artist, and figure on this page is sample data.</p>
+</footer>
+</body>
+</html>
