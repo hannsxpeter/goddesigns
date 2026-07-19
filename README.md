@@ -22,8 +22,8 @@ goddesign counters both with mechanisms, not advice. Every rule in it traces to 
 1. **Mode check**: existing design systems get faithful extension, not reinvention.
 2. **Lane selection**: DIVERGE (taste-heavy models fight their own attractors via forced seeded picks) or EXPAND (literal models get every decision enumerated to a hex, a number, or a named row).
 3. **Variance engine**: a seed selects from 17 aesthetic directions, 12 macrostructures, 10 palettes, and 12 type pairings; a run ledger forces rotation between runs; seeded jitter rotates accent hue and nudges paper lightness so two projects landing on the same row never ship identical values.
-4. **DIRECTION LOCK**: every visual decision is written down before any code, then executed exactly.
-5. **QA gate**: a six-axis self-critique, a greppable boolean sweep, and a measured audit (`scripts/audit.mjs`) that detects layout collisions, hidden-content reveal bugs, silent font fallbacks, overflow, and undersized touch targets, with a bounded self-correction loop (named failures only, lock frozen, maximum 3 cycles).
+4. **DIRECTION LOCK**: every visual decision is written down before any code, then executed exactly. Conception can flow through multiple avenues: the seeded deck, human-genome rows extracted from real sites, and comp-first mode (an image model draws a lock-derived mockup, the code model replicates it); one page may mix up to three avenues under one lock.
+5. **QA gate**: a seven-axis self-critique (including Credibility, from controlled-study evidence that trust is where AI design measurably lags), a greppable boolean sweep, and a measured audit (`scripts/audit.mjs`) that detects layout collisions, hidden-content reveal bugs, silent font fallbacks, overflow, and undersized touch targets, with a bounded self-correction loop (named failures only, lock frozen, maximum 3 cycles).
 
 ## Install
 

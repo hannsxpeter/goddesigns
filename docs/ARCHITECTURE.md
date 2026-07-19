@@ -31,7 +31,7 @@ Every visual decision is written in plain text before any code: seed numbers, to
 
 Three phases, in `references/checklist.md`:
 
-1. **Self-critique**: six axes scored 1-5; any score under 3 forces revision.
+1. **Self-critique**: seven axes scored 1-5 (Philosophy, Hierarchy, Execution, Specificity, Restraint, Variety, Credibility); any score under 3 forces revision. Credibility entered from a controlled 48-participant study (cited in validation/external-evidence-2026-07.md) whose one replicated finding is that AI-built sites lose trust and credibility while winning polish; a trust-surface gate (who is behind this, how to reach them, what are the terms) enforces it mechanically.
 2. **Boolean sweep**: one testable assertion per line, including case-insensitive greps for banned values.
 3. **Visual verification**: the measured audit (`scripts/audit.mjs`) detects horizontal overflow, text-on-text collisions, content hidden at effective opacity 0 (the reveal bug that made both vendors' baseline pages render blank), sub-24px targets, and silently fallen-back webfonts, per viewport, with screenshots. A bounded self-correction loop fixes only audit-named failures, lock frozen, maximum 3 cycles. Hosts that cannot render fall back through a screenshot chain to an honest `DEGRADED` declaration with a machine-readable operator handoff.
 
@@ -53,6 +53,10 @@ Mechanical metrics (audits, distinctness) are necessary and insufficient: the sk
 ## The grammar layer
 
 Forensics on real Claude-built production sites identified seven compositional tells that survive font/palette/structure rotation: the band metronome, the eyebrow ceremony, three-caste type, the rationed accent, uniform finish, symmetrized content, and a stock ornament kit (full evidence in `validation/claude-grammar-2026-07.md`). Every page must now break that grammar in declared, gated ways: a band that escapes the container, a section with no heading ceremony, an orphan grid cell, uneven padding rhythm. The breaks are written into the DIRECTION LOCK and verified by the Grammar gate group.
+
+## The conception avenues
+
+Conception is multiplied deliberately: the same disciplined executor (lock, gates, audit) can receive a design imagined through different acts, each with different defaults. Proven avenues: the seeded deck (curated form), human-genome rows (real-world grammar), and comp-first mode, in which an image model renders a lock-derived full-page mockup and the code model replicates it (comp governs composition, lock governs values, comp text is never transcribed; validated end to end, proof pair in validation/). A page may mix up to three avenues, declared in the lock's conception map: mixed conception, never mixed identity. Avenues are admitted by a test-first protocol; a failed candidate (page-scale SVG-first) is recorded in the evidence and kept out of the skill.
 
 ## The human-genome lane
 
