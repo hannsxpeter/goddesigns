@@ -9,3 +9,7 @@ The owner proposed it: when image generation is available, generate an image of 
 5. **Audit loop earned its keep**: cycle 2 root-caused a subtle overflow (sr-only spans escaping the scroll clip via the wrong positioning context); green by cycle 3.
 
 Verdict: the image model is a viable muse and the code model a faithful craftsman; comp-first stands as the EXPAND-lane default and a DIVERGE option. The three DNA sources (deck, human genomes, image comps) are all now proven in runs.
+
+## SVG-first: tested, not adopted
+
+Owner-proposed fallback (build the whole site as SVG, then convert). One page-scale test produced a scoped negative: alignment is manual at page scale ("some parts not aligned", owner), and rendering proved unreliable (top-level file:// SVGs with remote font @imports hang Chromium's load event; procedural filters over large canvases are expensive). Verdict: not a go-to for entire sites; a section-scale, filter-free, fallback-font variant remains open for a future test. Raster comp-first stays the page-scale avenue; no skill changes made.
