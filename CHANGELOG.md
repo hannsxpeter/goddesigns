@@ -1,5 +1,22 @@
 # Changelog
 
+## v1.2.0 (2026-07-18)
+
+The avenues release: new ways for a design to come into being, plus trust.
+
+### Conception avenues
+- Comp-first mode (owner's idea, proven end to end same day): when an image tool is available, generate one lock-derived full-page mockup and replicate it in HTML; the comp governs composition, the lock governs values, comp text is never transcribed. Recommended by default on the EXPAND lane. Proof pair archived (comp and replication) in `validation/`.
+- Conception map: a single page may mix up to three conception avenues per section (comp, artifact-first, human-genome grammar, copy-first), declared in the lock; mixed conception, never mixed identity: every avenue executes the same lock.
+- SVG-first experiment: FAILED and recorded plainly (page-scale hand-placed coordinates misalign; top-level file:// SVGs with remote font imports hang renderers). No skill changes; the test-first protocol contained it.
+
+### Trust (from a controlled 48-participant study, Martinovikj 2025, cited in validation/external-evidence-2026-07.md)
+- Credibility added as the seventh self-critique axis: the study's one replicated finding is that AI-built sites lose Trust/Security and Credibility/Professionalism in every pair while winning polish dimensions.
+- Trust-surface gate: every page answers who is behind it, how to reach them, and the material terms; sample-labeled in demos, truthful in real projects.
+- The study's suspicion inversion (the human agency site was most suspected of being AI, because polished generic layouts read as AI) recorded as third-party validation of the grammar program.
+
+### Calibration
+- The no-skill baseline's high appeal recorded honestly: appeal and tells coexist; the skill's bar is raw Claude's best day plus honesty, correctness, and non-repetition.
+
 ## v1.1.0 (2026-07-18)
 
 The owner-taste release: five comparative validation rounds in one day, each owner verdict compiled into mechanism the same day.
