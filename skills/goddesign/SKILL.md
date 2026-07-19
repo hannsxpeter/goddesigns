@@ -158,7 +158,7 @@ Subject test (the direction supplies the form; the subject must supply the matte
 
 ## Step 5: QA gate
 
-When the build is complete, read `references/checklist.md` and run all three phases: the six-axis self-critique (any score under 3 forces revision), the boolean gate sweep (report the pass count), and visual verification (the checklist ships a measured audit script plus a shell renderer chain to try before declaring `DEGRADED: no visual check`, and a bounded fix loop for what the audit names). Then persist the run: the CSS stamp comment and the `.design-log.json` entry, exactly as the checklist specifies.
+When the build is complete, read `references/checklist.md` and run all three phases: the seven-axis self-critique (any score under 3 forces revision), the boolean gate sweep (report the pass count), and visual verification (the checklist ships a measured audit script plus a shell renderer chain to try before declaring `DEGRADED: no visual check`, and a bounded fix loop for what the audit names). Then persist the run: the CSS stamp comment and the `.design-log.json` entry, exactly as the checklist specifies.
 
 A page that has not passed the gate is not done. If someone could glance at the result and say "AI made that" without doubt, it failed; go back to the weakest gate and fix it.
 

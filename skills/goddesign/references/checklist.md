@@ -6,7 +6,7 @@ Extension mode (Step 0 item 1: extending an existing design system; no DIRECTION
 
 ## Phase 1: pre-emit self-critique (before declaring done)
 
-Score your build 1-5 on each axis. Any score below 3 forces a revision pass before you continue.
+Score your build 1-5 on each of the seven axes. Any score below 3 forces a revision pass before you continue.
 
 1. **Philosophy**: does the page have one clear point of view a viewer could name?
 2. **Hierarchy**: does the eye land on the single most important thing first?
@@ -14,6 +14,7 @@ Score your build 1-5 on each axis. Any score below 3 forces a revision pass befo
 4. **Specificity**: could this design only belong to THIS product, or would it fit any product? Test: with the copy stripped, do the visuals alone identify the product's world, and does the page show the product working somewhere (an artifact of use, not just assertion)?
 5. **Restraint**: is there exactly one signature risk, with everything around it quiet?
 6. **Variety**: does it differ from this project's previous runs (check `.design-log.json`)?
+7. **Credibility**: would a cautious first-time visitor trust this page with money or data? Controlled studies show trust and credibility are the dimensions where AI-built pages measurably lag human ones; the fix is real information stated plainly, never invented proof.
 
 ## Phase 2: boolean gate sweep
 
@@ -76,8 +77,9 @@ Brief
 - [ ] The brief re-read as a checklist: every requested page, section, state, and behavior exists in the build; nothing silently trimmed.
 - [ ] If the brief supplied a reference (image, mockup, URL, existing screens), or the run generated its own comp (comp-first mode), the render was compared against it side by side; it matches on layout, spacing, and color, or the deviations are stated and justified.
 
-Honesty
+Honesty and trust surface
 - [ ] No invented metrics, fake testimonials, fake logos, or fake company names; placeholders labeled as placeholders.
+- [ ] The trust surface exists: the page answers who is behind the product (a real about or credits line, never invented people), how to reach them (a working contact route), and the material terms of the offer (pricing terms, cancellation, data handling where the product implies them). Demo builds label these sample like all other data; real projects state them truthfully or the gate fails.
 - [ ] Generated imagery (if any): its prompt is stated in the lock; it matches the locked palette on the rendered page; no text baked into images; alt text present; no generated people presented as customers, team, or testimonials; rasters over 200KB ship as sibling files, not base64.
 
 ## Phase 3: visual verification
