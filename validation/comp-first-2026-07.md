@@ -10,6 +10,6 @@ The owner proposed it: when image generation is available, generate an image of 
 
 Verdict: the image model is a viable muse and the code model a faithful craftsman; comp-first stands as the EXPAND-lane default and a DIVERGE option. The three DNA sources (deck, human genomes, image comps) are all now proven in runs.
 
-## SVG-first: tested, not adopted
+## SVG-first: FAILED
 
-Owner-proposed fallback (build the whole site as SVG, then convert). One page-scale test produced a scoped negative: alignment is manual at page scale ("some parts not aligned", owner), and rendering proved unreliable (top-level file:// SVGs with remote font @imports hang Chromium's load event; procedural filters over large canvases are expensive). Verdict: not a go-to for entire sites; a section-scale, filter-free, fallback-font variant remains open for a future test. Raster comp-first stays the page-scale avenue; no skill changes made.
+Owner-proposed fallback (build the whole site as SVG, then convert). The experiment failed, per the owner's verdict, and the record should say so plainly: the comp shipped with misaligned sections (hand-placing thousands of coordinates at page scale is the medium working against the task), the render pipeline hung repeatedly (top-level file:// SVGs with remote font @imports stall Chromium's load event; procedural filters over a 3420px canvas are expensive), a clean render of the final comp was never obtained, and the conversion step never ran. No part of the hypothesis was validated. What the failure cost: one agent run and an hour. What it bought: the failure modes are now known, and the test-first protocol did its job: nothing touched the skill. Raster comp-first remains the only proven page-scale comp avenue.
