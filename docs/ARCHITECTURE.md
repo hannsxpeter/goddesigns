@@ -65,3 +65,7 @@ A model cannot author its way out of its own distribution: every Claude-authored
 ## The refresh loop
 
 The recognizable-AI look is a moving target, so the tells catalog is a living artifact. [validation/sentiment-refresh-protocol.md](../validation/sentiment-refresh-protocol.md) documents the repeatable collect, verify, cluster, encode, validate cycle that keeps the skill current. New tells require counted, sourced evidence and land in three places: the DIVERGE attractor list, the Banned list (with an INSTEAD that points back into the deck), and the QA gate.
+
+## Evaluated and declined
+
+The same evidence bar that admits mechanisms also records what was evaluated and kept out, so the reasoning survives. The page-scale SVG-first conception avenue failed on coordinate alignment and renderer reliability and is documented in [validation/comp-first-2026-07.md](../validation/comp-first-2026-07.md). The ADHD reasoning skill (UditAkhourii/adhd, MIT) was evaluated as a candidate to borrow from and its parallel fan-out declined: it fights convergence, as goddesign does, but by multiplying the model distribution the skill exists to escape, at five to ten times the cost, on a mechanism the Codex host cannot guarantee. The borrow-and-decline verdict, the four native leverage seams it surfaced (each a hypothesis with a kill criterion, none shipped), and a grounded critique of its benchmark are recorded in [validation/adhd-evaluation-2026-07.md](../validation/adhd-evaluation-2026-07.md).

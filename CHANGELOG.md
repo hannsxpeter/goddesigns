@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.2.1 (2026-07-22)
+
+The evaluation release: an external skill assessed against the evidence bar, with no skill changes.
+
+### Evaluated and declined (ADHD)
+- The ADHD reasoning skill (UditAkhourii/adhd, MIT) was evaluated as a candidate to borrow from via a four-phase multi-agent investigation (four recon readers, thirty proposals across six angles, a four-lens adversarial attack on every candidate, synthesis on Codex gpt-5.6-sol xhigh). Full record: `validation/adhd-evaluation-2026-07.md`.
+- Verdict: borrow the diagnosis, decline the cure. ADHD and goddesign fight the same enemy (convergence) with opposite medicine; ADHD's parallel fan-out multiplies the model distribution the skill exists to escape, costs five to ten times a run, and cannot be guaranteed on the Codex host. Declined: the fan-out, the score chips, and the 0.35 / 0.40 / 0.25 weighting.
+- Four leverage seams recorded as hypotheses with kill criteria, none shipped: seed the Subject test before the aesthetic deck (highest value), point cognitive frames at human-genome sourcing rather than new authored rows, fail loudly on an incomplete install, and prototype one blind post-render critic. The seam-1 validation experiment is the recorded next action; nothing enters the skill until it earns a blind owner ranking.
+- Benchmark treated as hypotheses, not admission evidence: `bench/results.json` has four problems, one sample per arm, no significance test, a trap-detection metric that is a format artifact, and one showcase problem won by the baseline (builder usefulness 9 versus 4).
+
 ## v1.2.0 (2026-07-18)
 
 The avenues release: new ways for a design to come into being, plus trust.
