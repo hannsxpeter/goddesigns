@@ -1,5 +1,23 @@
 # Changelog
 
+## v1.3.0 (2026-07-22)
+
+The seams release: three of the four ADHD-surfaced leverage seams implemented after the first (seeded subject-vantage) was tested and rejected. Full evaluation: `validation/adhd-evaluation-2026-07.md`.
+
+### Install integrity (seam 3)
+- `scripts/verify-install.sh`: host-neutral POSIX check that `SKILL.md` and the seven `references/*.md` decks are present and non-empty (exit 0 OK, exit 1 with `INCOMPLETE INSTALL: <file> not found`). A partial install can otherwise let the model improvise missing rows, recreating the model-authored distribution the skill exists to escape.
+- SKILL.md Step 0 preflight and a Step 3c stop-rule enforce the same lazily on hosts with no shell; INSTALL.md documents the verify command.
+
+### Blind post-render critic (seam 4)
+- `scripts/blind-read.sh` + `references/blind-read.md`: a separate process sees ONLY the screenshots (never the code or the DIRECTION LOCK) and reconstructs the page's structure, paper band, display class, accent band, signature, subject, and one AI tell, closing the gap where Phase 1 self-critique is authored by the context holding the answer key.
+- Shipped OPTIONAL and degrade-friendly (`DEGRADED: no blind read` with no penalty), wired into checklist.md Phase 3 as a Specificity aid, not a hard gate. Calibration on four owner-ranked Bandquarter renders (`validation/blind-read-calibration-2026-07.md`) showed accurate subject and signature recovery every time but no winner-from-loser separation, so it ships as an identity-recovery check, not a ranker.
+
+### Genome sourcing intake (seam 2)
+- `references/genome-sources.md` (ten maintainer-only sourcing vantages, never read during a design run) plus a `CONTRIBUTING.md` intake rule that formalizes the pre-existing prose provenance requirement into a schema: new genome rows carry `Genome: vantage=<0-9> | source=<domain> | captured=<YYYY-MM>`, with grep-checkable caps enforced in review (at most two rows per vantage; the two newest must not share one) so the human-genome lane keeps spreading instead of re-converging. Row 16 is grandfathered (`source=unrecorded-preschema`).
+
+### Not adopted (seam 1)
+- The seeded subject-vantage (seed the Subject test before the aesthetic deck) was tested across three subjects and rejected: it reliably diversifies the signature but does not beat the current Subject test on product-page quality (owner tie, then two proxy losses to the control). Recorded in `validation/subject-vantage-2026-07.md`; the Subject test and its "show the product working" clause hold unchanged.
+
 ## v1.2.1 (2026-07-22)
 
 The evaluation release: an external skill assessed against the evidence bar, with no skill changes.

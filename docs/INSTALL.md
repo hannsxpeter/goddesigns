@@ -21,6 +21,16 @@ ln -s "$PWD/goddesigns/skills/goddesign" ~/.agents/skills/goddesign
 
 Older Codex versions read `~/.codex/skills`; link there too if yours does. Invoke with `$goddesign <design brief>`. Codex skills are turn-scoped: re-invoke for each new design task.
 
+## Verify the install
+
+The skill is only as good as its reference decks; a partial install (a broken symlink, a half-cloned tree) lets the model improvise missing rows, which recreates the generic look the skill exists to avoid. Confirm a complete install with:
+
+```sh
+sh skills/goddesign/scripts/verify-install.sh
+```
+
+It prints `goddesign: install OK` and exits 0 when `SKILL.md` and the seven `references/*.md` decks are present, or `INCOMPLETE INSTALL: <file> not found` and exits 1 otherwise (optional scripts and files are reported as notes, not failures). Hosts without a shell get the same protection lazily: the skill stops with the same message at Step 3 if a deck it needs cannot be read.
+
 ## Other agent CLIs
 
 Any host that loads markdown skills with `name` and `description` frontmatter can run goddesign; only that minimal frontmatter is used, deliberately. Point your host's skill directory at `skills/goddesign`.
@@ -34,6 +44,7 @@ The skill degrades gracefully without any of these, and says so honestly in its 
 | Node 18+ plus the Playwright library (`npm i -g playwright`, then `npx playwright install chromium`) | The measured audit (`scripts/audit.mjs`): collision, reveal-bug, font-fallback, overflow, and touch-target detection with screenshots | Falls back to a screenshot chain, then to `DEGRADED: no visual check` with an operator handoff command |
 | Playwright CLI or headless Chrome | The screenshot fallback chain | Same DEGRADED path |
 | OpenAI Codex CLI | Cross-host image generation (`scripts/genimage.sh`) and the sandboxed-Codex wrapper (`scripts/codex-audit-loop.sh`) | Imagery falls back to each direction row's CSS/SVG art; the wrapper is Codex-specific by definition |
+| An image-capable CLI (Codex or Claude Code) | The optional blind post-render critic (`scripts/blind-read.sh`): a separate process reads only the screenshots and reconstructs the page's identity, catching pages that render fine but do not communicate their subject | Prints `DEGRADED: no blind read`; the gate falls back to the builder's own Phase 3 inspection |
 | `curl` and network access | The webfont import liveness check | The gate states the skip |
 
 ## Running Codex sandboxed

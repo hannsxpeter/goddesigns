@@ -44,6 +44,8 @@ Then invoke `/goddesign <brief>` in Claude Code or `$goddesign <brief>` in Codex
 | `skills/goddesign/scripts/audit.mjs` | Measured visual audit: collisions, reveal bugs, font fallbacks, overflow, touch targets |
 | `skills/goddesign/scripts/codex-audit-loop.sh` | Operator wrapper for sandboxed Codex: build inside the sandbox, audit outside, feed failures back into the same session |
 | `skills/goddesign/scripts/genimage.sh` | Cross-host image generation: hosts without native image tools delegate to an installed image-capable CLI |
+| `skills/goddesign/scripts/verify-install.sh` | Install-integrity check: fails loud if a deck is missing rather than letting the model improvise it |
+| `skills/goddesign/scripts/blind-read.sh` | Optional blind post-render critic: a separate process reads only the screenshots and reconstructs the page's identity |
 | `validation/` | Every claim's receipts: run artifacts, screenshots, the sentiment study, and the refresh protocol |
 | `docs/` | Install guide, architecture, contributing |
 

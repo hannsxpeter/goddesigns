@@ -16,7 +16,9 @@ Precedence, stated once: **the user's brief always wins.** Seeded picks spend on
 
 ## Step 0: mode check
 
-Before anything else:
+Before anything else, confirm the skill is fully installed. If your host has a shell, run `sh <skill-root>/scripts/verify-install.sh` once: it confirms `SKILL.md` and the seven required reference decks are present and non-empty, and exits 1 with `INCOMPLETE INSTALL: <file> not found` if any is missing. (The `references/` folder also holds an optional blind-read prompt and a maintainer-only genome-sources file; those are not required to run.) With no shell, verify lazily: at Step 3c, if a reference deck you need cannot be read, STOP and report `INCOMPLETE INSTALL: <filename> not found`. Never reconstruct a missing deck row from memory; a partial install that invents rows recreates the exact model-authored distribution this skill exists to escape.
+
+Then the mode check:
 
 1. **Existing design system?** If the repo has one (design tokens, a themed Tailwind config, a component library with its own look, brand guidelines), your job is faithful extension, not reinvention. Skip Steps 2-3, translate everything you build into the existing tokens, and still apply Step 4's craft rules and the Step 5 QA gate. In this mode no DIRECTION LOCK exists: at the QA gate, skip Phase 1 axis 6 (Variety) and Phase 2's stated-macrostructure check, compare renders against the existing system's tokens, stamp the stylesheet `/* goddesign | extension of existing system */`, and write no `.design-log.json` entry.
 2. **Brief names an aesthetic?** If the user specified a look ("make it feel like a 70s print ad", "match our brand navy"), that IS the direction. Skip the seeded direction pick; still run the seed for the macrostructure, and still lock tokens in Step 4a's DIRECTION LOCK format.
@@ -70,7 +72,7 @@ No shell available? Let N be the character count of the user's brief plus today'
 - `palette` (10 rows in `references/palettes.md`) and `typepair` (12 rows in `references/fonts.md`) are the REMIX indices. Use them only when: the brief constrains the direction's colors or type (brand color exists), the ledger rules disqualify part of the row, a reroll landed you somewhere the brief cannot support, or the Step 2 audience-and-tone verdict contradicts the row's mood (a warm approachable audience under a cold dramatic row is a brief constraint like any other; remix by index and say so, do not freestyle). Swapping is fine; blending three palettes is not.
 - Conflicts with the ledger or brief: advance the offending index by 1 (mod its deck size) until legal, and say so.
 
-Read `references/directions.md` and `references/layouts.md` now; read `references/palettes.md` or `references/fonts.md` only if you are remixing.
+Read `references/directions.md` and `references/layouts.md` now; read `references/palettes.md` or `references/fonts.md` only if you are remixing. If any reference file you need cannot be read, stop with `INCOMPLETE INSTALL: <filename> not found` (Step 0 preflight) and do not reconstruct its rows from memory.
 
 ### 3d. Jitter the lock (population-scale uniqueness)
 
@@ -171,3 +173,4 @@ A page that has not passed the gate is not done. If someone could glance at the 
 - `references/motion.md`: budgets, easings, copy-paste recipes. Read at Step 4c before animating.
 - `references/imagery.md`: generated-image art direction and the genimage delegation chain. Read only when the run needs pixels.
 - `references/checklist.md`: the QA gate. Read at Step 5, not before.
+- `references/blind-read.md`: the fixed prompt for the optional blind post-render critic (`scripts/blind-read.sh`). Read only if you run the blind read at Step 5's visual verification.

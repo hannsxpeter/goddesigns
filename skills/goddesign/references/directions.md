@@ -188,7 +188,7 @@ Fits: note apps, journals, education, personal tools.
 
 ## 16. Trade Counter
 
-Fits: local services, trades, shops, clinics, anything that lives on phone calls and trust. Genome: derived 2026-07 from a real human-built local trade site, the deck's first externally-sourced row; its human traits are the point, do not polish them away.
+Fits: local services, trades, shops, clinics, anything that lives on phone calls and trust. Genome: vantage=5 | source=unrecorded-preschema | captured=2026-07 (derived from a real human-built local trade site, the deck's first externally-sourced row; its human traits are the point, do not polish them away; predates the v1.3.0 provenance schema, so the source domain was not retained).
 - Colors: bg #F6F6F4, surface #ECECEA, text #17181A, muted #5E6065, accent #E42313 signal red. This row overrides the accent budget: the accent floods entire CTA bands at full coverage, plus buttons; everywhere else stays neutral.
 - Type: ONE family only: Poppins 300/500/700/800. No display face, no mono; hierarchy comes from weight and size alone. Single-family weight-driven type is the genome; adding a second face breaks the row.
 - Import: `https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700;800&display=swap`

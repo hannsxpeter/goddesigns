@@ -24,6 +24,14 @@ A tell is admitted only with evidence, not taste:
 
 Rows 16+ are derived from real human-built sites, not authored. To add one: fetch and screenshot the site, extract its genome (type system, palette relationships including where it breaks polite defaults, grammar habits, density rhythm, signature devices, and its imperfections: they are part of the genome), then encode it as a complete row with a provenance line and a "do not polish the human traits away" note where the genome contradicts Claude instincts. Check the new row against the accent-distribution and depth-language caps like any other, and update every seed modulus.
 
+Sourcing intake (so the lane keeps spreading instead of re-converging). A prose provenance line was always required; v1.3.0 formalizes it into a machine-readable schema and adds sourcing vantages and caps. Left to instinct a maintainer keeps sampling the same admired corner of the web, and the sourced rows re-converge, which defeats the whole point of an out-of-distribution lane. Pick the site from a stated sourcing vantage in `skills/goddesign/references/genome-sources.md` (a maintainer-only file, never read during a design run), and record it. Every genome row added from v1.3.0 on carries this provenance line (row 16 predates the schema and is grandfathered with the fields still recoverable, `source=unrecorded-preschema`):
+
+```
+Genome: vantage=<0-9> | source=<domain> | captured=<YYYY-MM>
+```
+
+Caps, grep-checkable against `references/directions.md` and enforced in review (there is no runtime enforcer): at most two genome rows share a `vantage=` value, and the two most recently added genome rows must not share one. `source=` is the real site's domain (evidence of a human-built origin, not a design gallery). This is deck-maintenance only; it changes nothing in a design run, so both hosts stay identical.
+
 ## Changing scripts
 
 `audit.mjs`, `codex-audit-loop.sh`, and `genimage.sh` must stay dependency-light, degrade gracefully (clear message + documented exit code), and remain host-neutral. Test against the defect corpus in `validation/` before and after: the audit must still catch the known collisions and reveal bugs, and still pass the known-clean runs.
