@@ -3,10 +3,56 @@ import { spawn } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
+function signalProcessTree(child, signal) {
+  if (child.pid === undefined) {
+    return;
+  }
+
+  try {
+    if (process.platform === "win32") {
+      child.kill(signal);
+    } else {
+      process.kill(-child.pid, signal);
+    }
+  } catch (error) {
+    if (error.code !== "ESRCH") {
+      throw error;
+    }
+  }
+}
+
+function waitForExit(child, timeoutMs) {
+  if (child.exitCode !== null || child.signalCode !== null) {
+    return Promise.resolve(true);
+  }
+
+  return new Promise((resolve) => {
+    const finish = (exited) => {
+      clearTimeout(timer);
+      child.off("exit", onExit);
+      resolve(exited);
+    };
+    const onExit = () => finish(true);
+    const timer = setTimeout(() => finish(false), timeoutMs);
+    child.once("exit", onExit);
+  });
+}
+
+async function stop(child) {
+  signalProcessTree(child, "SIGTERM");
+  if (!(await waitForExit(child, 2_000))) {
+    signalProcessTree(child, "SIGKILL");
+    await waitForExit(child, 2_000);
+  }
+  child.stdout?.destroy();
+  child.stderr?.destroy();
+}
+
 async function render() {
   const port = 43000 + (process.pid % 1000);
   const child = spawn("npm", ["run", "start", "--", "--port", String(port)], {
     cwd: new URL("../", import.meta.url),
+    detached: process.platform !== "win32",
     stdio: ["ignore", "pipe", "pipe"],
   });
   let output = "";
@@ -29,7 +75,7 @@ async function render() {
       await new Promise((done) => setTimeout(done, 100));
     }
   }
-  child.kill("SIGTERM");
+  await stop(child);
   throw new Error(`production server did not become ready: ${output}`);
 }
 
@@ -44,7 +90,7 @@ test("server-renders the neutral study introduction", async () => {
     assert.match(html, /Preparing your study session/);
     assert.doesNotMatch(html, /codex-preview|Your site is taking shape|react-loading-skeleton/i);
   } finally {
-    child.kill("SIGTERM");
+    await stop(child);
   }
 });
 
