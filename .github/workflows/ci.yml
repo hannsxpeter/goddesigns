@@ -2,11 +2,14 @@ name: ci
 
 on:
   push:
+    branches:
+      - main
   pull_request:
 
 jobs:
   lint:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -20,10 +23,15 @@ jobs:
         run: node scripts/lint-decks.mjs
       - name: study tooling tests
         run: node --test scripts/study-a.test.mjs
-      - name: rater application
+      - name: rater install
         working-directory: study-a-rater
-        run: |
-          npm ci
-          npm run lint
-          npm test
-          npm audit --audit-level=high
+        run: npm ci --no-audit --no-fund
+      - name: rater lint
+        working-directory: study-a-rater
+        run: npm run lint
+      - name: rater test
+        working-directory: study-a-rater
+        run: npm test
+      - name: dependency audit
+        working-directory: study-a-rater
+        run: npm audit --audit-level=high
