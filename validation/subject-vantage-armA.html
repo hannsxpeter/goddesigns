@@ -1,0 +1,1602 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Cellar and harvest management software for independent wineries.">
+  <title>Cellar &amp; Harvest | Winery operations, from crush pad to compliance</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500&family=Manrope:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    /* goddesign | structure: Workbench | direction: Luxury Serif | accent: cool platinum */
+    /*
+      goddesign direction lock
+      Seed 4230224098 | Luxury Serif | Workbench | dark warm paper | cool platinum accent
+      Jitter: h -6 | L +0.01 | r +0
+      Bodoni Moda display | Manrope body and labels | square corners | hairline rules
+      Signature: a full-bleed fermentation run sheet built from cellar gauges, a gravity curve,
+      a punch-down log, and one traceable Pinot Noir lot.
+      Grammar: full-bleed overlapping workbench | bare claim section | spanning trace cell |
+      vertical paddings 96, 128, and 160 | 500ms opacity only.
+    */
+
+    :root {
+      --bg: oklch(from #0E0C08 calc(l + 0.01) c h);
+      --surface: oklch(from #171410 calc(l + 0.01) c h);
+      --text: #EFE9DC;
+      --muted: #9C917C;
+      --accent: oklch(from #C9CFDA l c calc(h - 6));
+      --hairline: #2E2A22;
+      --font-display: "Bodoni Moda", Georgia, serif;
+      --font-body: "Manrope", sans-serif;
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 24px;
+      --space-6: 32px;
+      --space-7: 48px;
+      --space-8: 64px;
+      --space-9: 96px;
+      --space-10: 128px;
+      --space-11: 160px;
+      --container: 1280px;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      border-radius: 0;
+    }
+
+    html {
+      color-scheme: dark;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      overflow-x: clip;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 17px;
+      font-weight: 300;
+      line-height: 1.58;
+      text-rendering: optimizeLegibility;
+    }
+
+    body::before {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      content: "";
+      background:
+        radial-gradient(circle at 52% 28%, transparent 0 20%, color-mix(in oklch, var(--bg) 82%, var(--surface)) 74%, var(--bg) 100%),
+        repeating-radial-gradient(circle at 20% 35%, color-mix(in oklch, var(--text) 2%, transparent) 0 1px, transparent 1px 5px);
+      opacity: 0.82;
+    }
+
+    ::selection {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    a,
+    button {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 4px;
+    }
+
+    .container {
+      width: min(calc(100% - 64px), var(--container));
+      margin-inline: auto;
+    }
+
+    .label {
+      margin: 0;
+      font-size: 0.72rem;
+      font-weight: 600;
+      line-height: 1.3;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .data-value,
+    .status {
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .topbar {
+      position: relative;
+      z-index: 5;
+      border-bottom: 1px solid var(--hairline);
+      background: color-mix(in oklch, var(--bg) 94%, transparent);
+    }
+
+    .topbar-inner {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      align-items: center;
+      min-height: 72px;
+      gap: var(--space-6);
+    }
+
+    .wordmark {
+      justify-self: start;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      transition: opacity 500ms ease;
+    }
+
+    .wordmark:hover,
+    .wordmark:active {
+      opacity: 0.64;
+    }
+
+    .topnav {
+      display: flex;
+      align-items: center;
+      gap: var(--space-6);
+    }
+
+    .nav-link {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.76rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      transition: opacity 500ms ease;
+    }
+
+    .nav-link:hover {
+      opacity: 0.62;
+    }
+
+    .nav-link:active {
+      opacity: 0.42;
+    }
+
+    .topbar-action {
+      justify-self: end;
+    }
+
+    .button {
+      min-height: 48px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--accent);
+      padding: var(--space-3) var(--space-5);
+      color: var(--accent);
+      font-size: 0.74rem;
+      font-weight: 600;
+      line-height: 1.2;
+      letter-spacing: 0.12em;
+      text-align: center;
+      text-transform: uppercase;
+      transition: opacity 500ms ease;
+    }
+
+    .button-primary {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    .button:hover {
+      opacity: 0.7;
+    }
+
+    .button:active {
+      opacity: 0.48;
+    }
+
+    .button[aria-disabled="true"],
+    .nav-link[aria-disabled="true"],
+    .wordmark[aria-disabled="true"] {
+      opacity: 0.32;
+      pointer-events: none;
+    }
+
+    .hero {
+      min-height: 760px;
+      padding-block: var(--space-9) var(--space-11);
+    }
+
+    .hero-inner {
+      min-height: 504px;
+      display: grid;
+      grid-template-columns: minmax(0, 0.78fr) minmax(280px, 0.22fr);
+      align-items: end;
+      gap: var(--space-9);
+    }
+
+    .hero-copy {
+      min-width: 0;
+    }
+
+    .hero h1 {
+      max-width: 16ch;
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(3.65rem, 8vw, 6rem);
+      font-weight: 500;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      text-wrap: balance;
+    }
+
+    .hero-side {
+      display: grid;
+      align-content: end;
+      gap: var(--space-6);
+      padding-bottom: var(--space-3);
+    }
+
+    .hero-sub {
+      max-width: 31ch;
+      margin: 0;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.58;
+      text-wrap: pretty;
+    }
+
+    .hero-side .button {
+      justify-self: start;
+    }
+
+    .signature-band {
+      position: relative;
+      z-index: 3;
+      width: 100%;
+      margin-top: -64px;
+      background: var(--surface);
+      box-shadow:
+        1px 2px 0 color-mix(in oklch, var(--bg) 80%, transparent),
+        4px 8px 16px color-mix(in oklch, var(--bg) 72%, transparent),
+        8px 16px 32px color-mix(in oklch, var(--bg) 86%, transparent);
+    }
+
+    .workbench {
+      border-top: 1px solid var(--hairline);
+      border-bottom: 1px solid var(--hairline);
+      animation: bench-appear 500ms cubic-bezier(0.25, 1, 0.5, 1) both;
+    }
+
+    .bench-head {
+      display: grid;
+      grid-template-columns: 1.2fr 0.75fr 0.75fr auto;
+      align-items: center;
+      gap: var(--space-5);
+      min-height: 72px;
+      padding-inline: max(32px, calc((100vw - var(--container)) / 2));
+      border-bottom: 1px solid var(--hairline);
+    }
+
+    .bench-title {
+      display: flex;
+      align-items: baseline;
+      min-width: 0;
+      gap: var(--space-3);
+    }
+
+    .bench-title strong {
+      font-family: var(--font-display);
+      font-size: 1.55rem;
+      font-weight: 500;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    .sample-flag {
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .bench-meta {
+      display: grid;
+      gap: var(--space-1);
+      min-width: 0;
+    }
+
+    .bench-meta .label {
+      color: var(--muted);
+    }
+
+    .bench-meta p {
+      margin: 0;
+      font-size: 0.86rem;
+      font-weight: 400;
+      white-space: nowrap;
+    }
+
+    .live-state {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      justify-self: end;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .live-state::before {
+      width: 7px;
+      height: 7px;
+      border: 1px solid var(--accent);
+      background: var(--accent);
+      content: "";
+    }
+
+    .bench-grid {
+      display: grid;
+      grid-template-areas:
+        "vessel curve shift"
+        "lot curve additions"
+        "log log log";
+      grid-template-columns: minmax(240px, 0.84fr) minmax(420px, 1.62fr) minmax(240px, 0.9fr);
+    }
+
+    .bench-panel {
+      min-width: 0;
+      padding: var(--space-6);
+    }
+
+    .vessel-panel {
+      grid-area: vessel;
+      border-right: 1px solid var(--hairline);
+      border-bottom: 1px solid var(--hairline);
+    }
+
+    .lot-panel {
+      grid-area: lot;
+      border-right: 1px solid var(--hairline);
+    }
+
+    .curve-panel {
+      grid-area: curve;
+      padding: var(--space-7);
+      border-right: 1px solid var(--hairline);
+    }
+
+    .shift-panel {
+      grid-area: shift;
+      border-bottom: 1px solid var(--hairline);
+    }
+
+    .additions-panel {
+      grid-area: additions;
+    }
+
+    .log-panel {
+      grid-area: log;
+      padding: 0;
+      border-top: 1px solid var(--hairline);
+    }
+
+    .panel-heading {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: var(--space-4);
+      margin-bottom: var(--space-6);
+    }
+
+    .panel-heading h2,
+    .panel-heading h3 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 1.55rem;
+      font-weight: 500;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    .panel-heading .label {
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .tank-readout {
+      display: grid;
+      grid-template-columns: 88px minmax(0, 1fr);
+      gap: var(--space-6);
+      align-items: end;
+    }
+
+    .tank-gauge {
+      position: relative;
+      height: 164px;
+      border: 1px solid var(--hairline);
+      background:
+        repeating-linear-gradient(to bottom, transparent 0 31px, var(--hairline) 31px 32px),
+        linear-gradient(to top, color-mix(in oklch, var(--accent) 12%, transparent) 0 65%, transparent 65% 100%);
+    }
+
+    .tank-gauge::before,
+    .tank-gauge::after {
+      position: absolute;
+      left: -6px;
+      width: 6px;
+      border-top: 1px solid var(--hairline);
+      content: "";
+    }
+
+    .tank-gauge::before {
+      top: 25%;
+    }
+
+    .tank-gauge::after {
+      top: 75%;
+    }
+
+    .tank-stats {
+      display: grid;
+      gap: var(--space-5);
+    }
+
+    .tank-stat {
+      display: grid;
+      gap: var(--space-1);
+    }
+
+    .tank-stat strong {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      font-weight: 500;
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+
+    .tank-stat span:last-child {
+      color: var(--muted);
+      font-size: 0.76rem;
+    }
+
+    .lot-data {
+      display: grid;
+      gap: var(--space-3);
+      margin: 0;
+    }
+
+    .lot-data div {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: var(--space-4);
+      padding-bottom: var(--space-3);
+      border-bottom: 1px solid var(--hairline);
+    }
+
+    .lot-data div:last-child {
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+
+    .lot-data dt,
+    .lot-data dd {
+      margin: 0;
+      font-size: 0.82rem;
+    }
+
+    .lot-data dt {
+      color: var(--muted);
+    }
+
+    .lot-data dd {
+      text-align: right;
+    }
+
+    .curve-header {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: var(--space-6);
+    }
+
+    .curve-header h2 {
+      max-width: 11ch;
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(2.2rem, 4vw, 4.4rem);
+      font-weight: 500;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      text-wrap: balance;
+    }
+
+    .current-brix {
+      display: grid;
+      justify-items: end;
+      gap: var(--space-1);
+      flex: 0 0 auto;
+    }
+
+    .current-brix strong {
+      font-family: var(--font-display);
+      font-size: clamp(3rem, 6vw, 5.5rem);
+      font-weight: 500;
+      line-height: 0.9;
+      letter-spacing: -0.03em;
+    }
+
+    .gravity-chart {
+      width: 100%;
+      height: auto;
+      display: block;
+      margin-top: var(--space-7);
+      overflow: visible;
+    }
+
+    .chart-grid {
+      stroke: var(--hairline);
+      stroke-width: 1;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .chart-fill {
+      fill: color-mix(in oklch, var(--accent) 7%, transparent);
+    }
+
+    .gravity-line {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 2;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .chart-point {
+      fill: var(--surface);
+      stroke: var(--accent);
+      stroke-width: 2;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .chart-labels,
+    .measure-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: var(--space-2);
+    }
+
+    .chart-labels {
+      margin-top: var(--space-3);
+      color: var(--muted);
+      font-size: 0.7rem;
+      text-align: center;
+    }
+
+    .measure-row {
+      margin-top: var(--space-5);
+      padding-top: var(--space-4);
+      border-top: 1px solid var(--hairline);
+    }
+
+    .measure {
+      display: grid;
+      gap: var(--space-1);
+      text-align: center;
+    }
+
+    .measure strong {
+      font-size: 0.82rem;
+      font-weight: 400;
+    }
+
+    .measure span {
+      color: var(--muted);
+      font-size: 0.64rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .task-list,
+    .addition-list {
+      display: grid;
+      gap: var(--space-4);
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .task-item,
+    .addition-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: baseline;
+      gap: var(--space-3);
+      padding-bottom: var(--space-4);
+      border-bottom: 1px solid var(--hairline);
+    }
+
+    .task-item:last-child,
+    .addition-item:last-child {
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+
+    .task-time,
+    .addition-amount {
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 400;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .task-name,
+    .addition-name {
+      font-size: 0.82rem;
+    }
+
+    .task-state,
+    .addition-state {
+      color: var(--muted);
+      font-size: 0.67rem;
+      font-weight: 600;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .task-state.status,
+    .addition-state.status {
+      color: var(--accent);
+    }
+
+    .log-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.79rem;
+    }
+
+    .log-table caption {
+      padding: var(--space-4) var(--space-6);
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-align: left;
+      text-transform: uppercase;
+    }
+
+    .log-table th,
+    .log-table td {
+      padding: var(--space-4) var(--space-6);
+      border-top: 1px solid var(--hairline);
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    .log-table th {
+      color: var(--muted);
+      font-size: 0.66rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .log-table td {
+      font-variant-numeric: tabular-nums;
+    }
+
+    .trace-section {
+      padding-block: var(--space-11);
+    }
+
+    .trace-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.7fr) minmax(220px, 0.65fr) minmax(220px, 0.65fr);
+      border-top: 1px solid var(--hairline);
+      border-bottom: 1px solid var(--hairline);
+    }
+
+    .trace-claim {
+      grid-column: span 2;
+      grid-row: span 2;
+      min-height: 520px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: var(--space-9);
+      padding: var(--space-8);
+      border-right: 1px solid var(--hairline);
+    }
+
+    .trace-claim p {
+      max-width: 13ch;
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(3rem, 6vw, 5.8rem);
+      font-weight: 500;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      text-wrap: balance;
+    }
+
+    .trace-claim small {
+      max-width: 48ch;
+      color: var(--muted);
+      font-size: 0.86rem;
+      line-height: 1.58;
+    }
+
+    .trace-node {
+      min-height: 260px;
+      display: grid;
+      align-content: space-between;
+      gap: var(--space-7);
+      padding: var(--space-6);
+      border-bottom: 1px solid var(--hairline);
+    }
+
+    .trace-node:last-child {
+      border-bottom: 0;
+    }
+
+    .trace-node-head {
+      display: flex;
+      justify-content: space-between;
+      gap: var(--space-4);
+    }
+
+    .trace-node h3 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      font-weight: 500;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    .trace-node p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .trace-path {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      overflow-wrap: anywhere;
+    }
+
+    .trace-path span {
+      font-size: 0.76rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .trace-path i {
+      width: 32px;
+      height: 1px;
+      flex: 0 0 auto;
+      background: var(--hairline);
+    }
+
+    .operations-section {
+      padding-block: var(--space-9);
+      background: var(--surface);
+    }
+
+    .operations-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.55fr);
+      align-items: end;
+      gap: var(--space-9);
+      margin-bottom: var(--space-9);
+    }
+
+    .operations-head h2 {
+      max-width: 13ch;
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(3rem, 5.5vw, 5.4rem);
+      font-weight: 500;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      text-wrap: balance;
+    }
+
+    .operations-head p {
+      max-width: 45ch;
+      margin: 0;
+      color: var(--muted);
+      text-wrap: pretty;
+    }
+
+    .operations-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-top: 1px solid var(--hairline);
+    }
+
+    .operation-row {
+      min-height: 196px;
+      display: grid;
+      grid-template-columns: minmax(150px, 0.4fr) minmax(0, 1fr);
+      gap: var(--space-6);
+      align-content: center;
+      padding: var(--space-6);
+      border-bottom: 1px solid var(--hairline);
+    }
+
+    .operation-row:nth-child(odd) {
+      border-right: 1px solid var(--hairline);
+    }
+
+    .operation-row h3 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 1.65rem;
+      font-weight: 500;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    .operation-row p {
+      max-width: 42ch;
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.86rem;
+      text-wrap: pretty;
+    }
+
+    .operation-row-wide {
+      grid-column: span 2;
+      grid-template-columns: minmax(150px, 0.2fr) minmax(0, 1fr);
+      border-right: 0;
+    }
+
+    .closing-section {
+      min-height: 640px;
+      display: grid;
+      align-items: center;
+      padding-block: var(--space-10);
+    }
+
+    .closing-inner {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end;
+      gap: var(--space-9);
+    }
+
+    .closing-copy h2 {
+      max-width: 12ch;
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(3.5rem, 7vw, 6rem);
+      font-weight: 500;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      text-wrap: balance;
+    }
+
+    .closing-copy p {
+      max-width: 52ch;
+      margin: var(--space-6) 0 0;
+      color: var(--muted);
+      text-wrap: pretty;
+    }
+
+    .closing-action {
+      display: grid;
+      justify-items: end;
+      gap: var(--space-4);
+    }
+
+    .closing-action small {
+      max-width: 30ch;
+      color: var(--muted);
+      font-size: 0.74rem;
+      text-align: right;
+    }
+
+    .footer {
+      border-top: 1px solid var(--hairline);
+    }
+
+    .footer-inner {
+      min-height: 112px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-6);
+      color: var(--muted);
+      font-size: 0.74rem;
+    }
+
+    .footer p {
+      margin: 0;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: var(--space-5);
+    }
+
+    .footer-link {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      transition: opacity 500ms ease;
+    }
+
+    .footer-link:hover {
+      opacity: 0.62;
+    }
+
+    .footer-link:active {
+      opacity: 0.42;
+    }
+
+    @keyframes bench-appear {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @media (max-width: 1080px) {
+      .bench-head {
+        grid-template-columns: 1.25fr 0.8fr 0.8fr;
+      }
+
+      .live-state {
+        display: none;
+      }
+
+      .bench-grid {
+        grid-template-areas:
+          "vessel curve"
+          "lot curve"
+          "shift additions"
+          "log log";
+        grid-template-columns: minmax(240px, 0.72fr) minmax(0, 1.28fr);
+      }
+
+      .curve-panel {
+        border-right: 0;
+      }
+
+      .shift-panel {
+        border-right: 1px solid var(--hairline);
+        border-top: 1px solid var(--hairline);
+        border-bottom: 0;
+      }
+
+      .additions-panel {
+        border-top: 1px solid var(--hairline);
+      }
+
+      .trace-grid {
+        grid-template-columns: minmax(0, 1.4fr) minmax(220px, 0.6fr);
+      }
+
+      .trace-claim {
+        grid-column: span 1;
+      }
+    }
+
+    @media (max-width: 820px) {
+      .container {
+        width: min(calc(100% - 48px), var(--container));
+      }
+
+      .topbar-inner {
+        grid-template-columns: 1fr auto;
+      }
+
+      .topnav {
+        display: none;
+      }
+
+      .hero {
+        min-height: 700px;
+        padding-block: var(--space-8) var(--space-10);
+      }
+
+      .hero-inner {
+        min-height: 500px;
+        grid-template-columns: 1fr;
+        align-content: end;
+        gap: var(--space-7);
+      }
+
+      .hero-side {
+        grid-template-columns: 1fr auto;
+        align-items: end;
+        gap: var(--space-6);
+      }
+
+      .bench-head {
+        grid-template-columns: 1fr 1fr;
+        padding-block: var(--space-4);
+      }
+
+      .bench-title {
+        grid-column: span 2;
+      }
+
+      .bench-grid {
+        grid-template-areas:
+          "vessel lot"
+          "curve curve"
+          "shift additions"
+          "log log";
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .vessel-panel,
+      .lot-panel {
+        border-bottom: 1px solid var(--hairline);
+      }
+
+      .lot-panel {
+        border-right: 0;
+      }
+
+      .curve-panel {
+        border-bottom: 0;
+      }
+
+      .log-panel {
+        overflow-x: auto;
+      }
+
+      .trace-section {
+        padding-block: var(--space-10);
+      }
+
+      .trace-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .trace-claim {
+        grid-column: span 2;
+        min-height: 460px;
+        border-right: 0;
+        border-bottom: 1px solid var(--hairline);
+      }
+
+      .trace-node:first-of-type {
+        border-right: 1px solid var(--hairline);
+      }
+
+      .operations-head,
+      .closing-inner {
+        grid-template-columns: 1fr;
+        gap: var(--space-7);
+      }
+
+      .closing-action {
+        justify-items: start;
+      }
+
+      .closing-action small {
+        text-align: left;
+      }
+    }
+
+    @media (max-width: 600px) {
+      body {
+        font-size: 16px;
+      }
+
+      .container {
+        width: min(calc(100% - 32px), var(--container));
+      }
+
+      .topbar-inner {
+        min-height: 64px;
+        gap: var(--space-3);
+      }
+
+      .wordmark {
+        font-size: 1.02rem;
+      }
+
+      .topbar-action .button {
+        min-height: 44px;
+        padding-inline: var(--space-4);
+        font-size: 0.66rem;
+      }
+
+      .hero {
+        min-height: 680px;
+        padding-block: var(--space-7) var(--space-10);
+      }
+
+      .hero h1 {
+        font-size: clamp(3.25rem, 17vw, 5.25rem);
+      }
+
+      .hero-side {
+        grid-template-columns: 1fr;
+      }
+
+      .signature-band {
+        margin-top: -48px;
+      }
+
+      .bench-head {
+        grid-template-columns: 1fr;
+        gap: var(--space-4);
+        padding-inline: var(--space-4);
+      }
+
+      .bench-title {
+        grid-column: auto;
+        flex-wrap: wrap;
+      }
+
+      .bench-meta:nth-of-type(3) {
+        display: none;
+      }
+
+      .bench-grid {
+        grid-template-areas:
+          "vessel"
+          "lot"
+          "curve"
+          "shift"
+          "additions"
+          "log";
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .bench-panel,
+      .curve-panel {
+        padding: var(--space-5) var(--space-4);
+        border-right: 0;
+      }
+
+      .vessel-panel,
+      .lot-panel,
+      .curve-panel,
+      .shift-panel,
+      .additions-panel {
+        border-bottom: 1px solid var(--hairline);
+      }
+
+      .shift-panel,
+      .additions-panel {
+        border-top: 0;
+      }
+
+      .curve-header {
+        gap: var(--space-4);
+      }
+
+      .curve-header h2 {
+        font-size: 2.4rem;
+      }
+
+      .current-brix strong {
+        font-size: 3.4rem;
+      }
+
+      .gravity-chart {
+        margin-top: var(--space-6);
+      }
+
+      .measure-row {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .measure:nth-child(4),
+      .measure:nth-child(5) {
+        display: none;
+      }
+
+      .log-table {
+        min-width: 720px;
+      }
+
+      .log-table caption,
+      .log-table th,
+      .log-table td {
+        padding-inline: var(--space-4);
+      }
+
+      .trace-section {
+        padding-block: var(--space-9);
+      }
+
+      .trace-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .trace-claim {
+        grid-column: auto;
+        min-height: 420px;
+        padding: var(--space-6);
+      }
+
+      .trace-claim p {
+        font-size: clamp(2.9rem, 14vw, 4.6rem);
+      }
+
+      .trace-node:first-of-type {
+        border-right: 0;
+      }
+
+      .operations-section {
+        padding-block: var(--space-8);
+      }
+
+      .operations-head {
+        gap: var(--space-6);
+        margin-bottom: var(--space-8);
+      }
+
+      .operations-list {
+        grid-template-columns: 1fr;
+      }
+
+      .operation-row,
+      .operation-row-wide {
+        grid-column: auto;
+        grid-template-columns: 1fr;
+        min-height: 0;
+        padding: var(--space-6) 0;
+        border-right: 0;
+      }
+
+      .closing-section {
+        min-height: 600px;
+        padding-block: var(--space-9);
+      }
+
+      .closing-copy h2 {
+        font-size: clamp(3.25rem, 15vw, 5rem);
+      }
+
+      .footer-inner {
+        align-items: flex-start;
+        flex-direction: column;
+        justify-content: center;
+        padding-block: var(--space-5);
+      }
+
+      .footer-links {
+        flex-wrap: wrap;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="wordmark" href="#top" aria-label="Cellar and Harvest home">Cellar &amp; Harvest</a>
+      <nav class="topnav" aria-label="Primary navigation">
+        <a class="nav-link" href="#workbench">Workbench</a>
+        <a class="nav-link" href="#traceability">Traceability</a>
+        <a class="nav-link" href="#operations">Operations</a>
+        <a class="nav-link" href="#trial">Harvest trial</a>
+      </nav>
+      <a class="button topbar-action" href="#trial">Start free trial</a>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <div class="container hero-inner">
+        <div class="hero-copy">
+          <h1 id="hero-title">The whole cellar, still under your hand.</h1>
+        </div>
+        <div class="hero-side">
+          <p class="hero-sub">Plan every punch-down, trace every lot, and finish the TTB trail before the cellar lights go out.</p>
+          <a class="button button-primary" href="#trial">Start harvest trial</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="signature-band" id="workbench" aria-labelledby="bench-heading">
+      <div class="workbench">
+        <header class="bench-head">
+          <div class="bench-title">
+            <strong id="bench-heading">Fermentation run sheet</strong>
+            <span class="sample-flag">Sample data</span>
+          </div>
+          <div class="bench-meta">
+            <span class="label">Vintage</span>
+            <p><span class="data-value">2026</span> harvest</p>
+          </div>
+          <div class="bench-meta">
+            <span class="label">Cellar date</span>
+            <p>July <span class="data-value">22</span>, <span class="data-value">2026</span></p>
+          </div>
+          <span class="live-state status">Shift open</span>
+        </header>
+
+        <div class="bench-grid">
+          <article class="bench-panel vessel-panel" aria-labelledby="vessel-heading">
+            <div class="panel-heading">
+              <h3 id="vessel-heading">Tank <span class="data-value">T07</span></h3>
+              <span class="label">Active</span>
+            </div>
+            <div class="tank-readout">
+              <div class="tank-gauge" role="img" aria-label="Tank T07 is filled to 65 percent capacity"></div>
+              <div class="tank-stats">
+                <div class="tank-stat">
+                  <strong class="data-value">6,480 L</strong>
+                  <span>Current volume</span>
+                </div>
+                <div class="tank-stat">
+                  <strong class="data-value">27.4 C</strong>
+                  <span>Cap temperature</span>
+                </div>
+                <div class="tank-stat">
+                  <strong class="data-value">65%</strong>
+                  <span>Vessel fill</span>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="bench-panel lot-panel" aria-labelledby="lot-heading">
+            <div class="panel-heading">
+              <h3 id="lot-heading">Lot <span class="data-value">CH-26-014</span></h3>
+              <span class="label">Pinot noir</span>
+            </div>
+            <dl class="lot-data">
+              <div><dt>Source</dt><dd>North slope, Block <span class="data-value">7</span></dd></div>
+              <div><dt>Received</dt><dd><span class="data-value">8,420 kg</span></dd></div>
+              <div><dt>Crush bin</dt><dd><span class="data-value">B-17</span></dd></div>
+              <div><dt>Yeast</dt><dd>RC <span class="data-value">212</span></dd></div>
+              <div><dt>Stage</dt><dd class="status">Primary ferment</dd></div>
+            </dl>
+          </article>
+
+          <article class="bench-panel curve-panel" aria-labelledby="curve-heading">
+            <div class="curve-header">
+              <h2 id="curve-heading">Gravity curve, lot <span class="data-value">014</span></h2>
+              <div class="current-brix">
+                <span class="label">Current Brix</span>
+                <strong class="data-value">8.9</strong>
+              </div>
+            </div>
+
+            <svg class="gravity-chart" viewBox="0 0 620 230" role="img" aria-labelledby="chart-title chart-desc">
+              <title id="chart-title">Falling Brix for Pinot Noir lot CH-26-014</title>
+              <desc id="chart-desc">Brix falls from 24.6 on July 18 to 8.9 on July 22.</desc>
+              <line class="chart-grid" x1="0" y1="18" x2="620" y2="18"></line>
+              <line class="chart-grid" x1="0" y1="82" x2="620" y2="82"></line>
+              <line class="chart-grid" x1="0" y1="146" x2="620" y2="146"></line>
+              <line class="chart-grid" x1="0" y1="210" x2="620" y2="210"></line>
+              <path class="chart-fill" d="M0 24 L155 47 L310 96 L465 145 L620 194 L620 210 L0 210 Z"></path>
+              <path class="gravity-line" d="M0 24 L155 47 L310 96 L465 145 L620 194"></path>
+              <circle class="chart-point" cx="0" cy="24" r="5"></circle>
+              <circle class="chart-point" cx="155" cy="47" r="5"></circle>
+              <circle class="chart-point" cx="310" cy="96" r="5"></circle>
+              <circle class="chart-point" cx="465" cy="145" r="5"></circle>
+              <circle class="chart-point" cx="620" cy="194" r="5"></circle>
+            </svg>
+            <div class="chart-labels" aria-hidden="true">
+              <span>Jul 18</span><span>Jul 19</span><span>Jul 20</span><span>Jul 21</span><span>Jul 22</span>
+            </div>
+            <div class="measure-row" aria-label="Daily Brix readings">
+              <div class="measure"><strong class="data-value">24.6</strong><span>Jul 18</span></div>
+              <div class="measure"><strong class="data-value">22.8</strong><span>Jul 19</span></div>
+              <div class="measure"><strong class="data-value">18.4</strong><span>Jul 20</span></div>
+              <div class="measure"><strong class="data-value">13.7</strong><span>Jul 21</span></div>
+              <div class="measure"><strong class="data-value">8.9</strong><span>Jul 22</span></div>
+            </div>
+          </article>
+
+          <article class="bench-panel shift-panel" aria-labelledby="shift-heading">
+            <div class="panel-heading">
+              <h3 id="shift-heading">Punch-downs</h3>
+              <span class="label">Today</span>
+            </div>
+            <ul class="task-list">
+              <li class="task-item">
+                <span class="task-time">08:00</span>
+                <span class="task-name">Full cap</span>
+                <span class="task-state status">Logged</span>
+              </li>
+              <li class="task-item">
+                <span class="task-time">16:00</span>
+                <span class="task-name">Full cap</span>
+                <span class="task-state status">Due</span>
+              </li>
+              <li class="task-item">
+                <span class="task-time">22:00</span>
+                <span class="task-name">Check cap rise</span>
+                <span class="task-state">Queued</span>
+              </li>
+            </ul>
+          </article>
+
+          <article class="bench-panel additions-panel" aria-labelledby="additions-heading">
+            <div class="panel-heading">
+              <h3 id="additions-heading">Additions</h3>
+              <span class="label">Lot 014</span>
+            </div>
+            <ul class="addition-list">
+              <li class="addition-item">
+                <span class="addition-amount">1.6 kg</span>
+                <span class="addition-name">RC 212 yeast</span>
+                <span class="addition-state status">Added</span>
+              </li>
+              <li class="addition-item">
+                <span class="addition-amount">1.9 kg</span>
+                <span class="addition-name">Fermentation nutrient</span>
+                <span class="addition-state status">Added</span>
+              </li>
+              <li class="addition-item">
+                <span class="addition-amount">6.1 g/L</span>
+                <span class="addition-name">TA at crush</span>
+                <span class="addition-state">Reference</span>
+              </li>
+            </ul>
+          </article>
+
+          <div class="log-panel">
+            <table class="log-table">
+              <caption>Latest cellar log, lot CH-26-014</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Recorded</th>
+                  <th scope="col">Brix</th>
+                  <th scope="col">pH</th>
+                  <th scope="col">Cap temp</th>
+                  <th scope="col">Action</th>
+                  <th scope="col">By</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Jul <span class="data-value">22</span>, <span class="data-value">08:12</span></td>
+                  <td class="data-value">8.9</td>
+                  <td class="data-value">3.42</td>
+                  <td class="data-value">27.4 C</td>
+                  <td>Punch-down complete</td>
+                  <td>M. Reyes</td>
+                </tr>
+                <tr>
+                  <td>Jul <span class="data-value">21</span>, <span class="data-value">20:04</span></td>
+                  <td class="data-value">13.7</td>
+                  <td class="data-value">3.41</td>
+                  <td class="data-value">26.9 C</td>
+                  <td>Cap and aroma checked</td>
+                  <td>A. Chen</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="trace-section" id="traceability" aria-label="Lot traceability">
+      <div class="container trace-grid">
+        <article class="trace-claim">
+          <p><span class="data-value">8,420 kg</span> in. One unbroken lot trail out.</p>
+          <small>Every weight, vessel move, addition, analysis, and cellar hand stays attached to the same record.</small>
+        </article>
+        <article class="trace-node">
+          <div class="trace-node-head">
+            <h3>Fruit in</h3>
+            <span class="label data-value">B-17</span>
+          </div>
+          <p>North slope Pinot Noir, Block <span class="data-value">7</span>. Scale ticket and receiving condition attached.</p>
+          <div class="trace-path" aria-label="Fruit moves from Block 7 to crush bin B-17">
+            <span>Block 7</span><i aria-hidden="true"></i><span>B-17</span>
+          </div>
+        </article>
+        <article class="trace-node">
+          <div class="trace-node-head">
+            <h3>Must through</h3>
+            <span class="label data-value">T07</span>
+          </div>
+          <p><span class="data-value">6,480 L</span> assigned to primary ferment, with every reading and addition on the lot.</p>
+          <div class="trace-path" aria-label="Crush bin B-17 moves to tank T07">
+            <span>B-17</span><i aria-hidden="true"></i><span>T07</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="operations-section" id="operations" aria-labelledby="operations-heading">
+      <div class="container">
+        <div class="operations-head">
+          <h2 id="operations-heading">The shift knows what happens next.</h2>
+          <p>Cellar &amp; Harvest turns the vintage plan into the day in front of you, with enough detail for the floor and the filing cabinet.</p>
+        </div>
+        <div class="operations-list">
+          <article class="operation-row">
+            <h3>Crush pad</h3>
+            <p>Receive fruit by block, record weigh tags, press fractions, chemistry, and destination vessels while the bins are moving.</p>
+          </article>
+          <article class="operation-row">
+            <h3>Cellar work</h3>
+            <p>Queue pump-overs, punch-downs, transfers, additions, and checks against the lot that needs the work.</p>
+          </article>
+          <article class="operation-row">
+            <h3>Barrel room</h3>
+            <p>Track fills, topping, analysis, rackings, and barrel position without losing the wine's source history.</p>
+          </article>
+          <article class="operation-row">
+            <h3>TTB trail</h3>
+            <p>Keep movement and production records ready for reconciliation, with cellar entries feeding the paperwork.</p>
+          </article>
+          <article class="operation-row operation-row-wide">
+            <h3>Built for harvest hands</h3>
+            <p>Fast enough for gloved, wet work. Exact enough for the winemaker who must reconcile tanks after a sixteen-hour crush day.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="closing-section" id="trial" aria-labelledby="trial-heading">
+      <div class="container closing-inner">
+        <div class="closing-copy">
+          <h2 id="trial-heading">Put this harvest on one record.</h2>
+          <p>Start a free harvest-season trial and set up your blocks, vessels, lots, and first cellar shift.</p>
+        </div>
+        <div class="closing-action">
+          <a class="button button-primary" href="#top">Start harvest trial</a>
+          <small>Free for the harvest season. Setup begins with your actual cellar map.</small>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <p>Cellar &amp; Harvest. Working software for independent wineries.</p>
+      <div class="footer-links">
+        <a class="footer-link" href="#workbench">See the workbench</a>
+        <a class="footer-link" href="#trial">Start a trial</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

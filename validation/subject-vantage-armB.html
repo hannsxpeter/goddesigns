@@ -1,0 +1,1290 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Cellar and harvest management software for independent wineries.">
+  <title>Cellar &amp; Harvest | Winery cellar management</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500&family=Manrope:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    /* goddesign | structure: Workbench | direction: Luxury Serif | accent: cool platinum */
+    /*
+      goddesign | Luxury Serif / Workbench
+      Seed 4230224098 | h -6, L +0.01, r +0
+      Type: Bodoni Moda 500 / Manrope 300, 400, 600
+      Layout: top bar, hero, full-bleed barrel-row topping route, supporting rails
+      Signature: cellar bay occupancy and topping-route sheet with live illustrative data
+      Grammar: full-bleed signature; bare claim; spanning operations cell; 96/128/160 section rhythm
+      Motion: 500ms opacity fades only
+    */
+
+    :root {
+      color-scheme: dark;
+      --bg: oklch(from #0E0C08 calc(l + 0.01) c h);
+      --surface: oklch(from #171410 calc(l + 0.01) c h);
+      --text: #EFE9DC;
+      --muted: #9C917C;
+      --accent: oklch(from #C9CFDA l c calc(h - 6));
+      --hairline: #2E2A22;
+      --clear: transparent;
+      --surface-soft: color-mix(in oklch, var(--surface) 76%, var(--bg));
+      --surface-raised: color-mix(in oklch, var(--surface) 88%, var(--text) 12%);
+      --accent-soft: color-mix(in oklch, var(--accent) 12%, var(--clear));
+      --accent-hover: color-mix(in oklch, var(--accent) 84%, var(--text));
+      --accent-active: color-mix(in oklch, var(--accent) 68%, var(--bg));
+      --muted-soft: color-mix(in oklch, var(--muted) 58%, var(--clear));
+      --rule-light: color-mix(in oklch, var(--hairline) 58%, var(--text));
+      --font-display: "Bodoni Moda", serif;
+      --font-body: "Manrope", sans-serif;
+      --radius: 0;
+      --max: 1180px;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--bg);
+    }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      overflow-x: clip;
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(circle at 50% -18%, var(--surface-raised) 0, var(--clear) 44%),
+        repeating-linear-gradient(94deg, var(--clear) 0 7px, var(--accent-soft) 8px, var(--clear) 9px 19px);
+      background-size: auto, 480px 480px;
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 17px;
+      font-weight: 300;
+      line-height: 1.58;
+      text-rendering: optimizeLegibility;
+    }
+
+    a,
+    button {
+      color: inherit;
+      font: inherit;
+    }
+
+    a {
+      text-decoration: none;
+    }
+
+    button {
+      border-radius: var(--radius);
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 4px;
+    }
+
+    .shell {
+      width: min(calc(100% - 48px), var(--max));
+      margin-inline: auto;
+    }
+
+    .label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      line-height: 1.35;
+      text-transform: uppercase;
+    }
+
+    .measure,
+    .coordinate,
+    .route-total,
+    .artifact-number {
+      color: var(--accent);
+      font-family: var(--font-display);
+      font-variant-numeric: lining-nums tabular-nums;
+      font-weight: 500;
+    }
+
+    .topbar {
+      border-bottom: 1px solid var(--hairline);
+    }
+
+    .topbar-inner {
+      display: grid;
+      grid-template-columns: minmax(190px, 1fr) auto minmax(190px, 1fr);
+      align-items: center;
+      min-height: 72px;
+      gap: 32px;
+    }
+
+    .wordmark {
+      justify-self: start;
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+    }
+
+    .nav-list {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      color: var(--muted);
+      font-size: 0.74rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      opacity: 1;
+      text-transform: uppercase;
+      transition: opacity 500ms ease;
+    }
+
+    .nav-link:hover {
+      opacity: 0.72;
+    }
+
+    .nav-link:active {
+      opacity: 0.48;
+    }
+
+    .nav-link[aria-disabled="true"] {
+      cursor: not-allowed;
+      opacity: 0.36;
+      pointer-events: none;
+    }
+
+    .topbar-cta {
+      justify-self: end;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 12px 24px;
+      border: 1px solid var(--accent);
+      border-radius: var(--radius);
+      background: var(--accent);
+      color: var(--bg);
+      font-size: 0.73rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      line-height: 1.2;
+      opacity: 1;
+      text-transform: uppercase;
+      transition: opacity 500ms ease;
+    }
+
+    .button-outline {
+      background: var(--clear);
+      color: var(--accent);
+    }
+
+    .button:hover {
+      opacity: 0.8;
+    }
+
+    .button:active {
+      opacity: 0.58;
+    }
+
+    .button[aria-disabled="true"],
+    .button:disabled {
+      cursor: not-allowed;
+      opacity: 0.32;
+      pointer-events: none;
+    }
+
+    .hero {
+      padding-block: 128px 160px;
+    }
+
+    .hero-copy {
+      display: grid;
+      max-width: 940px;
+      gap: 32px;
+    }
+
+    .hero h1 {
+      max-width: 16ch;
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(3.35rem, 8vw, 6rem);
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      line-height: 1.06;
+      text-wrap: balance;
+    }
+
+    .hero p {
+      max-width: 58ch;
+      margin: 0;
+      color: var(--muted);
+      font-size: clamp(1rem, 1.4vw, 1.125rem);
+      text-wrap: pretty;
+    }
+
+    .hero-action {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .trial-note {
+      color: var(--muted);
+      font-size: 0.76rem;
+    }
+
+    .workbench {
+      position: relative;
+      z-index: 1;
+      margin-top: -64px;
+      border-block: 1px solid var(--hairline);
+      background: var(--surface);
+    }
+
+    .workbench-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      align-items: center;
+      gap: 24px;
+      min-height: 80px;
+      padding: 16px 32px;
+      border-bottom: 1px solid var(--hairline);
+    }
+
+    .workbench-title {
+      display: flex;
+      min-width: 0;
+      align-items: baseline;
+      gap: 16px;
+    }
+
+    .workbench-title h2 {
+      margin: 0;
+      overflow-wrap: anywhere;
+      font-family: var(--font-display);
+      font-size: clamp(1.4rem, 3vw, 2.1rem);
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+
+    .sample-label {
+      color: var(--muted);
+    }
+
+    .sync-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--accent);
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border: 1px solid var(--accent);
+      background: var(--accent);
+      border-radius: 50%;
+    }
+
+    .view-stamp {
+      color: var(--muted);
+      text-align: right;
+    }
+
+    .bench-grid {
+      display: grid;
+      grid-template-columns: minmax(280px, 0.7fr) minmax(760px, 2.3fr);
+      min-width: 0;
+    }
+
+    .route-rail {
+      display: grid;
+      align-content: start;
+      min-width: 0;
+      padding: 48px 32px;
+      border-right: 1px solid var(--hairline);
+      background: var(--surface-soft);
+    }
+
+    .route-rail h3 {
+      max-width: 12ch;
+      margin: 8px 0 24px;
+      font-family: var(--font-display);
+      font-size: clamp(1.8rem, 3.5vw, 3rem);
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      line-height: 1.07;
+    }
+
+    .route-total {
+      display: block;
+      margin-top: 16px;
+      font-size: clamp(3.7rem, 7vw, 6rem);
+      letter-spacing: -0.03em;
+      line-height: 0.94;
+    }
+
+    .route-unit {
+      margin-top: 8px;
+      color: var(--muted);
+    }
+
+    .supply-list,
+    .stop-list {
+      margin: 32px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .supply-list li,
+    .stop-list li {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: baseline;
+      gap: 12px;
+      padding-block: 12px;
+      border-top: 1px solid var(--hairline);
+    }
+
+    .supply-list span:first-child,
+    .stop-list span:first-child {
+      color: var(--muted);
+      font-size: 0.78rem;
+      overflow-wrap: anywhere;
+    }
+
+    .supply-list span:last-child,
+    .stop-list span:last-child {
+      color: var(--accent);
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      white-space: nowrap;
+    }
+
+    .floorplan-wrap {
+      min-width: 0;
+      overflow-x: auto;
+      padding: 32px;
+      scrollbar-color: var(--accent) var(--surface-soft);
+    }
+
+    .floorplan {
+      display: grid;
+      grid-template-columns: minmax(280px, 1.15fr) 88px minmax(220px, 0.85fr) minmax(220px, 0.85fr);
+      grid-template-areas:
+        "north north north north"
+        "bay-a aisle bay-b bay-c"
+        "bay-a aisle staging staging";
+      grid-template-rows: 48px auto 96px;
+      min-width: 920px;
+      border-top: 1px solid var(--hairline);
+      border-left: 1px solid var(--hairline);
+    }
+
+    .north-wall {
+      grid-area: north;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding-inline: 16px;
+      border-right: 1px solid var(--hairline);
+      border-bottom: 1px solid var(--hairline);
+      color: var(--muted);
+    }
+
+    .north-wall .measure {
+      font-size: 1.1rem;
+    }
+
+    .bay {
+      display: grid;
+      align-content: start;
+      min-width: 0;
+      border-right: 1px solid var(--hairline);
+      border-bottom: 1px solid var(--hairline);
+    }
+
+    .bay-a {
+      grid-area: bay-a;
+    }
+
+    .bay-b {
+      grid-area: bay-b;
+    }
+
+    .bay-c {
+      grid-area: bay-c;
+    }
+
+    .bay-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--hairline);
+      background: var(--surface-raised);
+    }
+
+    .bay-head span:last-child {
+      color: var(--muted);
+    }
+
+    .rack {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .barrel {
+      display: grid;
+      min-width: 0;
+      min-height: 92px;
+      align-content: space-between;
+      gap: 8px;
+      padding: 12px;
+      border-right: 1px solid var(--hairline);
+      border-bottom: 1px solid var(--hairline);
+    }
+
+    .barrel:nth-child(even) {
+      border-right: 0;
+    }
+
+    .barrel.due {
+      background: var(--accent-soft);
+      box-shadow: inset 0 0 0 1px var(--accent);
+    }
+
+    .barrel-top,
+    .barrel-data {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .coordinate {
+      font-size: 1.05rem;
+      line-height: 1;
+    }
+
+    .lot-code,
+    .barrel-data {
+      color: var(--muted);
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      line-height: 1.35;
+      text-transform: uppercase;
+    }
+
+    .stop-number {
+      color: var(--accent);
+      font-family: var(--font-display);
+      font-size: 1rem;
+    }
+
+    .barrel-data .measure {
+      font-size: 0.92rem;
+    }
+
+    .aisle {
+      grid-area: aisle;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      align-items: center;
+      justify-items: center;
+      gap: 16px;
+      padding-block: 16px;
+      border-right: 1px solid var(--hairline);
+      border-bottom: 1px solid var(--hairline);
+      background: var(--bg);
+    }
+
+    .aisle-label {
+      writing-mode: vertical-rl;
+      color: var(--muted);
+    }
+
+    .route-sequence {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .route-sequence li {
+      display: grid;
+      width: 28px;
+      height: 28px;
+      place-items: center;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+    }
+
+    .staging {
+      grid-area: staging;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 24px;
+      padding: 16px;
+      border-right: 1px solid var(--hairline);
+      border-bottom: 1px solid var(--hairline);
+      background: var(--surface-soft);
+    }
+
+    .staging p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 0.75rem;
+    }
+
+    .staging .measure {
+      font-size: 2rem;
+      white-space: nowrap;
+    }
+
+    .bench-footer {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      border-top: 1px solid var(--hairline);
+    }
+
+    .bench-footer div {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      padding: 16px 32px;
+      border-right: 1px solid var(--hairline);
+      color: var(--muted);
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .bench-footer div:last-child {
+      border-right: 0;
+    }
+
+    .bench-footer strong {
+      color: var(--accent);
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 500;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
+    .trace {
+      padding-block: 160px;
+      background: var(--surface-soft);
+    }
+
+    .trace-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+      align-items: start;
+      gap: 96px;
+    }
+
+    .trace h2 {
+      max-width: 15ch;
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(2.7rem, 6vw, 5.5rem);
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      line-height: 1.06;
+      text-wrap: balance;
+    }
+
+    .movement-slip {
+      border-top: 1px solid var(--rule-light);
+      border-bottom: 1px solid var(--rule-light);
+    }
+
+    .slip-head,
+    .slip-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+      gap: 24px;
+      padding-block: 16px;
+      border-bottom: 1px solid var(--hairline);
+    }
+
+    .slip-head {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    .slip-row:last-child {
+      border-bottom: 0;
+    }
+
+    .slip-row span:first-child {
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .slip-row span:last-child {
+      overflow-wrap: anywhere;
+    }
+
+    .artifact-number {
+      font-size: 1.35rem;
+    }
+
+    .operations {
+      padding-block: 128px;
+    }
+
+    .operations-head {
+      display: grid;
+      grid-template-columns: minmax(0, 0.75fr) minmax(320px, 1.25fr);
+      gap: 64px;
+      align-items: end;
+      margin-bottom: 64px;
+    }
+
+    .operations h2 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 5vw, 4.8rem);
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      line-height: 1.08;
+    }
+
+    .operations-head p {
+      max-width: 58ch;
+      margin: 0;
+      color: var(--muted);
+      text-wrap: pretty;
+    }
+
+    .operations-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      border-top: 1px solid var(--hairline);
+      border-left: 1px solid var(--hairline);
+    }
+
+    .operation {
+      display: grid;
+      align-content: start;
+      gap: 16px;
+      min-height: 230px;
+      padding: 32px;
+      border-right: 1px solid var(--hairline);
+      border-bottom: 1px solid var(--hairline);
+    }
+
+    .operation-wide {
+      grid-column: span 2;
+      min-height: 300px;
+      padding: 48px;
+      background: var(--surface);
+    }
+
+    .operation h3 {
+      max-width: 16ch;
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(1.55rem, 3vw, 2.6rem);
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      line-height: 1.12;
+    }
+
+    .operation p {
+      max-width: 55ch;
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+      text-wrap: pretty;
+    }
+
+    .operation-data {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      margin-top: auto;
+      padding-top: 32px;
+    }
+
+    .operation-data span {
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .operation-data strong {
+      display: block;
+      color: var(--accent);
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      font-weight: 500;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
+    .closing {
+      padding-block: 96px;
+      border-top: 1px solid var(--hairline);
+      background: var(--surface-raised);
+    }
+
+    .closing-inner {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 64px;
+    }
+
+    .closing h2 {
+      max-width: 17ch;
+      margin: 0 0 12px;
+      font-family: var(--font-display);
+      font-size: clamp(2.4rem, 5vw, 4.6rem);
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      line-height: 1.06;
+      text-wrap: balance;
+    }
+
+    .closing p {
+      max-width: 54ch;
+      margin: 0;
+      color: var(--muted);
+    }
+
+    footer {
+      padding-block: 32px;
+      border-top: 1px solid var(--hairline);
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      color: var(--muted);
+      font-size: 0.75rem;
+    }
+
+    .fade-in {
+      animation: fade-in 500ms ease both;
+    }
+
+    @keyframes fade-in {
+      from {
+        opacity: 0;
+      }
+    }
+
+    @media (max-width: 980px) {
+      .bench-grid {
+        grid-template-columns: 260px minmax(680px, 1fr);
+      }
+
+      .trace-grid,
+      .operations-head {
+        grid-template-columns: 1fr;
+        gap: 48px;
+      }
+
+      .operations-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 800px) {
+      .shell {
+        width: min(calc(100% - 32px), var(--max));
+      }
+
+      .topbar-inner {
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 8px 16px;
+        padding-block: 12px;
+      }
+
+      .nav-list {
+        grid-column: 1 / -1;
+        grid-row: 2;
+        justify-content: space-between;
+        width: 100%;
+        gap: 12px;
+      }
+
+      .topbar-inner nav {
+        grid-column: 1 / -1;
+        grid-row: 2;
+        min-width: 0;
+      }
+
+      .topbar-cta {
+        grid-column: 2;
+        grid-row: 1;
+      }
+
+      .topbar-cta .button {
+        min-height: 44px;
+        padding-inline: 16px;
+      }
+
+      .hero {
+        padding-block: 96px 128px;
+      }
+
+      .hero-copy {
+        gap: 24px;
+      }
+
+      .hero-action {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .button {
+        min-height: 52px;
+      }
+
+      .workbench-head {
+        grid-template-columns: 1fr auto;
+        padding-inline: 16px;
+      }
+
+      .workbench-title {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .view-stamp {
+        display: none;
+      }
+
+      .bench-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .route-rail {
+        grid-template-columns: minmax(0, 1fr) minmax(160px, 0.8fr);
+        gap: 24px;
+        padding: 32px 16px;
+        border-right: 0;
+        border-bottom: 1px solid var(--hairline);
+      }
+
+      .route-summary,
+      .route-detail {
+        min-width: 0;
+      }
+
+      .route-total {
+        font-size: 4.3rem;
+      }
+
+      .floorplan-wrap {
+        padding: 24px 16px;
+      }
+
+      .bench-footer {
+        grid-template-columns: 1fr;
+      }
+
+      .bench-footer div {
+        border-right: 0;
+        border-bottom: 1px solid var(--hairline);
+      }
+
+      .bench-footer div:last-child {
+        border-bottom: 0;
+      }
+
+      .trace {
+        padding-block: 128px;
+      }
+
+      .operations {
+        padding-block: 96px;
+      }
+
+      .operations-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .operation-wide {
+        grid-column: auto;
+      }
+
+      .operation {
+        min-height: auto;
+      }
+
+      .closing-inner {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+
+      .closing .button {
+        justify-self: start;
+      }
+    }
+
+    @media (max-width: 520px) {
+      body {
+        font-size: 16px;
+      }
+
+      .wordmark {
+        font-size: 1rem;
+      }
+
+      .topbar-cta .button {
+        padding-inline: 12px;
+        font-size: 0.63rem;
+      }
+
+      .nav-list {
+        overflow-x: auto;
+        justify-content: flex-start;
+        scrollbar-width: none;
+      }
+
+      .nav-link {
+        min-height: 44px;
+        white-space: nowrap;
+      }
+
+      .hero h1 {
+        font-size: clamp(3rem, 16vw, 4.6rem);
+      }
+
+      .route-rail {
+        grid-template-columns: 1fr;
+      }
+
+      .trace-grid {
+        gap: 64px;
+      }
+
+      .slip-head,
+      .slip-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .operation-wide {
+        padding: 32px;
+      }
+
+      .footer-inner {
+        flex-direction: column;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="shell topbar-inner">
+      <a class="wordmark" href="#top" aria-label="Cellar and Harvest home">Cellar &amp; Harvest</a>
+      <nav aria-label="Primary navigation">
+        <ul class="nav-list">
+          <li><a class="nav-link" href="#workbench">Cellar map</a></li>
+          <li><a class="nav-link" href="#trace">Lot trace</a></li>
+          <li><a class="nav-link" href="#operations">Operations</a></li>
+        </ul>
+      </nav>
+      <a class="button button-outline topbar-cta" href="#trial">Start trial</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero fade-in" aria-labelledby="hero-title">
+      <div class="shell hero-copy">
+        <h1 id="hero-title">Every barrel, exactly where the cellar left it.</h1>
+        <p>Run crush, fermentation, aging, and compliance from one working cellar record.</p>
+        <div class="hero-action">
+          <a class="button" href="#trial">Start harvest trial</a>
+          <span class="trial-note">Free for the harvest season.</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="workbench fade-in" id="workbench" aria-labelledby="workbench-title">
+      <header class="workbench-head">
+        <div class="workbench-title">
+          <h2 id="workbench-title">North cellar topping route</h2>
+          <span class="label sample-label">Sample data</span>
+        </div>
+        <span class="label sync-status"><span class="status-dot" aria-hidden="true"></span>Synced 06:42</span>
+        <span class="label view-stamp">Wed 22 Jul 2026</span>
+      </header>
+
+      <div class="bench-grid">
+        <aside class="route-rail" aria-label="Topping route summary">
+          <div class="route-summary">
+            <span class="label">Route 07</span>
+            <h3>Barrel-row topping pass</h3>
+            <span class="route-total">2.21</span>
+            <div class="label route-unit">Litres across 4 stops</div>
+          </div>
+          <div class="route-detail">
+            <ul class="supply-list" aria-label="Topping wine by lot">
+              <li><span>PN-24-T</span><span>1.04 L</span></li>
+              <li><span>CH-24-T</span><span>0.62 L</span></li>
+              <li><span>SY-23-T</span><span>0.55 L</span></li>
+            </ul>
+            <ul class="stop-list" aria-label="Route stops">
+              <li><span>Stop A-01</span><span>0.58 L</span></li>
+              <li><span>Stop A-04</span><span>0.46 L</span></li>
+              <li><span>Stop B-03</span><span>0.62 L</span></li>
+              <li><span>Stop C-02</span><span>0.55 L</span></li>
+            </ul>
+          </div>
+        </aside>
+
+        <div class="floorplan-wrap" tabindex="0" aria-label="Scrollable north cellar floor plan">
+          <div class="floorplan">
+            <div class="north-wall">
+              <span class="label">North cellar wall / rack depth 1.2 m</span>
+              <span class="measure">18.4 m</span>
+            </div>
+
+            <section class="bay bay-a" aria-labelledby="bay-a-title">
+              <div class="bay-head">
+                <span class="label" id="bay-a-title">Bay A / Pinot Noir</span>
+                <span class="label">Rack 02 / Tier 1</span>
+              </div>
+              <div class="rack">
+                <div class="barrel due">
+                  <div class="barrel-top"><span class="coordinate">A-01</span><span class="stop-number">01</span></div>
+                  <span class="lot-code">PN-24-17</span>
+                  <div class="barrel-data"><span>Ullage</span><span class="measure">0.58 L</span></div>
+                  <div class="barrel-data"><span>Free SO2</span><span class="measure">23 mg/L</span></div>
+                </div>
+                <div class="barrel">
+                  <div class="barrel-top"><span class="coordinate">A-02</span></div>
+                  <span class="lot-code">PN-24-17</span>
+                  <div class="barrel-data"><span>Ullage</span><span class="measure">0.21 L</span></div>
+                </div>
+                <div class="barrel">
+                  <div class="barrel-top"><span class="coordinate">A-03</span></div>
+                  <span class="lot-code">PN-24-17</span>
+                  <div class="barrel-data"><span>Ullage</span><span class="measure">0.18 L</span></div>
+                </div>
+                <div class="barrel due">
+                  <div class="barrel-top"><span class="coordinate">A-04</span><span class="stop-number">02</span></div>
+                  <span class="lot-code">PN-24-17</span>
+                  <div class="barrel-data"><span>Ullage</span><span class="measure">0.46 L</span></div>
+                  <div class="barrel-data"><span>Free SO2</span><span class="measure">24 mg/L</span></div>
+                </div>
+                <div class="barrel">
+                  <div class="barrel-top"><span class="coordinate">A-05</span></div>
+                  <span class="lot-code">PN-24-21</span>
+                  <div class="barrel-data"><span>Ullage</span><span class="measure">0.24 L</span></div>
+                </div>
+                <div class="barrel">
+                  <div class="barrel-top"><span class="coordinate">A-06</span></div>
+                  <span class="lot-code">PN-24-21</span>
+                  <div class="barrel-data"><span>Ullage</span><span class="measure">0.19 L</span></div>
+                </div>
+              </div>
+            </section>
+
+            <div class="aisle" aria-label="Service aisle with topping route sequence">
+              <span class="label aisle-label">Service aisle</span>
+              <ol class="route-sequence" aria-label="Route sequence">
+                <li>01</li>
+                <li>02</li>
+                <li>03</li>
+                <li>04</li>
+              </ol>
+              <span class="measure">2.4 m</span>
+            </div>
+
+            <section class="bay bay-b" aria-labelledby="bay-b-title">
+              <div class="bay-head">
+                <span class="label" id="bay-b-title">Bay B / Chardonnay</span>
+                <span class="label">Rack 01 / Tier 1</span>
+              </div>
+              <div class="rack">
+                <div class="barrel">
+                  <div class="barrel-top"><span class="coordinate">B-01</span></div>
+                  <span class="lot-code">CH-24-05</span>
+                  <div class="barrel-data"><span>Ullage</span><span class="measure">0.12 L</span></div>
+                </div>
+                <div class="barrel">
+                  <div class="barrel-top"><span class="coordinate">B-02</span></div>
+                  <span class="lot-code">CH-24-05</span>
+                  <div class="barrel-data"><span>Ullage</span><span class="measure">0.22 L</span></div>
+                </div>
+                <div class="barrel due">
+                  <div class="barrel-top"><span class="coordinate">B-03</span><span class="stop-number">03</span></div>
+                  <span class="lot-code">CH-24-05</span>
+                  <div class="barrel-data"><span>Ullage</span><span class="measure">0.62 L</span></div>
+                  <div class="barrel-data"><span>Free SO2</span><span class="measure">21 mg/L</span></div>
+                </div>
+                <div class="barrel">
+                  <div class="barrel-top"><span class="coordinate">B-04</span></div>
+                  <span class="lot-code">CH-24-05</span>
+                  <div class="barrel-data"><span>Ullage</span><span class="measure">0.26 L</span></div>
+                </div>
+              </div>
+            </section>
+
+            <section class="bay bay-c" aria-labelledby="bay-c-title">
+              <div class="bay-head">
+                <span class="label" id="bay-c-title">Bay C / Syrah</span>
+                <span class="label">Rack 04 / Tier 1</span>
+              </div>
+              <div class="rack">
+                <div class="barrel">
+                  <div class="barrel-top"><span class="coordinate">C-01</span></div>
+                  <span class="lot-code">SY-23-08</span>
+                  <div class="barrel-data"><span>Ullage</span><span class="measure">0.28 L</span></div>
+                </div>
+                <div class="barrel due">
+                  <div class="barrel-top"><span class="coordinate">C-02</span><span class="stop-number">04</span></div>
+                  <span class="lot-code">SY-23-08</span>
+                  <div class="barrel-data"><span>Ullage</span><span class="measure">0.55 L</span></div>
+                  <div class="barrel-data"><span>Free SO2</span><span class="measure">27 mg/L</span></div>
+                </div>
+                <div class="barrel">
+                  <div class="barrel-top"><span class="coordinate">C-03</span></div>
+                  <span class="lot-code">SY-23-08</span>
+                  <div class="barrel-data"><span>Ullage</span><span class="measure">0.34 L</span></div>
+                </div>
+                <div class="barrel">
+                  <div class="barrel-top"><span class="coordinate">C-04</span></div>
+                  <span class="lot-code">SY-23-08</span>
+                  <div class="barrel-data"><span>Ullage</span><span class="measure">0.17 L</span></div>
+                </div>
+              </div>
+            </section>
+
+            <div class="staging">
+              <div>
+                <span class="label">Topping cart staging</span>
+                <p>Three lot-specific vessels, sanitized and assigned before entry.</p>
+              </div>
+              <span class="measure">3 vessels</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bench-footer" aria-label="Route checks">
+        <div><span>Free SO2 range</span><strong>21-27 mg/L</strong></div>
+        <div><span>Route status</span><strong>Ready</strong></div>
+        <div><span>Sanitation check</span><strong>Passed 06:18</strong></div>
+      </div>
+    </section>
+
+    <section class="trace" id="trace" aria-labelledby="trace-title">
+      <div class="shell trace-grid">
+        <h2 id="trace-title">From the press throat to bay B, the lot stays one thread.</h2>
+        <div class="movement-slip" aria-label="Cellar movement docket for lot CH-24-05">
+          <div class="slip-head">
+            <span class="label">Cellar movement docket</span>
+            <span class="artifact-number">CH-24-05</span>
+          </div>
+          <div class="slip-row"><span>Origin</span><span>Press P-02 / south crush pad</span></div>
+          <div class="slip-row"><span>Hose path</span><span>Line C / manifold M2 / north catwalk</span></div>
+          <div class="slip-row"><span>Fermentation</span><span>Tank T-03 / <span class="measure">1,860 L</span></span></div>
+          <div class="slip-row"><span>Aging move</span><span>Bay B / Rack 01 / B-01 to B-04</span></div>
+          <div class="slip-row"><span>Compliance lot</span><span>TTB record 5120.17 / bonded wine premises</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="operations" id="operations" aria-labelledby="operations-title">
+      <div class="shell">
+        <header class="operations-head">
+          <h2 id="operations-title">The cellar record works at cellar speed.</h2>
+          <p>Cellar hands see the next physical move. The winemaker sees chemistry, lot lineage, and paperwork without rebuilding the day from notes.</p>
+        </header>
+        <div class="operations-grid">
+          <article class="operation operation-wide">
+            <span class="label">Harvest desk</span>
+            <h3>Receive fruit, track ferments, and hand off work by vessel.</h3>
+            <p>Scale tickets open the lot. Brix, pH, TA, temperature, additions, and punch-downs stay attached as the wine changes vessels.</p>
+            <div class="operation-data">
+              <span>Start Brix<strong>24.8</strong></span>
+              <span>Day 3 Brix<strong>15.6</strong></span>
+              <span>Day 6 Brix<strong>4.2</strong></span>
+            </div>
+          </article>
+          <article class="operation">
+            <span class="label">Cellar floor</span>
+            <h3>Know what is due before the shift begins.</h3>
+            <p>Filter by tank stage, topping date, work type, or assigned cellar hand.</p>
+          </article>
+          <article class="operation">
+            <span class="label">Winemaker view</span>
+            <h3>Follow one lot through every blend and move.</h3>
+            <p>Parent and child lots retain analyses, additions, losses, and barrel locations.</p>
+          </article>
+          <article class="operation">
+            <span class="label">Paperwork</span>
+            <h3>Keep production records ready for review.</h3>
+            <p>Bond activity, inventory movement, and lot history stay tied to cellar actions.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="closing" id="trial" aria-labelledby="closing-title">
+      <div class="shell closing-inner">
+        <div>
+          <h2 id="closing-title">Start before the first fruit crosses the scale.</h2>
+          <p>Set up vessels, barrel bays, and harvest lots now. Use Cellar &amp; Harvest free through the season.</p>
+        </div>
+        <a class="button" href="/harvest-trial">Start harvest trial</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="shell footer-inner">
+      <span>Cellar &amp; Harvest</span>
+      <span>Working software for independent wineries.</span>
+    </div>
+  </footer>
+</body>
+</html>
