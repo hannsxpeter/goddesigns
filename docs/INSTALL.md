@@ -21,26 +21,6 @@ ln -s "$PWD/goddesigns/skills/goddesign" ~/.agents/skills/goddesign
 
 Older Codex versions read `~/.codex/skills`; link there too if yours does. Invoke with `$goddesign <design brief>`. Codex skills are turn-scoped: re-invoke for each new design task.
 
-## Install from GitHub Packages (alternative)
-
-goddesign is also published as an npm package to GitHub Packages: [`@hannsxpeter/goddesign`](https://github.com/hannsxpeter/goddesigns/pkgs/npm/goddesign). This is a convenience mirror, not the recommended path: GitHub Packages requires npm to authenticate with a GitHub token (scope `read:packages`) even for a public package, so the `git clone` method above is simpler for most people.
-
-Point the `@hannsxpeter` scope at GitHub Packages and authenticate, in your `~/.npmrc`:
-
-```
-@hannsxpeter:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=YOUR_GITHUB_TOKEN
-```
-
-Then install and link the skill into your host directories:
-
-```sh
-npm install -g @hannsxpeter/goddesign
-goddesign-install
-```
-
-`goddesign-install` symlinks the packaged skill into `~/.claude/skills`, `~/.agents/skills`, and `~/.codex/skills` (skipping any that already exist), so a `git pull`-free update path is `npm update -g @hannsxpeter/goddesign`.
-
 ## Verify the install
 
 The skill is only as good as its reference decks; a partial install (a broken symlink, a half-cloned tree) lets the model improvise missing rows, which recreates the generic look the skill exists to avoid. Confirm a complete install with:
