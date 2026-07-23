@@ -31,9 +31,30 @@ sh skills/goddesign/scripts/verify-install.sh
 
 It prints `goddesign: install OK` and exits 0 when `SKILL.md` and the seven `references/*.md` decks are present, or `INCOMPLETE INSTALL: <file> not found` and exits 1 otherwise (optional scripts and files are reported as notes, not failures). Hosts without a shell get the same protection lazily: the skill stops with the same message at Step 3 if a deck it needs cannot be read.
 
+The skill also inventories known agent commands before a run:
+
+```sh
+sh skills/goddesign/scripts/detect-clis.sh
+```
+
+The tab-separated result distinguishes agent commands such as `codex`, `claude`, and `cursor-agent` from desktop launchers such as `cursor`. It also checks Gemini CLI, OpenCode, Aider, Goose, GitHub Copilot, Amp, Amazon Q, Kiro, and Factory Droid. Detection means only that the command exists on `PATH`; authentication and capability are verified when a documented helper actually invokes it.
+
 ## Other agent CLIs
 
 Any host that loads markdown skills with `name` and `description` frontmatter can run goddesign; only that minimal frontmatter is used, deliberately. Point your host's skill directory at `skills/goddesign`.
+
+The detected tools are optional capabilities, not requirements. The skill does
+not depend on one editor, agent, model vendor, deployment platform, account,
+domain, DNS configuration, or network service. When a host lacks an optional
+capability, the documented fallback or an honest `DEGRADED` note applies.
+
+One capable host is the complete default setup. The inventory never launches a
+second host by itself. Cross-host work runs only when the design brief
+explicitly asks for comparison, replication, or compatibility testing across
+hosts. Merely naming the current host does not opt in. Named maintainer
+validation protocols are the only non-prompt exception. If requested
+cross-host scope is unavailable, report that limitation separately without
+lowering the design's QA score.
 
 ## Optional dependencies
 

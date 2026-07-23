@@ -1,3 +1,8 @@
 .DS_Store
 node_modules/
 *.log
+.playwright-mcp/
+.playwright-cli/
+output/playwright/
+validation/studies/study-a-2026-07/sealed/
+validation/studies/study-a-2026-07/work/

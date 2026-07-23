@@ -1,0 +1,101 @@
+{
+  "study": "goddesign-study-a-2026-07",
+  "frozen_at": "2026-07-23T00:00:00-04:00",
+  "capture_viewport": {
+    "width": 1280,
+    "height": 900,
+    "full_page": true
+  },
+  "models": {
+    "codex": {
+      "model": "gpt-5.6-sol",
+      "effort": "xhigh"
+    },
+    "claude": {
+      "model": "claude-fable-5",
+      "effort": "xhigh"
+    }
+  },
+  "briefs": [
+    {
+      "id": "B01",
+      "host": "codex",
+      "category": "saas-analytics",
+      "human_url": "https://plausible.io/",
+      "human_match": "Plausible Analytics, a live privacy-first web analytics product site.",
+      "brief": "Build a production-quality single-file index.html marketing page for Northstar Signal, a privacy-first web analytics product for small software teams. Include a compact nav, a hero that drives Start a free trial, one concrete analytics product artifact, feature proof, transparent pricing without invented customer claims, a trust surface naming data ownership and support, and a footer. The page must work at 375, 768, and 1280 pixels."
+    },
+    {
+      "id": "B02",
+      "host": "claude",
+      "category": "photographer-portfolio",
+      "human_url": "https://joeyl.com/",
+      "human_match": "Joey L., a live professional photographer and director portfolio.",
+      "brief": "Build a production-quality single-file index.html portfolio for Mara Venn, a documentary photographer working across portraits, field reporting, and long-form commissions. Include image-led work, a short biography, selected project context, publication availability, contact details, and one clear inquiry action. Do not invent awards, clients, or testimonials. The page must work at 375, 768, and 1280 pixels."
+    },
+    {
+      "id": "B03",
+      "host": "codex",
+      "category": "single-product-commerce",
+      "human_url": "https://fellowproducts.com/products/stagg-ekg-electric-pour-over-kettle",
+      "human_match": "Fellow Stagg EKG, a live single-product commerce page for a physical kettle.",
+      "brief": "Build a production-quality single-file index.html product page for Rill One, a precision electric pour-over kettle. Include a strong product presentation, price of $179, color selection, quantity, Add to cart, the temperature and hold controls shown in use, material and care details, shipping and returns, and a support contact. Do not invent reviews, press logos, or scarcity. The page must work at 375, 768, and 1280 pixels."
+    },
+    {
+      "id": "B04",
+      "host": "claude",
+      "category": "developer-documentation",
+      "human_url": "https://docs.astro.build/en/getting-started/",
+      "human_match": "Astro documentation, a live developer-tool documentation site.",
+      "brief": "Build a production-quality single-file index.html documentation landing page for Pinion, a command-line tool that validates release manifests before deployment. Include documentation navigation, a working search control, installation commands, a first validation example with output, configuration reference links, error and empty search states, version information, and a GitHub link. Drive the reader to run the first command. The page must work at 375, 768, and 1280 pixels."
+    },
+    {
+      "id": "B05",
+      "host": "codex",
+      "category": "conference-event",
+      "human_url": "https://smashingconf.com/freiburg-2026/",
+      "human_match": "SmashingConf Freiburg 2026, a live professional two-day conference site.",
+      "brief": "Build a production-quality single-file index.html event page for Field Notes Summit, a two-day conference in Toronto for people who research and build public-interest technology. Dates are October 8-9, 2026 at Evergreen Brick Works. Include the event premise, a two-day program with named session topics but no fabricated celebrity speakers, venue and accessibility details, ticket tiers, code of conduct, contact information, and a Register action. The page must work at 375, 768, and 1280 pixels."
+    },
+    {
+      "id": "B06",
+      "host": "claude",
+      "category": "restaurant-reservation",
+      "human_url": "https://barisabel.com/",
+      "human_match": "Bar Isabel, a live independent restaurant site.",
+      "brief": "Build a production-quality single-file index.html site for Morrow Table, a 34-seat Toronto restaurant serving a short seasonal menu after 5pm. Include the current sample menu with honest placeholder labeling where prices are unknown, hours, location, dietary and accessibility notes, reservation policy, contact details, and a Reserve a table action. Do not invent awards, reviews, or suppliers. The page must work at 375, 768, and 1280 pixels."
+    },
+    {
+      "id": "B07",
+      "host": "codex",
+      "category": "nonprofit-donation",
+      "human_url": "https://www.charitywater.org/",
+      "human_match": "charity: water, a live nonprofit donation site.",
+      "brief": "Build a production-quality single-file index.html campaign page for Clearwell Fund, a registered community fund replacing lead service lines in older rental buildings. Include a concrete explanation of the work, how grants are approved, a transparent use-of-funds breakdown without invented impact numbers, governance and contact details, recurring and one-time donation controls, privacy language, and a Donate action. The page must work at 375, 768, and 1280 pixels."
+    },
+    {
+      "id": "B08",
+      "host": "claude",
+      "category": "boutique-hotel",
+      "human_url": "https://thelakesidemotel.com/",
+      "human_match": "The Lakeside Motel, a live lakeside boutique hotel site in Prince Edward County.",
+      "brief": "Build a production-quality single-file index.html booking page for Drift House, a 22-room lakeside hotel in Prince Edward County. Include room types with honest nightly prices, arrival and departure controls, availability loading, empty, and error states, property details, accessibility, cancellation terms, local contact information, and a Check availability action. Do not invent guest reviews or press logos. The page must work at 375, 768, and 1280 pixels."
+    },
+    {
+      "id": "B09",
+      "host": "codex",
+      "category": "fitness-membership",
+      "human_url": "https://www.soul-cycle.com/",
+      "human_match": "SoulCycle, a live fitness studio booking site.",
+      "brief": "Build a production-quality single-file index.html site for Southpaw Movement, an independent strength and mobility studio in Toronto. Include a class schedule artifact, coach and approach information without invented credentials, membership and drop-in prices, first-visit guidance, accessibility and injury-modification notes, contact details, and a Book a class action. The page must work at 375, 768, and 1280 pixels."
+    },
+    {
+      "id": "B10",
+      "host": "claude",
+      "category": "independent-magazine",
+      "human_url": "https://www.theparisreview.org/",
+      "human_match": "The Paris Review, a live independent literary magazine site.",
+      "brief": "Build a production-quality single-file index.html home page for Current Review, an independent quarterly magazine of essays, interviews, photography, and criticism. Include a current issue lead, a varied article index, archive access, contributor information, print and digital subscription options, editorial contact and masthead links, and a Subscribe action. Do not invent readership numbers, famous contributors, or endorsements. The page must work at 375, 768, and 1280 pixels."
+    }
+  ]
+}

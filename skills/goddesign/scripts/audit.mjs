@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // goddesign Phase 3 audit: measures what eyeballing misses.
-// Usage: node audit.mjs <path-to-index.html> [more.html ...]
+// Usage: node audit.mjs <path-or-http-url> [more targets ...]
 // Exit codes: 0 = green, 1 = named failures found, 2 = playwright lib unavailable (fall back to the screenshot chain).
 import { execSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
@@ -33,8 +33,8 @@ if (!pw) {
   process.exit(2);
 }
 
-const files = process.argv.slice(2);
-if (!files.length) { console.error('usage: node audit.mjs <index.html> [...]'); process.exit(2); }
+const targets = process.argv.slice(2);
+if (!targets.length) { console.error('usage: node audit.mjs <index.html-or-http-url> [...]'); process.exit(2); }
 const VIEWPORTS = [{ w: 375, h: 812 }, { w: 768, h: 1024 }, { w: 1280, h: 900 }];
 
 const IN_PAGE = () => {
@@ -113,15 +113,17 @@ try {
 }
 const results = [];
 let failures = 0;
-for (const file of files) {
-  const url = pathToFileURL(resolve(file)).href;
+for (const target of targets) {
+  const url = /^https?:\/\//i.test(target)
+    ? target
+    : pathToFileURL(resolve(target)).href;
   for (const vp of VIEWPORTS) {
     const page = await browser.newPage({ viewport: { width: vp.w, height: vp.h } });
     await page.goto(url, { waitUntil: 'load' });
     try { await page.evaluate(() => document.fonts.ready); } catch {}
     await page.waitForTimeout(1700); // past the 1500ms reveal-timeout guard; unguarded reveals stay hidden and get caught
     const r = await page.evaluate(IN_PAGE);
-    r.file = file; r.viewport = `${vp.w}x${vp.h}`;
+    r.file = target; r.viewport = `${vp.w}x${vp.h}`;
     const fail = r.overflowX || r.hiddenText.length || r.overlaps.length || r.fontIssues.length || (vp.w === 375 && r.smallTargets.length);
     if (fail) failures++;
     results.push(r);

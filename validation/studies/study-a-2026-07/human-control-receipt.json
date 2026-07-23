@@ -1,0 +1,81 @@
+{
+  "study": "goddesign-study-a-2026-07",
+  "scope": "frozen live human-control arm",
+  "status": "complete",
+  "controls": 10,
+  "http_200": 10,
+  "captures": [
+    {
+      "brief_id": "B01",
+      "final_url": "https://plausible.io/",
+      "captured_at": "2026-07-23T04:29:10.469Z",
+      "rendered_html_sha256": "58d63b5af068d795c945d7912fdff0f37cea3e8a32e8c6f1f2c83f16b4eb488c",
+      "png_sha256": "31c3993abcbd09b658227e42a2c12c8030e81503c6fa9c9f5af2536f20972cf7"
+    },
+    {
+      "brief_id": "B02",
+      "final_url": "https://joeyl.com/overview/category/quick-portfolio",
+      "captured_at": "2026-07-23T04:30:23.098Z",
+      "rendered_html_sha256": "50806ec88e2549f1f305dcf9739160bd8464c365c24606ef78e354dcbea7f6f8",
+      "png_sha256": "8f0a29984078721d0aca12d853bd6b7cfc6baadb8fd930365aa35a126421395d"
+    },
+    {
+      "brief_id": "B03",
+      "final_url": "https://fellowproducts.com/products/stagg-ekg-electric-pour-over-kettle",
+      "captured_at": "2026-07-23T05:30:16.242Z",
+      "dismissed_consent": "#onetrust-accept-btn-handler",
+      "rendered_html_sha256": "6d34d44c6507728afa97704604ef8d2ef889e55e29576044ee0ca3e168dbd1ac",
+      "png_sha256": "0be339ffd3c74ad7673f35c4fc1b6f4c8d0e62a5275c823dc6b81ad5937cb7da"
+    },
+    {
+      "brief_id": "B04",
+      "final_url": "https://docs.astro.build/en/getting-started/",
+      "captured_at": "2026-07-23T04:29:20.768Z",
+      "rendered_html_sha256": "0a9cccf20f933d5e9cf2a3f0b1b2193050d15bcdcadf11ad072e278651d91d47",
+      "png_sha256": "285861fdb64043f236d6b5fcd60188aed9b07f0a8c4d6d976ccb3c86c2daa7cc"
+    },
+    {
+      "brief_id": "B05",
+      "final_url": "https://smashingconf.com/freiburg-2026/",
+      "captured_at": "2026-07-23T05:30:28.301Z",
+      "rendered_html_sha256": "3ec4a7bee89aa653cb534db5658cde1ae23f4185cd0f9039b5a26b647c143ce2",
+      "png_sha256": "9eeef06714eb8478aa27fdd2326f51de75b0df32d20ac1a21f9b945169ac585f"
+    },
+    {
+      "brief_id": "B06",
+      "final_url": "https://barisabel.com/",
+      "captured_at": "2026-07-23T04:29:27.150Z",
+      "rendered_html_sha256": "0c913bd70c53916bbb3216df5a348f007de9abc584abc42f5cc04983d0e8f65c",
+      "png_sha256": "6628b11d4e1d2773110e1b6ae77eaba672e2fa23638b349229e0098aeeebc5a3"
+    },
+    {
+      "brief_id": "B07",
+      "final_url": "https://www.charitywater.org/",
+      "captured_at": "2026-07-23T05:31:58.224Z",
+      "rendered_html_sha256": "cb5a7a21ee306e67da4f22056cddb0086c54667487710e9e6a8528ef19ed07c1",
+      "png_sha256": "b61823b71a58f6da6184706fc2c0aaa7fa4cbe0a36c71a9929a4ba15bf4fc879"
+    },
+    {
+      "brief_id": "B08",
+      "final_url": "https://thelakesidemotel.com/",
+      "captured_at": "2026-07-23T05:35:17.746Z",
+      "dismissed_consent": ".sqs-cookie-banner-v2-accept",
+      "rendered_html_sha256": "d1e8bc1acaf262b6192b0061a1320eb619be7a30f8b6bb58ac0025d6daaa38cf",
+      "png_sha256": "bb2fa6a5b74a7379e2822704f294c2dbf0205d83e624b1a3543f3abbfcdc055d"
+    },
+    {
+      "brief_id": "B09",
+      "final_url": "https://www.soul-cycle.com/",
+      "captured_at": "2026-07-23T04:29:38.336Z",
+      "rendered_html_sha256": "f2fa42509a20bf14106081fcc1da13654f504f0ff89e2bf7be039999b70ba93c",
+      "png_sha256": "0fd2a8a35a3957be966b6b1fcbe159a0c3c558f727bb5172e3f041c2273afa96"
+    },
+    {
+      "brief_id": "B10",
+      "final_url": "https://www.theparisreview.org/",
+      "captured_at": "2026-07-23T05:35:23.307Z",
+      "rendered_html_sha256": "da08af8d75552cb8a5cb46f25950b436507821b2bb15fe6028b70e692d0a3485",
+      "png_sha256": "23b5a512dd98588154c72f1bfec37581487f4f4c0fa256771f8d36c3f81fb631"
+    }
+  ]
+}

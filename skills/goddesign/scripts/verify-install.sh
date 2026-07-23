@@ -15,7 +15,7 @@ root=$(CDPATH= cd -- "$script_dir/.." && pwd)
 required="SKILL.md references/directions.md references/layouts.md references/palettes.md references/fonts.md references/motion.md references/imagery.md references/checklist.md"
 
 # Optional files: the run degrades honestly without them (audit, imagery, blind read).
-optional="scripts/audit.mjs scripts/codex-audit-loop.sh scripts/genimage.sh scripts/blind-read.sh references/blind-read.md references/genome-sources.md"
+optional="scripts/audit.mjs scripts/codex-audit-loop.sh scripts/detect-clis.sh scripts/genimage.sh scripts/blind-read.sh references/blind-read.md references/genome-sources.md"
 
 missing=0
 for f in $required; do
