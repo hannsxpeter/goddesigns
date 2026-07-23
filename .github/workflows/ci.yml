@@ -1,0 +1,29 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: install integrity
+        run: sh skills/goddesign/scripts/verify-install.sh
+      - name: CLI inventory smoke
+        run: sh -n skills/goddesign/scripts/detect-clis.sh && sh skills/goddesign/scripts/detect-clis.sh
+      - name: deck lint
+        run: node scripts/lint-decks.mjs
+      - name: study tooling tests
+        run: node --test scripts/study-a.test.mjs
+      - name: rater application
+        working-directory: study-a-rater
+        run: |
+          npm ci
+          npm run lint
+          npm test
+          npm audit --audit-level=high

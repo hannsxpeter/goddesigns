@@ -2,11 +2,18 @@
 
 [![Release](https://img.shields.io/github/v/release/hannsxpeter/goddesigns)](https://github.com/hannsxpeter/goddesigns/releases)
 [![License: MIT](https://img.shields.io/github/license/hannsxpeter/goddesigns)](LICENSE)
-[![Hosts](https://img.shields.io/badge/hosts-Claude%20Code%20%7C%20Codex%20CLI-blue)](docs/INSTALL.md)
-[![Validation](https://img.shields.io/badge/validation-7%2F7%20skill%20runs%20green-success)](validation/archive/2026-07-kilnhouse/kilnhouse-2026-07.md)
-[![Evidence](https://img.shields.io/badge/evidence-346%20sourced%20comments-informational)](validation/sentiment-evidence-2026-07.md)
+[![Hosts](https://img.shields.io/badge/hosts-agnostic-blue)](docs/INSTALL.md)
+[![Validation](https://img.shields.io/badge/validation-7%2F7%20skill%20runs%20green-success)](validation/runs/kilnhouse-2026-07/README.md)
+[![Evidence](https://img.shields.io/badge/evidence-346%20sourced%20comments-informational)](validation/research/sentiment-evidence-2026-07.md)
 
-A cross-agent frontend design skill that produces distinctive, production-grade UI instead of recognizable AI slop. One skill, two model lanes: it runs identically in Claude Code (`/goddesign`) and OpenAI Codex CLI (`$goddesign`).
+A host-agnostic frontend design skill that produces distinctive,
+production-grade UI instead of recognizable AI slop. One skill, two model
+lanes: it is proven on Claude Code (`/goddesign`) and OpenAI Codex CLI
+(`$goddesign`), and any host that loads minimal markdown skill frontmatter can
+run it. One capable host is sufficient for a complete, fully scored design
+run. Cross-host work happens only when the prompt asks for comparison,
+replication, or compatibility testing, or when a maintainer protocol requires
+it.
 
 ## Why this exists
 
@@ -43,17 +50,38 @@ Then invoke `/goddesign <brief>` in Claude Code or `$goddesign <brief>` in Codex
 | `skills/goddesign/references/` | The decks: 17 directions (including the first human-genome row), 12 layouts, 10 palettes, 12 font pairings, motion recipes, imagery rules, the QA gate |
 | `skills/goddesign/scripts/audit.mjs` | Measured visual audit: collisions, reveal bugs, font fallbacks, overflow, touch targets |
 | `skills/goddesign/scripts/codex-audit-loop.sh` | Operator wrapper for sandboxed Codex: build inside the sandbox, audit outside, feed failures back into the same session |
+| `skills/goddesign/scripts/detect-clis.sh` | Presence-only inventory of known agent CLIs, including distinct Cursor Agent and Cursor editor entries |
 | `skills/goddesign/scripts/genimage.sh` | Cross-host image generation: hosts without native image tools delegate to an installed image-capable CLI |
 | `skills/goddesign/scripts/verify-install.sh` | Install-integrity check: fails loud if a deck is missing rather than letting the model improvise it |
 | `skills/goddesign/scripts/blind-read.sh` | Optional blind post-render critic: a separate process reads only the screenshots and reconstructs the page's identity |
-| `validation/` | Every claim's receipts: run artifacts, screenshots, the sentiment study, and the refresh protocol |
+| [`validation/`](validation/README.md) | Indexed evidence library: research, protocols, experiments, comparative runs, studies, and tools |
 | `docs/` | Install guide, architecture, contributing |
 
 ## Validation
 
-Seven skill runs on one brief produced seven fully distinct, gate-passing directions (terminal letter, Swiss manifesto, luxury serif, machine-room data-dense, editorial print, art deco dashboard, chartreuse signup) while three unskilled baseline runs reproduced the catalogued failures, including two pages that render completely blank in static capture due to scroll-reveal bugs. The audit script caught defects human review missed. Full evidence with screenshots: [validation/archive/2026-07-kilnhouse/kilnhouse-2026-07.md](validation/archive/2026-07-kilnhouse/kilnhouse-2026-07.md).
+Seven skill runs on one brief produced seven fully distinct, gate-passing directions (terminal letter, Swiss manifesto, luxury serif, machine-room data-dense, editorial print, art deco dashboard, chartreuse signup) while three unskilled baseline runs reproduced the catalogued failures, including two pages that render completely blank in static capture due to scroll-reveal bugs. The audit script caught defects human review missed. Full evidence with screenshots: [validation/runs/kilnhouse-2026-07/README.md](validation/runs/kilnhouse-2026-07/README.md).
 
-The tells catalog is a living artifact. The repeatable method for refreshing it against current public discourse is documented in [validation/sentiment-refresh-protocol.md](validation/sentiment-refresh-protocol.md).
+The tells catalog is a living artifact. The repeatable method for refreshing it against current public discourse is documented in [validation/protocols/sentiment-refresh-protocol.md](validation/protocols/sentiment-refresh-protocol.md).
+
+Everything above is author-run validation, which proves the machinery rotates, not that outside judges agree. The pre-registered external studies that test the core claim (blind identification by 20+ outside raters, a five-brief matrix, cross-model replication), with bars fixed in advance and results published either way, live in [validation/protocols/external-validation-protocol.md](validation/protocols/external-validation-protocol.md).
+
+Study A generation is complete: all 10 live human controls are captured and
+hashed, and all 10 frozen generated brief pairs are complete across Codex and
+Claude Code. Each host has 5 green skill audits, 5 same-model baselines
+executed in neutral temporary workspaces, and 5 distinct direction rows. The
+30-sample anonymized corpus and balanced 40-slot rater pack are frozen.
+See [the human-control receipt](validation/studies/study-a-2026-07/human-control-receipt.json)
+along with the [Codex replication receipt](validation/studies/study-a-2026-07/codex-replication-receipt.json)
+and [Claude replication receipt](validation/studies/study-a-2026-07/claude-replication-receipt.json).
+The 20 outside-rater responses are not complete, so this is not yet external
+validation and the evidence badge remains unchanged. The
+[Study A completion audit](validation/studies/study-a-2026-07/completion-audit.md)
+records the requirement-by-requirement state.
+
+After scoring closes, the analyzer emits a hash-sealed publication bundle and
+re-runs from its own de-identified public rows. Private submission IDs remain
+in a sealed integrity file, while deterministic recurring terms from
+goddesign AI-yes reasons become the next recalibration input.
 
 ## Documentation
 

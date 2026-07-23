@@ -1,6 +1,6 @@
 # Seam-1 experiment: does a seeded subject-vantage beat the in-context Subject test? 2026-07-22
 
-Origin: the ADHD evaluation (`validation/adhd-evaluation-2026-07.md`) surfaced four native leverage seams. Seam 1, the highest-value one, is the hypothesis that goddesign's Subject test (`skills/goddesign/SKILL.md` Step 4b) would produce a more distinctive signature if the subject's world were mined from a seeded vantage before the aesthetic deck is read, instead of chosen once in-context with no candidate set. This is the first controlled test of that hypothesis. Nothing here has been shipped into the skill.
+Origin: the ADHD evaluation (`validation/research/adhd-evaluation-2026-07.md`) surfaced four native leverage seams. Seam 1, the highest-value one, is the hypothesis that goddesign's Subject test (`skills/goddesign/SKILL.md` Step 4b) would produce a more distinctive signature if the subject's world were mined from a seeded vantage before the aesthetic deck is read, instead of chosen once in-context with no candidate set. This is the first controlled test of that hypothesis. Nothing here has been shipped into the skill.
 
 ## Method: a controlled A/B with form held constant
 
@@ -37,7 +37,7 @@ The juror ranked Arm B first, reasoning that the spatial operations diagram is "
 
 ## Weight and limitations
 
-This is one data point, not proof, and it is deliberately reported as such. One subject, one sample per arm, one juror, and the juror is a model of the same family as the builders, the exact methodological weakness this project charged against ADHD's own benchmark (`validation/adhd-evaluation-2026-07.md`, "The benchmark"). The embodiment scores were within 0.2, so the control is not weak; it is excellent, and the vantage arm won on distinctiveness alone. The experiment ran on the Codex host only: the no-shell index fallback and a Claude-host arm are untested, and generalization across other subjects and directions is untested. Per the seam's own kill criterion, the decider is the owner's blind ranking, not the proxy juror's.
+This is one data point, not proof, and it is deliberately reported as such. One subject, one sample per arm, one juror, and the juror is a model of the same family as the builders, the exact methodological weakness this project charged against ADHD's own benchmark (`validation/research/adhd-evaluation-2026-07.md`, "The benchmark"). The embodiment scores were within 0.2, so the control is not weak; it is excellent, and the vantage arm won on distinctiveness alone. The experiment ran on the Codex host only: the no-shell index fallback and a Claude-host arm are untested, and generalization across other subjects and directions is untested. Per the seam's own kill criterion, the decider is the owner's blind ranking, not the proxy juror's.
 
 ## Decision gate
 

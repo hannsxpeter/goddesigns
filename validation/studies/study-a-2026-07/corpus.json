@@ -1,0 +1,604 @@
+{
+  "study": "goddesign-study-a-2026-07",
+  "frozen_at": "2026-07-23T00:00:00-04:00",
+  "built_at": "2026-07-23T08:39:03.078Z",
+  "capture_viewport": {
+    "width": 1280,
+    "height": 900,
+    "full_page": true
+  },
+  "samples": [
+    {
+      "brief_id": "B01",
+      "arm": "goddesign",
+      "host": "codex",
+      "model": "gpt-5.6-sol",
+      "direction": "Industrial",
+      "audit": {
+        "status": "green",
+        "cycles": 1
+      },
+      "captured_at": "2026-07-23T04:50:26.373Z",
+      "html": "work/generated/B01-goddesign/index.html",
+      "png": "work/generated/B01-goddesign/capture/page.png"
+    },
+    {
+      "brief_id": "B01",
+      "arm": "baseline",
+      "host": "codex",
+      "model": "gpt-5.6-sol",
+      "direction": "",
+      "audit": {
+        "status": "not-applicable",
+        "cycles": 0
+      },
+      "captured_at": "2026-07-23T07:12:11.297Z",
+      "html": "work/generated/B01-baseline/index.html",
+      "png": "work/generated/B01-baseline/capture/page.png"
+    },
+    {
+      "brief_id": "B01",
+      "arm": "human",
+      "host": "human",
+      "model": "",
+      "direction": "",
+      "audit": "not-applicable",
+      "source_url": "https://plausible.io/",
+      "captured_at": "2026-07-23T04:29:10.469Z",
+      "html": "work/human/B01/page.html",
+      "png": "work/human/B01/page.png",
+      "capture": {
+        "kind": "human",
+        "source": "https://plausible.io/",
+        "final_url": "https://plausible.io/",
+        "http_status": 200,
+        "captured_at": "2026-07-23T04:29:10.469Z",
+        "started_at": "2026-07-23T04:29:07.389Z",
+        "title": "Plausible Analytics | Simple, privacy-friendly Google Analytics alternative",
+        "generator": "Jekyll v3.9.2",
+        "page_width": 1280,
+        "page_height": 6405,
+        "dismissed_consent": "",
+        "html_sha256": "58d63b5af068d795c945d7912fdff0f37cea3e8a32e8c6f1f2c83f16b4eb488c",
+        "png_sha256": "31c3993abcbd09b658227e42a2c12c8030e81503c6fa9c9f5af2536f20972cf7",
+        "mhtml_sha256": "553a0a737a84c653453b9e3b193ca2fd0bebdca23125c995770bf3d03096c0b9",
+        "browser": "playwright-chromium",
+        "viewport": "1280x900 full-page",
+        "reduced_motion": true
+      }
+    },
+    {
+      "brief_id": "B02",
+      "arm": "goddesign",
+      "host": "claude",
+      "model": "claude-fable-5",
+      "direction": "Brutalist Raw",
+      "audit": {
+        "status": "green",
+        "cycles": 1
+      },
+      "captured_at": "2026-07-23T06:53:06.690Z",
+      "html": "work/generated/B02-goddesign/index.html",
+      "png": "work/generated/B02-goddesign/capture/page.png"
+    },
+    {
+      "brief_id": "B02",
+      "arm": "baseline",
+      "host": "claude",
+      "model": "claude-fable-5",
+      "direction": "",
+      "audit": {
+        "status": "not-applicable",
+        "cycles": 0
+      },
+      "captured_at": "2026-07-23T07:27:37.326Z",
+      "html": "work/generated/B02-baseline/index.html",
+      "png": "work/generated/B02-baseline/capture/page.png"
+    },
+    {
+      "brief_id": "B02",
+      "arm": "human",
+      "host": "human",
+      "model": "",
+      "direction": "",
+      "audit": "not-applicable",
+      "source_url": "https://joeyl.com/overview/category/quick-portfolio",
+      "captured_at": "2026-07-23T04:30:23.098Z",
+      "html": "work/human/B02/page.html",
+      "png": "work/human/B02/page.png",
+      "capture": {
+        "kind": "human",
+        "source": "https://joeyl.com/",
+        "final_url": "https://joeyl.com/overview/category/quick-portfolio",
+        "http_status": 200,
+        "captured_at": "2026-07-23T04:30:23.098Z",
+        "started_at": "2026-07-23T04:30:18.077Z",
+        "title": "Joey L. - NYC-based Photographer and Director ",
+        "generator": "",
+        "page_width": 1280,
+        "page_height": 7802,
+        "dismissed_consent": "",
+        "html_sha256": "50806ec88e2549f1f305dcf9739160bd8464c365c24606ef78e354dcbea7f6f8",
+        "png_sha256": "8f0a29984078721d0aca12d853bd6b7cfc6baadb8fd930365aa35a126421395d",
+        "mhtml_sha256": "8c4f5130394c14d9e187591b82489a18fe0f968fc9c8debded3ffdeb75f2e5ba",
+        "browser": "playwright-chromium",
+        "viewport": "1280x900 full-page",
+        "reduced_motion": true
+      }
+    },
+    {
+      "brief_id": "B03",
+      "arm": "goddesign",
+      "host": "codex",
+      "model": "gpt-5.6-sol",
+      "direction": "Editorial Magazine",
+      "audit": {
+        "status": "green",
+        "cycles": 1
+      },
+      "captured_at": "2026-07-23T05:12:58.317Z",
+      "html": "work/generated/B03-goddesign/index.html",
+      "png": "work/generated/B03-goddesign/capture/page.png"
+    },
+    {
+      "brief_id": "B03",
+      "arm": "baseline",
+      "host": "codex",
+      "model": "gpt-5.6-sol",
+      "direction": "",
+      "audit": {
+        "status": "not-applicable",
+        "cycles": 0
+      },
+      "captured_at": "2026-07-23T07:23:34.729Z",
+      "html": "work/generated/B03-baseline/index.html",
+      "png": "work/generated/B03-baseline/capture/page.png"
+    },
+    {
+      "brief_id": "B03",
+      "arm": "human",
+      "host": "human",
+      "model": "",
+      "direction": "",
+      "audit": "not-applicable",
+      "source_url": "https://fellowproducts.com/products/stagg-ekg-electric-pour-over-kettle",
+      "captured_at": "2026-07-23T05:30:16.242Z",
+      "html": "work/human/B03/page.html",
+      "png": "work/human/B03/page.png",
+      "capture": {
+        "kind": "human",
+        "source": "https://fellowproducts.com/products/stagg-ekg-electric-pour-over-kettle",
+        "final_url": "https://fellowproducts.com/products/stagg-ekg-electric-pour-over-kettle",
+        "http_status": 200,
+        "captured_at": "2026-07-23T05:30:16.242Z",
+        "started_at": "2026-07-23T05:30:08.895Z",
+        "title": "Stagg ‎EKG Electric Kettle | Stagg Pro & Pro Studio",
+        "generator": "",
+        "page_width": 1280,
+        "page_height": 9730,
+        "dismissed_consent": "#onetrust-accept-btn-handler",
+        "html_sha256": "6d34d44c6507728afa97704604ef8d2ef889e55e29576044ee0ca3e168dbd1ac",
+        "png_sha256": "0be339ffd3c74ad7673f35c4fc1b6f4c8d0e62a5275c823dc6b81ad5937cb7da",
+        "mhtml_sha256": "616243b098b9d1981224c1d0a69344fe55cd339984763b0a6d6f809163c9c480",
+        "browser": "playwright-chromium",
+        "viewport": "1280x900 full-page",
+        "reduced_motion": true
+      }
+    },
+    {
+      "brief_id": "B04",
+      "arm": "goddesign",
+      "host": "claude",
+      "model": "claude-fable-5",
+      "direction": "Cinematic Dark",
+      "audit": {
+        "status": "green",
+        "cycles": 1
+      },
+      "captured_at": "2026-07-23T07:09:44.260Z",
+      "html": "work/generated/B04-goddesign/index.html",
+      "png": "work/generated/B04-goddesign/capture/page.png"
+    },
+    {
+      "brief_id": "B04",
+      "arm": "baseline",
+      "host": "claude",
+      "model": "claude-fable-5",
+      "direction": "",
+      "audit": {
+        "status": "not-applicable",
+        "cycles": 0
+      },
+      "captured_at": "2026-07-23T07:35:45.988Z",
+      "html": "work/generated/B04-baseline/index.html",
+      "png": "work/generated/B04-baseline/capture/page.png"
+    },
+    {
+      "brief_id": "B04",
+      "arm": "human",
+      "host": "human",
+      "model": "",
+      "direction": "",
+      "audit": "not-applicable",
+      "source_url": "https://docs.astro.build/en/getting-started/",
+      "captured_at": "2026-07-23T04:29:20.768Z",
+      "html": "work/human/B04/page.html",
+      "png": "work/human/B04/page.png",
+      "capture": {
+        "kind": "human",
+        "source": "https://docs.astro.build/en/getting-started/",
+        "final_url": "https://docs.astro.build/en/getting-started/",
+        "http_status": 200,
+        "captured_at": "2026-07-23T04:29:20.768Z",
+        "started_at": "2026-07-23T04:29:18.259Z",
+        "title": "Getting started | Docs",
+        "generator": "Astro v7.0.2",
+        "page_width": 1280,
+        "page_height": 2315,
+        "dismissed_consent": "",
+        "html_sha256": "0a9cccf20f933d5e9cf2a3f0b1b2193050d15bcdcadf11ad072e278651d91d47",
+        "png_sha256": "285861fdb64043f236d6b5fcd60188aed9b07f0a8c4d6d976ccb3c86c2daa7cc",
+        "mhtml_sha256": "cb22a908fdb9593add69143d2ac6dd27c4441f81525926a2f0a020c3dc305cd1",
+        "browser": "playwright-chromium",
+        "viewport": "1280x900 full-page",
+        "reduced_motion": true
+      }
+    },
+    {
+      "brief_id": "B05",
+      "arm": "goddesign",
+      "host": "codex",
+      "model": "gpt-5.6-sol",
+      "direction": "Swiss International",
+      "audit": {
+        "status": "green",
+        "cycles": 1
+      },
+      "captured_at": "2026-07-23T05:35:17.853Z",
+      "html": "work/generated/B05-goddesign/index.html",
+      "png": "work/generated/B05-goddesign/capture/page.png"
+    },
+    {
+      "brief_id": "B05",
+      "arm": "baseline",
+      "host": "codex",
+      "model": "gpt-5.6-sol",
+      "direction": "",
+      "audit": {
+        "status": "not-applicable",
+        "cycles": 0
+      },
+      "captured_at": "2026-07-23T07:32:26.691Z",
+      "html": "work/generated/B05-baseline/index.html",
+      "png": "work/generated/B05-baseline/capture/page.png"
+    },
+    {
+      "brief_id": "B05",
+      "arm": "human",
+      "host": "human",
+      "model": "",
+      "direction": "",
+      "audit": "not-applicable",
+      "source_url": "https://smashingconf.com/freiburg-2026/",
+      "captured_at": "2026-07-23T05:30:28.301Z",
+      "html": "work/human/B05/page.html",
+      "png": "work/human/B05/page.png",
+      "capture": {
+        "kind": "human",
+        "source": "https://smashingconf.com/freiburg-2026/",
+        "final_url": "https://smashingconf.com/freiburg-2026/",
+        "http_status": 200,
+        "captured_at": "2026-07-23T05:30:28.301Z",
+        "started_at": "2026-07-23T05:30:24.669Z",
+        "title": "SmashingConf 2026, September 7–10 — Friendly, inclusive, practical event for web designers and developers. — Freiburg in Germany, September 7–10.",
+        "generator": "",
+        "page_width": 1280,
+        "page_height": 6733,
+        "dismissed_consent": "",
+        "html_sha256": "3ec4a7bee89aa653cb534db5658cde1ae23f4185cd0f9039b5a26b647c143ce2",
+        "png_sha256": "9eeef06714eb8478aa27fdd2326f51de75b0df32d20ac1a21f9b945169ac585f",
+        "mhtml_sha256": "a54e8331d527e34c015fafed494266a81a89c98ca0e9ce8182491b81ac1bcc85",
+        "browser": "playwright-chromium",
+        "viewport": "1280x900 full-page",
+        "reduced_motion": true
+      }
+    },
+    {
+      "brief_id": "B06",
+      "arm": "goddesign",
+      "host": "claude",
+      "model": "claude-fable-5",
+      "direction": "Playful Pop",
+      "audit": {
+        "status": "green",
+        "cycles": 1
+      },
+      "captured_at": "2026-07-23T07:54:40.586Z",
+      "html": "work/generated/B06-goddesign/index.html",
+      "png": "work/generated/B06-goddesign/capture/page.png"
+    },
+    {
+      "brief_id": "B06",
+      "arm": "baseline",
+      "host": "claude",
+      "model": "claude-fable-5",
+      "direction": "",
+      "audit": {
+        "status": "not-applicable",
+        "cycles": 0
+      },
+      "captured_at": "2026-07-23T07:39:46.147Z",
+      "html": "work/generated/B06-baseline/index.html",
+      "png": "work/generated/B06-baseline/capture/page.png"
+    },
+    {
+      "brief_id": "B06",
+      "arm": "human",
+      "host": "human",
+      "model": "",
+      "direction": "",
+      "audit": "not-applicable",
+      "source_url": "https://barisabel.com/",
+      "captured_at": "2026-07-23T04:29:27.150Z",
+      "html": "work/human/B06/page.html",
+      "png": "work/human/B06/page.png",
+      "capture": {
+        "kind": "human",
+        "source": "https://barisabel.com/",
+        "final_url": "https://barisabel.com/",
+        "http_status": 200,
+        "captured_at": "2026-07-23T04:29:27.150Z",
+        "started_at": "2026-07-23T04:29:23.843Z",
+        "title": "Bar Isabel",
+        "generator": "",
+        "page_width": 1280,
+        "page_height": 3930,
+        "dismissed_consent": "",
+        "html_sha256": "0c913bd70c53916bbb3216df5a348f007de9abc584abc42f5cc04983d0e8f65c",
+        "png_sha256": "6628b11d4e1d2773110e1b6ae77eaba672e2fa23638b349229e0098aeeebc5a3",
+        "mhtml_sha256": "b5c5a2789c7c7524a9bcfa76f968d6edf978820c134474994e26fc1ccd642d6a",
+        "browser": "playwright-chromium",
+        "viewport": "1280x900 full-page",
+        "reduced_motion": true
+      }
+    },
+    {
+      "brief_id": "B07",
+      "arm": "goddesign",
+      "host": "codex",
+      "model": "gpt-5.6-sol",
+      "direction": "Luxury Serif",
+      "audit": {
+        "status": "green",
+        "cycles": 1
+      },
+      "captured_at": "2026-07-23T05:54:54.333Z",
+      "html": "work/generated/B07-goddesign/index.html",
+      "png": "work/generated/B07-goddesign/capture/page.png"
+    },
+    {
+      "brief_id": "B07",
+      "arm": "baseline",
+      "host": "codex",
+      "model": "gpt-5.6-sol",
+      "direction": "",
+      "audit": {
+        "status": "not-applicable",
+        "cycles": 0
+      },
+      "captured_at": "2026-07-23T07:40:18.690Z",
+      "html": "work/generated/B07-baseline/index.html",
+      "png": "work/generated/B07-baseline/capture/page.png"
+    },
+    {
+      "brief_id": "B07",
+      "arm": "human",
+      "host": "human",
+      "model": "",
+      "direction": "",
+      "audit": "not-applicable",
+      "source_url": "https://www.charitywater.org/",
+      "captured_at": "2026-07-23T05:31:58.224Z",
+      "html": "work/human/B07/page.html",
+      "png": "work/human/B07/page.png",
+      "capture": {
+        "kind": "human",
+        "source": "https://www.charitywater.org/",
+        "final_url": "https://www.charitywater.org/",
+        "http_status": 200,
+        "captured_at": "2026-07-23T05:31:58.224Z",
+        "started_at": "2026-07-23T05:31:53.832Z",
+        "title": "charity: water | Help Bring Clean and Safe Water to Communities",
+        "generator": "",
+        "page_width": 1280,
+        "page_height": 6243,
+        "dismissed_consent": "",
+        "html_sha256": "cb5a7a21ee306e67da4f22056cddb0086c54667487710e9e6a8528ef19ed07c1",
+        "png_sha256": "b61823b71a58f6da6184706fc2c0aaa7fa4cbe0a36c71a9929a4ba15bf4fc879",
+        "mhtml_sha256": "4433879f4e34ef50d9f2f9f426b01accb440babbf9d20c233a19d7f4097c3e01",
+        "browser": "playwright-chromium",
+        "viewport": "1280x900 full-page",
+        "reduced_motion": true
+      }
+    },
+    {
+      "brief_id": "B08",
+      "arm": "goddesign",
+      "host": "claude",
+      "model": "claude-fable-5",
+      "direction": "Art Deco Geometric",
+      "audit": {
+        "status": "green",
+        "cycles": 1
+      },
+      "captured_at": "2026-07-23T08:18:09.391Z",
+      "html": "work/generated/B08-goddesign/index.html",
+      "png": "work/generated/B08-goddesign/capture/page.png"
+    },
+    {
+      "brief_id": "B08",
+      "arm": "baseline",
+      "host": "claude",
+      "model": "claude-fable-5",
+      "direction": "",
+      "audit": {
+        "status": "not-applicable",
+        "cycles": 0
+      },
+      "captured_at": "2026-07-23T08:04:14.131Z",
+      "html": "work/generated/B08-baseline/index.html",
+      "png": "work/generated/B08-baseline/capture/page.png"
+    },
+    {
+      "brief_id": "B08",
+      "arm": "human",
+      "host": "human",
+      "model": "",
+      "direction": "",
+      "audit": "not-applicable",
+      "source_url": "https://thelakesidemotel.com/",
+      "captured_at": "2026-07-23T05:35:17.746Z",
+      "html": "work/human/B08/page.html",
+      "png": "work/human/B08/page.png",
+      "capture": {
+        "kind": "human",
+        "source": "https://thelakesidemotel.com/",
+        "final_url": "https://thelakesidemotel.com/",
+        "http_status": 200,
+        "captured_at": "2026-07-23T05:35:17.746Z",
+        "started_at": "2026-07-23T05:35:06.515Z",
+        "title": "Bedside. Poolside. Fireside. Roadside | Stay at The Lakeside Motel | Prince Edward County ON | Canada",
+        "generator": "",
+        "page_width": 1280,
+        "page_height": 5401,
+        "dismissed_consent": ".sqs-cookie-banner-v2-accept",
+        "dismissed_overlay": "",
+        "html_sha256": "d1e8bc1acaf262b6192b0061a1320eb619be7a30f8b6bb58ac0025d6daaa38cf",
+        "png_sha256": "bb2fa6a5b74a7379e2822704f294c2dbf0205d83e624b1a3543f3abbfcdc055d",
+        "mhtml_sha256": "d19300f9480d4de3f3065ea788d3314b0f5f8bebdc5048c8156021f6810bf9a5",
+        "browser": "playwright-chromium",
+        "viewport": "1280x900 full-page",
+        "reduced_motion": true
+      }
+    },
+    {
+      "brief_id": "B09",
+      "arm": "goddesign",
+      "host": "codex",
+      "model": "gpt-5.6-sol",
+      "direction": "Data-Dense Pro",
+      "audit": {
+        "status": "green",
+        "cycles": 1
+      },
+      "captured_at": "2026-07-23T06:13:26.193Z",
+      "html": "work/generated/B09-goddesign/index.html",
+      "png": "work/generated/B09-goddesign/capture/page.png"
+    },
+    {
+      "brief_id": "B09",
+      "arm": "baseline",
+      "host": "codex",
+      "model": "gpt-5.6-sol",
+      "direction": "",
+      "audit": {
+        "status": "not-applicable",
+        "cycles": 0
+      },
+      "captured_at": "2026-07-23T07:50:12.049Z",
+      "html": "work/generated/B09-baseline/index.html",
+      "png": "work/generated/B09-baseline/capture/page.png"
+    },
+    {
+      "brief_id": "B09",
+      "arm": "human",
+      "host": "human",
+      "model": "",
+      "direction": "",
+      "audit": "not-applicable",
+      "source_url": "https://www.soul-cycle.com/",
+      "captured_at": "2026-07-23T04:29:38.336Z",
+      "html": "work/human/B09/page.html",
+      "png": "work/human/B09/page.png",
+      "capture": {
+        "kind": "human",
+        "source": "https://www.soul-cycle.com/",
+        "final_url": "https://www.soul-cycle.com/",
+        "http_status": 200,
+        "captured_at": "2026-07-23T04:29:38.336Z",
+        "started_at": "2026-07-23T04:29:34.854Z",
+        "title": "Find Cycling Classes Near You or Ride at Home - SoulCycle",
+        "generator": "",
+        "page_width": 1280,
+        "page_height": 5226,
+        "dismissed_consent": "",
+        "html_sha256": "f2fa42509a20bf14106081fcc1da13654f504f0ff89e2bf7be039999b70ba93c",
+        "png_sha256": "0fd2a8a35a3957be966b6b1fcbe159a0c3c558f727bb5172e3f041c2273afa96",
+        "mhtml_sha256": "ed6fa0e1477216fd2e8b06a139f48dcb22745dc53214a69aaa179a3665bf055b",
+        "browser": "playwright-chromium",
+        "viewport": "1280x900 full-page",
+        "reduced_motion": true
+      }
+    },
+    {
+      "brief_id": "B10",
+      "arm": "goddesign",
+      "host": "claude",
+      "model": "claude-fable-5",
+      "direction": "Soft Craft",
+      "audit": {
+        "status": "green",
+        "cycles": 1
+      },
+      "captured_at": "2026-07-23T08:38:40.877Z",
+      "html": "work/generated/B10-goddesign/index.html",
+      "png": "work/generated/B10-goddesign/capture/page.png"
+    },
+    {
+      "brief_id": "B10",
+      "arm": "baseline",
+      "host": "claude",
+      "model": "claude-fable-5",
+      "direction": "",
+      "audit": {
+        "status": "not-applicable",
+        "cycles": 0
+      },
+      "captured_at": "2026-07-23T08:27:58.478Z",
+      "html": "work/generated/B10-baseline/index.html",
+      "png": "work/generated/B10-baseline/capture/page.png"
+    },
+    {
+      "brief_id": "B10",
+      "arm": "human",
+      "host": "human",
+      "model": "",
+      "direction": "",
+      "audit": "not-applicable",
+      "source_url": "https://www.theparisreview.org/",
+      "captured_at": "2026-07-23T05:35:23.307Z",
+      "html": "work/human/B10/page.html",
+      "png": "work/human/B10/page.png",
+      "capture": {
+        "kind": "human",
+        "source": "https://www.theparisreview.org/",
+        "final_url": "https://www.theparisreview.org/",
+        "http_status": 200,
+        "captured_at": "2026-07-23T05:35:23.307Z",
+        "started_at": "2026-07-23T05:35:17.813Z",
+        "title": "Paris Review - Writers, Quotes, Biography, Interviews, Artists",
+        "generator": "",
+        "page_width": 1280,
+        "page_height": 4441,
+        "dismissed_consent": "",
+        "dismissed_overlay": "",
+        "html_sha256": "da08af8d75552cb8a5cb46f25950b436507821b2bb15fe6028b70e692d0a3485",
+        "png_sha256": "23b5a512dd98588154c72f1bfec37581487f4f4c0fa256771f8d36c3f81fb631",
+        "mhtml_sha256": "39cd92b3befca4e377941fb28d4674c9cc7773fe95fae657ccc81485c5583dda",
+        "browser": "playwright-chromium",
+        "viewport": "1280x900 full-page",
+        "reduced_motion": true
+      }
+    }
+  ]
+}

@@ -1,10 +1,10 @@
 # Blind post-render critic: calibration, 2026-07-22
 
-Seam 4 of the ADHD evaluation (`validation/adhd-evaluation-2026-07.md`): a separate process sees only a page's screenshots (never its code or its DIRECTION LOCK) and reconstructs the page's identity, closing the gap where the QA gate's Phase 1 self-critique is authored by the same context that holds the answer key. Shipped as `skills/goddesign/scripts/blind-read.sh` with its fixed prompt in `skills/goddesign/references/blind-read.md`. This is the calibration that decided how it ships.
+Seam 4 of the ADHD evaluation (`validation/research/adhd-evaluation-2026-07.md`): a separate process sees only a page's screenshots (never its code or its DIRECTION LOCK) and reconstructs the page's identity, closing the gap where the QA gate's Phase 1 self-critique is authored by the same context that holds the answer key. Shipped as `skills/goddesign/scripts/blind-read.sh` with its fixed prompt in `skills/goddesign/references/blind-read.md`. This is the calibration that decided how it ships.
 
 ## Method
 
-The script was dogfooded end to end (it delegates to the installed Codex CLI, gpt-5.6-sol xhigh, via stdin so the variadic `-i` image flag does not swallow the prompt) against four archived Bandquarter renders whose owner ranking is on record (`validation/bandquarter-2026-07.md`): gd-a (owner first), gd-c (owner second), fd-a (a gig-poster the owner placed behind), and the no-skill baseline (appealing but tell-laden, audit-failed on mobile). All four are the same domain (independent music-venue management software), so the test isolates whether the blind reader recovers a page's identity from pixels alone. Raw outputs in `validation/blind-read-calibration/`.
+The script was dogfooded end to end (it delegates to the installed Codex CLI, gpt-5.6-sol xhigh, via stdin so the variadic `-i` image flag does not swallow the prompt) against four archived Bandquarter renders whose owner ranking is on record (`validation/experiments/bandquarter-2026-07/README.md`): gd-a (owner first), gd-c (owner second), fd-a (a gig-poster the owner placed behind), and the no-skill baseline (appealing but tell-laden, audit-failed on mobile). All four are the same domain (independent music-venue management software), so the test isolates whether the blind reader recovers a page's identity from pixels alone. Raw outputs in `validation/experiments/blind-read-calibration-2026-07/results/`.
 
 ## Result
 

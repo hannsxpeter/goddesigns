@@ -1,0 +1,74 @@
+{
+  "study": "goddesign-study-a-2026-07",
+  "scope": "frozen claude half of the Study A matched corpus",
+  "status": "complete",
+  "completed_at": "2026-07-23T08:38:55.581Z",
+  "host": "claude",
+  "model": "claude-fable-5",
+  "effort": "xhigh",
+  "pairs": 5,
+  "skill_audits_green": 5,
+  "distinct_directions": 5,
+  "runs": [
+    {
+      "brief_id": "B02",
+      "direction": "Brutalist Raw",
+      "goddesign_run_sha256": "e2334aabd86cf2b2ea54b1ed06ba3451261943aa40cad20ad6c51e9def9ec224",
+      "goddesign_source_html_sha256": "0ded62f0d76a5df864f4efe0a6c0c3277af0f15f70ff7947c396489269a47433",
+      "goddesign_rendered_html_sha256": "16d98fe950b65e2e200b6e58492481c6dbd3d48b7726e273b96ee8722738a663",
+      "goddesign_png_sha256": "1b523dc830d046adb384503916c4d2db6734e35be121c61a6b3d76a45c4e9d39",
+      "baseline_run_sha256": "8faf2e3a104da5d263a5103754d2df4bedc27bdede24a6a34b367a544c1cf195",
+      "baseline_source_html_sha256": "92b28147c10ce4bebe4f7ca1be1b29abaec0fd13b81a7969dc047d55255f976c",
+      "baseline_rendered_html_sha256": "f282a22c4054182cf9495c76a1302128b72e24e3e05d158cab3eb94e851017d4",
+      "baseline_png_sha256": "f470810b7f24eb4600a2726b530b073313e3d25e45564b2ba4b9c77fc0a20e37"
+    },
+    {
+      "brief_id": "B04",
+      "direction": "Cinematic Dark",
+      "goddesign_run_sha256": "709b030a5740b073d4e4c3e9fbddf9441bf731f75ab2e2ee2e7789aa7471352a",
+      "goddesign_source_html_sha256": "0314d2dbfac62897e527f52f6ac3e23ea3bb8cd063e5ecc8f0597b134558bbbe",
+      "goddesign_rendered_html_sha256": "33e2e419a0e870f361c71e55a096220187719a2d58b481610290cd5bc882f0f6",
+      "goddesign_png_sha256": "90725971a0923a85b714848d2f60ec566579ddccacad1fd4e2e4d0fe90117b79",
+      "baseline_run_sha256": "ebd5e8cf88f374b2f3d0e548c95c3314b43b343f48796c933fc51ccffa2ed249",
+      "baseline_source_html_sha256": "9efa4b60a0963cc747ffda6f60dc40e98b66265f4b3e69f192154a7b875f5458",
+      "baseline_rendered_html_sha256": "50f80e3740a978d72751cd34950d0aed3049b1b7a28ddc709555cba1d7375bbb",
+      "baseline_png_sha256": "e8b2f8c8afc56a44bce165db2c87840892e968b36922c633146b4d49fe60010e"
+    },
+    {
+      "brief_id": "B06",
+      "direction": "Playful Pop",
+      "goddesign_run_sha256": "efdce7bc42274d807b193364ecfa050eaf78cbb2ca39fc29f70fd3c89e5f1462",
+      "goddesign_source_html_sha256": "3a3b4a8582a6081216a4ec48b2f7653e07a052ee036f02af9a305401b6f78316",
+      "goddesign_rendered_html_sha256": "416e71077d848016f396cf2a28186f748e1be0796dba8d54fd3149b8eb6a452a",
+      "goddesign_png_sha256": "26cfdd777ee046fe238935bfbeb55657cc4b62a0ae277aeb10433edcf549c850",
+      "baseline_run_sha256": "b35430e0a18b3767f49e8a7d95bb1d13b6913f0ac1d43626511f7b290c78b5f5",
+      "baseline_source_html_sha256": "ad971d1e7a18eba5dfa6607117606bd9b090168e76f991653a76169b9f427883",
+      "baseline_rendered_html_sha256": "aa59eb7a3d2e34c91a79f2ed8ac906e61aa9a049e09dffc9d408b42e4fec7374",
+      "baseline_png_sha256": "b47588587ca75dfaec8a2e2a37d0a7963fee4f506ca31e1127cc6cfbb2a7f1d8"
+    },
+    {
+      "brief_id": "B08",
+      "direction": "Art Deco Geometric",
+      "goddesign_run_sha256": "ec0616d85ab7593d607369c93ee334c1aea6471fd67ef57beea7c0a84bc255e9",
+      "goddesign_source_html_sha256": "0ec3cb0cc0e48f43ccd721804b9bcb22c51ee20167944c385da20922c5c94d32",
+      "goddesign_rendered_html_sha256": "e4fda530fc46d6d5fecc7b06e6c7bd6022515e43dea290ad0f6e1267f0476ab6",
+      "goddesign_png_sha256": "89dcd4508c1ea0c486b0fa4b5d33873450f5dcf617c1bc3109cb0c0ca38dbfab",
+      "baseline_run_sha256": "68bc5e93f4b40de348848ed0cb25d35e566927d877c6fe01781a93fb87c8cb8d",
+      "baseline_source_html_sha256": "9f55c1356ca1429822b1b5178302d74e836b33d28323f269403a75c6bd2c3514",
+      "baseline_rendered_html_sha256": "2b4b0c0d46fadef99be0af6041c1d7aa4135f659c571420ddab9c9d0dc5675b3",
+      "baseline_png_sha256": "a606bd23ac80b888280ee04c8874495e37e9da050ba56de799c03cbb2ab48122"
+    },
+    {
+      "brief_id": "B10",
+      "direction": "Soft Craft",
+      "goddesign_run_sha256": "d89c71fbf869eb8fea1642d68dc887db995e141faa16465d6cb7434069ff8716",
+      "goddesign_source_html_sha256": "f83e737068c6e6671fa640240fabf8c09b6b67ac1555628559ef29d5984f17dc",
+      "goddesign_rendered_html_sha256": "9a9d61985a7fe732789cd14727d6a9f049e748eb1ea097c9acecf66e1afb34ff",
+      "goddesign_png_sha256": "77c15676a2abe739c4e7a36d22926e5ac3b1fa0210aaef7f988b60d92b7f5145",
+      "baseline_run_sha256": "c33846a55c0b571d0da5b5f77add41fc90b82ef0bef1ebcdb152a238fba13156",
+      "baseline_source_html_sha256": "0b8892eb71deebe47767289c2d8ec5e9d05845a1491bfdcd72b361b49c60cd09",
+      "baseline_rendered_html_sha256": "01774da1adf0cdf461dd875e7ed0f8051d48a8315d9e749a6549fd1ac491c3ce",
+      "baseline_png_sha256": "1d770edbef94f10ee67991cd62513afdea66c0065060e44e4020f2363a1b6766"
+    }
+  ]
+}

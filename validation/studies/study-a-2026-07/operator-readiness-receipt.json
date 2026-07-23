@@ -1,0 +1,23 @@
+{
+  "study": "goddesign-study-a-2026-07",
+  "status": "operator-ready-not-enrolling",
+  "verified_at": "2026-07-23T09:15:09Z",
+  "source_commit": "7362b2bc3367f315afa62eb479fa76ae08cb7903",
+  "site_version": 2,
+  "environment_revision": 1,
+  "access": "owner-only",
+  "operator_preview_url": "https://goddesign-study-a.hxpxxpxh.chatgpt.site",
+  "participant_distribution_allowed": false,
+  "distribution_blocker": "A neutral participant URL, distribution access, and explicit distribution approval are required. A custom domain or DNS change is not required.",
+  "checks": {
+    "root_http_status": 200,
+    "neutral_page_title": true,
+    "participant_payload_method_clean_except_operator_hostname": true,
+    "signed_session_http_status": 200,
+    "signed_session_study_id": "website-perception-study-2026-07",
+    "signed_session_samples": 15,
+    "operator_export_http_status": 200,
+    "participant_response_rows": 0,
+    "worker_error_events_last_15_minutes": 0
+  }
+}

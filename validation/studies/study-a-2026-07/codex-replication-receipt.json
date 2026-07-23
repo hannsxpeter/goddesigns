@@ -1,0 +1,74 @@
+{
+  "study": "goddesign-study-a-2026-07",
+  "scope": "frozen codex half of the Study A matched corpus",
+  "status": "complete",
+  "completed_at": "2026-07-23T07:50:33.140Z",
+  "host": "codex",
+  "model": "gpt-5.6-sol",
+  "effort": "xhigh",
+  "pairs": 5,
+  "skill_audits_green": 5,
+  "distinct_directions": 5,
+  "runs": [
+    {
+      "brief_id": "B01",
+      "direction": "Industrial",
+      "goddesign_run_sha256": "ee5366845377ff692f9767a7f7cbd6d860028dd25f6b260f4de963aaff5051d0",
+      "goddesign_source_html_sha256": "9013f6bef23161722c0cc9897cc16acffa08e703ed01fb7de8d436d23e1b3cf1",
+      "goddesign_rendered_html_sha256": "6912df5814920444116ccc804b4673cbcfc6e6129ad5841c45ba353d63d785f1",
+      "goddesign_png_sha256": "e7b250951db7a185925ef205c840978474f1ac3800ae7b2bbe7f87efd0a43227",
+      "baseline_run_sha256": "7d9ee1acf432f75210789fa28581f6378bb931aa11441754bf14ea68619572a1",
+      "baseline_source_html_sha256": "1e246c26143c274bafe0504f7030d66af1dcb522aab4609fe2bf9f98dd7ad457",
+      "baseline_rendered_html_sha256": "6c51e1b5508daba016356f723190490464d1bfdbd79046beaff6291ef8622699",
+      "baseline_png_sha256": "df54da02ad59592a67a9194a5f5ab8711cd3e7f8e116e5b398af20552a9856ec"
+    },
+    {
+      "brief_id": "B03",
+      "direction": "Editorial Magazine",
+      "goddesign_run_sha256": "0b6f9c1d1399e95d19f8005ccbcfef491669478fa3afe7e93459c093ee6b5643",
+      "goddesign_source_html_sha256": "9dc8104b8f8b161a8f48526538320f3beed6fd402c64a632d61d17bf0a927489",
+      "goddesign_rendered_html_sha256": "7d4e9ac93d96eab0154c8e4dc81686dd4e04e6dd80575bec9e225e2f5e6a6242",
+      "goddesign_png_sha256": "da446a295f48737d6d14d0934ce649ad80ec57b1894da12c796d75dbdffe16e4",
+      "baseline_run_sha256": "dc127ef506c6e46a3f181a48f51a81e118b6c51db53b8dcab5e9b8d0c8925a58",
+      "baseline_source_html_sha256": "2582ab0110df6d5fde1c6b55ec055ce7cf5d918d41eb2fdbbfd26374a8b9ac8e",
+      "baseline_rendered_html_sha256": "46e2551e015faad30367f2b5aa2f4aa8f6ce044ffc11ae3fd92674947e149cde",
+      "baseline_png_sha256": "9c79b17533034394aae6ea054c66d2f68174bc8911f12b5708ad4eeef2b02185"
+    },
+    {
+      "brief_id": "B05",
+      "direction": "Swiss International",
+      "goddesign_run_sha256": "2751d24d8356254407f3919ab296ee7eedc888ca04fb3e1c6a200ba7083cf4ec",
+      "goddesign_source_html_sha256": "c7fcd48d263eca64319d2efadc91aefd1dddee2942967f895fe1c6ccd4eaa6e1",
+      "goddesign_rendered_html_sha256": "72d80a62182e9bebe97ef6cd1d511afca21c85136516b0844e1fb83bfff936be",
+      "goddesign_png_sha256": "92f5cfa714104273f48615e89102f857494080d51bd8f29da95329f01050ca86",
+      "baseline_run_sha256": "7db11264ae5beac3e33e05a6529878ac7058abdcc3fb6a2dc67886f134e129e3",
+      "baseline_source_html_sha256": "db506eb843e8aaecb93748240af2af7ea214c8408c8df12440120c7e9da7b3ec",
+      "baseline_rendered_html_sha256": "99084859854018ebb9db24a3b2dc38abdb0ddcd388bfa5a28d93cb89dfa1ecbf",
+      "baseline_png_sha256": "0ace489acb47997099a6ea9c562b5ac303419b722501f3dfde178a8437ed3929"
+    },
+    {
+      "brief_id": "B07",
+      "direction": "Luxury Serif",
+      "goddesign_run_sha256": "4d332dc2d55313d60ea88470bcd4fa3b0d106a87365de962920d7963cc6f7e7b",
+      "goddesign_source_html_sha256": "7c7e2b57fea87bc80a16e84c3db7e189d13201a84f96d03e9bde519496d2eea1",
+      "goddesign_rendered_html_sha256": "73029223f3d43d15e8e584af06ed8f2d1bee9aba06ae674ebe25182adb9ffb55",
+      "goddesign_png_sha256": "2aec628f14f2e3b7aa927660b9b6bbbf4be1e0aa5dbf144ce258101087e5d8ae",
+      "baseline_run_sha256": "d1ec77cfdb5d8d472b6e4a93624f51892d94c52a318368f51ac7d55b074d14f8",
+      "baseline_source_html_sha256": "961b802c58686b06376bc5dbf3ff9d622fd44167bd0d78805f7b12bff57ba312",
+      "baseline_rendered_html_sha256": "8785a97ddda741399084f6cca8efcb1fcd31fd31872c2b27310ec943a9af9d05",
+      "baseline_png_sha256": "0ab7f36f1f059e26cb99dfe14d63f411a1b8237b5f2c37f19b4195ce08294d95"
+    },
+    {
+      "brief_id": "B09",
+      "direction": "Data-Dense Pro",
+      "goddesign_run_sha256": "8573c26350911ace0f2d1b8063c413c2ddfcb4429554bbeae0f91b8c31f77e90",
+      "goddesign_source_html_sha256": "b3724d54797eb2ecc2cb3725ada4dc885eda406a8e61f82f85b1a1da12802e4a",
+      "goddesign_rendered_html_sha256": "03bba14bfb2048c4f88a92cdb8e1151bb59054a81cc4d5b126a6782117dae605",
+      "goddesign_png_sha256": "27d7c0fda1d787cfed85128d0f74fba8f71a19437228114c983c90f379ddaee6",
+      "baseline_run_sha256": "26c995064d66dbcc9f62e62629233ced1e011a55af6825e7166349547d287717",
+      "baseline_source_html_sha256": "c4188ebea7b53d3c7aa4c9511f926884a9de51bb9e33df6ffdfc7971a7719d0d",
+      "baseline_rendered_html_sha256": "9efe6cc614a4d3305fd303bc543f059147dc260826fb39163036ed228d5ae435",
+      "baseline_png_sha256": "ba1f277f88d820b0d998bb3cf8241ba1aefaa1f53604707704a54def29f8bf1b"
+    }
+  ]
+}
