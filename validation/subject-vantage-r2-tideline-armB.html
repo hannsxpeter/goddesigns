@@ -1,0 +1,1105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Tideline is catch-logging and quota-management software built for a working commercial dayboat.">
+  <title>Tideline | Catch logs that keep their balance</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&amp;family=Atkinson+Hyperlegible:wght@400;700&amp;family=Space+Mono&amp;display=swap" rel="stylesheet">
+  <style>
+    /* goddesign | structure: Workbench | direction: Lo-Fi Riso | accent: riso blue h+7 */
+    /*
+      DIRECTION LOCK
+      Seed 1556110663 | Direction 6 Lo-Fi Riso | Structure 4 Workbench
+      Jitter h+7 L0 r+1 | radius 6px | light paper | slab display
+      Subject: Tideline, catch logging and quota management for a small commercial dayboat.
+      Action: Start free trial. Tone: honest, hard-wearing, print-craft.
+      Tokens: shared lock variables declared once below. Type: Alfa Slab One / Atkinson Hyperlegible / Space Mono.
+      Layout: slim top bar, hero band, full-bleed quota reconciliation packet, three supporting sections.
+      Signature: a carbon-copy quota reconciliation packet with one misregistered heading and one -3deg sticker.
+      Atmosphere: halftone hero band, layered paper packet, dark full-bleed workbench.
+      Grammar: full-bleed signature | bare-claim workflow | spanning third cell | 40/64/72/96/112 padding.
+      Motion: 200ms steps(3) feedback only, reduced-motion safe.
+      Anti-cliche: no nautical navy, rope, wheel, anchor, generic card trio, or inflated claims.
+    */
+
+    :root {
+      --bg: #F6F3EB;
+      --surface: #ECE8DC;
+      --text: #24242C;
+      --muted: #62626E;
+      --hairline: var(--text);
+      --accent: oklch(from #0078BF l c calc(h + 7));
+      --secondary: #FF48B0;
+      --font-display: "Alfa Slab One", Georgia, serif;
+      --font-body: "Atkinson Hyperlegible", sans-serif;
+      --font-utility: "Space Mono", monospace;
+      --radius: 6px;
+      --border: 2px solid var(--hairline);
+      --s4: 4px;
+      --s8: 8px;
+      --s12: 12px;
+      --s16: 16px;
+      --s24: 24px;
+      --s32: 32px;
+      --s40: 40px;
+      --s48: 48px;
+      --s64: 64px;
+      --s72: 72px;
+      --s96: 96px;
+      --s112: 112px;
+      --s128: 128px;
+      --content: 1180px;
+      --type-xs: 0.75rem;
+      --type-sm: 0.875rem;
+      --type-base: 1rem;
+      --type-body: 1.125rem;
+      --type-lead: 1.25rem;
+      --type-card: 1.5rem;
+      --type-hero: clamp(3rem, 7vw, 5rem);
+      --type-display: clamp(2.3rem, 5vw, 4.5rem);
+      --type-claim: clamp(2.4rem, 6vw, 4.6rem);
+      --type-section: clamp(2rem, 4.5vw, 3.8rem);
+      --type-closing: clamp(1.8rem, 3.5vw, 2.8rem);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      overflow-x: clip;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 18px;
+      line-height: 1.55;
+      text-rendering: optimizeLegibility;
+    }
+
+    a,
+    button {
+      color: inherit;
+      font: inherit;
+    }
+
+    a {
+      text-decoration-thickness: 2px;
+      text-underline-offset: var(--s4);
+    }
+
+    a:hover {
+      text-decoration-color: var(--accent);
+    }
+
+    a:active {
+      color: var(--accent);
+    }
+
+    a[aria-disabled="true"] {
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: var(--s4);
+    }
+
+    .shell {
+      width: min(calc(100% - var(--s48)), var(--content));
+      margin-inline: auto;
+    }
+
+    .topbar {
+      border-bottom: var(--border);
+      background: var(--bg);
+    }
+
+    .topbar-inner {
+      min-height: 72px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: var(--s32);
+    }
+
+    .wordmark {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: baseline;
+      gap: var(--s8);
+      color: var(--text);
+      font-family: var(--font-display);
+      font-size: var(--type-lead);
+      line-height: 1;
+      text-decoration: none;
+    }
+
+    .wordmark small {
+      color: var(--muted);
+      font-family: var(--font-body);
+      font-size: var(--type-xs);
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .nav-links {
+      display: flex;
+      justify-content: center;
+      gap: var(--s32);
+      font-size: var(--type-sm);
+      font-weight: 700;
+    }
+
+    .nav-links a {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+    }
+
+    .button {
+      min-height: 48px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--s12) var(--s24);
+      border: var(--border);
+      border-radius: var(--radius);
+      background: var(--accent);
+      color: var(--bg);
+      font-weight: 700;
+      line-height: 1;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform 200ms steps(3), background-color 200ms steps(3);
+    }
+
+    .button:hover {
+      background: oklch(from var(--accent) calc(l - 0.08) c h);
+      text-decoration: none;
+      transform: translateY(-2px);
+    }
+
+    .button:active {
+      transform: translateY(1px);
+    }
+
+    .button:disabled,
+    .button[aria-disabled="true"] {
+      border-color: var(--muted);
+      background: var(--surface);
+      color: var(--muted);
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .button-compact {
+      min-height: 44px;
+      padding: var(--s12) var(--s16);
+      font-size: var(--type-sm);
+    }
+
+    .hero {
+      position: relative;
+      isolation: isolate;
+      padding-block: var(--s112);
+      background-color: var(--bg);
+      background-image: radial-gradient(circle, color-mix(in oklch, var(--text) 6%, transparent) 1.25px, transparent 1.5px);
+      background-size: var(--s12) var(--s12);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(220px, 0.34fr);
+      align-items: end;
+      gap: var(--s64);
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: var(--s24);
+    }
+
+    .hero h1 {
+      max-width: 16ch;
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: var(--type-hero);
+      font-weight: 400;
+      letter-spacing: -0.035em;
+      line-height: 1.05;
+      text-wrap: balance;
+    }
+
+    .hero p {
+      max-width: 52ch;
+      margin: 0;
+      font-size: var(--type-body);
+      text-wrap: pretty;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--s16);
+    }
+
+    .hero-proof {
+      border-inline-start: var(--border);
+      padding-left: var(--s24);
+    }
+
+    .hero-proof strong,
+    .hero-proof span {
+      display: block;
+    }
+
+    .hero-proof strong {
+      max-width: 14ch;
+      font-family: var(--font-display);
+      font-size: var(--type-card);
+      font-weight: 400;
+      line-height: 1.15;
+    }
+
+    .hero-proof span {
+      margin-top: var(--s12);
+      color: var(--muted);
+      font-size: var(--type-sm);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .full-bleed {
+      width: 100vw;
+      margin-left: calc(50% - 50vw);
+    }
+
+    .reconcile-band {
+      padding-block: var(--s72) var(--s96);
+      background: var(--text);
+      color: var(--bg);
+    }
+
+    .packet-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end;
+      gap: var(--s32);
+      margin-bottom: var(--s32);
+    }
+
+    .packet-head p {
+      max-width: 52ch;
+      margin: var(--s16) 0 0;
+      color: var(--surface);
+      text-wrap: pretty;
+    }
+
+    .packet-head h2 {
+      max-width: 18ch;
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: var(--type-display);
+      font-weight: 400;
+      letter-spacing: -0.025em;
+      line-height: 1.02;
+      text-shadow: 2px 0 var(--secondary);
+      text-wrap: balance;
+    }
+
+    .packet-sticker {
+      align-self: start;
+      margin-top: calc(var(--s112) * -1);
+      padding: var(--s12) var(--s16);
+      border: var(--border);
+      border-radius: var(--radius);
+      background: var(--accent);
+      color: var(--bg);
+      font-family: var(--font-utility);
+      font-size: var(--type-xs);
+      line-height: 1.35;
+      text-transform: uppercase;
+      transform: rotate(-3deg);
+    }
+
+    .packet {
+      display: grid;
+      grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.35fr);
+      grid-template-areas:
+        "receipt ledger"
+        "memo ledger";
+      gap: var(--s16);
+      align-items: stretch;
+    }
+
+    .paper {
+      min-width: 0;
+      border: var(--border);
+      border-radius: var(--radius);
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .receipt {
+      grid-area: receipt;
+      transform: translateY(var(--s12));
+    }
+
+    .memo {
+      grid-area: memo;
+      align-self: start;
+      margin-right: var(--s32);
+      background: var(--surface);
+    }
+
+    .ledger {
+      grid-area: ledger;
+      transform: translateY(calc(var(--s12) * -1));
+    }
+
+    .paper-topline {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--s8) var(--s24);
+      padding: var(--s12) var(--s16);
+      border-bottom: var(--border);
+      font-family: var(--font-utility);
+      font-size: var(--type-xs);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .paper-topline strong {
+      color: var(--accent);
+      font-weight: 400;
+    }
+
+    .paper-body {
+      padding: var(--s24);
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--s16) var(--s24);
+      margin-bottom: var(--s24);
+    }
+
+    .field-label {
+      display: block;
+      margin-bottom: var(--s4);
+      color: var(--muted);
+      font-size: var(--type-xs);
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .field-value {
+      display: block;
+      font-family: var(--font-utility);
+      font-size: var(--type-sm);
+      overflow-wrap: anywhere;
+    }
+
+    .table-scroll {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-utility);
+      font-size: var(--type-xs);
+      font-variant-numeric: tabular-nums;
+      line-height: 1.4;
+    }
+
+    caption {
+      padding-bottom: var(--s12);
+      font-family: var(--font-body);
+      font-size: var(--type-sm);
+      font-weight: 700;
+      text-align: left;
+    }
+
+    th,
+    td {
+      padding: var(--s8);
+      border-bottom: 1px solid var(--hairline);
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    th:first-child,
+    td:first-child,
+    th:nth-child(2),
+    td:nth-child(2) {
+      text-align: left;
+    }
+
+    thead th {
+      color: var(--muted);
+      font-family: var(--font-body);
+      font-size: var(--type-xs);
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+
+    tbody tr:last-child td,
+    tfoot td {
+      border-bottom: 0;
+    }
+
+    tfoot td {
+      padding-top: var(--s12);
+      font-weight: 700;
+    }
+
+    .balance {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .memo .paper-body {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: var(--s16);
+      align-items: start;
+    }
+
+    .memo-mark {
+      min-width: var(--s72);
+      padding: var(--s8);
+      border: var(--border);
+      border-radius: var(--radius);
+      color: var(--accent);
+      font-family: var(--font-utility);
+      font-size: var(--type-xs);
+      line-height: 1.35;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .memo p {
+      margin: 0;
+      font-size: var(--type-sm);
+      line-height: 1.45;
+    }
+
+    .packet-foot {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: var(--s16);
+      margin-top: var(--s32);
+      color: var(--surface);
+      font-family: var(--font-utility);
+      font-size: var(--type-xs);
+    }
+
+    .packet-foot strong {
+      color: var(--bg);
+      font-weight: 400;
+    }
+
+    .workflow {
+      padding-block: var(--s96);
+    }
+
+    .bare-claim {
+      max-width: 20ch;
+      margin: 0 0 var(--s64);
+      font-family: var(--font-display);
+      font-size: var(--type-claim);
+      font-weight: 400;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      text-wrap: balance;
+    }
+
+    .workflow-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--s48) var(--s64);
+    }
+
+    .workflow-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: var(--s16);
+      align-items: start;
+      padding-top: var(--s16);
+      border-top: var(--border);
+    }
+
+    .workflow-item:last-child {
+      grid-column: 2;
+      max-width: 42ch;
+    }
+
+    .workflow-number {
+      color: var(--accent);
+      font-family: var(--font-utility);
+      font-size: var(--type-card);
+      line-height: 1;
+    }
+
+    .workflow-item h3 {
+      margin: 0 0 var(--s8);
+      font-size: var(--type-body);
+      line-height: 1.2;
+    }
+
+    .workflow-item p {
+      max-width: 48ch;
+      margin: 0;
+      color: var(--muted);
+      font-size: var(--type-base);
+      text-wrap: pretty;
+    }
+
+    .grounds {
+      padding-block: var(--s112);
+      background: var(--surface);
+    }
+
+    .grounds-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr);
+      gap: var(--s96);
+      align-items: center;
+    }
+
+    .grounds-copy h2 {
+      max-width: 13ch;
+      margin: 0 0 var(--s24);
+      font-family: var(--font-display);
+      font-size: var(--type-section);
+      font-weight: 400;
+      letter-spacing: -0.025em;
+      line-height: 1.08;
+      text-wrap: balance;
+    }
+
+    .grounds-copy p {
+      max-width: 46ch;
+      margin: 0;
+      color: var(--muted);
+      text-wrap: pretty;
+    }
+
+    .ground-book {
+      border: var(--border);
+      border-radius: var(--radius);
+      background: var(--bg);
+    }
+
+    .ground-book-head {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: var(--s16);
+      padding: var(--s16) var(--s24);
+      border-bottom: var(--border);
+      font-family: var(--font-utility);
+      font-size: var(--type-sm);
+      text-transform: uppercase;
+    }
+
+    .ground-book-head span:last-child {
+      color: var(--accent);
+    }
+
+    .ground-lines {
+      display: grid;
+    }
+
+    .ground-line {
+      display: grid;
+      grid-template-columns: minmax(var(--s96), 0.55fr) minmax(0, 1fr);
+      gap: var(--s24);
+      padding: var(--s16) var(--s24);
+      border-bottom: 1px solid var(--hairline);
+    }
+
+    .ground-line:last-child {
+      border-bottom: 0;
+    }
+
+    .ground-line dt,
+    .ground-line dd {
+      margin: 0;
+    }
+
+    .ground-line dt {
+      color: var(--muted);
+      font-size: var(--type-xs);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .ground-line dd {
+      font-family: var(--font-utility);
+      font-size: var(--type-sm);
+      overflow-wrap: anywhere;
+    }
+
+    .closing {
+      padding-block: var(--s64);
+    }
+
+    .closing-inner {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: var(--s48);
+    }
+
+    .closing h2 {
+      max-width: 20ch;
+      margin: 0 0 var(--s12);
+      font-family: var(--font-display);
+      font-size: var(--type-closing);
+      font-weight: 400;
+      line-height: 1.08;
+      text-wrap: balance;
+    }
+
+    .closing p {
+      max-width: 55ch;
+      margin: 0;
+      color: var(--muted);
+    }
+
+    footer {
+      padding-block: var(--s40);
+      border-top: var(--border);
+      font-size: var(--type-sm);
+    }
+
+    .footer-inner {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: var(--s16);
+    }
+
+    footer p {
+      margin: 0;
+    }
+
+    @media (max-width: 860px) {
+      .topbar-inner {
+        grid-template-columns: 1fr auto;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .hero-grid,
+      .grounds-layout {
+        grid-template-columns: 1fr;
+        gap: var(--s48);
+      }
+
+      .hero-proof {
+        max-width: 28ch;
+      }
+
+      .packet {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "receipt"
+          "memo"
+          "ledger";
+      }
+
+      .receipt,
+      .ledger {
+        transform: none;
+      }
+
+      .memo {
+        margin-right: var(--s48);
+      }
+
+      .packet-sticker {
+        margin-top: calc(var(--s96) * -1);
+      }
+
+      .workflow-grid {
+        gap: var(--s48);
+      }
+
+      .workflow-item:last-child {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 620px) {
+      body {
+        font-size: 16px;
+      }
+
+      .shell {
+        width: min(calc(100% - var(--s32)), var(--content));
+      }
+
+      .topbar-inner {
+        min-height: 68px;
+        gap: var(--s16);
+      }
+
+      .wordmark small {
+        display: none;
+      }
+
+      .hero {
+        padding-block: var(--s72);
+      }
+
+      .hero h1 {
+        font-size: clamp(2.6rem, 14vw, 4rem);
+      }
+
+      .hero-actions {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .hero-actions .button {
+        width: 100%;
+      }
+
+      .reconcile-band {
+        padding-block: var(--s64);
+      }
+
+      .packet-head {
+        grid-template-columns: 1fr;
+      }
+
+      .packet-sticker {
+        justify-self: start;
+        margin-top: 0;
+      }
+
+      .paper-body {
+        padding: var(--s16);
+      }
+
+      .memo {
+        margin-right: var(--s24);
+      }
+
+      .memo .paper-body {
+        grid-template-columns: 1fr;
+      }
+
+      .ledger th:nth-child(2),
+      .ledger td:nth-child(2),
+      .ledger th:nth-child(4),
+      .ledger td:nth-child(4) {
+        display: none;
+      }
+
+      .workflow,
+      .grounds {
+        padding-block: var(--s72);
+      }
+
+      .workflow-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .workflow-item:last-child {
+        grid-column: auto;
+      }
+
+      .ground-line {
+        grid-template-columns: 1fr;
+        gap: var(--s4);
+      }
+
+      .closing-inner {
+        grid-template-columns: 1fr;
+        gap: var(--s24);
+      }
+
+      .closing .button {
+        width: 100%;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="shell topbar-inner">
+      <a class="wordmark" href="#top" aria-label="Tideline home">
+        Tideline <small>Dayboat log</small>
+      </a>
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="#packet">Catch log</a>
+        <a href="#packet">Quota</a>
+        <a href="#grounds">Trip window</a>
+      </nav>
+      <a class="button button-compact" href="#trial">Start free trial</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="shell hero-grid">
+        <div class="hero-copy">
+          <h1 id="hero-title">The catch log that keeps its balance.</h1>
+          <p>Log each box, draw down quota, and leave the landing with the record squared.</p>
+          <div class="hero-actions">
+            <a class="button" href="#trial">Start free trial</a>
+            <a href="#packet">See a landing reconciled</a>
+          </div>
+        </div>
+        <aside class="hero-proof" aria-label="Built for the landing">
+          <strong>One trip record from deck to dealer.</strong>
+          <span>Catch. Tare. Quota. Filed.</span>
+        </aside>
+      </div>
+    </section>
+
+    <section class="reconcile-band full-bleed" id="packet" aria-labelledby="packet-title">
+      <div class="shell">
+        <div class="packet-head">
+          <div>
+            <h2 id="packet-title">Quota reconciliation packet</h2>
+            <p>The old carbon packet, rebuilt as one working record: dealer weight, correction note, and quota carried forward.</p>
+          </div>
+          <div class="packet-sticker">Posted<br>19 Jul 2026</div>
+        </div>
+
+        <div class="packet" aria-label="A reconciled catch and quota record">
+          <article class="paper receipt">
+            <header class="paper-topline">
+              <span>Dealer weigh slip / TL-0427</span>
+              <strong>Sample data</strong>
+            </header>
+            <div class="paper-body">
+              <div class="meta-grid">
+                <div>
+                  <span class="field-label">Trip</span>
+                  <span class="field-value">TL-0427</span>
+                </div>
+                <div>
+                  <span class="field-label">Landed</span>
+                  <span class="field-value">19 Jul / 16:15</span>
+                </div>
+                <div>
+                  <span class="field-label">Port</span>
+                  <span class="field-value">North pier</span>
+                </div>
+                <div>
+                  <span class="field-label">Gear</span>
+                  <span class="field-value">OTB / 100 mm</span>
+                </div>
+              </div>
+              <div class="table-scroll">
+                <table>
+                  <caption>Box weight check, kilograms</caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">Code</th>
+                      <th scope="col">Boxes</th>
+                      <th scope="col">Gross</th>
+                      <th scope="col">Tare</th>
+                      <th scope="col">Net</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>HAD</td><td>27</td><td>351</td><td>39</td><td>312</td></tr>
+                    <tr><td>POL</td><td>16</td><td>212</td><td>24</td><td>188</td></tr>
+                    <tr><td>COD</td><td>4</td><td>48</td><td>6</td><td>42</td></tr>
+                  </tbody>
+                  <tfoot>
+                    <tr><td>Total</td><td>47</td><td>611</td><td>69</td><td>542</td></tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+          </article>
+
+          <article class="paper memo">
+            <header class="paper-topline">
+              <span>Correction memo / CM-0427</span>
+              <span>Attached</span>
+            </header>
+            <div class="paper-body">
+              <div class="memo-mark">+2 kg<br>HAD</div>
+              <p>Haddock tare corrected from 41 kg to 39 kg. Posted net changes from 310 kg to 312 kg; the quota ledger below uses the corrected weight.</p>
+            </div>
+          </article>
+
+          <article class="paper ledger">
+            <header class="paper-topline">
+              <span>Carried-forward quota ledger</span>
+              <strong>Balanced</strong>
+            </header>
+            <div class="paper-body">
+              <div class="meta-grid">
+                <div>
+                  <span class="field-label">Posting</span>
+                  <span class="field-value">Landing TL-0427</span>
+                </div>
+                <div>
+                  <span class="field-label">Trip net</span>
+                  <span class="field-value">542 kg</span>
+                </div>
+                <div>
+                  <span class="field-label">Variance</span>
+                  <span class="field-value">0 kg</span>
+                </div>
+                <div>
+                  <span class="field-label">Record state</span>
+                  <span class="field-value">Ready to file</span>
+                </div>
+              </div>
+              <div class="table-scroll">
+                <table>
+                  <caption>Species quota drawdown, kilograms</caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">Code</th>
+                      <th scope="col">Species</th>
+                      <th scope="col">Allocation</th>
+                      <th scope="col">Prior</th>
+                      <th scope="col">Trip</th>
+                      <th scope="col">Balance</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>HAD</td><td>Haddock</td><td>2,400</td><td>1,060</td><td>312</td><td class="balance">1,028</td></tr>
+                    <tr><td>POL</td><td>Pollock</td><td>1,800</td><td>740</td><td>188</td><td class="balance">872</td></tr>
+                    <tr><td>COD</td><td>Atlantic cod</td><td>600</td><td>361</td><td>42</td><td class="balance">197</td></tr>
+                  </tbody>
+                  <tfoot>
+                    <tr><td>Total</td><td>All species</td><td>4,800</td><td>2,161</td><td>542</td><td class="balance">2,097</td></tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div class="packet-foot">
+          <span>Codes: <strong>HAD haddock / POL pollock / COD Atlantic cod</strong></span>
+          <span>Check: <strong>2,161 + 542 + 2,097 = 4,800 kg</strong></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="workflow" aria-labelledby="workflow-title">
+      <div class="shell">
+        <h2 class="bare-claim" id="workflow-title">The numbers move once.</h2>
+        <div class="workflow-grid">
+          <article class="workflow-item">
+            <span class="workflow-number">1</span>
+            <div>
+              <h3>Log on deck</h3>
+              <p>Record species, box count, haul, gear, and retained weight while the trip is still fresh.</p>
+            </div>
+          </article>
+          <article class="workflow-item">
+            <span class="workflow-number">2</span>
+            <div>
+              <h3>Match at landing</h3>
+              <p>Reconcile the dealer's gross and tare against the deck log before anything reaches quota.</p>
+            </div>
+          </article>
+          <article class="workflow-item">
+            <span class="workflow-number">3</span>
+            <div>
+              <h3>Carry the balance</h3>
+              <p>Post the corrected species weights once. Tideline keeps the remaining quota ready for the next decision.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="grounds" id="grounds" aria-labelledby="grounds-title">
+      <div class="shell grounds-layout">
+        <div class="grounds-copy">
+          <h2 id="grounds-title">Keep the skipper's working memory aboard.</h2>
+          <p>Trip windows can carry the notes that matter: ground, bottom, tide offset, snag marks, and the weather limit learned over seasons.</p>
+        </div>
+        <article class="ground-book" aria-label="Digital grounds notebook entry">
+          <header class="ground-book-head">
+            <span>Ground book / station 41-B</span>
+            <span>Checked</span>
+          </header>
+          <dl class="ground-lines">
+            <div class="ground-line">
+              <dt>Legacy fix</dt>
+              <dd>LORAN TD 9960-X / 41,382.4 and 9960-Y / 62,104.7</dd>
+            </div>
+            <div class="ground-line">
+              <dt>Converted fix</dt>
+              <dd>GPS position held in trip record, conversion source retained</dd>
+            </div>
+            <div class="ground-line">
+              <dt>Bottom</dt>
+              <dd>76-82 m / hard edge to broken shell</dd>
+            </div>
+            <div class="ground-line">
+              <dt>Skipper note</dt>
+              <dd>Work 38 min after turn; avoid east set above 18 kn</dd>
+            </div>
+          </dl>
+        </article>
+      </div>
+    </section>
+
+    <section class="closing" id="trial" aria-labelledby="trial-title">
+      <div class="shell closing-inner">
+        <div>
+          <h2 id="trial-title">Square the landing before you leave the pier.</h2>
+          <p>Try Tideline with your next trip and carry the balance forward.</p>
+        </div>
+        <a class="button" href="?trial=start">Start free trial</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="shell footer-inner">
+      <p><strong>Tideline</strong> catch logging for working dayboats.</p>
+      <p>Built for catch, quota, and landing records.</p>
+    </div>
+  </footer>
+</body>
+</html>

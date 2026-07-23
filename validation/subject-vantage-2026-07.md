@@ -48,3 +48,46 @@ Ship the vantage deck into the skill (a `references/vantages.md`, a seeded vanta
 Tie, too close to call. Recorded as a weak positive: holding form constant, the vantage arm did no harm (both audit-green, embodiment within 0.2) and shifted the signature onto a genuinely non-default spatial artifact, which the proxy juror scored as more distinctive, but the owner's eye did not separate them decisively on one brief. The gate's first condition (owner prefers or ties Arm B) is met by the tie; the second (repeat across more subjects) is not yet. The vantage deck therefore stays OUT of the skill, and a two-subject repeat on different directions is triggered to test whether the distinctiveness edge holds or was a one-brief artifact. Round-2 results append below.
 
 Artifacts committed alongside this doc: `subject-vantage-armA.html` / `.png` (control) and `subject-vantage-armB.html` / `.png` (vantage). Working copies with mobile shots and `SIGNATURE.md` in `/scratchpad/seam1/`; proxy read in `/scratchpad/seam1/blind-result.json`.
+
+## Round 2: two subjects, two directions, the "archive" vantage
+
+Two fresh briefs, fresh seeds, same controlled A/B, both arms per subject built by Codex gpt-5.6-sol xhigh.
+
+- Keyring (locksmith dispatch and safe service), seed 3919150615, Direction 8 Data-Dense Pro + Structure 0 Marquee Hero.
+- Tideline (small commercial dayboat catch and quota), seed 1556110663, Direction 6 Lo-Fi Riso + Structure 4 Workbench.
+
+Both seeds independently rolled vantage 8 ("the archive") and artifact index 2, so round 2 also tests whether one vantage generalizes across two subjects and two directions.
+
+Signatures produced:
+- Keyring control (Arm A): a live dispatch board (technician routes T-08 / T-14 / Bench) plus a rekey pinning matrix. The operations-in-use default.
+- Keyring vantage (Arm B): a safe-opening case jacket (recovered field record, a timestamped opening event log reading "container opened without forced entry / combination withheld," a billed resolution) plus an obsolete key-blank silhouette index. An archive artifact.
+- Tideline control (Arm A): a live catch log (per-species retained / discard / remaining, quota bars, landing receipt, tide and wind window). The operations-in-use default.
+- Tideline vantage (Arm B): a quota reconciliation packet (dealer weigh slip, a tare-correction memo moving haddock 41 to 39 kg, a carried-forward quota ledger cross-footing to 4,800 kg) plus a LORAN-to-GPS ground book. An archive artifact.
+
+Measured audit (real Playwright, 375 / 768 / 1280): all four exit 0.
+
+Blind reads (Codex gpt-5.6-sol xhigh, method-blind). Process honesty, disclosed: the first two round-2 read attempts were invalid and discarded. One arm's screenshot was missing at read time (a casualty of running audits and screenshots against Chromium in parallel), and the juror prompt had been copied from round 1 with the word "winery" hardcoded, which made it penalize the correct-category pages. Both faults were fixed (a subject-neutral prompt, all four screenshots regenerated from the final builds, reads re-run sequentially) before the results below were taken.
+
+| Subject | Control (Arm A) embodiment / distinctiveness | Vantage (Arm B) embodiment / distinctiveness | Blind ranking |
+| --- | --- | --- | --- |
+| Keyring | 9.7 / 9.1 | 9.2 / 8.6 | control |
+| Tideline | 9.7 / 8.8 | 9.4 / 9.1 | control |
+
+Both round-2 reads favored the control. On Tideline the vantage won distinctiveness (9.1 vs 8.8) but lost embodiment and the overall rank; the juror rewarded the control for reading as "one continuous operational record" (the software in use) over the vantage's more document-like packet.
+
+## Consolidated verdict across three subjects
+
+- Round 1 winery (vantage 9, map): owner tie; proxy juror favored the vantage.
+- Round 2 locksmith (vantage 8, archive): proxy juror favored the control.
+- Round 2 dayboat (vantage 8, archive): proxy juror favored the control.
+
+What the mechanism did, 3 for 3: it produced a genuinely different, non-default signature (a cellar route map, a safe-opening case jacket, a quota reconciliation packet) and held audit-green every time. It reliably diversifies. What it did not do: reliably beat the current Subject test on overall product-page quality. Two structural reasons, both now evidenced:
+
+1. The current Subject test already carries the load-bearing clause "show the product working: one concrete artifact of use." That biases the control toward tool-in-use signatures (a live board, a live log, a live ferment panel), which judges reward as more credible product pages. The vantage arm, sourcing from a standpoint, often produced document-like artifacts (case jackets, reconciliation packets) that read as more distinctive but less like the software running.
+2. Vantage content is not uniformly helpful. The "archive" vantage (rolled in both round-2 subjects) systematically produces filing-cabinet artifacts that lose on product-in-use; the "map / floorplan" vantage (round 1) produced a more operational artifact and tied. A vantage deck would therefore need curation; some rows actively hurt.
+
+Recommendation (owner sign-off pending): DO NOT adopt the seeded vantage as a replacement for or override of the Subject test. The Subject test holds, and its "show the product working" clause is the thing doing the work; the honest improvement is to strengthen that clause, not replace it. Seam-1 leaves a positive residue rather than a clean failure: the vantage has value strictly as an OPTIONAL divergence lever for a run that wants to escape an obvious signature (Keyring's safe-opening case jacket is more memorable than its dispatch board), but only for operational vantages, and never as a default that overrides showing the product working. Whether to add such an optional lever is deferred to the owner and is not shipped now. Cleaner outcome than the SVG-first failure: seam-1's diagnosis has merit and its mechanism half-works, but it does not clear the bar to change the skill.
+
+## Owner verdict (round 2) and disposition
+
+Owner disposition: tested, not adopted. The seeded subject-vantage reliably diversifies the signature but does not beat the current Subject test on product-page quality; the deck stays out of the skill and the Subject test holds unchanged. Seam-1 is closed the way the SVG-first experiment was closed: recorded in full, kept out of the skill, with the reasoning preserved so it is not re-litigated. The positive residue (an optional operational-vantage divergence lever, and the observation that the Subject test's "show the product working" clause is load-bearing) is noted here for any future work but is not built. Round-2 renders and pages committed as `subject-vantage-r2-{keyring,tideline}-{armA,armB}.{html,png}`.

@@ -1,0 +1,1392 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Tideline is catch-logging and quota-management software for small commercial dayboats.">
+  <title>Tideline | Catch logs ready for landing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&amp;family=Atkinson+Hyperlegible:wght@400;700&amp;family=Space+Mono&amp;display=swap" rel="stylesheet">
+  <style>
+    /* goddesign | structure: Workbench | direction: Lo-Fi Riso | accent: riso blue h+7 */
+    /*
+      goddesign | Lo-Fi Riso | Workbench
+      DIRECTION LOCK
+      Seed: 1556110663 | Direction: 6 Lo-Fi Riso | Structure: 4 Workbench
+      Rotation: shared experiment lock, no reroll
+      Tokens: exact locked paper, surface, text, hairline, muted, accent, and secondary values are declared once in :root
+      Jitter: accent hue h+7 | paper lightness L0 | radius r+1 gives 6px
+      Type: Alfa Slab One 400 display / Atkinson Hyperlegible 400 and 700 body / Space Mono 400 utility
+      Layout: slim top bar, single-composition hero, full-bleed working catch ledger, three supporting bands, quiet trial close
+      Signature: a carbon-copy catch and quota ledger for Trip 042, with a landing receipt stub and quota drawdown bars
+      Grammar: full-bleed signature overlaps by 64px | record-flow band has no heading ceremony | tide grid has a spanning cell | paddings 64/96/128
+      Atmosphere: 6% halftone dots on the hero only | surfaces shift between paper and inked paper | one rotated sample-data sticker
+      Motion: 200ms steps(3) on controls only | reduced-motion kill switch
+      Anti-cliche: no navy palette, rope border, anchor, wheel, recreational voice, equal card trio, or fake browser chrome
+    */
+
+    :root {
+      --bg: #F6F3EB;
+      --surface: #ECE8DC;
+      --text: #24242C;
+      --muted: #62626E;
+      --hairline: var(--text);
+      --accent: oklch(from #0078BF l c calc(h + 7));
+      --secondary: #FF48B0;
+      --accent-strong: oklch(from var(--accent) calc(l - 0.08) c h);
+      --accent-dark: oklch(from var(--accent) calc(l - 0.14) c h);
+      --accent-wash: color-mix(in oklch, var(--accent) 13%, var(--surface));
+      --ink-wash: color-mix(in oklch, var(--text) 6%, transparent);
+      --disabled: color-mix(in oklch, var(--muted) 35%, var(--surface));
+      --font-display: "Alfa Slab One", Rockwell, serif;
+      --font-body: "Atkinson Hyperlegible", Verdana, sans-serif;
+      --font-utility: "Space Mono", ui-monospace, monospace;
+      --radius: 6px;
+      --border: 2px solid var(--hairline);
+      --s1: 4px;
+      --s2: 8px;
+      --s3: 12px;
+      --s4: 16px;
+      --s5: 24px;
+      --s6: 32px;
+      --s7: 48px;
+      --s8: 64px;
+      --s9: 96px;
+      --s10: 128px;
+      --page: 1180px;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      overflow-x: clip;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 17px;
+      line-height: 1.55;
+      text-rendering: optimizeLegibility;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button,
+    a,
+    input {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    svg {
+      display: block;
+    }
+
+    .skip-link {
+      position: fixed;
+      inset-block-start: var(--s4);
+      inset-inline-start: var(--s4);
+      z-index: 50;
+      padding: var(--s3) var(--s4);
+      border: var(--border);
+      border-radius: var(--radius);
+      background: var(--bg);
+      color: var(--text);
+      font-weight: 700;
+      transform: translateY(-160%);
+    }
+
+    .skip-link:focus {
+      transform: translateY(0);
+    }
+
+    .shell {
+      width: min(calc(100% - var(--s8)), var(--page));
+      margin-inline: auto;
+    }
+
+    .topbar {
+      position: relative;
+      z-index: 10;
+      border-block-end: var(--border);
+      background: var(--bg);
+    }
+
+    .topbar-inner {
+      min-height: 72px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: var(--s6);
+    }
+
+    .wordmark {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      color: var(--text);
+      font-family: var(--font-display);
+      font-size: 1.45rem;
+      line-height: 1;
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+
+    .wordmark:hover {
+      color: var(--accent-dark);
+    }
+
+    .wordmark:focus-visible,
+    .nav-link:focus-visible,
+    .button:focus-visible,
+    .text-link:focus-visible,
+    .table-scroll:focus-visible,
+    input:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    .wordmark:active,
+    .nav-link:active,
+    .text-link:active {
+      color: var(--accent-dark);
+    }
+
+    .wordmark[aria-disabled="true"],
+    .nav-link[aria-disabled="true"],
+    .text-link[aria-disabled="true"] {
+      color: var(--disabled);
+      pointer-events: none;
+    }
+
+    .nav {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: var(--s5);
+    }
+
+    .nav-link {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      color: var(--text);
+      font-weight: 700;
+      text-decoration-thickness: 2px;
+      text-underline-offset: var(--s1);
+      text-decoration-color: transparent;
+      transition: color 200ms steps(3), text-decoration-color 200ms steps(3);
+    }
+
+    .nav-link:hover {
+      color: var(--accent-dark);
+      text-decoration-color: currentColor;
+    }
+
+    .button {
+      min-height: 48px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--s2);
+      padding: var(--s3) var(--s5);
+      border: var(--border);
+      border-radius: var(--radius);
+      background: var(--accent-strong);
+      color: var(--bg);
+      font-weight: 700;
+      line-height: 1.15;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform 200ms steps(3), background-color 200ms steps(3);
+    }
+
+    .button svg {
+      inline-size: 18px;
+      block-size: 18px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+    }
+
+    .button:hover {
+      background: var(--accent-dark);
+      transform: translateY(-2px);
+    }
+
+    .button:active {
+      transform: translateY(1px);
+    }
+
+    .button:disabled,
+    .button[aria-disabled="true"] {
+      border-color: var(--disabled);
+      background: var(--disabled);
+      color: var(--muted);
+      cursor: not-allowed;
+      pointer-events: none;
+      transform: none;
+    }
+
+    .button-small {
+      min-height: 44px;
+      padding: var(--s2) var(--s4);
+      font-size: 0.95rem;
+    }
+
+    .hero {
+      min-height: 670px;
+      display: grid;
+      align-items: start;
+      padding-block: var(--s9) var(--s10);
+      background-color: var(--surface);
+      background-image: radial-gradient(circle at 1px 1px, var(--ink-wash) 1.2px, transparent 1.3px);
+      background-size: 12px 12px;
+    }
+
+    .hero-copy {
+      max-width: 900px;
+    }
+
+    .hero h1 {
+      max-width: 16ch;
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(3.25rem, 8vw, 5rem);
+      font-weight: 400;
+      line-height: 1.1;
+      letter-spacing: -0.025em;
+      text-wrap: balance;
+    }
+
+    .hero p {
+      max-width: 54ch;
+      margin: var(--s5) 0 var(--s6);
+      font-size: clamp(1.1rem, 2vw, 1.3rem);
+      line-height: 1.5;
+      text-wrap: pretty;
+    }
+
+    .workbench {
+      position: relative;
+      z-index: 4;
+      margin-block-start: calc(var(--s8) * -1);
+      padding-block: 0 var(--s9);
+    }
+
+    .workbench-frame {
+      border-block: var(--border);
+      background: var(--bg);
+    }
+
+    .workbench-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--s5);
+      padding: var(--s5) var(--s6);
+      border-block-end: var(--border);
+    }
+
+    .workbench-title {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(1.75rem, 4vw, 3rem);
+      font-weight: 400;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      text-shadow: 2px 0 var(--secondary);
+      text-wrap: balance;
+    }
+
+    .sticker {
+      flex: none;
+      padding: var(--s2) var(--s3);
+      border: var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      font-family: var(--font-utility);
+      font-size: 0.78rem;
+      line-height: 1.2;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      transform: rotate(-3deg);
+    }
+
+    .trip-strip {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      border-block-end: var(--border);
+      background: var(--surface);
+    }
+
+    .trip-field {
+      min-width: 0;
+      padding: var(--s4);
+      border-inline-end: var(--border);
+    }
+
+    .trip-field:last-child {
+      border-inline-end: 0;
+    }
+
+    .field-label,
+    .panel-label,
+    .table-label,
+    .tiny-label {
+      display: block;
+      color: var(--muted);
+      font-family: var(--font-utility);
+      font-size: 0.72rem;
+      line-height: 1.35;
+      letter-spacing: 0.02em;
+    }
+
+    .field-value {
+      display: block;
+      margin-block-start: var(--s1);
+      font-family: var(--font-utility);
+      font-size: 0.9rem;
+      line-height: 1.4;
+      overflow-wrap: anywhere;
+    }
+
+    .ledger-grid {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+    }
+
+    .catch-sheet,
+    .quota-sheet,
+    .haul-sheet,
+    .receipt-sheet {
+      min-width: 0;
+      padding: var(--s6);
+    }
+
+    .catch-sheet {
+      grid-column: span 8;
+      border-inline-end: var(--border);
+      border-block-end: var(--border);
+    }
+
+    .quota-sheet {
+      grid-column: span 4;
+      border-block-end: var(--border);
+    }
+
+    .haul-sheet {
+      grid-column: span 7;
+      border-inline-end: var(--border);
+    }
+
+    .receipt-sheet {
+      grid-column: span 5;
+      background: var(--surface);
+    }
+
+    .panel-heading {
+      margin: var(--s1) 0 var(--s5);
+      font-size: 1.25rem;
+      line-height: 1.2;
+      text-wrap: balance;
+    }
+
+    .table-scroll {
+      max-width: 100%;
+      overflow-x: auto;
+      overscroll-behavior-inline: contain;
+    }
+
+    table {
+      width: 100%;
+      min-width: 660px;
+      border-collapse: collapse;
+      font-variant-numeric: tabular-nums;
+    }
+
+    th,
+    td {
+      padding: var(--s3) var(--s2);
+      border-block-end: 1px solid var(--hairline);
+      text-align: start;
+      white-space: nowrap;
+    }
+
+    th {
+      color: var(--muted);
+      font-family: var(--font-utility);
+      font-size: 0.7rem;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+    }
+
+    td {
+      font-size: 0.95rem;
+    }
+
+    td:first-child {
+      font-weight: 700;
+    }
+
+    .code,
+    .number,
+    .time,
+    .receipt-value {
+      font-family: var(--font-utility);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .number {
+      color: var(--accent-dark);
+      font-weight: 700;
+    }
+
+    tfoot td {
+      border-block-end: 0;
+      font-weight: 700;
+    }
+
+    .quota-list,
+    .haul-list,
+    .receipt-list,
+    .flow-list,
+    .tide-grid {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .quota-item + .quota-item {
+      margin-block-start: var(--s5);
+    }
+
+    .quota-top {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: var(--s3);
+      margin-block-end: var(--s2);
+    }
+
+    .quota-name {
+      font-weight: 700;
+    }
+
+    .quota-value {
+      color: var(--accent-dark);
+      font-family: var(--font-utility);
+      font-size: 0.86rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .quota-track {
+      height: 10px;
+      overflow: hidden;
+      border: var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+
+    .quota-fill {
+      display: block;
+      height: 100%;
+      background: var(--accent-strong);
+    }
+
+    .quota-cod {
+      width: 55%;
+    }
+
+    .quota-haddock {
+      width: 44%;
+    }
+
+    .quota-pollock {
+      width: 56%;
+    }
+
+    .quota-note {
+      margin: var(--s2) 0 0;
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
+    .status-line {
+      display: flex;
+      align-items: center;
+      gap: var(--s2);
+      margin-block-start: var(--s5);
+      font-weight: 700;
+    }
+
+    .status-mark {
+      width: var(--s3);
+      height: var(--s3);
+      border: 2px solid var(--text);
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .haul-row,
+    .receipt-row {
+      display: grid;
+      grid-template-columns: minmax(80px, auto) 1fr auto;
+      gap: var(--s4);
+      align-items: baseline;
+      padding-block: var(--s3);
+      border-block-end: 1px solid var(--hairline);
+    }
+
+    .haul-row:last-child,
+    .receipt-row:last-child {
+      border-block-end: 0;
+    }
+
+    .haul-name,
+    .receipt-name {
+      font-weight: 700;
+    }
+
+    .haul-meta,
+    .receipt-meta {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .receipt-list {
+      border-block-start: var(--border);
+    }
+
+    .receipt-row {
+      grid-template-columns: 1fr auto;
+    }
+
+    .receipt-ready {
+      margin: var(--s5) 0 0;
+      padding: var(--s3) var(--s4);
+      border: var(--border);
+      border-radius: var(--radius);
+      background: var(--accent-wash);
+      font-weight: 700;
+    }
+
+    .data-state {
+      padding: var(--s5);
+      border: var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+
+    .data-state-title {
+      margin: 0 0 var(--s2);
+      font-weight: 700;
+    }
+
+    .data-state-copy {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .record-flow {
+      padding-block: var(--s8) var(--s9);
+      background: var(--surface);
+    }
+
+    .bare-claim {
+      max-width: 19ch;
+      margin: 0 0 var(--s7);
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 4rem);
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      text-wrap: balance;
+    }
+
+    .flow-list {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--s6);
+    }
+
+    .flow-item {
+      padding-block-start: var(--s3);
+      border-block-start: var(--border);
+    }
+
+    .flow-item:nth-child(2) {
+      margin-block-start: var(--s5);
+    }
+
+    .flow-item:nth-child(3) {
+      margin-block-start: var(--s7);
+    }
+
+    .flow-time {
+      color: var(--accent-dark);
+      font-family: var(--font-utility);
+      font-weight: 700;
+    }
+
+    .flow-title {
+      margin: var(--s3) 0 var(--s2);
+      font-size: 1.2rem;
+      line-height: 1.25;
+    }
+
+    .flow-copy {
+      max-width: 34ch;
+      margin: 0;
+      color: var(--muted);
+      text-wrap: pretty;
+    }
+
+    .window-band {
+      padding-block: var(--s10) var(--s8);
+      background: var(--bg);
+    }
+
+    .window-intro {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(260px, 0.65fr);
+      gap: var(--s8);
+      align-items: end;
+      margin-block-end: var(--s7);
+    }
+
+    .window-intro h2 {
+      max-width: 15ch;
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 4.25rem);
+      font-weight: 400;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      text-wrap: balance;
+    }
+
+    .window-intro p {
+      max-width: 48ch;
+      margin: 0;
+      color: var(--muted);
+      text-wrap: pretty;
+    }
+
+    .tide-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      border: var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+
+    .tide-cell {
+      min-width: 0;
+      min-height: 132px;
+      padding: var(--s5);
+      border-inline-end: var(--border);
+      border-block-end: var(--border);
+    }
+
+    .tide-cell:nth-child(3),
+    .tide-cell:last-child {
+      border-inline-end: 0;
+    }
+
+    .tide-cell:last-child {
+      border-block-end: 0;
+    }
+
+    .tide-span {
+      grid-column: span 2;
+    }
+
+    .tide-span-wide {
+      grid-column: 1 / -1;
+    }
+
+    .tide-reading {
+      display: block;
+      margin-block-start: var(--s3);
+      color: var(--accent-dark);
+      font-family: var(--font-utility);
+      font-size: clamp(1.45rem, 3vw, 2.2rem);
+      line-height: 1.1;
+      font-variant-numeric: tabular-nums;
+      overflow-wrap: anywhere;
+    }
+
+    .tide-detail {
+      display: block;
+      margin-block-start: var(--s2);
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .trial {
+      padding-block: var(--s9);
+      border-block-start: var(--border);
+      background: var(--surface);
+    }
+
+    .trial-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(360px, 1.1fr);
+      gap: var(--s8);
+      align-items: end;
+    }
+
+    .trial h2 {
+      max-width: 14ch;
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4.5vw, 3.75rem);
+      font-weight: 400;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      text-wrap: balance;
+    }
+
+    .trial-copy {
+      max-width: 48ch;
+      margin: var(--s4) 0 0;
+      color: var(--muted);
+      text-wrap: pretty;
+    }
+
+    .trial-form {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: var(--s3);
+      align-items: end;
+    }
+
+    .input-wrap {
+      display: grid;
+      gap: var(--s2);
+    }
+
+    .input-wrap label {
+      font-weight: 700;
+    }
+
+    input {
+      width: 100%;
+      min-height: 48px;
+      padding: var(--s3) var(--s4);
+      border: var(--border);
+      border-radius: var(--radius);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 16px;
+      transition: border-color 200ms steps(3), background-color 200ms steps(3);
+    }
+
+    input:hover {
+      border-color: var(--accent-dark);
+    }
+
+    input:active {
+      background: var(--accent-wash);
+    }
+
+    input:disabled {
+      border-color: var(--disabled);
+      background: var(--disabled);
+      color: var(--muted);
+      cursor: not-allowed;
+    }
+
+    .form-status {
+      min-height: 1.55em;
+      grid-column: 1 / -1;
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .prototype-terms {
+      grid-column: 1 / -1;
+      margin: var(--s2) 0 0;
+      padding-block-start: var(--s3);
+      border-block-start: 1px solid var(--hairline);
+      color: var(--muted);
+      font-size: 0.9rem;
+      text-wrap: pretty;
+    }
+
+    .footer {
+      padding-block: var(--s7);
+      background: var(--text);
+      color: var(--bg);
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: var(--s6);
+    }
+
+    .footer-name {
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+    }
+
+    .footer p {
+      margin: 0;
+      color: var(--surface);
+      text-align: end;
+    }
+
+    @media (max-width: 900px) {
+      .shell {
+        width: min(calc(100% - var(--s7)), var(--page));
+      }
+
+      .topbar-inner {
+        grid-template-columns: auto 1fr;
+      }
+
+      .nav {
+        display: none;
+      }
+
+      .topbar .button {
+        justify-self: end;
+      }
+
+      .trip-strip {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .trip-field:nth-child(3) {
+        border-inline-end: 0;
+      }
+
+      .trip-field:nth-child(-n + 3) {
+        border-block-end: var(--border);
+      }
+
+      .catch-sheet,
+      .quota-sheet,
+      .haul-sheet,
+      .receipt-sheet {
+        grid-column: 1 / -1;
+        border-inline-end: 0;
+        border-block-end: var(--border);
+      }
+
+      .receipt-sheet {
+        border-block-end: 0;
+      }
+
+      .window-intro,
+      .trial-layout {
+        grid-template-columns: 1fr;
+        gap: var(--s6);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .shell {
+        width: min(calc(100% - var(--s6)), var(--page));
+      }
+
+      .topbar-inner {
+        min-height: 64px;
+        gap: var(--s3);
+      }
+
+      .topbar .button-small {
+        padding-inline: var(--s3);
+      }
+
+      .topbar .button-small svg {
+        display: none;
+      }
+
+      .hero {
+        min-height: 590px;
+        padding-block: var(--s8) var(--s10);
+      }
+
+      .hero h1 {
+        font-size: clamp(2.75rem, 14vw, 4.5rem);
+      }
+
+      .workbench-head {
+        align-items: flex-start;
+        padding: var(--s5) var(--s4);
+      }
+
+      .workbench-title {
+        font-size: 1.6rem;
+      }
+
+      .sticker {
+        font-size: 0.66rem;
+      }
+
+      .trip-strip {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .trip-field:nth-child(3) {
+        border-inline-end: var(--border);
+      }
+
+      .trip-field:nth-child(2n) {
+        border-inline-end: 0;
+      }
+
+      .trip-field:nth-child(-n + 4) {
+        border-block-end: var(--border);
+      }
+
+      .catch-sheet,
+      .quota-sheet,
+      .haul-sheet,
+      .receipt-sheet {
+        padding: var(--s5) var(--s4);
+      }
+
+      .haul-row {
+        grid-template-columns: auto 1fr;
+      }
+
+      .haul-row .number {
+        grid-column: 2;
+      }
+
+      .flow-list {
+        grid-template-columns: 1fr;
+        gap: var(--s5);
+      }
+
+      .flow-item:nth-child(2),
+      .flow-item:nth-child(3) {
+        margin-block-start: 0;
+      }
+
+      .window-band {
+        padding-block-start: var(--s9);
+      }
+
+      .tide-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .tide-cell {
+        min-height: 120px;
+      }
+
+      .tide-cell:nth-child(2) {
+        border-inline-end: var(--border);
+      }
+
+      .tide-cell:nth-child(3) {
+        border-inline-end: 0;
+      }
+
+      .tide-cell:nth-child(3),
+      .tide-cell:nth-child(4) {
+        border-block-end: var(--border);
+      }
+
+      .tide-span,
+      .tide-span-wide {
+        grid-column: 1 / -1;
+        border-inline-end: 0;
+      }
+
+      .tide-span-wide {
+        border-block-end: 0;
+      }
+
+      .trial-form {
+        grid-template-columns: 1fr;
+      }
+
+      .trial-form .button {
+        width: 100%;
+      }
+
+      .footer-inner {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .footer p {
+        text-align: start;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to catch log</a>
+
+  <header class="topbar">
+    <div class="shell topbar-inner">
+      <a class="wordmark" href="#top" aria-label="Tideline home">Tideline</a>
+      <nav class="nav" aria-label="Primary navigation">
+        <a class="nav-link" href="#workbench">Catch log</a>
+        <a class="nav-link" href="#quotas">Quotas</a>
+        <a class="nav-link" href="#window">Trip window</a>
+      </nav>
+      <a class="button button-small" href="#trial">
+        Start free trial
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M5 12h14M13 6l6 6-6 6"></path>
+        </svg>
+      </a>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <div class="shell hero-copy">
+        <h1 id="hero-title">Land the catch. Leave the log ready.</h1>
+        <p>Log each haul, watch every species quota, and arrive with the landing record ready.</p>
+        <a class="button" href="#trial">
+          Start free trial
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M5 12h14M13 6l6 6-6 6"></path>
+          </svg>
+        </a>
+      </div>
+    </section>
+
+    <section class="workbench" id="workbench" aria-labelledby="log-title">
+      <div class="workbench-frame">
+        <div class="workbench-head">
+          <h2 class="workbench-title" id="log-title">Catch log / Trip 042</h2>
+          <span class="sticker">Sample data</span>
+        </div>
+
+        <div class="trip-strip" aria-label="Trip details">
+          <div class="trip-field">
+            <span class="field-label">Trip</span>
+            <span class="field-value">TD-042</span>
+          </div>
+          <div class="trip-field">
+            <span class="field-label">Sailed</span>
+            <span class="field-value">05:10</span>
+          </div>
+          <div class="trip-field">
+            <span class="field-label">Landed</span>
+            <span class="field-value">14:35</span>
+          </div>
+          <div class="trip-field">
+            <span class="field-label">Gear</span>
+            <span class="field-value">LLS / longline</span>
+          </div>
+          <div class="trip-field">
+            <span class="field-label">Hauls</span>
+            <span class="field-value">3 complete</span>
+          </div>
+          <div class="trip-field">
+            <span class="field-label">High water</span>
+            <span class="field-value">06:18 / 2.7 m</span>
+          </div>
+        </div>
+
+        <div class="ledger-grid">
+          <section class="catch-sheet" aria-labelledby="catch-heading">
+            <span class="panel-label">Retained catch and discard</span>
+            <h3 class="panel-heading" id="catch-heading">Species log</h3>
+            <div class="table-scroll" tabindex="0" aria-label="Scrollable catch table">
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Species</th>
+                    <th scope="col">Code</th>
+                    <th scope="col">Retained</th>
+                    <th scope="col">Discard</th>
+                    <th scope="col">Before</th>
+                    <th scope="col">Remaining</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Atlantic cod</td>
+                    <td class="code">COD</td>
+                    <td class="number">184 kg</td>
+                    <td>12 kg</td>
+                    <td>842 kg</td>
+                    <td class="number">658 kg</td>
+                  </tr>
+                  <tr>
+                    <td>Haddock</td>
+                    <td class="code">HAD</td>
+                    <td class="number">126 kg</td>
+                    <td>8 kg</td>
+                    <td>524 kg</td>
+                    <td class="number">398 kg</td>
+                  </tr>
+                  <tr>
+                    <td>Pollock</td>
+                    <td class="code">POL</td>
+                    <td class="number">78 kg</td>
+                    <td>3 kg</td>
+                    <td>414 kg</td>
+                    <td class="number">336 kg</td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="2">Trip total</td>
+                    <td class="number">388 kg</td>
+                    <td>23 kg</td>
+                    <td></td>
+                    <td></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </section>
+
+          <section class="quota-sheet" id="quotas" aria-labelledby="quota-heading">
+            <span class="panel-label">Quota after this trip</span>
+            <h3 class="panel-heading" id="quota-heading">Remaining by species</h3>
+            <ul class="quota-list">
+              <li class="quota-item">
+                <div class="quota-top">
+                  <span class="quota-name">Atlantic cod</span>
+                  <span class="quota-value">658 / 1,200 kg</span>
+                </div>
+                <div class="quota-track" role="progressbar" aria-label="Atlantic cod quota remaining" aria-valuemin="0" aria-valuemax="100" aria-valuenow="55">
+                  <span class="quota-fill quota-cod"></span>
+                </div>
+                <p class="quota-note">55% remaining</p>
+              </li>
+              <li class="quota-item">
+                <div class="quota-top">
+                  <span class="quota-name">Haddock</span>
+                  <span class="quota-value">398 / 900 kg</span>
+                </div>
+                <div class="quota-track" role="progressbar" aria-label="Haddock quota remaining" aria-valuemin="0" aria-valuemax="100" aria-valuenow="44">
+                  <span class="quota-fill quota-haddock"></span>
+                </div>
+                <p class="quota-note">44% remaining</p>
+              </li>
+              <li class="quota-item">
+                <div class="quota-top">
+                  <span class="quota-name">Pollock</span>
+                  <span class="quota-value">336 / 600 kg</span>
+                </div>
+                <div class="quota-track" role="progressbar" aria-label="Pollock quota remaining" aria-valuemin="0" aria-valuemax="100" aria-valuenow="56">
+                  <span class="quota-fill quota-pollock"></span>
+                </div>
+                <p class="quota-note">56% remaining</p>
+              </li>
+            </ul>
+            <div class="status-line">
+              <span class="status-mark" aria-hidden="true"></span>
+              <span>All retained catch is within quota</span>
+            </div>
+          </section>
+
+          <section class="haul-sheet" aria-labelledby="haul-heading">
+            <span class="panel-label">Entry trail</span>
+            <h3 class="panel-heading" id="haul-heading">Three hauls, one open record</h3>
+            <ul class="haul-list">
+              <li class="haul-row">
+                <span class="time">06:52</span>
+                <span>
+                  <span class="haul-name">Haul 1</span>
+                  <span class="haul-meta"> West ground / 24 tubs</span>
+                </span>
+                <span class="number">144 kg</span>
+              </li>
+              <li class="haul-row">
+                <span class="time">09:41</span>
+                <span>
+                  <span class="haul-name">Haul 2</span>
+                  <span class="haul-meta"> Middle ground / 19 tubs</span>
+                </span>
+                <span class="number">121 kg</span>
+              </li>
+              <li class="haul-row">
+                <span class="time">12:18</span>
+                <span>
+                  <span class="haul-name">Haul 3</span>
+                  <span class="haul-meta"> Home edge / 21 tubs</span>
+                </span>
+                <span class="number">123 kg</span>
+              </li>
+            </ul>
+          </section>
+
+          <section class="receipt-sheet" aria-labelledby="receipt-heading">
+            <span class="panel-label">Landing receipt stub</span>
+            <h3 class="panel-heading" id="receipt-heading">LR-042</h3>
+            <ul class="receipt-list">
+              <li class="receipt-row">
+                <span class="receipt-name">Offload</span>
+                <span class="receipt-value">14:35</span>
+              </li>
+              <li class="receipt-row">
+                <span class="receipt-name">Net landed</span>
+                <span class="receipt-value number">388 kg</span>
+              </li>
+              <li class="receipt-row">
+                <span class="receipt-name">Species lines</span>
+                <span class="receipt-value">3</span>
+              </li>
+              <li class="receipt-row">
+                <span class="receipt-name">Catch log match</span>
+                <span class="receipt-value">388 kg</span>
+              </li>
+            </ul>
+            <p class="receipt-ready">Ready for skipper review</p>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <template id="catch-log-loading">
+      <div class="data-state" role="status">
+        <p class="data-state-title">Loading trip data</p>
+        <p class="data-state-copy">The catch log will appear when the latest entries arrive.</p>
+      </div>
+    </template>
+    <template id="catch-log-empty">
+      <div class="data-state">
+        <p class="data-state-title">No catch entries yet</p>
+        <p class="data-state-copy">Add the first haul to begin this trip record.</p>
+      </div>
+    </template>
+    <template id="catch-log-error">
+      <div class="data-state" role="alert">
+        <p class="data-state-title">Catch data could not load</p>
+        <p class="data-state-copy">Check the connection, then try loading the trip again.</p>
+      </div>
+    </template>
+
+    <section class="record-flow" aria-label="How one trip record stays together">
+      <div class="shell">
+        <p class="bare-claim">A single record stays open from first haul to landing scale.</p>
+        <ol class="flow-list">
+          <li class="flow-item">
+            <span class="flow-time">06:52</span>
+            <h3 class="flow-title">Crew logs the catch</h3>
+            <p class="flow-copy">Retained and discarded weights enter the same trip line while the gear is still working.</p>
+          </li>
+          <li class="flow-item">
+            <span class="flow-time">09:41</span>
+            <h3 class="flow-title">Quota redraws</h3>
+            <p class="flow-copy">Each species balance changes with the haul, so the skipper can see what is left before setting again.</p>
+          </li>
+          <li class="flow-item">
+            <span class="flow-time">14:35</span>
+            <h3 class="flow-title">Landing matches</h3>
+            <p class="flow-copy">The receipt total is checked against the retained catch before the trip is closed.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="window-band" id="window" aria-labelledby="window-heading">
+      <div class="shell">
+        <div class="window-intro">
+          <h2 id="window-heading">The water decides the window.</h2>
+          <p>Keep the trip conditions beside the catch record, with the tide, wind, and return window tied to the same working day.</p>
+        </div>
+        <ul class="tide-grid" aria-label="Trip 042 water and weather window">
+          <li class="tide-cell tide-span">
+            <span class="tiny-label">High water</span>
+            <strong class="tide-reading">06:18 / 2.7 m</strong>
+            <span class="tide-detail">Trip 042 departure window</span>
+          </li>
+          <li class="tide-cell">
+            <span class="tiny-label">Wind</span>
+            <strong class="tide-reading">SW 12 kn</strong>
+            <span class="tide-detail">Logged at sail time</span>
+          </li>
+          <li class="tide-cell">
+            <span class="tiny-label">Sea</span>
+            <strong class="tide-reading">0.8 m</strong>
+            <span class="tide-detail">Short southwest swell</span>
+          </li>
+          <li class="tide-cell tide-span-wide">
+            <span class="tiny-label">Return window</span>
+            <strong class="tide-reading">13:45-15:10</strong>
+            <span class="tide-detail">Landing completed at 14:35</span>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="trial" id="trial" aria-labelledby="trial-heading">
+      <div class="shell trial-layout">
+        <div>
+          <h2 id="trial-heading">Bring the next trip into one log.</h2>
+          <p class="trial-copy">Start a free Tideline trial and work with the species quotas you already manage.</p>
+        </div>
+        <form class="trial-form" id="trial-form">
+          <div class="input-wrap">
+            <label for="email">Work email</label>
+            <input id="email" name="email" type="email" autocomplete="email" placeholder="skipper@example.com" required>
+          </div>
+          <button class="button" type="submit">
+            Start free trial
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M5 12h14M13 6l6 6-6 6"></path>
+            </svg>
+          </button>
+          <p class="form-status" id="form-status" role="status">Standalone preview. This form does not send or store data.</p>
+          <p class="prototype-terms">Prototype disclosure: trial length, pricing, cancellation, contact, and data-handling terms were not supplied. Add them before launch.</p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="shell footer-inner">
+      <span class="footer-name">Tideline</span>
+      <p>Catch logs, quota drawdowns, and landing records for small commercial dayboats.</p>
+    </div>
+  </footer>
+
+  <script>
+    const trialForm = document.querySelector('#trial-form');
+    const formStatus = document.querySelector('#form-status');
+    const submitButton = trialForm.querySelector('button');
+
+    trialForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (!trialForm.reportValidity()) return;
+      submitButton.disabled = true;
+      formStatus.textContent = 'Email validated in this preview. Nothing was sent or stored.';
+    });
+  </script>
+</body>
+</html>

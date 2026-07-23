@@ -1,0 +1,1288 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Keyring dispatch and job management software for commercial locksmith and safe teams.">
+  <title>Keyring | Locksmith operations, keyed together</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@600&amp;family=IBM+Plex+Sans:wght@400;600&amp;family=IBM+Plex+Mono:wght@500&amp;display=swap" rel="stylesheet">
+  <style>
+    /* goddesign | structure: Marquee Hero | direction: Data-Dense Pro | accent: yellow-green */
+    /*
+      goddesign | DIRECTION LOCK
+      Seed: 3919150615 | Direction: 8 Data-Dense Pro | Structure: 0 Marquee Hero
+      Rotation: controlled shared lock; rotation does not alter the experiment.
+      Tokens: exact locked bg, surface, text, muted, accent, status, and hairline values are declared once in :root.
+      Jitter: h+2 L0 r0 | accent oklch(from source l c calc(h + 2)) | radius 4px
+      Type: Familjen Grotesk 600 display / IBM Plex Sans 400 and 600 body / IBM Plex Mono 500 numerals
+      Layout: full-viewport marquee hero, quiet handoff claim, full-bleed signature job panel, uneven support grid, inventory ledger, quiet CTA
+      Signature: one live rekey job ticket layered with its matching six-pin bitting worksheet
+      Grammar: signature panel escapes full-bleed and overlaps by 64px | workflow opens on a bare claim | capability grid has one double-width cell | vertical paddings 48/72/96
+      Atmosphere: solid dark ground, surface-lightness layers, dense hairline grids, key-cut profiles
+      Motion: 160ms linear state changes only; no entrances
+      Anti-cliche: no padlock or shield icon, no cyber green, no generic equal card trio. Physical key cuts, pin stacks, van stock, and job tickets define the subject.
+    */
+    :root {
+      --bg: #1A1815;
+      --surface: #22201C;
+      --text: #EDEDE6;
+      --muted: #9A9A8E;
+      --accent: oklch(from #FAFF69 l c calc(h + 2));
+      --positive: #4ADE80;
+      --negative: #F87171;
+      --hairline: #2E2E2A;
+      --accent-hover: oklch(from var(--accent) calc(l - 0.08) c h);
+      --accent-active: oklch(from var(--accent) calc(l - 0.14) c h);
+      --accent-wash: color-mix(in oklch, var(--accent) 10%, transparent);
+      --positive-wash: color-mix(in oklch, var(--positive) 10%, transparent);
+      --negative-wash: color-mix(in oklch, var(--negative) 10%, transparent);
+      --surface-raised: color-mix(in oklch, var(--surface) 86%, var(--text));
+      --surface-low: color-mix(in oklch, var(--bg) 72%, var(--surface));
+      --text-soft: color-mix(in oklch, var(--text) 76%, var(--muted));
+      --bg-grid: color-mix(in oklch, var(--hairline) 54%, transparent);
+      --display: "Familjen Grotesk", sans-serif;
+      --body: "IBM Plex Sans", sans-serif;
+      --mono: "IBM Plex Mono", monospace;
+      --radius: 4px;
+      --rule: 1px solid var(--hairline);
+      --space-1: 2px;
+      --space-2: 4px;
+      --space-3: 8px;
+      --space-4: 12px;
+      --space-5: 16px;
+      --space-6: 24px;
+      --space-7: 32px;
+      --space-8: 48px;
+      --section-mid: 72px;
+      --section-wide: 96px;
+      --page: min(1180px, calc(100% - 48px));
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--bg);
+    }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      overflow-x: clip;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--body);
+      font-size: 16px;
+      line-height: 1.5;
+      text-rendering: optimizeLegibility;
+    }
+
+    a,
+    button,
+    input {
+      font: inherit;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    button,
+    input {
+      border-radius: var(--radius);
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    .skip-link {
+      position: fixed;
+      z-index: 20;
+      top: var(--space-3);
+      left: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      transform: translateY(-160%);
+      background: var(--accent);
+      color: var(--bg);
+      border-radius: var(--radius);
+    }
+
+    .skip-link:focus {
+      transform: translateY(0);
+    }
+
+    .shell {
+      width: var(--page);
+      margin-inline: auto;
+    }
+
+    .hero {
+      min-height: 100svh;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      background:
+        linear-gradient(var(--bg-grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px),
+        var(--bg);
+      background-size: 48px 48px;
+      border-bottom: var(--rule);
+    }
+
+    .topbar {
+      width: var(--page);
+      margin-inline: auto;
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-6);
+      border-bottom: var(--rule);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-3);
+      min-height: 44px;
+      font-family: var(--display);
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      text-decoration: none;
+    }
+
+    .brand-mark {
+      width: 28px;
+      height: 12px;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      align-items: end;
+      gap: var(--space-1);
+      color: var(--accent);
+    }
+
+    .brand-mark span {
+      display: block;
+      background: currentColor;
+    }
+
+    .brand-mark span:nth-child(1),
+    .brand-mark span:nth-child(5) { height: 33%; }
+    .brand-mark span:nth-child(2),
+    .brand-mark span:nth-child(4) { height: 66%; }
+    .brand-mark span:nth-child(3),
+    .brand-mark span:nth-child(6) { height: 100%; }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: var(--space-6);
+    }
+
+    .nav a:not(.button) {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 0.875rem;
+      text-decoration: none;
+      transition: color 160ms linear;
+    }
+
+    .nav a:not(.button):hover {
+      color: var(--text);
+    }
+
+    .nav a:not(.button):active {
+      color: var(--accent);
+    }
+
+    .button {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-4) var(--space-5);
+      border: 1px solid transparent;
+      border-radius: var(--radius);
+      background: var(--accent);
+      color: var(--bg);
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background-color 160ms linear, color 160ms linear, border-color 160ms linear, transform 160ms linear;
+    }
+
+    .button:hover {
+      background: var(--accent-hover);
+    }
+
+    .button:active {
+      background: var(--accent-active);
+      transform: translateY(2px);
+    }
+
+    .button:disabled,
+    .button[aria-disabled="true"] {
+      background: var(--hairline);
+      color: var(--muted);
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .hero-copy {
+      width: var(--page);
+      margin-inline: auto;
+      align-self: center;
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(240px, 1fr);
+      align-items: end;
+      gap: var(--space-8);
+      padding-block: var(--space-8);
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-family: var(--display);
+      font-weight: 600;
+      text-wrap: balance;
+    }
+
+    h1 {
+      max-width: 16ch;
+      font-size: clamp(3.25rem, 7.7vw, 6rem);
+      line-height: 1.1;
+      letter-spacing: -0.04em;
+    }
+
+    .hero-aside {
+      display: grid;
+      gap: var(--space-6);
+      align-content: end;
+      padding-bottom: var(--space-3);
+    }
+
+    .hero-aside p {
+      max-width: 32ch;
+      color: var(--text-soft);
+      text-wrap: pretty;
+    }
+
+    .hero-aside .button {
+      justify-self: start;
+    }
+
+    .key-gauge {
+      width: var(--page);
+      margin-inline: auto;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: end;
+      gap: var(--space-5);
+      padding-bottom: var(--space-6);
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.04em;
+    }
+
+    .key-bow {
+      width: 64px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      border: var(--rule);
+      border-radius: 50% 4px 4px 50%;
+      background: var(--surface);
+    }
+
+    .key-bow::after {
+      content: "";
+      width: 16px;
+      height: 16px;
+      border: var(--rule);
+      border-radius: 50%;
+    }
+
+    .key-cuts {
+      height: 48px;
+      display: grid;
+      grid-template-columns: repeat(6, minmax(24px, 1fr));
+      align-items: end;
+      border-bottom: var(--rule);
+    }
+
+    .key-cut {
+      position: relative;
+      min-width: 0;
+      background: var(--surface);
+      border-inline-start: var(--rule);
+    }
+
+    .key-cut::before {
+      content: attr(data-depth);
+      position: absolute;
+      inset: auto 0 calc(100% + var(--space-1));
+      color: var(--accent);
+      text-align: center;
+    }
+
+    .key-cut:nth-child(1) { height: 58%; }
+    .key-cut:nth-child(2) { height: 88%; }
+    .key-cut:nth-child(3) { height: 42%; }
+    .key-cut:nth-child(4) { height: 68%; }
+    .key-cut:nth-child(5) { height: 76%; }
+    .key-cut:nth-child(6) { height: 32%; border-inline-end: var(--rule); }
+
+    .workflow {
+      padding-block: var(--section-wide);
+      background: var(--surface-low);
+    }
+
+    .workflow-inner {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
+      gap: var(--section-mid);
+      align-items: end;
+      padding-bottom: 64px;
+    }
+
+    .workflow h2 {
+      max-width: 18ch;
+      font-size: clamp(2.5rem, 5vw, 4.75rem);
+      line-height: 1.1;
+      letter-spacing: -0.035em;
+    }
+
+    .handoff-list {
+      display: grid;
+      border-top: var(--rule);
+    }
+
+    .handoff {
+      display: grid;
+      grid-template-columns: 3ch minmax(0, 1fr);
+      gap: var(--space-4);
+      padding-block: var(--space-4);
+      border-bottom: var(--rule);
+      color: var(--text-soft);
+    }
+
+    .handoff span:first-child {
+      color: var(--accent);
+      font-family: var(--mono);
+      font-size: 0.875rem;
+    }
+
+    .signature {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      margin-top: -64px;
+      background: var(--surface);
+      border-block: var(--rule);
+    }
+
+    .ops-header {
+      min-height: 56px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) repeat(3, minmax(110px, 0.55fr));
+      border-bottom: var(--rule);
+    }
+
+    .ops-header > div,
+    .ops-header > p {
+      min-width: 0;
+      display: grid;
+      align-content: center;
+      gap: var(--space-1);
+      padding: var(--space-3) var(--space-5);
+      border-inline-end: var(--rule);
+    }
+
+    .ops-header > :last-child {
+      border-inline-end: 0;
+    }
+
+    .label {
+      color: var(--muted);
+      font-size: 0.6875rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      line-height: 1.2;
+    }
+
+    .mono {
+      font-family: var(--mono);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .accent {
+      color: var(--accent);
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-3);
+      color: var(--positive);
+    }
+
+    .status::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .ops-body {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(410px, 0.8fr);
+      min-height: 600px;
+    }
+
+    .dispatch-board {
+      min-width: 0;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      border-inline-end: var(--rule);
+    }
+
+    .panel-title {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: var(--space-5);
+      padding: var(--space-5) var(--space-6);
+      border-bottom: var(--rule);
+    }
+
+    .panel-title h2,
+    .panel-title h3 {
+      font-size: 1.25rem;
+      line-height: 1.2;
+    }
+
+    .board-grid {
+      display: grid;
+      grid-template-columns: 84px minmax(0, 1fr);
+      min-height: 0;
+    }
+
+    .time-rail {
+      display: grid;
+      grid-template-rows: repeat(6, 1fr);
+      border-inline-end: var(--rule);
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 0.75rem;
+    }
+
+    .time-rail span {
+      padding: var(--space-3) var(--space-4);
+      border-bottom: var(--rule);
+    }
+
+    .routes {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      min-width: 0;
+    }
+
+    .route {
+      min-width: 0;
+      display: grid;
+      grid-template-rows: auto repeat(6, 1fr);
+      border-inline-end: var(--rule);
+    }
+
+    .route:last-child {
+      border-inline-end: 0;
+    }
+
+    .route-head {
+      min-height: 56px;
+      display: grid;
+      align-content: center;
+      gap: var(--space-1);
+      padding: var(--space-3);
+      border-bottom: var(--rule);
+    }
+
+    .route-slot {
+      min-height: 56px;
+      padding: var(--space-3);
+      border-bottom: var(--rule);
+    }
+
+    .job {
+      height: 100%;
+      display: grid;
+      align-content: start;
+      gap: var(--space-2);
+      padding: var(--space-3);
+      border: 1px solid var(--accent);
+      border-radius: var(--radius);
+      background: var(--accent-wash);
+    }
+
+    .job strong {
+      font-size: 0.875rem;
+      line-height: 1.25;
+    }
+
+    .job small {
+      color: var(--text-soft);
+      line-height: 1.35;
+    }
+
+    .job-confirmed {
+      border-color: var(--positive);
+      background: var(--positive-wash);
+    }
+
+    .job-alert {
+      border-color: var(--negative);
+      background: var(--negative-wash);
+    }
+
+    .pinning-sheet {
+      min-width: 0;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      background: var(--surface-raised);
+    }
+
+    .ticket-meta {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      border-bottom: var(--rule);
+    }
+
+    .ticket-meta > div {
+      min-width: 0;
+      display: grid;
+      gap: var(--space-1);
+      padding: var(--space-4);
+      border-inline-end: var(--rule);
+    }
+
+    .ticket-meta > div:last-child {
+      border-inline-end: 0;
+    }
+
+    .pinning-grid {
+      display: grid;
+      grid-template-columns: 92px repeat(6, minmax(36px, 1fr));
+      align-content: start;
+      padding: var(--space-5) var(--space-6);
+    }
+
+    .pinning-grid > div {
+      min-height: 44px;
+      display: grid;
+      place-items: center;
+      border-inline-end: var(--rule);
+      border-bottom: var(--rule);
+      font-family: var(--mono);
+      font-size: 0.875rem;
+    }
+
+    .pinning-grid > div:nth-child(7n) {
+      border-inline-end: 0;
+    }
+
+    .pinning-grid .row-label {
+      place-items: center start;
+      color: var(--muted);
+      font-family: var(--body);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+
+    .pin-stack {
+      width: 18px;
+      height: 32px;
+      display: flex;
+      flex-direction: column-reverse;
+      justify-content: flex-start;
+      gap: var(--space-1);
+      padding: var(--space-1);
+      border: var(--rule);
+      border-radius: 9px 9px 2px 2px;
+    }
+
+    .pin-stack i {
+      display: block;
+      height: 5px;
+      background: var(--accent);
+      border-radius: 1px;
+    }
+
+    .pin-stack i:last-child {
+      background: var(--muted);
+    }
+
+    .key-result {
+      align-self: end;
+      padding: 0 var(--space-6) var(--space-6);
+    }
+
+    .result-blade {
+      height: 56px;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      align-items: end;
+      border-bottom: 2px solid var(--accent);
+    }
+
+    .result-blade span {
+      display: block;
+      background: var(--hairline);
+      border-inline-start: 1px solid var(--muted);
+    }
+
+    .result-blade span:nth-child(1) { height: 58%; }
+    .result-blade span:nth-child(2) { height: 88%; }
+    .result-blade span:nth-child(3) { height: 42%; }
+    .result-blade span:nth-child(4) { height: 68%; }
+    .result-blade span:nth-child(5) { height: 76%; }
+    .result-blade span:nth-child(6) { height: 32%; border-inline-end: 1px solid var(--muted); }
+
+    .ops-footer {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto auto;
+      align-items: center;
+      gap: var(--space-5);
+      min-height: 48px;
+      padding: var(--space-3) var(--space-5);
+      border-top: var(--rule);
+      color: var(--muted);
+      font-size: 0.8125rem;
+    }
+
+    .sync-error {
+      color: var(--negative);
+    }
+
+    .capabilities {
+      padding-block: var(--section-wide);
+      background: var(--bg);
+    }
+
+    .section-intro {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.65fr);
+      gap: var(--space-8);
+      align-items: end;
+      margin-bottom: var(--space-8);
+    }
+
+    .section-intro h2 {
+      max-width: 15ch;
+      font-size: clamp(2.25rem, 4vw, 4rem);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+
+    .section-intro p {
+      max-width: 44ch;
+      color: var(--text-soft);
+      text-wrap: pretty;
+    }
+
+    .capability-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      border-top: var(--rule);
+      border-inline-start: var(--rule);
+    }
+
+    .capability {
+      min-height: 180px;
+      display: grid;
+      align-content: space-between;
+      gap: var(--space-6);
+      padding: var(--space-6);
+      border-inline-end: var(--rule);
+      border-bottom: var(--rule);
+    }
+
+    .capability-wide {
+      grid-column: span 2;
+      grid-template-columns: minmax(0, 1fr) minmax(240px, 0.8fr);
+      align-items: end;
+    }
+
+    .capability h3 {
+      font-size: 1.5rem;
+      line-height: 1.1;
+    }
+
+    .capability p {
+      max-width: 42ch;
+      color: var(--muted);
+      text-wrap: pretty;
+    }
+
+    .mini-log {
+      display: grid;
+      border-top: var(--rule);
+      font-family: var(--mono);
+      font-size: 0.75rem;
+    }
+
+    .mini-log span {
+      display: flex;
+      justify-content: space-between;
+      gap: var(--space-4);
+      padding-block: var(--space-2);
+      border-bottom: var(--rule);
+    }
+
+    .inventory {
+      padding-block: var(--section-mid);
+      background: var(--surface-low);
+    }
+
+    .inventory-layout {
+      display: grid;
+      grid-template-columns: minmax(240px, 0.65fr) minmax(0, 1.35fr);
+      gap: var(--section-mid);
+      align-items: start;
+    }
+
+    .inventory h2 {
+      max-width: 11ch;
+      font-size: clamp(2.25rem, 4vw, 4rem);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+
+    .inventory-copy {
+      display: grid;
+      gap: var(--space-5);
+    }
+
+    .inventory-copy p {
+      max-width: 38ch;
+      color: var(--muted);
+    }
+
+    .stock-table {
+      border-top: var(--rule);
+    }
+
+    .stock-row {
+      display: grid;
+      grid-template-columns: 1.3fr 0.8fr 0.7fr 0.5fr;
+      align-items: center;
+      min-height: 48px;
+      border-bottom: var(--rule);
+    }
+
+    .stock-row > span {
+      min-width: 0;
+      padding-inline: var(--space-4);
+    }
+
+    .stock-row-head {
+      color: var(--muted);
+      font-size: 0.6875rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+
+    .stock-row .low {
+      color: var(--negative);
+    }
+
+    .stock-row .good {
+      color: var(--positive);
+    }
+
+    .closing {
+      padding-block: var(--section-wide);
+      background: var(--surface);
+    }
+
+    .closing-inner {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(240px, 0.6fr);
+      align-items: end;
+      gap: var(--space-8);
+    }
+
+    .closing h2 {
+      max-width: 16ch;
+      font-size: clamp(2.5rem, 5vw, 4.75rem);
+      line-height: 1.1;
+      letter-spacing: -0.035em;
+    }
+
+    .closing-action {
+      display: grid;
+      gap: var(--space-4);
+      justify-items: start;
+    }
+
+    .closing-action p {
+      max-width: 34ch;
+      color: var(--text-soft);
+    }
+
+    .site-footer {
+      padding-block: var(--space-6);
+      background: var(--surface);
+      border-top: var(--rule);
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-5);
+      color: var(--muted);
+      font-size: 0.8125rem;
+    }
+
+    .footer-inner a {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+      transition: color 160ms linear;
+    }
+
+    .footer-inner a:hover {
+      color: var(--text);
+    }
+
+    .footer-inner a:active {
+      color: var(--accent);
+    }
+
+    @media (max-width: 64rem) {
+      .ops-body {
+        grid-template-columns: 1fr;
+      }
+
+      .dispatch-board {
+        border-inline-end: 0;
+        border-bottom: var(--rule);
+      }
+
+      .pinning-sheet {
+        min-height: 520px;
+      }
+
+      .capability-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .capability-wide {
+        grid-column: span 2;
+      }
+    }
+
+    @media (max-width: 48rem) {
+      :root {
+        --page: min(100% - 32px, 720px);
+      }
+
+      .nav a:not(.button) {
+        display: none;
+      }
+
+      .hero-copy,
+      .workflow-inner,
+      .section-intro,
+      .inventory-layout,
+      .closing-inner {
+        grid-template-columns: 1fr;
+        gap: var(--space-7);
+      }
+
+      .hero-copy {
+        align-content: center;
+      }
+
+      .hero-aside {
+        padding-bottom: 0;
+      }
+
+      .workflow-inner {
+        padding-bottom: 64px;
+      }
+
+      .ops-header {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .ops-header > :nth-child(2) {
+        border-inline-end: 0;
+      }
+
+      .ops-header > :nth-child(-n+2) {
+        border-bottom: var(--rule);
+      }
+
+      .board-grid {
+        grid-template-columns: 64px minmax(0, 1fr);
+      }
+
+      .time-rail span {
+        padding-inline: var(--space-3);
+      }
+
+      .route-slot,
+      .route-head {
+        padding: var(--space-2);
+      }
+
+      .job {
+        padding: var(--space-2);
+      }
+
+      .ticket-meta {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .ticket-meta > div:nth-child(2) {
+        border-inline-end: 0;
+      }
+
+      .ticket-meta > div:last-child {
+        grid-column: span 2;
+        border-top: var(--rule);
+      }
+
+      .capability-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .capability-wide {
+        grid-column: auto;
+        grid-template-columns: 1fr;
+      }
+
+      .footer-inner {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 32rem) {
+      :root {
+        --page: calc(100% - 24px);
+      }
+
+      .topbar {
+        min-height: 64px;
+      }
+
+      .nav .button {
+        padding-inline: var(--space-4);
+      }
+
+      h1 {
+        font-size: clamp(3rem, 15vw, 4.5rem);
+      }
+
+      .key-gauge {
+        grid-template-columns: minmax(0, 1fr) auto;
+      }
+
+      .key-bow {
+        display: none;
+      }
+
+      .workflow,
+      .capabilities,
+      .closing {
+        padding-block: var(--section-mid);
+      }
+
+      .ops-body {
+        min-height: 0;
+      }
+
+      .panel-title {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .board-grid {
+        grid-template-columns: 52px minmax(0, 1fr);
+      }
+
+      .routes {
+        grid-template-columns: repeat(3, minmax(92px, 1fr));
+        overflow-x: auto;
+      }
+
+      .route-slot {
+        min-height: 72px;
+      }
+
+      .pinning-grid {
+        grid-template-columns: 72px repeat(6, minmax(30px, 1fr));
+        padding-inline: var(--space-3);
+      }
+
+      .pinning-grid > div {
+        min-height: 40px;
+        font-size: 0.75rem;
+      }
+
+      .ops-footer {
+        grid-template-columns: 1fr;
+        gap: var(--space-2);
+      }
+
+      .stock-row {
+        grid-template-columns: 1fr 0.7fr 0.6fr;
+      }
+
+      .stock-row > span:nth-child(2) {
+        display: none;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header class="hero">
+    <nav class="topbar" aria-label="Primary navigation">
+      <a class="brand" href="#top" aria-label="Keyring home">
+        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span>
+        Keyring
+      </a>
+      <div class="nav">
+        <a href="#dispatch">Dispatch</a>
+        <a href="#field">Field work</a>
+        <a href="#stock">Stock</a>
+        <a class="button" href="#trial">Start free trial</a>
+      </div>
+    </nav>
+
+    <div class="hero-copy" id="top">
+      <h1>The board for every key, safe, and service call.</h1>
+      <div class="hero-aside">
+        <p>Dispatch work, carry pinning records, and close jobs without losing the details between shop and van.</p>
+        <a class="button" href="#trial">Start free trial</a>
+      </div>
+    </div>
+
+    <div class="key-gauge" aria-label="Six-pin key bitting profile, depths 3, 6, 2, 4, 5, 1">
+      <span class="key-bow" aria-hidden="true"></span>
+      <span class="key-cuts" aria-hidden="true">
+        <span class="key-cut" data-depth="3"></span>
+        <span class="key-cut" data-depth="6"></span>
+        <span class="key-cut" data-depth="2"></span>
+        <span class="key-cut" data-depth="4"></span>
+        <span class="key-cut" data-depth="5"></span>
+        <span class="key-cut" data-depth="1"></span>
+      </span>
+      <span>6 PIN / KEYWAY C</span>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="workflow">
+      <div class="shell workflow-inner">
+        <h2>From call intake to cut key, every handoff stays on one job.</h2>
+        <div class="handoff-list" aria-label="Job handoff sequence">
+          <p class="handoff"><span>01</span><span>Dispatcher records scope, site access, and service window.</span></p>
+          <p class="handoff"><span>02</span><span>Technician receives key system, parts, and prior service notes.</span></p>
+          <p class="handoff"><span>03</span><span>Office gets signatures, material use, and closeout in the same record.</span></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="signature" id="dispatch" aria-labelledby="dispatch-title">
+      <div class="ops-header">
+        <div>
+          <span class="label">Operations board</span>
+          <strong id="dispatch-title">Wednesday dispatch</strong>
+        </div>
+        <p><span class="label">Open jobs</span><span class="mono accent">08</span></p>
+        <p><span class="label">On route</span><span class="mono accent">03</span></p>
+        <p><span class="label">Board sync</span><span class="status">Live</span></p>
+      </div>
+
+      <div class="ops-body">
+        <div class="dispatch-board">
+          <div class="panel-title">
+            <h2>Technician routes</h2>
+            <span class="label">Sample data</span>
+          </div>
+          <div class="board-grid">
+            <div class="time-rail" aria-hidden="true">
+              <span>08:00</span><span>09:00</span><span>10:00</span><span>11:00</span><span>12:00</span><span>13:00</span>
+            </div>
+            <div class="routes">
+              <div class="route">
+                <div class="route-head"><span class="label">Van 08</span><strong>T-08</strong></div>
+                <div class="route-slot"><div class="job job-confirmed"><span class="mono">KRG-1839</span><strong>Safe service</strong><small>Dial and boltwork</small></div></div>
+                <div class="route-slot"></div>
+                <div class="route-slot"><div class="job"><span class="mono accent">KRG-1842</span><strong>Rekey 12 cylinders</strong><small>Loading dock / keyway C</small></div></div>
+                <div class="route-slot"></div>
+                <div class="route-slot"></div>
+                <div class="route-slot"></div>
+              </div>
+              <div class="route">
+                <div class="route-head"><span class="label">Van 14</span><strong>T-14</strong></div>
+                <div class="route-slot"></div>
+                <div class="route-slot"><div class="job"><span class="mono">KRG-1844</span><strong>Closer adjustment</strong><small>North vestibule</small></div></div>
+                <div class="route-slot"></div>
+                <div class="route-slot"></div>
+                <div class="route-slot"><div class="job job-alert"><span class="mono">KRG-1848</span><strong>Safe lockout</strong><small>Access pending</small></div></div>
+                <div class="route-slot"></div>
+              </div>
+              <div class="route">
+                <div class="route-head"><span class="label">Bench</span><strong>SHOP</strong></div>
+                <div class="route-slot"></div>
+                <div class="route-slot"></div>
+                <div class="route-slot"><div class="job job-confirmed"><span class="mono">KRG-1841</span><strong>Master key prep</strong><small>24 cores / A2 system</small></div></div>
+                <div class="route-slot"></div>
+                <div class="route-slot"></div>
+                <div class="route-slot"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <aside class="pinning-sheet" aria-labelledby="ticket-title">
+          <div class="panel-title">
+            <h3 id="ticket-title">Rekey job ticket</h3>
+            <span class="mono accent">KRG-1842</span>
+          </div>
+          <div class="ticket-meta">
+            <div><span class="label">Scope</span><span>12 cylinders</span></div>
+            <div><span class="label">Keyway</span><span class="mono">C / 6 pin</span></div>
+            <div><span class="label">Window</span><span class="mono">09:00-11:00</span></div>
+          </div>
+          <div class="pinning-grid" aria-label="Pinning worksheet">
+            <div class="row-label">Chamber</div><div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div>
+            <div class="row-label">Change key</div><div class="accent">3</div><div class="accent">6</div><div class="accent">2</div><div class="accent">4</div><div class="accent">5</div><div class="accent">1</div>
+            <div class="row-label">Master key</div><div>5</div><div>6</div><div>4</div><div>2</div><div>5</div><div>3</div>
+            <div class="row-label">Master pin</div><div>2</div><div>0</div><div>2</div><div>2</div><div>0</div><div>2</div>
+            <div class="row-label">Stack</div>
+            <div><span class="pin-stack"><i></i><i></i></span></div>
+            <div><span class="pin-stack"><i></i></span></div>
+            <div><span class="pin-stack"><i></i><i></i></span></div>
+            <div><span class="pin-stack"><i></i><i></i></span></div>
+            <div><span class="pin-stack"><i></i></span></div>
+            <div><span class="pin-stack"><i></i><i></i></span></div>
+          </div>
+          <div class="key-result">
+            <span class="label">Cut profile / CK-17</span>
+            <div class="result-blade" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+          </div>
+        </aside>
+      </div>
+      <div class="ops-footer">
+        <span>Last board sync <span class="mono">09:16:42</span></span>
+        <span>Empty route: assign the next job</span>
+        <span>Loading ticket: reading field changes</span>
+        <span class="sync-error">Offline changes retry automatically</span>
+      </div>
+    </section>
+
+    <section class="capabilities" id="field">
+      <div class="shell">
+        <div class="section-intro">
+          <h2>Built around the work your team actually carries.</h2>
+          <p>Jobs keep the operational details attached: door, opening, cylinder, key system, material, access, and technician notes.</p>
+        </div>
+        <div class="capability-grid">
+          <article class="capability capability-wide">
+            <div>
+              <h3>One service record, from dispatch to invoice.</h3>
+              <p>Scope changes and field notes land on the active job, so the dispatcher sees what changed before closeout.</p>
+            </div>
+            <div class="mini-log" aria-label="Sample service record activity">
+              <span><span>08:42</span><span>Window confirmed</span></span>
+              <span><span>09:08</span><span>Technician en route</span></span>
+              <span><span>09:37</span><span>12 cylinders verified</span></span>
+              <span><span>10:14</span><span>Pinning sheet attached</span></span>
+            </div>
+          </article>
+          <article class="capability">
+            <h3>Key systems stay with the site.</h3>
+            <p>Find keyways, bittings, master levels, and previous rekeys without calling the shop.</p>
+          </article>
+          <article class="capability">
+            <h3>Safe work keeps its own history.</h3>
+            <p>Record lock type, service performed, access state, and the next recommended maintenance date.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="inventory" id="stock">
+      <div class="shell inventory-layout">
+        <div class="inventory-copy">
+          <h2>Know what is on the van before it rolls.</h2>
+          <p>Track blanks, cylinders, locks, and safe parts by shop bin or service vehicle. Low stock is visible where dispatch decisions happen.</p>
+        </div>
+        <div class="stock-table" role="table" aria-label="Sample van stock">
+          <div class="stock-row stock-row-head" role="row"><span role="columnheader">Item</span><span role="columnheader">Location</span><span role="columnheader">On hand</span><span role="columnheader">State</span></div>
+          <div class="stock-row" role="row"><span role="cell">Key blank / keyway C</span><span role="cell">Van 08</span><span class="mono" role="cell">42</span><span class="good" role="cell">Ready</span></div>
+          <div class="stock-row" role="row"><span role="cell">Mortise cylinder / satin chrome</span><span role="cell">Van 08</span><span class="mono" role="cell">06</span><span class="good" role="cell">Ready</span></div>
+          <div class="stock-row" role="row"><span role="cell">A2 master pin / size 2</span><span role="cell">Bench 03</span><span class="mono" role="cell">18</span><span class="low" role="cell">Low</span></div>
+          <div class="stock-row" role="row"><span role="cell">Safe lock spindle kit</span><span role="cell">Shop bin S4</span><span class="mono" role="cell">03</span><span class="good" role="cell">Ready</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="closing" id="trial">
+      <div class="shell closing-inner">
+        <h2>Put the next job on a board built for locksmith work.</h2>
+        <div class="closing-action">
+          <p>Start a free trial and set up your dispatch board, technicians, and first job.</p>
+          <a class="button" href="#top">Start free trial</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell footer-inner">
+      <span>Keyring dispatch and job management</span>
+      <a href="#top">Back to top</a>
+    </div>
+  </footer>
+</body>
+</html>

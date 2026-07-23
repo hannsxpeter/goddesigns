@@ -1,0 +1,1178 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Keyring dispatch and job management for commercial locksmith and safe operations.">
+  <title>Keyring | Commercial locksmith operations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@600&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+  <style>/* goddesign | structure: Marquee Hero | direction: Data-Dense Pro | accent: yellow-green */
+    /*
+      DIRECTION LOCK
+      Seed: 3919150615 | Direction: 8 Data-Dense Pro | Structure: 0 Marquee Hero
+      Jitter: h+2 L0 r0 | Token values are declared exactly once in :root below.
+      Type: Familjen Grotesk 600 display / IBM Plex Sans 400 and 600 body / IBM Plex Mono 500 numerals
+      Layout: full-viewport marquee hero, quiet overlap, full-bleed case jacket, quiet archive recall, loud handoff grid, quiet CTA
+      Signature: archived safe-opening carbon-copy case jacket linked to a live Keyring work order
+      Grammar: full-bleed signature | bare overlap claim | spanning handoff cell | section paddings 48/72/96
+      Atmosphere: solid dark ground, lightness-separated surfaces, dense rules, one boundary overlap
+      Motion: 160ms linear state changes only; no entrance choreography
+      goddesign | seeded direction
+    */
+
+    :root {
+      --bg: #1A1815;
+      --surface: #22201C;
+      --text: #EDEDE6;
+      --muted: #9A9A8E;
+      --accent: oklch(from #FAFF69 l c calc(h + 2));
+      --positive: #4ADE80;
+      --negative: #F87171;
+      --hairline: #2E2E2A;
+      --font-display: "Familjen Grotesk", sans-serif;
+      --font-body: "IBM Plex Sans", sans-serif;
+      --font-mono: "IBM Plex Mono", monospace;
+      --radius: 4px;
+      --s-1: 2px;
+      --s-2: 4px;
+      --s-3: 8px;
+      --s-4: 12px;
+      --s-5: 16px;
+      --s-6: 24px;
+      --s-7: 32px;
+      --s-8: 48px;
+      --section-mid: 72px;
+      --section-long: 96px;
+      --page: min(1440px, calc(100% - 48px));
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--bg);
+    }
+
+    body {
+      margin: 0;
+      overflow-x: clip;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.5;
+      text-rendering: optimizeLegibility;
+    }
+
+    a,
+    button,
+    input {
+      font: inherit;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    a,
+    button,
+    input {
+      transition: color 160ms linear, background-color 160ms linear, border-color 160ms linear, transform 160ms linear;
+    }
+
+    a:hover {
+      color: var(--accent);
+    }
+
+    a:active,
+    button:active {
+      transform: translateY(1px);
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    [aria-disabled="true"],
+    button:disabled,
+    input:disabled {
+      cursor: not-allowed;
+      opacity: 0.45;
+      pointer-events: none;
+    }
+
+    svg {
+      display: block;
+      max-width: 100%;
+    }
+
+    .page-shell {
+      width: var(--page);
+      margin-inline: auto;
+    }
+
+    .mono,
+    .number,
+    time,
+    td:first-child {
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .label {
+      color: var(--muted);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      line-height: 1.25;
+      text-transform: none;
+    }
+
+    .button {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--accent);
+      border-radius: var(--radius);
+      background: var(--accent);
+      color: var(--bg);
+      cursor: pointer;
+      font-weight: 600;
+      padding: var(--s-4) var(--s-6);
+    }
+
+    .button:hover {
+      border-color: var(--text);
+      background: var(--text);
+      color: var(--bg);
+    }
+
+    .button:active {
+      background: var(--muted);
+      border-color: var(--muted);
+    }
+
+    .hero {
+      min-height: 100svh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      background: var(--bg);
+      isolation: isolate;
+    }
+
+    .nav {
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--hairline);
+      gap: var(--s-6);
+    }
+
+    .wordmark {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+    }
+
+    .nav-context {
+      color: var(--muted);
+      font-size: 0.875rem;
+    }
+
+    .hero-main {
+      min-width: 0;
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
+      align-items: end;
+      gap: var(--s-8);
+      padding-block: var(--section-mid) var(--section-long);
+    }
+
+    .hero-copy {
+      min-width: 0;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-family: var(--font-display);
+      font-weight: 600;
+      text-wrap: balance;
+    }
+
+    p {
+      text-wrap: pretty;
+    }
+
+    h1 {
+      max-width: 15ch;
+      font-size: clamp(3.5rem, 7vw, 6rem);
+      letter-spacing: -0.04em;
+      line-height: 0.98;
+    }
+
+    .hero-sub {
+      max-width: 52ch;
+      margin-top: var(--s-6);
+      color: var(--muted);
+      font-size: 1.125rem;
+    }
+
+    .hero .button {
+      margin-top: var(--s-7);
+    }
+
+    .dispatch-path {
+      counter-reset: stage;
+      display: grid;
+      align-self: stretch;
+      margin: 0;
+      padding: 0;
+      border-top: 1px solid var(--hairline);
+      list-style: none;
+    }
+
+    .dispatch-path li {
+      counter-increment: stage;
+      display: grid;
+      grid-template-columns: 48px 1fr auto;
+      align-items: center;
+      border-bottom: 1px solid var(--hairline);
+      gap: var(--s-5);
+      padding-block: var(--s-5);
+    }
+
+    .dispatch-path li::before {
+      content: "0" counter(stage);
+      color: var(--accent);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+    }
+
+    .dispatch-path strong {
+      font-family: var(--font-display);
+      font-size: clamp(1.25rem, 2vw, 1.75rem);
+      font-weight: 600;
+    }
+
+    .dispatch-path span {
+      color: var(--muted);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: none;
+    }
+
+    .hero-foot {
+      min-height: 96px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      border-top: 1px solid var(--hairline);
+      color: var(--muted);
+      font-size: 0.75rem;
+      gap: var(--s-5);
+      padding-top: var(--s-5);
+    }
+
+    .hero-foot strong {
+      color: var(--positive);
+      font-weight: 600;
+    }
+
+    .overlap-wrap {
+      position: relative;
+      z-index: 2;
+      margin-top: calc(var(--s-8) * -1);
+    }
+
+    .board-skim {
+      display: grid;
+      grid-template-columns: minmax(240px, 0.8fr) minmax(0, 2.2fr);
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+
+    .bare-claim {
+      display: flex;
+      align-items: center;
+      border-right: 1px solid var(--hairline);
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 3vw, 2.5rem);
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      padding: var(--s-6);
+    }
+
+    .active-job {
+      min-width: 0;
+      display: grid;
+      grid-template-columns: 0.6fr 1.1fr 0.65fr 0.5fr;
+      align-items: center;
+    }
+
+    .active-job > div {
+      min-width: 0;
+      display: grid;
+      gap: var(--s-2);
+      padding: var(--s-5);
+    }
+
+    .active-job > div + div {
+      border-left: 1px solid var(--hairline);
+    }
+
+    .active-job strong {
+      overflow-wrap: anywhere;
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+
+    .active-job .status {
+      color: var(--accent);
+    }
+
+    .signature-section {
+      padding-top: var(--section-long);
+      background: var(--bg);
+    }
+
+    .case-jacket {
+      width: 100%;
+      background: var(--surface);
+      border-block: 1px solid var(--hairline);
+    }
+
+    .case-tab {
+      min-height: 48px;
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      align-items: center;
+      border-bottom: 1px solid var(--hairline);
+      gap: var(--s-6);
+      padding-inline: max(24px, calc((100vw - min(1440px, calc(100vw - 48px))) / 2));
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: none;
+    }
+
+    .case-tab .sample {
+      color: var(--accent);
+    }
+
+    .case-layout {
+      display: grid;
+      grid-template-columns: minmax(220px, 0.62fr) minmax(0, 1.38fr) minmax(240px, 0.7fr);
+    }
+
+    .case-column {
+      min-width: 0;
+      padding: var(--s-6);
+    }
+
+    .case-column + .case-column {
+      border-left: 1px solid var(--hairline);
+    }
+
+    .case-heading {
+      display: grid;
+      gap: var(--s-3);
+      margin-bottom: var(--s-6);
+    }
+
+    .case-heading h2 {
+      max-width: 18ch;
+      font-size: clamp(1.75rem, 3vw, 3rem);
+      letter-spacing: -0.035em;
+      line-height: 1;
+    }
+
+    .data-list {
+      display: grid;
+      margin: 0;
+    }
+
+    .data-list > div {
+      display: grid;
+      grid-template-columns: minmax(88px, 0.85fr) minmax(0, 1.15fr);
+      border-top: 1px solid var(--hairline);
+      gap: var(--s-4);
+      padding-block: var(--s-3);
+    }
+
+    .data-list dt,
+    .data-list dd {
+      margin: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .data-list dt {
+      color: var(--muted);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: none;
+    }
+
+    .data-list dd {
+      font-size: 0.875rem;
+    }
+
+    .data-list .number {
+      color: var(--accent);
+    }
+
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      min-width: 620px;
+      border-collapse: collapse;
+      font-size: 0.8125rem;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--hairline);
+      padding: var(--s-4) var(--s-3);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 0.6875rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: none;
+    }
+
+    td:last-child,
+    th:last-child {
+      text-align: right;
+    }
+
+    .verified {
+      color: var(--positive);
+      font-weight: 600;
+    }
+
+    .issue {
+      color: var(--negative);
+      font-weight: 600;
+    }
+
+    .billing {
+      display: grid;
+      margin-top: var(--s-6);
+      border-top: 1px solid var(--hairline);
+    }
+
+    .billing-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: baseline;
+      gap: var(--s-5);
+      padding-block: var(--s-3);
+    }
+
+    .billing-row span:first-child {
+      color: var(--muted);
+      font-size: 0.75rem;
+    }
+
+    .billing-row strong {
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      font-weight: 500;
+    }
+
+    .billing-row.total {
+      border-top: 1px solid var(--hairline);
+      color: var(--accent);
+      padding-top: var(--s-5);
+    }
+
+    .jacket-foot {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr;
+      border-top: 1px solid var(--hairline);
+    }
+
+    .jacket-foot > div {
+      display: grid;
+      gap: var(--s-2);
+      padding: var(--s-5) var(--s-6);
+    }
+
+    .jacket-foot > div + div {
+      border-left: 1px solid var(--hairline);
+    }
+
+    .jacket-foot strong {
+      font-size: 0.8125rem;
+      font-weight: 600;
+    }
+
+    .archive-recall {
+      padding-block: var(--s-8);
+      background: var(--bg);
+    }
+
+    .archive-grid {
+      display: grid;
+      grid-template-columns: minmax(260px, 0.7fr) minmax(0, 1.3fr);
+      align-items: center;
+      gap: var(--s-8);
+    }
+
+    .archive-copy {
+      display: grid;
+      gap: var(--s-5);
+    }
+
+    .archive-copy h2,
+    .handoff-copy h2,
+    .trial h2 {
+      font-size: clamp(2rem, 5vw, 4.5rem);
+      letter-spacing: -0.04em;
+      line-height: 0.98;
+    }
+
+    .archive-copy p,
+    .handoff-copy p,
+    .trial p {
+      max-width: 58ch;
+      color: var(--muted);
+    }
+
+    .blank-index {
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+
+    .blank-index-head {
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--hairline);
+      gap: var(--s-5);
+      padding-inline: var(--s-5);
+    }
+
+    .blank-index-head span:last-child {
+      color: var(--accent);
+    }
+
+    .blank-specimens {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+    }
+
+    .blank-record {
+      min-width: 0;
+      display: grid;
+      grid-template-rows: 1fr auto;
+      gap: var(--s-5);
+      padding: var(--s-6);
+    }
+
+    .blank-record + .blank-record {
+      border-left: 1px solid var(--hairline);
+    }
+
+    .blank-record svg {
+      width: 100%;
+      height: 132px;
+      color: var(--muted);
+    }
+
+    .blank-meta {
+      display: flex;
+      justify-content: space-between;
+      border-top: 1px solid var(--hairline);
+      gap: var(--s-5);
+      padding-top: var(--s-3);
+      color: var(--muted);
+      font-size: 0.75rem;
+    }
+
+    .blank-meta strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .handoff {
+      padding-block: var(--section-long);
+      background: var(--surface);
+    }
+
+    .handoff-copy {
+      display: grid;
+      grid-template-columns: 1fr 0.7fr;
+      align-items: end;
+      gap: var(--s-8);
+      margin-bottom: var(--s-8);
+    }
+
+    .handoff-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      border-top: 1px solid var(--hairline);
+      border-left: 1px solid var(--hairline);
+    }
+
+    .handoff-cell {
+      min-width: 0;
+      min-height: 240px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-right: 1px solid var(--hairline);
+      border-bottom: 1px solid var(--hairline);
+      gap: var(--s-7);
+      padding: var(--s-6);
+    }
+
+    .handoff-cell.span-two {
+      min-height: 320px;
+      grid-column: span 2;
+      background: var(--bg);
+    }
+
+    .handoff-cell h3 {
+      max-width: 18ch;
+      font-size: clamp(1.5rem, 3vw, 2.75rem);
+      letter-spacing: -0.035em;
+      line-height: 1;
+    }
+
+    .handoff-cell p {
+      max-width: 48ch;
+      color: var(--muted);
+      font-size: 0.875rem;
+    }
+
+    .cell-status {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--hairline);
+      gap: var(--s-5);
+      padding-top: var(--s-3);
+      color: var(--muted);
+      font-size: 0.75rem;
+    }
+
+    .cell-status strong {
+      color: var(--accent);
+      font-family: var(--font-mono);
+      font-weight: 500;
+    }
+
+    .trial {
+      padding-block: var(--section-mid);
+      background: var(--bg);
+    }
+
+    .trial-grid {
+      display: grid;
+      grid-template-columns: 1fr minmax(320px, 0.68fr);
+      align-items: end;
+      gap: var(--s-8);
+    }
+
+    .trial-copy {
+      display: grid;
+      gap: var(--s-5);
+    }
+
+    .trial-form {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius);
+      background: var(--surface);
+      padding: var(--s-2);
+    }
+
+    .trial-form label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+
+    .trial-form input {
+      min-width: 0;
+      min-height: 44px;
+      border: 0;
+      border-radius: var(--radius);
+      background: transparent;
+      color: var(--text);
+      padding-inline: var(--s-5);
+    }
+
+    .trial-form input::placeholder {
+      color: var(--muted);
+      opacity: 1;
+    }
+
+    .trial-form input:hover {
+      background: color-mix(in oklch, var(--surface), var(--text) 3%);
+    }
+
+    .trial-form input:focus-visible {
+      background: var(--bg);
+    }
+
+    .footer {
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--hairline);
+      color: var(--muted);
+      font-size: 0.75rem;
+      gap: var(--s-5);
+    }
+
+    .footer strong {
+      color: var(--text);
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    @media (max-width: 980px) {
+      :root {
+        --page: min(100% - 32px, 900px);
+      }
+
+      .hero-main,
+      .archive-grid,
+      .handoff-copy,
+      .trial-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-main {
+        align-items: start;
+      }
+
+      .dispatch-path {
+        align-self: end;
+      }
+
+      .board-skim {
+        grid-template-columns: 1fr;
+      }
+
+      .bare-claim {
+        border-right: 0;
+        border-bottom: 1px solid var(--hairline);
+      }
+
+      .case-layout {
+        grid-template-columns: 1fr 1.6fr;
+      }
+
+      .case-column.billing-column {
+        grid-column: 1 / -1;
+        border-top: 1px solid var(--hairline);
+        border-left: 0;
+      }
+
+      .archive-grid,
+      .trial-grid {
+        gap: var(--s-7);
+      }
+    }
+
+    @media (max-width: 720px) {
+      :root {
+        --page: calc(100% - 24px);
+      }
+
+      .nav-context,
+      .hero-foot span:last-child {
+        display: none;
+      }
+
+      .hero-main {
+        gap: var(--s-7);
+        padding-block: var(--s-8) var(--section-mid);
+      }
+
+      h1 {
+        font-size: clamp(3rem, 15vw, 4.5rem);
+      }
+
+      .overlap-wrap {
+        margin-top: calc(var(--s-7) * -1);
+      }
+
+      .active-job {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .active-job > div:nth-child(3) {
+        border-left: 0;
+      }
+
+      .active-job > div:nth-child(n + 3) {
+        border-top: 1px solid var(--hairline);
+      }
+
+      .case-tab {
+        grid-template-columns: 1fr auto;
+        padding-inline: var(--s-5);
+      }
+
+      .case-tab span:nth-child(2) {
+        display: none;
+      }
+
+      .case-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .case-column + .case-column {
+        border-top: 1px solid var(--hairline);
+        border-left: 0;
+      }
+
+      .jacket-foot {
+        grid-template-columns: 1fr;
+      }
+
+      .jacket-foot > div + div {
+        border-top: 1px solid var(--hairline);
+        border-left: 0;
+      }
+
+      .blank-specimens,
+      .handoff-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .blank-record + .blank-record {
+        border-top: 1px solid var(--hairline);
+        border-left: 0;
+      }
+
+      .handoff-cell.span-two {
+        grid-column: auto;
+      }
+
+      .trial-form {
+        grid-template-columns: 1fr;
+        gap: var(--s-2);
+      }
+
+      .trial-form .button {
+        width: 100%;
+      }
+
+      .footer {
+        align-items: flex-start;
+        flex-direction: column;
+        justify-content: center;
+        padding-block: var(--s-5);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main id="top">
+    <section class="hero" aria-labelledby="hero-title">
+      <nav class="nav page-shell" aria-label="Primary navigation">
+        <a class="wordmark" href="#top" aria-label="Keyring home">Keyring</a>
+        <span class="nav-context">Commercial locksmith operations</span>
+      </nav>
+
+      <div class="hero-main page-shell">
+        <div class="hero-copy">
+          <h1 id="hero-title">Run the board. Keep every key traceable.</h1>
+          <p class="hero-sub">Assign locksmiths, track restricted key work, and close safe calls from one operational record.</p>
+          <a class="button" href="#trial">Start free trial</a>
+        </div>
+
+        <ol class="dispatch-path" aria-label="A Keyring job from dispatch to archive">
+          <li><strong>Assigned</strong><span>Board</span></li>
+          <li><strong>En route</strong><span>Van</span></li>
+          <li><strong>On site</strong><span>Field</span></li>
+          <li><strong>Secured</strong><span>Archive</span></li>
+        </ol>
+      </div>
+
+      <div class="hero-foot page-shell">
+        <span><strong>Board online</strong> / Field records synced</span>
+        <span>Dispatch / Keying / Safe service / Closeout</span>
+      </div>
+    </section>
+
+    <div class="overlap-wrap page-shell">
+      <section class="board-skim" aria-labelledby="board-claim">
+        <h2 class="bare-claim" id="board-claim">The board knows what the van knows.</h2>
+        <div class="active-job" aria-label="Current job preview">
+          <div><span class="label">Job</span><strong class="mono">KR-2084</strong></div>
+          <div><span class="label">Work</span><strong>Safe service</strong></div>
+          <div><span class="label">Tech</span><strong class="mono">T-04</strong></div>
+          <div><span class="label">State</span><strong class="status">Assigned</strong></div>
+        </div>
+      </section>
+    </div>
+
+    <section class="signature-section" aria-labelledby="case-title">
+      <article class="case-jacket">
+        <header class="case-tab">
+          <span>Archive case jacket / <span class="mono">83-0471</span></span>
+          <span>Linked job <span class="mono">KR-2084</span></span>
+          <span class="sample">Sample data</span>
+        </header>
+
+        <div class="case-layout">
+          <section class="case-column" aria-label="Case identity">
+            <div class="case-heading">
+              <span class="label">Recovered field record</span>
+              <h2 id="case-title">Safe-opening case jacket</h2>
+            </div>
+            <dl class="data-list">
+              <div><dt>Legacy ref</dt><dd class="number">83-0471</dd></div>
+              <div><dt>Keyring job</dt><dd class="number">KR-2084</dd></div>
+              <div><dt>Asset</dt><dd>TL-15 composite safe</dd></div>
+              <div><dt>Lock</dt><dd>S&amp;G 6730 mechanical dial</dd></div>
+              <div><dt>Service lane</dt><dd>West annex / vault 2</dd></div>
+              <div><dt>Symptom</dt><dd>Dial turns; boltwork does not withdraw</dd></div>
+              <div><dt>Spindle</dt><dd>Free play within service limit</dd></div>
+              <div><dt>Opening</dt><dd>Non-destructive manipulation</dd></div>
+              <div><dt>Authorization</dt><dd class="verified">Identity and scope verified</dd></div>
+              <div><dt>Assigned</dt><dd><span class="mono">T-04</span> / van <span class="mono">12</span></dd></div>
+            </dl>
+          </section>
+
+          <section class="case-column" aria-label="Field event log">
+            <div class="case-heading">
+              <span class="label">Field event log</span>
+              <h3>One trace from dispatch to secure close.</h3>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Time</th>
+                    <th scope="col">Event</th>
+                    <th scope="col">Source</th>
+                    <th scope="col">Check</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><time datetime="08:17">08:17</time></td>
+                    <td>Tech <span class="mono">T-04</span> assigned with safe kit</td>
+                    <td>Dispatch board</td>
+                    <td class="verified">Verified</td>
+                  </tr>
+                  <tr>
+                    <td><time datetime="08:42">08:42</time></td>
+                    <td>On site; asset and authority matched</td>
+                    <td>Field mobile</td>
+                    <td class="verified">Verified</td>
+                  </tr>
+                  <tr>
+                    <td><time datetime="09:06">09:06</time></td>
+                    <td>Dial ring measured <span class="mono issue">1.5 div off index</span></td>
+                    <td>Tech <span class="mono">T-04</span></td>
+                    <td class="issue">Fault found</td>
+                  </tr>
+                  <tr>
+                    <td><time datetime="10:16">10:16</time></td>
+                    <td>Container opened without forced entry</td>
+                    <td>Field mobile</td>
+                    <td class="verified">Logged</td>
+                  </tr>
+                  <tr>
+                    <td><time datetime="10:58">10:58</time></td>
+                    <td>Ring reindexed; combination changed and withheld</td>
+                    <td>Secure record</td>
+                    <td class="verified">Sealed</td>
+                  </tr>
+                  <tr>
+                    <td><time datetime="11:11">11:11</time></td>
+                    <td>Three open-door tests and one closed-door test passed</td>
+                    <td>Closeout list</td>
+                    <td class="verified">4 / 4</td>
+                  </tr>
+                  <tr>
+                    <td><time datetime="11:24">11:24</time></td>
+                    <td>Site accepted secure condition</td>
+                    <td>Field mobile</td>
+                    <td class="verified">Closed</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <aside class="case-column billing-column" aria-label="Resolution and billing">
+            <div class="case-heading">
+              <span class="label">Resolution</span>
+              <h3>Repaired, tested, billed.</h3>
+            </div>
+            <dl class="data-list">
+              <div><dt>Cause</dt><dd>Dial ring shifted from index</dd></div>
+              <div><dt>Repair</dt><dd>Ring reset and fasteners secured</dd></div>
+              <div><dt>Secret data</dt><dd>Combination values withheld</dd></div>
+              <div><dt>Elapsed</dt><dd class="number">02:42</dd></div>
+            </dl>
+            <div class="billing" aria-label="Billing reconciliation">
+              <div class="billing-row"><span>Labor / 2.75 h at $148</span><strong>$407.00</strong></div>
+              <div class="billing-row"><span>Service call</span><strong>$95.00</strong></div>
+              <div class="billing-row"><span>Parts and supplies</span><strong>$18.00</strong></div>
+              <div class="billing-row"><span>Subtotal</span><strong>$520.00</strong></div>
+              <div class="billing-row"><span>HST / 13%</span><strong>$67.60</strong></div>
+              <div class="billing-row total"><span>Total</span><strong>$587.60</strong></div>
+            </div>
+          </aside>
+        </div>
+
+        <footer class="jacket-foot">
+          <div><span class="label">Provenance</span><strong>Paper case transcribed; original retained in archive box C-14</strong></div>
+          <div><span class="label">Chain</span><strong class="mono">83-0471 → KR-2084</strong></div>
+          <div><span class="label">Close state</span><strong class="verified">Secure / bill reconciled</strong></div>
+        </footer>
+      </article>
+    </section>
+
+    <section class="archive-recall" aria-labelledby="archive-title">
+      <div class="archive-grid page-shell">
+        <div class="archive-copy">
+          <span class="label">Archive recall</span>
+          <h2 id="archive-title">Find the old work before cutting a new key.</h2>
+          <p>Keyring ties odd legacy references to the current asset, site, work order, and technician who last handled it.</p>
+        </div>
+
+        <article class="blank-index" aria-label="Obsolete key blank silhouette index">
+          <header class="blank-index-head label">
+            <span>Obsolete blank silhouette index</span>
+            <span class="mono">Drawer B-09</span>
+          </header>
+          <div class="blank-specimens">
+            <div class="blank-record">
+              <svg viewBox="0 0 440 132" role="img" aria-label="Traced shoulder key blank with bow stamp and stepped blade">
+                <path d="M34 39h76l20 16h222l16 12h26v24h-34l-12-8h-26l-10 8h-30l-10-8h-30l-10 8h-30l-12-8h-50l-20 16H34C17 99 8 87 8 69S17 39 34 39Z" fill="none" stroke="currentColor" stroke-width="2" vector-effect="non-scaling-stroke"/>
+                <circle cx="47" cy="69" r="13" fill="none" stroke="currentColor" stroke-width="2" vector-effect="non-scaling-stroke"/>
+                <path d="M130 49v40M151 55v28M172 55v28M193 55v28" fill="none" stroke="currentColor" stroke-width="1" vector-effect="non-scaling-stroke"/>
+              </svg>
+              <div class="blank-meta"><strong class="mono">BOW 71 / REV C</strong><span>Shoulder to tip 31.8 mm</span></div>
+            </div>
+            <div class="blank-record">
+              <svg viewBox="0 0 320 132" role="img" aria-label="Traced bit key blank with notched flag">
+                <path d="M46 35c-22 0-38 15-38 34s16 34 38 34c17 0 31-9 36-23h128v19h28V84h24V70h31V45h-83v13H82C77 44 63 35 46 35Z" fill="none" stroke="currentColor" stroke-width="2" vector-effect="non-scaling-stroke"/>
+                <circle cx="46" cy="69" r="14" fill="none" stroke="currentColor" stroke-width="2" vector-effect="non-scaling-stroke"/>
+                <path d="M102 58v22M124 58v22M146 58v22" fill="none" stroke="currentColor" stroke-width="1" vector-effect="non-scaling-stroke"/>
+              </svg>
+              <div class="blank-meta"><strong class="mono">BIT 24 / OLD STOCK</strong><span>Superseded 1994</span></div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="handoff" aria-labelledby="handoff-title">
+      <div class="page-shell">
+        <div class="handoff-copy">
+          <h2 id="handoff-title">One record crosses the board, the van, and the archive.</h2>
+          <p>Assignments, authority, controlled key work, service notes, parts, and billing stay on the same job.</p>
+        </div>
+
+        <div class="handoff-grid">
+          <article class="handoff-cell span-two">
+            <span class="label">Dispatch board</span>
+            <h3>Send the right tech with the right stock and the full site history.</h3>
+            <div class="cell-status"><span>Queue, skill, van inventory, authorization</span><strong>Ready</strong></div>
+          </article>
+          <article class="handoff-cell">
+            <span class="label">Field record</span>
+            <h3>Capture what changed while the door is still open.</h3>
+            <p>Attach the asset, work performed, restricted-key issue, parts, tests, and secure state.</p>
+            <div class="cell-status"><span>Mobile closeout</span><strong>Synced</strong></div>
+          </article>
+          <article class="handoff-cell">
+            <span class="label">Key control</span>
+            <h3>Keep issue history attached to the system it belongs to.</h3>
+            <p>Record authorization, blank, cut reference, quantity, recipient, and the tech who released it.</p>
+            <div class="cell-status"><span>Restricted issue</span><strong>Traceable</strong></div>
+          </article>
+          <article class="handoff-cell">
+            <span class="label">Closeout</span>
+            <h3>Make the invoice match the field record.</h3>
+            <p>Labor, call charges, supplies, tax, and completion checks reconcile before the job leaves the board.</p>
+            <div class="cell-status"><span>Bill and audit</span><strong>Balanced</strong></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="trial" id="trial" aria-labelledby="trial-title">
+      <div class="trial-grid page-shell">
+        <div class="trial-copy">
+          <h2 id="trial-title">Put the next shift on one ring.</h2>
+          <p>Start with the dispatch board, then bring field records and archive history into the same operational trail.</p>
+        </div>
+        <form class="trial-form" action="#trial" method="get">
+          <label for="work-email">Work email</label>
+          <input id="work-email" name="email" type="email" autocomplete="email" placeholder="Work email" required>
+          <button class="button" type="submit">Start free trial</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer page-shell">
+    <strong>Keyring</strong>
+    <span>Dispatch and job management for commercial locksmith and safe operations.</span>
+  </footer>
+</body>
+</html>
