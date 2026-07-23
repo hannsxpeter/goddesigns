@@ -1,0 +1,46 @@
+{
+  "name": "@hannsxpeter/goddesign",
+  "version": "1.3.0",
+  "description": "A cross-agent frontend design skill that produces distinctive, production-grade UI instead of recognizable AI slop. Runs identically in Claude Code and OpenAI Codex CLI.",
+  "keywords": [
+    "claude-code",
+    "codex",
+    "agent-skill",
+    "frontend",
+    "design",
+    "ui",
+    "css"
+  ],
+  "homepage": "https://github.com/hannsxpeter/goddesigns#readme",
+  "bugs": {
+    "url": "https://github.com/hannsxpeter/goddesigns/issues"
+  },
+  "license": "MIT",
+  "author": "hannsxpeter",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hannsxpeter/goddesigns.git"
+  },
+  "type": "module",
+  "bin": {
+    "goddesign-install": "bin/goddesign-install.mjs"
+  },
+  "files": [
+    "skills/",
+    "bin/",
+    "docs/",
+    "README.md",
+    "CHANGELOG.md",
+    "CONTRIBUTING.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "verify": "sh skills/goddesign/scripts/verify-install.sh"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

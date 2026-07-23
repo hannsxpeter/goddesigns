@@ -18,6 +18,9 @@ The seams release: three of the four ADHD-surfaced leverage seams implemented af
 ### Not adopted (seam 1)
 - The seeded subject-vantage (seed the Subject test before the aesthetic deck) was tested across three subjects and rejected: it reliably diversifies the signature but does not beat the current Subject test on product-page quality (owner tie, then two proxy losses to the control). Recorded in `validation/subject-vantage-2026-07.md`; the Subject test and its "show the product working" clause hold unchanged.
 
+### Packaging
+- Published as an npm package to GitHub Packages, `@hannsxpeter/goddesign`, with a `goddesign-install` bin that symlinks the skill into the host directories. This is a convenience mirror; the `git clone` + symlink install stays the recommended path because GitHub Packages requires token auth even for public installs (docs/INSTALL.md).
+
 ## v1.2.1 (2026-07-22)
 
 The evaluation release: an external skill assessed against the evidence bar, with no skill changes.
