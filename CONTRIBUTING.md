@@ -7,9 +7,10 @@ goddesign's credibility rests on one rule: every load-bearing claim has receipts
 A tell is admitted only with evidence, not taste:
 
 1. **Evidence**: at least 3 independent, sourced public complaints (URLs required), or a defect reproduced in a validation run. The collection method is documented in [validation/protocols/sentiment-refresh-protocol.md](validation/protocols/sentiment-refresh-protocol.md).
-2. **Encode in three places**: the DIVERGE lane's attractor list in `SKILL.md`, the Banned list (with an INSTEAD that points back into the seeded deck, never at a specific alternative look, and a [fingerprint] tag), and a greppable string or yes/no assertion in `references/checklist.md`. Pure quality rules (contrast, targets, states) take a [craft] tag instead and enter the craft floor or the sweep without touching the attractor list.
-3. **Deck check**: grep the reference decks for rows embodying the pattern. A row where the pattern is the stated concept is a legal exception; anything else needs fixing in the same change.
-4. **Record**: add the evidence with source URLs to a dated file in `validation/`.
+2. **Encode in three places**: the DIVERGE lane's attractor list in `SKILL.md`, the Banned list (with an INSTEAD that points back into the seeded deck, never at a specific alternative look, and a [fingerprint] tag), and a greppable string or yes/no assertion in `references/checklist.md`. Pure quality rules (contrast, targets, states) take a [craft] tag instead and enter the craft floor or the gate without touching the attractor list.
+3. **Mechanize it if it is statically detectable**: if the pattern resolves to a string, a number, or a count in source, it becomes a rule in `skills/goddesign/scripts/sweep.mjs` and a row in the Phase 2a table in `references/checklist.md`. Those two are one contract in two files and `scripts/lint-decks.mjs` fails when they drift, so add the rule id and its severity to both in the same change. Choose `advisory` when the pattern has a legal case the script cannot read (a row that states the face, a grammar break declared in the lock); choose `fail` only when no lock line can make it correct. Then calibrate: run the new rule across `validation/runs/` and `validation/experiments/` and report the split, because a rule that fires on the clean corpus is a false positive, not a stricter gate.
+4. **Deck check**: grep the reference decks for rows embodying the pattern. A row where the pattern is the stated concept is a legal exception; anything else needs fixing in the same change.
+5. **Record**: add the evidence with source URLs to a dated file in `validation/`.
 
 ## Adding a direction row
 
@@ -48,7 +49,9 @@ Caps, grep-checkable against `references/directions.md` and enforced in review (
 
 ## Changing scripts
 
-`audit.mjs`, `codex-audit-loop.sh`, `genimage.sh`, and `verify-map.mjs` must stay dependency-light, degrade gracefully (clear message + documented exit code), and remain host-neutral. Test against the defect corpus in `validation/` before and after: the audit must still catch the known collisions and reveal bugs, and still pass the known-clean runs.
+`audit.mjs`, `sweep.mjs`, `extract-tokens.mjs`, `codex-audit-loop.sh`, `genimage.sh`, and `verify-map.mjs` must stay dependency-light, degrade gracefully (clear message + documented exit code), and remain host-neutral. Test against the defect corpus in `validation/` before and after: the audit must still catch the known collisions and reveal bugs, the sweep must still separate the skill runs from the baselines, and both must still pass the known-clean runs.
+
+`sweep.mjs` has one extra rule of its own, because a source scanner that cries wolf gets ignored and then the gate is worse than before it existed. Comments are not code (the script blanks them before every scan, so a lock block quoting a banned hex is not a finding), waivers are read before the blanking and require a stated reason, and every new or changed rule reports its corpus split in the pull request: how many of the goddesign artifacts in `validation/` it fires on, and how many of the baselines. A rule that fires on the clean corpus is fixed or narrowed, never merged with a note.
 
 ## Changing the design map contract
 

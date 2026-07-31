@@ -68,6 +68,24 @@ The skill degrades gracefully without any of these, and says so honestly in its 
 | An image-capable CLI (Codex or Claude Code) | The optional blind post-render critic (`scripts/blind-read.sh`): a separate process reads only the screenshots and reconstructs the page's identity, catching pages that render fine but do not communicate their subject | Prints `DEGRADED: no blind read`; the gate falls back to the builder's own Phase 3 inspection |
 | `curl` and network access | The webfont import liveness check | The gate states the skip |
 | Node 18+ (no browser needed) | The design-map validator (`scripts/verify-map.mjs`): checks `.design-map.md` parses, its System lock is complete, and no surface sits in two states | Multi-session efforts check the map by eye against `references/map.md`; single-run designs are unaffected |
+| Node 18+ (no browser, no network) | The mechanical sweep (`scripts/sweep.mjs`): 29 source rules covering banned faces and hexes, gradient text, stray `!important`, inline styles, container accent stripes, achromatic neutrals, hexes outside `:root`, the band metronome, missing focus-visible and reduced-motion, silent font fallback, buzzword copy, and the reveal cascade | The model checks the greppable half of the gate by hand, which is the arrangement this script exists to replace |
+| Node 18+ (no browser, no network) | Token extraction (`scripts/extract-tokens.mjs`) for extension mode: resolves the existing system's roles, fonts, radii, spacing, and palette, and feeds `sweep.mjs --tokens` so drift from that system is reported as values | Extension mode infers the token list by reading the repo, with no drift check |
+
+## Checking a build without a browser
+
+The measured audit needs Playwright and a browser. The sweep needs neither, so it runs anywhere Node does, including inside a sandbox and offline:
+
+```sh
+node skills/goddesign/scripts/sweep.mjs index.html
+```
+
+It accepts files or directories, prints every finding with file, line, and the offending value, and exits 0 green, 1 named failures, 2 nothing scannable. `--rules` prints the rule table, `--json` emits machine-readable output, and `--tokens <baseline.json>` adds drift reporting against an existing design system (see `scripts/extract-tokens.mjs`). A rule with a legal case is waived per file by an inline comment that must state a reason:
+
+```
+/* goddesign-allow: metallic-premium the Art Deco row is the one row that states metallics */
+```
+
+The sweep is half the gate, not the gate: it reads source, so it cannot see a collision, a clipped label, or a blank band. Run the audit too whenever a browser is available.
 
 ## Running Codex sandboxed
 

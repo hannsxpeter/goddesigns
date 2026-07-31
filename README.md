@@ -4,6 +4,7 @@
 [![License: MIT](https://img.shields.io/github/license/hannsxpeter/goddesigns)](LICENSE)
 [![Hosts](https://img.shields.io/badge/hosts-agnostic-blue)](docs/INSTALL.md)
 [![Scope](https://img.shields.io/badge/scope-one%20run%20or%20a%20multi--session%20map-blue)](skills/goddesign/references/map.md)
+[![Gate](https://img.shields.io/badge/gate-29%20deterministic%20sweep%20rules-blue)](skills/goddesign/references/checklist.md)
 [![Validation](https://img.shields.io/badge/validation-7%2F7%20skill%20runs%20green-success)](validation/runs/kilnhouse-2026-07/README.md)
 [![Evidence](https://img.shields.io/badge/evidence-346%20sourced%20comments-informational)](validation/research/sentiment-evidence-2026-07.md)
 
@@ -31,7 +32,9 @@ goddesign counters both with mechanisms, not advice. Every rule in it traces to 
 2. **Lane selection**: DIVERGE (taste-heavy models fight their own attractors via forced seeded picks) or EXPAND (literal models get every decision enumerated to a hex, a number, or a named row).
 3. **Variance engine**: a seed selects from 17 aesthetic directions, 12 macrostructures, 10 palettes, and 12 type pairings; a run ledger forces rotation between runs; seeded jitter rotates accent hue and nudges paper lightness so two projects landing on the same row never ship identical values.
 4. **DIRECTION LOCK**: every visual decision is written down before any code, then executed exactly. Conception can flow through multiple avenues: the seeded deck, human-genome rows extracted from real sites, and comp-first mode (an image model draws a lock-derived mockup, the code model replicates it); one page may mix up to three avenues under one lock.
-5. **QA gate**: a seven-axis self-critique (including Credibility, from controlled-study evidence that trust is where AI design measurably lags), a greppable boolean sweep, and a measured audit (`scripts/audit.mjs`) that detects layout collisions, hidden-content reveal bugs, silent font fallbacks, overflow, and undersized touch targets, with a bounded self-correction loop (named failures only, lock frozen, maximum 3 cycles).
+5. **QA gate**: a seven-axis self-critique (including Credibility, from controlled-study evidence that trust is where AI design measurably lags), then two measured halves. `scripts/sweep.mjs` runs 29 deterministic rules over the source with no browser, no network, and no model, reporting file, line, and value for banned faces and hexes, gradient text, stray `!important`, inline styles, container accent stripes, achromatic neutrals, hexes outside `:root`, the band metronome, missing focus-visible and reduced-motion, silent font fallback, buzzword copy, and the reveal cascade that renders a page blank. `scripts/audit.mjs` renders and detects layout collisions, hidden-content reveal bugs, silent font fallbacks, overflow, and undersized touch targets. Both feed one bounded self-correction loop (named failures only, lock frozen, maximum 3 cycles).
+
+The two halves fail for opposite reasons and neither excuses the other: the sweep cannot see a collision, and the audit cannot see a banned value behind a lock that never shipped. The sweep is the half that survives a sandbox, where the audit exits 2 for a blocked browser spawn. Rules split into `fail` and `advisory`, and an inline `goddesign-allow: <rule> <reason>` comment waives one rule for one file with the reason mandatory, so the escape hatch cannot be used silently. Across the existing validation corpus the sweep clears 14 of 19 goddesign artifacts with zero failures (the other five carry six true positives against rules the skill already had) and fails all 18 unskilled and frontend-design artifacts, at 6 to 70 findings each.
 
 ## Efforts bigger than one session
 
@@ -59,6 +62,8 @@ Then invoke `/goddesign <brief>` in Claude Code or `$goddesign <brief>` in Codex
 | `skills/goddesign/references/` | The decks: 17 directions (including the first human-genome row), 12 layouts, 10 palettes, 12 font pairings, motion recipes, imagery rules, the design map, the QA gate |
 | `skills/goddesign/references/map.md` | The design map: how an effort too big for one session is charted once and worked one surface at a time under a single frozen lock |
 | `skills/goddesign/scripts/verify-map.mjs` | Design-map validator: required sections, a complete System lock, surface-line shape, claims, and one-surface-one-state |
+| `skills/goddesign/scripts/sweep.mjs` | The mechanical half of the gate: 29 deterministic source rules, no browser, no network, no model; `fail`/`advisory` severity and reason-bearing inline waivers |
+| `skills/goddesign/scripts/extract-tokens.mjs` | Token extraction for extension mode: reads design-token JSON, custom properties, `@theme`, and Tailwind config, resolves the lock's role slots, and feeds `sweep.mjs --tokens` for drift reporting |
 | `skills/goddesign/scripts/audit.mjs` | Measured visual audit: collisions, reveal bugs, font fallbacks, overflow, touch targets |
 | `skills/goddesign/scripts/codex-audit-loop.sh` | Operator wrapper for sandboxed Codex: build inside the sandbox, audit outside, feed failures back into the same session |
 | `skills/goddesign/scripts/detect-clis.sh` | Presence-only inventory of known agent CLIs, including distinct Cursor Agent and Cursor editor entries |
@@ -71,6 +76,8 @@ Then invoke `/goddesign <brief>` in Claude Code or `$goddesign <brief>` in Codex
 ## Validation
 
 Seven skill runs on one brief produced seven fully distinct, gate-passing directions (terminal letter, Swiss manifesto, luxury serif, machine-room data-dense, editorial print, art deco dashboard, chartreuse signup) while three unskilled baseline runs reproduced the catalogued failures, including two pages that render completely blank in static capture due to scroll-reveal bugs. The audit script caught defects human review missed. Full evidence with screenshots: [validation/runs/kilnhouse-2026-07/README.md](validation/runs/kilnhouse-2026-07/README.md).
+
+Running the new sweep back over that same corpus separates the two populations mechanically: 14 of 19 goddesign artifacts exit 0, and all 18 unskilled and frontend-design artifacts fail. The mechanisms it borrows, what was declined from each source, and its kill criterion are recorded in [validation/research/design-skills-evaluation-2026-07.md](validation/research/design-skills-evaluation-2026-07.md). That is a false-positive and separation check on artifacts that already existed, not predictive evidence.
 
 The tells catalog is a living artifact. The repeatable method for refreshing it against current public discourse is documented in [validation/protocols/sentiment-refresh-protocol.md](validation/protocols/sentiment-refresh-protocol.md).
 

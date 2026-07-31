@@ -14,8 +14,9 @@ root=$(CDPATH= cd -- "$script_dir/.." && pwd)
 # load-bearing files: a missing one must stop the run, not be improvised.
 required="SKILL.md references/directions.md references/layouts.md references/palettes.md references/fonts.md references/motion.md references/imagery.md references/map.md references/checklist.md"
 
-# Optional files: the run degrades honestly without them (audit, imagery, blind read, map validation).
-optional="scripts/audit.mjs scripts/codex-audit-loop.sh scripts/detect-clis.sh scripts/genimage.sh scripts/blind-read.sh scripts/verify-map.mjs references/blind-read.md references/genome-sources.md"
+# Optional files: the run degrades honestly without them (audit, sweep, token
+# extraction, imagery, blind read, map validation).
+optional="scripts/audit.mjs scripts/sweep.mjs scripts/extract-tokens.mjs scripts/codex-audit-loop.sh scripts/detect-clis.sh scripts/genimage.sh scripts/blind-read.sh scripts/verify-map.mjs references/blind-read.md references/genome-sources.md"
 
 missing=0
 for f in $required; do

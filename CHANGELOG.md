@@ -1,5 +1,38 @@
 # Changelog
 
+## v1.6.0 (2026-07-31)
+
+The enforcement release. goddesign's QA gate had three phases, and only one of them was mechanical. Phase 1 is advisory by construction. Phase 3 is measured by `scripts/audit.mjs`, which needs Playwright and a browser and exits 2 without one. Phase 2, the pass/fail half meant to hold everywhere, was 40-plus assertions executed by the model that had just written the code, including the ones written as literal greps. In a sandbox, where the audit cannot run, a run could be declared gate-passing with nothing objective behind it. This release moves the greppable half to a script. No visual rule, craft-floor number, or banned pattern changes.
+
+### The mechanical sweep
+- `skills/goddesign/scripts/sweep.mjs`: 29 deterministic rules over source (`.html`, `.css`, `.jsx`, `.tsx`, `.vue`, `.svelte`, `.astro`), reporting file, line, and the offending value. No browser, no network, no model, no dependency. Exit 0 green, 1 named failures, 2 nothing scannable. `--rules` prints the table, `--json` emits machine-readable output.
+- Rules: banned faces, mono in the body or display slot, Space Grotesk, silent font fallback, the indigo-violet family, gradient text, metallic premium shorthand, pure `#000`/`#FFF` bases, achromatic neutrals, hexes outside `:root`, `transition: all`, stray `!important`, inline styles, container accent stripes, `<hr>`, numbered chapter cadence, the band metronome and its 2x padding ratio, the reveal cascade, missing `:focus-visible`, missing `prefers-reduced-motion`, buzzword copy, em and en dashes in copy, the missing stylesheet stamp, token drift, off-scale spacing, the stock ornament kit, markup color literals, and reasonless waivers.
+- Severity splits `fail` from `advisory`. Advisories never fail the gate because each has a legal case a script cannot read: a mono face in the slot a direction row states, a spacing value that is a grammar break declared in the lock, an ornament the locked row names.
+- Waivers are inline, file-scoped, and must state a reason: `/* goddesign-allow: metallic-premium the Art Deco row is the one row that states metallics */`. A reason under 8 characters is itself reported as `waiver-without-reason`, so the escape hatch cannot be used silently.
+- Comments are blanked before every rule scan (indices and line numbers preserved), so a DIRECTION LOCK block quoting a banned hex, or a note reading "the one allowed `!important` kill switch", is never a finding. Waivers are read first, off the raw text.
+
+### Extension mode, measured instead of inferred
+- `skills/goddesign/scripts/extract-tokens.mjs`: reads W3C design-token JSON (including the `tokens/*.json` skillui emits), CSS custom properties, `@theme` blocks, Tailwind config, and `@font-face` and import declarations. Resolves the five DIRECTION LOCK role slots plus border, and reports fonts, radii, spacing, imports, and the palette by frequency. A role it cannot resolve is named as unresolved, never guessed. Exit 2 (`NO DESIGN SYSTEM FOUND`) is the greenfield answer: roll the seed and take the full path.
+- `sweep.mjs --tokens <baseline.json>` reports every hex, font, and radius the build introduced that the baseline does not have. Step 0 item 1 and the QA gate now state extension mode as values rather than as a comparison done by eye.
+
+### Gate wiring
+- `references/checklist.md`: Phase 2 splits into 2a (run the sweep, fix what it names, lock frozen) and 2b (the assertions needing judgment, a render, or the lock in hand). Assertions the sweep decides are marked `[sweep]`. The rule table, waiver syntax, and the extension-mode two-command loop are documented there.
+- The sweep and the audit are stated as complements: static analysis cannot see a collision, a clipped label, or a blank band; a render cannot see a banned value behind a lock that never shipped. Neither one green makes the other unnecessary and neither one unavailable excuses skipping the other. A `DEGRADED: no visual check` run must now report which half of the gate did run.
+- `SKILL.md` Step 0 item 1 and Step 5 route through the two scripts; `verify-install.sh` lists both as optional (the run degrades honestly without them).
+- `scripts/lint-decks.mjs` gained 95 checks, from 215 to 310. The script's rule table and the deck's rule table are one contract in two files: every rule id and severity must appear in both, and a rule documented but not implemented fails the build.
+
+### Corpus calibration
+- Both scripts were run over the whole existing validation corpus. 14 of 19 goddesign artifacts exit 0; the five with findings carry six failures in total, and every one was inspected and is a true positive against a rule the skill already had (a numbered chapter cadence the ban post-dates, a raw hex in `.btn-primary:active`, an em dash in copy, a 3px colored left border on a container, two distinct section paddings where the gate wants three). All 18 unskilled and frontend-design artifacts fail, at 6 to 70 findings each.
+- Four false positives were found and fixed during calibration, and a fifth rule was narrowed rather than removed: a colored side border is reported only on a container, so a drawn rail or route line is not a card stripe.
+- `scripts/sweep.test.mjs` plus a CI step: 19 executable tests covering the rule table, the waiver contract, each fixed false positive, the extraction round trip, and the corpus separation itself, so the calibration is asserted on every push instead of claimed in prose.
+- This is a false-positive and separation check on artifacts that already existed. It is not predictive evidence, and the evidence badge is unchanged.
+
+### Evaluation record
+- `validation/research/design-skills-evaluation-2026-07.md`: the borrow-and-decline record for three public design skills. impeccable (pbakaus, Apache 2.0) supplied the deterministic-detector diagnosis, the severity split, and inline waivers; skillui (amaancoderx, MIT) supplied static token extraction; ui-ux-pro-max (nextlevelbuilder, MIT) supplied token-conformance validation as a gate.
+- Declined: impeccable's 23-command surface, its four modes (advice, not mechanism), its per-host edit-time hook manifests (four host-specific config files against a documented host-agnostic constraint), its live browser mode (a network service core design work must not need), its PRODUCT.md/DESIGN.md context layer, and its 59-rule registry (on the evidence bar, not on quality: a tell enters goddesign through three sourced complaints or a reproduced defect). Declined from ui-ux-pro-max: the 84-style and 192-palette catalogue (uncapped decks cannot carry the accent and depth caps `lint-decks.mjs` enforces) and the requirements-to-pattern generator (the convergence engine this skill exists to fight). Declined from skillui: the URL crawl, ultra mode, and `.skill` packaging (the network half).
+- No text, code, rule definition, prompt content, or data file was copied from any of the three. Both new scripts implement goddesign's own checklist and Banned list.
+- `CONTRIBUTING.md` gained the mechanization step: a statically detectable tell now becomes a sweep rule and a checklist row in the same change, with its corpus split reported in the pull request. A rule that fires on the clean corpus is narrowed, never merged with a note.
+
 ## v1.5.0 (2026-07-31)
 
 The scope release. Every mechanism in goddesign was scoped to a single run, and the only artifact that outlived a run was a ledger whose job is to make the next run differ. This release adds the missing scale: an effort too big for one session. Nothing about a single-surface design run changes.
