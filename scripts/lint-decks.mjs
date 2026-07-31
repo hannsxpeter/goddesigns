@@ -79,7 +79,41 @@ check("cross-host work requires prompt opt-in",
 check("missing a second host does not change QA",
   checklist.includes("A missing second host never changes the design score"));
 
-// 7. Repo style: no em dashes or en dashes in prose files.
+// 7. Design map: the deck, the validator, and the skill wiring stay in sync.
+const map = read("skills/goddesign/references/map.md");
+const verifyMap = read("skills/goddesign/scripts/verify-map.mjs");
+const verifyInstall = read("skills/goddesign/scripts/verify-install.sh");
+
+check("verify-install.sh requires references/map.md",
+  /required="[^"]*references\/map\.md/.test(verifyInstall));
+check("verify-install.sh lists verify-map.mjs as optional",
+  /optional="[^"]*scripts\/verify-map\.mjs/.test(verifyInstall));
+check("SKILL.md Step 0 routes multi-session efforts to the map",
+  skill.includes("references/map.md") && skill.includes(".design-map.md"));
+check("SKILL.md reference index lists map.md",
+  /^- `references\/map\.md`:/m.test(skill));
+check("checklist.md carries the Map gate group",
+  checklist.includes("Map (run this group only when `.design-map.md` exists"));
+
+// The validator's required sections are the contract; map.md must document all
+// of them, or the deck teaches a shape the script rejects.
+const orderBlock = verifyMap.slice(verifyMap.indexOf("const ORDER = ["), verifyMap.indexOf("];", verifyMap.indexOf("const ORDER = [")));
+const mapSections = [...orderBlock.matchAll(/"([^"]+)"/g)].map((m) => m[1]);
+check("verify-map.mjs declares its required sections", mapSections.length === 8,
+  `found ${mapSections.length}`);
+for (const s of mapSections)
+  check(`map.md documents the "${s}" section`, map.includes(`## ${s}`));
+
+// The three inversions are the whole point of the map; each is stated where the
+// single-run rule it overrides lives, not only in the deck.
+check("SKILL.md states the ledger inversion under a map",
+  skill.includes("Under a design map (Step 0 item 3) these rules run **once, at charting**"));
+check("SKILL.md forbids re-rolling the seed inside a map",
+  skill.includes("Never re-roll the seed, re-jitter the tokens"));
+check("checklist.md persists one ledger entry per map, not per surface",
+  checklist.includes("A map is one effort, so it is **one** ledger entry, not one per surface"));
+
+// 8. Repo style: no em dashes or en dashes in prose files.
 import { execSync } from "node:child_process";
 const prose = execSync(
   "git ls-files --cached --others --exclude-standard -- '*.md'",

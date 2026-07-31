@@ -1,5 +1,32 @@
 # Changelog
 
+## v1.5.0 (2026-07-31)
+
+The scope release. Every mechanism in goddesign was scoped to a single run, and the only artifact that outlived a run was a ledger whose job is to make the next run differ. This release adds the missing scale: an effort too big for one session. Nothing about a single-surface design run changes.
+
+### The design map
+- `skills/goddesign/references/map.md`: a new required deck. An effort naming 3 or more distinct surfaces, stating a hand-off, or finding an existing `.design-map.md` charts a map first: a **Destination** that fixes the scope, one **System lock** (a DIRECTION LOCK rolled once, jitter included, that every surface inherits verbatim), **Surfaces locked** as links plus one-line gists, **Surfaces to design** each carrying its one action, audience, and claim slot, **Not yet specified** for fog, **Out of scope** for work past the destination, and **Open questions** for the facts only a person can supply.
+- Charting is one session and produces no pixels. After that, one surface per session, gated in full.
+- The threshold is deliberately narrow: two surfaces or fewer in one session skips the map, and charting that surfaces fewer than 3 specifiable surfaces ends by deleting the map and designing directly.
+
+### Three inversions the map fixes
+- **The seed rolls once per map**, at charting, not once per surface. Surface sessions never re-roll, never re-jitter, and never re-read `directions.md`; siblings shipping different accents was the failure this prevents.
+- **Rotation matches instead of differing.** Step 3a exists to push the next run off the last one, which is right across projects and backwards across the surfaces of one product. Under a map it applies at charting only.
+- **One ledger entry per map, not one per surface.** Nine surfaces written as nine entries trip the Step 3a popularity cap by the third surface and fill the entire 8-entry rotation window with one project. The entry is written when the map's last surface locks.
+
+### Human-only facts stop stalling and stop being invented
+- Step 2 says invent confidently where the brief is silent; Step 4c forbids inventing metrics, testimonials, logos, and company names. Under a map, a surface never blocks on the collision: it ships a placeholder labeled as a placeholder and parks the dated question under **Open questions**. These are the only map items an agent may not answer itself.
+
+### Mechanical enforcement
+- `skills/goddesign/scripts/verify-map.mjs`: validates the eight required sections and their order, the System lock's seven fields and five hex tokens, every surface line's shape, claim format (`no` or `YYYY-MM-DD <host>`), dated open questions, and one-surface-one-state. Exit 0 green, 1 named failures, 2 no map. Prints the owed-ledger-entry reminder when a map completes.
+- `scripts/lint-decks.mjs` gained 17 checks binding the deck, the validator, and the skill wiring together: the validator's required-section list is read at lint time, so the deck's template and the script cannot drift apart.
+- `references/checklist.md` gained a Map gate group (claim taken before work, lock inherited verbatim, sibling accent and fonts identical, macrostructure differs from the previous surface, fog graduated, no premature ledger entry), and Phase 1 axis 6 now inverts under a map: drifting from the system scores 1, and so does shipping the previous surface's skeleton with new copy.
+- `references/map.md` joins the required set, so `verify-install.sh` now checks eight decks rather than seven.
+
+### Evaluation record
+- `validation/research/wayfinder-evaluation-2026-07.md`: the borrow-and-decline record for the wayfinder skill (mattpocock/skills, MIT). Seven structural disciplines shipped. Declined: the issue-tracker substrate (core design work depends on no account or network service), blocking edges (design surfaces are an ordering, not a dependency graph, once the System lock exists), the four ticket types and their sub-skills (another skill's ecosystem; only the human-in-the-loop distinction survives), parallel research subagents (same cost and Codex-guarantee reasoning that declined ADHD's fan-out), and planning-by-default (the inversion that would turn a design skill into a planning skill). No text or code was copied.
+- The record states the mechanism's weight honestly: it is derived from rules already in the skill and verified mechanically, not from a failing validation run, and no multi-surface map has been run end to end yet. It ships with a kill criterion recorded in advance.
+
 ## v1.4.0 (2026-07-23)
 
 The evidence-readiness release: the skill's own review surfaced that every claim rested on author-run validation and a self-graded gate. This release fixes the process, not the pixels.

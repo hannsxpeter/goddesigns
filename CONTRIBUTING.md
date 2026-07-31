@@ -48,7 +48,11 @@ Caps, grep-checkable against `references/directions.md` and enforced in review (
 
 ## Changing scripts
 
-`audit.mjs`, `codex-audit-loop.sh`, and `genimage.sh` must stay dependency-light, degrade gracefully (clear message + documented exit code), and remain host-neutral. Test against the defect corpus in `validation/` before and after: the audit must still catch the known collisions and reveal bugs, and still pass the known-clean runs.
+`audit.mjs`, `codex-audit-loop.sh`, `genimage.sh`, and `verify-map.mjs` must stay dependency-light, degrade gracefully (clear message + documented exit code), and remain host-neutral. Test against the defect corpus in `validation/` before and after: the audit must still catch the known collisions and reveal bugs, and still pass the known-clean runs.
+
+## Changing the design map contract
+
+`references/map.md` documents the `.design-map.md` shape and `scripts/verify-map.mjs` enforces it. They are one contract in two files, so change both in the same commit: `scripts/lint-decks.mjs` reads the validator's `ORDER` array and fails if the deck stops documenting a required section. A new section means a new heading in the deck's template, a new entry in `ORDER`, and its own check in the validator. The map is structural machinery, so it takes no [fingerprint] or [craft] tag and needs no tell evidence, but it does need the same mechanical bar as every other rule here: a number, a greppable string, or a yes/no test.
 
 ## Validation bar for any substantive change
 

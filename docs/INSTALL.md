@@ -29,7 +29,7 @@ The skill is only as good as its reference decks; a partial install (a broken sy
 sh skills/goddesign/scripts/verify-install.sh
 ```
 
-It prints `goddesign: install OK` and exits 0 when `SKILL.md` and the seven `references/*.md` decks are present, or `INCOMPLETE INSTALL: <file> not found` and exits 1 otherwise (optional scripts and files are reported as notes, not failures). Hosts without a shell get the same protection lazily: the skill stops with the same message at Step 3 if a deck it needs cannot be read.
+It prints `goddesign: install OK` and exits 0 when `SKILL.md` and the eight `references/*.md` decks are present, or `INCOMPLETE INSTALL: <file> not found` and exits 1 otherwise (optional scripts and files are reported as notes, not failures). Hosts without a shell get the same protection lazily: the skill stops with the same message at Step 3 if a deck it needs cannot be read.
 
 The skill also inventories known agent commands before a run:
 
@@ -67,6 +67,7 @@ The skill degrades gracefully without any of these, and says so honestly in its 
 | OpenAI Codex CLI | Cross-host image generation (`scripts/genimage.sh`) and the sandboxed-Codex wrapper (`scripts/codex-audit-loop.sh`) | Imagery falls back to each direction row's CSS/SVG art; the wrapper is Codex-specific by definition |
 | An image-capable CLI (Codex or Claude Code) | The optional blind post-render critic (`scripts/blind-read.sh`): a separate process reads only the screenshots and reconstructs the page's identity, catching pages that render fine but do not communicate their subject | Prints `DEGRADED: no blind read`; the gate falls back to the builder's own Phase 3 inspection |
 | `curl` and network access | The webfont import liveness check | The gate states the skip |
+| Node 18+ (no browser needed) | The design-map validator (`scripts/verify-map.mjs`): checks `.design-map.md` parses, its System lock is complete, and no surface sits in two states | Multi-session efforts check the map by eye against `references/map.md`; single-run designs are unaffected |
 
 ## Running Codex sandboxed
 
