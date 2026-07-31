@@ -6,6 +6,8 @@ Host scope comes from the prompt. Run this gate on the active host by default. U
 
 Extension mode (Step 0 item 1: extending an existing design system; no DIRECTION LOCK exists): skip Phase 1 axis 6 and the Phase 2 stated-macrostructure gate; in Phase 3 compare the render against the existing system's tokens; in Persist, stamp the stylesheet `/* goddesign | extension of existing system */` and skip the `.design-log.json` entry.
 
+Map mode (Step 0 item 3: this surface belongs to a `.design-map.md`): run every phase in full, then additionally run the Map group in Phase 2, read Phase 1 axis 6 in its map form, and follow the map branch in Persist. A map buys consistency across sessions, never relief from a gate.
+
 ## Phase 1: pre-emit self-critique (advisory, evidence-cited)
 
 Score your build 1-5 on each of the seven axes. This phase is advisory: the same context that made every design choice now grades them, so a bare number proves nothing. Counter that mechanically: every score must cite the element, line, or screenshot region that earns it (a selector, a token, a pixel region). A score without a citation is recorded as 1. A cited score of 1 or 2 triggers one revision attempt at the cited spot, then you move on and report honestly; a cited score of 3+ you could defend to a skeptic stands.
@@ -15,7 +17,7 @@ Score your build 1-5 on each of the seven axes. This phase is advisory: the same
 3. **Execution**: are spacing, alignment, and states consistent to the token scale?
 4. **Specificity**: could this design only belong to THIS product, or would it fit any product? Test: with the copy stripped, do the visuals alone identify the product's world, and does the page show the product working somewhere (an artifact of use, not just assertion)?
 5. **Restraint**: is there exactly one signature risk, with everything around it quiet?
-6. **Variety**: does it differ from this project's previous runs (check `.design-log.json`)?
+6. **Variety**: does it differ from this project's previous runs (check `.design-log.json`)? Under a map the question inverts, because sibling surfaces must match: does this surface read as the same system as the surfaces already in **Surfaces locked** (same tokens, type, motion, atmosphere), while not being the previously locked surface's section skeleton with new copy (different macrostructure, different section grammar, different signature)? Score 1 if it drifts from the system, and 1 if it is a recolored clone of its sibling; both are failures of the same axis.
 7. **Credibility**: would a cautious first-time visitor trust this page with money or data? Controlled studies show trust and credibility are the dimensions where AI-built pages measurably lag human ones; the fix is real information stated plainly, never invented proof.
 
 ## Phase 2: boolean gate sweep
@@ -79,6 +81,17 @@ Brief
 - [ ] The brief re-read as a checklist: every requested page, section, state, and behavior exists in the build; nothing silently trimmed.
 - [ ] If the brief supplied a reference (image, mockup, URL, existing screens), or the run generated its own comp (comp-first mode), the render was compared against it side by side; it matches on layout, spacing, and color, or the deviations are stated and justified.
 
+Map (run this group only when `.design-map.md` exists at the project root)
+- [ ] `node <skill-root>/scripts/verify-map.mjs .design-map.md` exits 0, both before the session started and after this surface was recorded.
+- [ ] The surface was claimed (`claimed: <YYYY-MM-DD> <host>`) before any design work began, not after.
+- [ ] This surface's DIRECTION LOCK repeats the map's System lock Seed, Tokens, Jitter, Type, Import, Motion, and Atmosphere lines verbatim; no seed was re-rolled, no token re-jittered, and `references/directions.md` was not re-read.
+- [ ] The rendered accent hex, paper hexes, and loaded font families are identical to those on every surface already in **Surfaces locked**; a sibling shipping a different accent fails this gate.
+- [ ] The macrostructure differs from the previously locked surface's, and comes from the map's stated structure pool.
+- [ ] The surface moved from **Surfaces to design** to **Surfaces locked** as a markdown link plus a one-line gist; its lock is not restated in the map.
+- [ ] Any fog this surface made specifiable graduated into **Surfaces to design** and was deleted from **Not yet specified**; anything found past the destination went to **Out of scope** with a reason, never to **Surfaces locked**.
+- [ ] Every human-only fact this surface needed is parked under **Open questions** with a date and a labeled placeholder on the page; none was invented, and the session did not stall waiting for one.
+- [ ] No `.design-log.json` entry was written, unless this was the map's last surface, in which case exactly one entry was written for the whole map.
+
 Honesty and trust surface
 - [ ] No invented metrics, fake testimonials, fake logos, or fake company names; placeholders labeled as placeholders.
 - [ ] The trust surface exists: the page answers who is behind the product (a real about or credits line, never invented people), how to reach them (a working contact route), and the material terms of the offer (pricing terms, cancellation, data handling where the product implies them). Demo builds label these sample like all other data; real projects state them truthfully or the gate fails.
@@ -125,3 +138,5 @@ If someone could glance at this and say "AI made that" without doubt, it failed.
 ```
 
 `accent_hue_deg` is the accent's OKLCH hue in degrees, written as a number; write null when the accent is neutral (chroma below 0.02), so the neutral hue band in SKILL.md Step 3a stays recoverable from the ledger.
+
+Map branch (step 2 only). A map is one effort, so it is **one** ledger entry, not one per surface: nine surfaces writing nine near-identical rows would trip the popularity cap in Step 3a and poison rotation for every future project on this machine. So when a `.design-map.md` exists, stamp this surface's stylesheet as usual, record the surface in the map's **Surfaces locked**, and write **no** ledger entry. Write the single entry for the whole map, using the System lock's values, only in the session that locks the map's last surface, when **Surfaces to design** and **Not yet specified** are both empty (`verify-map.mjs` prints the reminder). Then append it to both ledgers exactly as step 2 describes.

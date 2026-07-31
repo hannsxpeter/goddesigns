@@ -16,7 +16,7 @@ Precedence, stated once: **the user's brief always wins.** Seeded picks spend on
 
 ## Step 0: mode check
 
-Before anything else, confirm the skill is fully installed. If your host has a shell, run `sh <skill-root>/scripts/verify-install.sh` once: it confirms `SKILL.md` and the seven required reference decks are present and non-empty, and exits 1 with `INCOMPLETE INSTALL: <file> not found` if any is missing. Then run `sh <skill-root>/scripts/detect-clis.sh` once. It inventories known CLIs on `PATH`, including Codex, Claude Code, Cursor Agent, Cursor, Gemini CLI, OpenCode, Aider, Goose, GitHub Copilot, Amp, Amazon Q, Kiro, and Factory Droid. Treat this as presence discovery only: an installed command can still be logged out or lack a required capability. The inventory is advisory, not a dependency gate. Core design work requires no particular CLI, editor, model vendor, deployment platform, account, domain, DNS setup, or network service.
+Before anything else, confirm the skill is fully installed. If your host has a shell, run `sh <skill-root>/scripts/verify-install.sh` once: it confirms `SKILL.md` and the eight required reference decks are present and non-empty, and exits 1 with `INCOMPLETE INSTALL: <file> not found` if any is missing. Then run `sh <skill-root>/scripts/detect-clis.sh` once. It inventories known CLIs on `PATH`, including Codex, Claude Code, Cursor Agent, Cursor, Gemini CLI, OpenCode, Aider, Goose, GitHub Copilot, Amp, Amazon Q, Kiro, and Factory Droid. Treat this as presence discovery only: an installed command can still be logged out or lack a required capability. The inventory is advisory, not a dependency gate. Core design work requires no particular CLI, editor, model vendor, deployment platform, account, domain, DNS setup, or network service.
 
 Host scope is prompt-specified. One capable host is the default and is a complete setup. Use multiple hosts only when the user's brief explicitly asks for cross-host or multi-host comparison, replication, or compatibility testing, or when running a named maintainer validation protocol. Phrases such as "run this on both Claude and Codex", "compare hosts", or "replicate on another host" opt in; merely naming the current host does not. Without that opt-in, never launch a second host, compare the user against one, lower a score, withhold completion, or record `DEGRADED` because another host is absent. If cross-host work was explicitly requested but another host is unavailable, report that requested scope as unavailable separately; do not deduct from the design's QA score.
 
@@ -26,8 +26,9 @@ Then the mode check:
 
 1. **Existing design system?** If the repo has one (design tokens, a themed Tailwind config, a component library with its own look, brand guidelines), your job is faithful extension, not reinvention. Skip Steps 2-3, translate everything you build into the existing tokens, and still apply Step 4's craft rules and the Step 5 QA gate. In this mode no DIRECTION LOCK exists: at the QA gate, skip Phase 1 axis 6 (Variety) and Phase 2's stated-macrostructure check, compare renders against the existing system's tokens, stamp the stylesheet `/* goddesign | extension of existing system */`, and write no `.design-log.json` entry.
 2. **Scoped edit on a locked page?** If the page's stylesheet already carries a `/* goddesign | */` stamp and the task is a restyle, fix, or extension of existing components (no new page, no new macrostructure, no direction change), reuse the stamped lock: it IS the DIRECTION LOCK. Skip Steps 2-3, keep the existing tokens and jitter, apply Step 4c-4d and the full Step 5 gate. A new page, a new section that introduces a new macrostructure, or any requested direction change sends you back to the full path; when in doubt, the full path.
-3. **Brief names an aesthetic?** If the user specified a look ("make it feel like a 70s print ad", "match our brand navy"), that IS the direction. Skip the seeded direction pick; still run the seed for the macrostructure, and still lock tokens in Step 4a's DIRECTION LOCK format.
-4. Otherwise, continue to Step 1.
+3. **More than one session of work?** A `.design-map.md` at the project root, a brief naming 3 or more distinct surfaces (a page, a screen, or a component set with its own one action), or a stated hand-off to another session or host means this effort is bigger than a run. Read `references/map.md` and follow it: chart the map if none exists (one session, no pixels), otherwise claim one surface and inherit the map's System lock verbatim instead of rolling a seed. Two surfaces or fewer in one session with no existing map: no map, design them directly. Under a map, items 1 and 2 still win where they apply: an existing design system supplies the System lock's tokens, and a restyle of an already-stamped surface stays a scoped edit.
+4. **Brief names an aesthetic?** If the user specified a look ("make it feel like a 70s print ad", "match our brand navy"), that IS the direction. Skip the seeded direction pick; still run the seed for the macrostructure, and still lock tokens in Step 4a's DIRECTION LOCK format. Under a map this resolves once, at charting, into the System lock.
+5. Otherwise, continue to Step 1.
 
 ## Step 1: identify your lane
 
@@ -59,6 +60,8 @@ If `.design-log.json` exists at the project root, read it. Also read `~/.design-
 - Rest hot rows across BOTH ledgers' last 8 entries combined: if any one direction appears 3 or more times, or any one macrostructure 4 or more times, it is resting this run; advance the offending index until legal and say so. This is the popularity cap: a row the rotation keeps landing on is a row the population will start recognizing.
 
 State the rotation in plain text: "Last runs: Workbench, Marquee Hero, Letter. Picking from the rest."
+
+Under a design map (Step 0 item 3) these rules run **once, at charting**, and never again inside that map. Surface sessions inherit the map's System lock and must MATCH it: rotating a sibling surface away from the system is the defect, not the goal. The map also writes exactly one ledger entry, when its last surface locks, so a nine-surface product does not flood both ledgers with nine near-identical rows and trip its own popularity cap. See `references/map.md`.
 
 ### 3b. Roll the seed
 
@@ -114,6 +117,8 @@ Grammar: manifesto band runs full-bleed | pricing opens on a bare claim, no eyeb
 Motion: one marquee 30s linear; hovers 180ms; nothing else
 ```
 
+Under a design map, this lock is assembled, not rolled. Copy the map's System lock lines (Seed, Tokens, Jitter, Type, Import, Motion, Atmosphere) verbatim, and choose fresh only the Structure, Layout, Signature, Grammar, and conception-map lines for this surface. Add a `Map:` line naming the map and the surface. Never re-roll the seed, re-jitter the tokens, or read `references/directions.md` again inside a map: siblings that ship different accents are the failure the map exists to prevent.
+
 ### 4b. Anti-cliche critique
 
 One paragraph: imagine the generic output an unskilled AI would produce for this same brief. Name three things it would do. Confirm your lock shares none of them. If it shares any, fix the lock now. Second-order check: the "tasteful" cream-serif-terracotta look is itself now a cliche; if your lock resembles it and the seed did not select it, reroll.
@@ -168,7 +173,7 @@ Tags: [fingerprint] entries avoid patterns the public identifies as AI-made on s
 
 ## Step 5: QA gate
 
-When the build is complete, read `references/checklist.md` and run all three phases: the advisory seven-axis self-critique (every score cites the element, line, or screenshot region that earns it), the boolean gate sweep (pass/fail; report the pass count), and visual verification (the measured audit is the second half of the pass/fail gate; run the blind read by default when an image-capable CLI exists, skip only with a stated reason; a shell renderer chain stands between you and a `DEGRADED: no visual check`, and a bounded fix loop repairs only what the audit names). Judge the design on the active host unless the prompt explicitly opted into cross-host work. Missing a second host is not a skip, failure, or degraded state. If prompt-requested cross-host scope cannot run, report it separately from the QA verdict. Then persist the run: the CSS stamp comment and the `.design-log.json` entry, exactly as the checklist specifies.
+When the build is complete, read `references/checklist.md` and run all three phases: the advisory seven-axis self-critique (every score cites the element, line, or screenshot region that earns it), the boolean gate sweep (pass/fail; report the pass count), and visual verification (the measured audit is the second half of the pass/fail gate; run the blind read by default when an image-capable CLI exists, skip only with a stated reason; a shell renderer chain stands between you and a `DEGRADED: no visual check`, and a bounded fix loop repairs only what the audit names). Judge the design on the active host unless the prompt explicitly opted into cross-host work. Missing a second host is not a skip, failure, or degraded state. If prompt-requested cross-host scope cannot run, report it separately from the QA verdict. Then persist the run: the CSS stamp comment and the `.design-log.json` entry, exactly as the checklist specifies. Under a design map, persist the surface instead: stamp the stylesheet, move the surface into the map's **Surfaces locked** with a link and a one-line gist, re-run `node <skill-root>/scripts/verify-map.mjs .design-map.md`, and write the single `.design-log.json` entry only when the map's last surface locks.
 
 A page that has not passed the gate is not done. If someone could glance at the result and say "AI made that" without doubt, it failed; go back to the weakest gate and fix it.
 
@@ -180,5 +185,6 @@ A page that has not passed the gate is not done. If someone could glance at the 
 - `references/fonts.md`: 12 pairings with safe import lines and availability warnings. Read only when remixing type.
 - `references/motion.md`: budgets, easings, copy-paste recipes. Read at Step 4c before animating.
 - `references/imagery.md`: generated-image art direction and the genimage delegation chain. Read only when the run needs pixels.
+- `references/map.md`: the design map, for efforts spanning more than one session (3+ surfaces, a hand-off, or an existing `.design-map.md`). Read at Step 0 item 3, not otherwise.
 - `references/checklist.md`: the QA gate. Read at Step 5, not before.
 - `references/blind-read.md`: the fixed prompt for the optional blind post-render critic (`scripts/blind-read.sh`). Read only if you run the blind read at Step 5's visual verification.

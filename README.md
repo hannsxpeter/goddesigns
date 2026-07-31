@@ -3,6 +3,7 @@
 [![Release](https://img.shields.io/github/v/release/hannsxpeter/goddesigns)](https://github.com/hannsxpeter/goddesigns/releases)
 [![License: MIT](https://img.shields.io/github/license/hannsxpeter/goddesigns)](LICENSE)
 [![Hosts](https://img.shields.io/badge/hosts-agnostic-blue)](docs/INSTALL.md)
+[![Scope](https://img.shields.io/badge/scope-one%20run%20or%20a%20multi--session%20map-blue)](skills/goddesign/references/map.md)
 [![Validation](https://img.shields.io/badge/validation-7%2F7%20skill%20runs%20green-success)](validation/runs/kilnhouse-2026-07/README.md)
 [![Evidence](https://img.shields.io/badge/evidence-346%20sourced%20comments-informational)](validation/research/sentiment-evidence-2026-07.md)
 
@@ -32,6 +33,14 @@ goddesign counters both with mechanisms, not advice. Every rule in it traces to 
 4. **DIRECTION LOCK**: every visual decision is written down before any code, then executed exactly. Conception can flow through multiple avenues: the seeded deck, human-genome rows extracted from real sites, and comp-first mode (an image model draws a lock-derived mockup, the code model replicates it); one page may mix up to three avenues under one lock.
 5. **QA gate**: a seven-axis self-critique (including Credibility, from controlled-study evidence that trust is where AI design measurably lags), a greppable boolean sweep, and a measured audit (`scripts/audit.mjs`) that detects layout collisions, hidden-content reveal bugs, silent font fallbacks, overflow, and undersized touch targets, with a bounded self-correction loop (named failures only, lock frozen, maximum 3 cycles).
 
+## Efforts bigger than one session
+
+A product is not a page. When a brief names 3 or more surfaces (marketing, auth, app shell, dashboard, settings, empty states), one session cannot hold them, and goddesign's own ledger works against you: its job is to make the next run **differ**, which is right across projects and backwards across the surfaces of one product.
+
+So an effort that size charts a `.design-map.md` first: a destination that fixes the scope, one DIRECTION LOCK rolled once that every surface inherits verbatim, a queue of surfaces each carrying its one action and audience, a claim slot so parallel sessions do not collide, a fog section for what cannot yet be specified, an out-of-scope section that never graduates, and parked questions for the facts only a person can supply (a surface ships a labeled placeholder and records the question rather than stalling or inventing). Then one surface per session, gated in full. The seed rolls once, surfaces MATCH the system instead of rotating away from it, and the whole map writes exactly one ledger entry instead of flooding the rotation with nine near-identical rows.
+
+The threshold is narrow on purpose: two surfaces or fewer in one session skips the map entirely. `scripts/verify-map.mjs` validates the map mechanically. The structure is adapted from the [wayfinder skill](https://github.com/mattpocock/skills/blob/main/skills/engineering/wayfinder/SKILL.md) (MIT); what was borrowed, what was declined, and the kill criterion it ships under are recorded in [validation/research/wayfinder-evaluation-2026-07.md](validation/research/wayfinder-evaluation-2026-07.md).
+
 ## Install
 
 ```sh
@@ -47,7 +56,9 @@ Then invoke `/goddesign <brief>` in Claude Code or `$goddesign <brief>` in Codex
 | Path | What it is |
 |---|---|
 | `skills/goddesign/SKILL.md` | The skill: lanes, variance engine, craft floor, banned list |
-| `skills/goddesign/references/` | The decks: 17 directions (including the first human-genome row), 12 layouts, 10 palettes, 12 font pairings, motion recipes, imagery rules, the QA gate |
+| `skills/goddesign/references/` | The decks: 17 directions (including the first human-genome row), 12 layouts, 10 palettes, 12 font pairings, motion recipes, imagery rules, the design map, the QA gate |
+| `skills/goddesign/references/map.md` | The design map: how an effort too big for one session is charted once and worked one surface at a time under a single frozen lock |
+| `skills/goddesign/scripts/verify-map.mjs` | Design-map validator: required sections, a complete System lock, surface-line shape, claims, and one-surface-one-state |
 | `skills/goddesign/scripts/audit.mjs` | Measured visual audit: collisions, reveal bugs, font fallbacks, overflow, touch targets |
 | `skills/goddesign/scripts/codex-audit-loop.sh` | Operator wrapper for sandboxed Codex: build inside the sandbox, audit outside, feed failures back into the same session |
 | `skills/goddesign/scripts/detect-clis.sh` | Presence-only inventory of known agent CLIs, including distinct Cursor Agent and Cursor editor entries |
