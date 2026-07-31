@@ -23,6 +23,10 @@ jobs:
         run: node scripts/lint-decks.mjs
       - name: study tooling tests
         run: node --test scripts/study-a.test.mjs
+      # The mechanical half of the QA gate, including the corpus separation the
+      # evaluation record claims: skill runs stay clean, comparison runs do not.
+      - name: gate sweep tests
+        run: node --test scripts/sweep.test.mjs
       - name: rater install
         working-directory: study-a-rater
         run: npm ci --no-audit --no-fund

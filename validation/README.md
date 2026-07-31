@@ -19,6 +19,14 @@ This directory contains the empirical record for goddesign. Material is grouped 
 - [Public sentiment evidence](research/sentiment-evidence-2026-07.md)
 - [Kilnhouse comparative run](runs/kilnhouse-2026-07/README.md)
 
+## Mechanism evaluations
+
+External work read against goddesign, with what was borrowed, what was declined, and the kill criterion each shipped mechanism runs under.
+
+- [ADHD reasoning skill](research/adhd-evaluation-2026-07.md): parallel fan-out declined; four native leverage seams surfaced.
+- [wayfinder skill](research/wayfinder-evaluation-2026-07.md): seven structural disciplines shipped as the design map; the issue-tracker substrate declined.
+- [impeccable, ui-ux-pro-max, skillui](research/design-skills-evaluation-2026-07.md): the deterministic sweep, severity split, inline waivers, and static token extraction shipped; the command surface, the catalogue decks, edit-time hooks, live browser mode, and the pattern generator declined.
+
 ## Conventions
 
 - Dated units use `name-YYYY-MM`.

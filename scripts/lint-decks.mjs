@@ -113,7 +113,34 @@ check("SKILL.md forbids re-rolling the seed inside a map",
 check("checklist.md persists one ledger entry per map, not per surface",
   checklist.includes("A map is one effort, so it is **one** ledger entry, not one per surface"));
 
-// 8. Repo style: no em dashes or en dashes in prose files.
+// 8. The mechanical sweep: the script's rule table and the deck's rule table are
+// one contract in two files, so neither may grow a rule the other does not know.
+const sweep = read("skills/goddesign/scripts/sweep.mjs");
+const sweepBlock = sweep.slice(sweep.indexOf("const RULES = ["), sweep.indexOf("];", sweep.indexOf("const RULES = [")));
+const sweepRules = [...sweepBlock.matchAll(/^\s*\['([a-z-]+)',\s*'(fail|advisory)'/gm)].map((m) => ({ id: m[1], sev: m[2] }));
+check("sweep.mjs declares a rule table", sweepRules.length >= 20, `found ${sweepRules.length}`);
+for (const r of sweepRules) {
+  check(`checklist.md documents sweep rule "${r.id}"`, checklist.includes(`\`${r.id}\``));
+  check(`checklist.md records "${r.id}" as ${r.sev}`,
+    new RegExp(`\\\`${r.id}\\\`\\s*\\|\\s*${r.sev}\\s*\\|`).test(checklist));
+}
+const documented = [...checklist.matchAll(/^\| `([a-z-]+)` \| (fail|advisory) \|/gm)].map((m) => m[1]);
+for (const id of documented)
+  check(`sweep.mjs implements documented rule "${id}"`, sweepRules.some((r) => r.id === id));
+check("verify-install.sh lists sweep.mjs as optional",
+  /optional="[^"]*scripts\/sweep\.mjs/.test(verifyInstall));
+check("verify-install.sh lists extract-tokens.mjs as optional",
+  /optional="[^"]*scripts\/extract-tokens\.mjs/.test(verifyInstall));
+check("SKILL.md Step 5 routes the gate through the sweep",
+  skill.includes("scripts/sweep.mjs"));
+check("SKILL.md extension mode measures the existing system",
+  skill.includes("scripts/extract-tokens.mjs"));
+check("checklist.md keeps the sweep and the audit as complements",
+  checklist.includes("The sweep and the audit are complements, not substitutes"));
+check("checklist.md requires a reason on every waiver",
+  checklist.includes("the reason is mandatory"));
+
+// 9. Repo style: no em dashes or en dashes in prose files.
 import { execSync } from "node:child_process";
 const prose = execSync(
   "git ls-files --cached --others --exclude-standard -- '*.md'",
