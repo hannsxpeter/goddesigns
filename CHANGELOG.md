@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## v1.6.1 (2026-07-31)
+
+The correction release. No rule, script, deck, or gate behaviour changes; this release fixes the evidence record.
 
 ### Evidence correction: one kilnhouse baseline withdrawn
 - `validation/runs/kilnhouse-2026-07/codex-baseline-kilnhouse.html` / `.png` are withdrawn as a contaminated capture and renamed with a `WITHDRAWN-` prefix. The files are kept byte-unchanged; nothing was deleted. Finding, evidence, and affected claims: `validation/runs/kilnhouse-2026-07/WITHDRAWN-codex-baseline-kilnhouse.md`.
