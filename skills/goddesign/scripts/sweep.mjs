@@ -159,7 +159,17 @@ function rulesOf(css) {
       // Comments sit between rules, so the raw slice carries the previous rule's
       // trailing comment. Strip them or ":root" reads as a comment and every token
       // in it gets reported as a component-rule literal.
-      const selector = css.slice(selStart, i).replace(/\/\*[\s\S]*?\*\//g, ' ').trim();
+      // Statement at-rules (@import, @charset, @namespace, @layer a, b;) end in a
+      // semicolon and carry no block, so they are finished business by the time
+      // the next '{' arrives. Without dropping them the text before that brace
+      // still starts with '@', the rule below reads the NEXT rule as an at-rule
+      // container, and its declarations are never scanned. goddesign mandates an
+      // @import for webfonts and :root first for tokens, so that combination is
+      // the shape the skill itself prescribes.
+      const rawSel = css.slice(selStart, i).replace(/\/\*[\s\S]*?\*\//g, ' ');
+      const selOffset = rawSel.lastIndexOf(';') + 1;
+      const selText = rawSel.slice(selOffset);
+      const selector = selText.trim();
       // Most at-rules (@media, @supports, @layer) hold rules, so walk into them and
       // carry the at-rule as context. @theme holds bare declarations the way :root
       // does (Tailwind v4, and extract-tokens.mjs reads it as a token source), so
@@ -172,8 +182,8 @@ function rulesOf(css) {
         else if (css[end] === '}') inner--;
         end++;
       }
-      const lead = css.slice(selStart, i).search(/\S/);
-      out.push({ selector, body: css.slice(i + 1, end - 1), index: selStart + (lead > 0 ? lead : 0), at: stack.join(' ') });
+      const lead = selText.search(/\S/);
+      out.push({ selector, body: css.slice(i + 1, end - 1), index: selStart + selOffset + (lead > 0 ? lead : 0), at: stack.join(' ') });
       i = end; selStart = i; continue;
     }
     if (ch === '}') { if (stack.length) stack.pop(); depth = Math.max(0, depth - 1); i++; selStart = i; continue; }

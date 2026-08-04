@@ -1,5 +1,34 @@
 # Changelog
 
+## v1.6.3 (2026-08-04)
+
+The refusal release. An attempt to mechanize the five Banned-list clauses v1.6.2 left open produced **zero new sweep rules** and two real bug fixes. Every candidate that reached a clean corpus split was then broken on legal, deck-faithful code, and four of the five died the same way: the deck states the pattern, and a source scanner cannot read the DIRECTION LOCK that makes it legal. Record: `validation/research/banned-list-mechanization-2026-08.md`.
+
+### An `@import` before the first rule silently swallowed that rule
+- `rulesOf()` read everything before the first `{` as the selector. A statement at-rule (`@import`, `@charset`, `@namespace`) ends in a semicolon and carries no block, so the text still began with `@`, the parser read the **next** rule as an at-rule container, and its declarations were never scanned.
+- The skill mandates an `@import` for webfonts and `:root` first for tokens, so **the stylesheet shape the skill prescribes was the shape that evaded it**. Measured: `:root { --font-display: Inter, sans-serif }` behind an `@import` swept green; the identical file without the `@import` reports `banned-font`.
+- This is the same class as the `@theme` bug v1.6.2 fixed and the more serious of the two, because `@theme` affects Tailwind v4 projects while this affected any stylesheet written the way the skill says to write one. Three files in the repo had a swallowed first rule, including both stylesheets of `validation/runs/bellweather-2026-08/`, whose token block was therefore unchecked when that run was gated. That run was re-gated and still exits 0.
+- Fixed by dropping everything up to the last `;` when computing a rule's selector, with line numbers preserved. Corpus split: **zero change across all 49 pre-existing artifacts.** `@media`, `@supports`, `@layer` blocks and `@font-face` still nest correctly, all covered by a regression test.
+
+### Deck row 16 contradicted its own gate
+- Row 16 Trade Counter states `ONE family only: Poppins`, and Poppins is on the Banned list at `fail`. The contradiction was invisible before the parser fix, because a row-16 build declares its face in a custom property behind an `@import`. With the parser fixed, a faithful row-16 build fails its own deck row.
+- The row is a genome extracted from a real human-built site, so changing the face would falsify the evidence. The row now carries the exact `goddesign-allow` comment to ship, and it is the only deck row that requires a waiver to pass its own gate.
+- Related drift, also fixed: `BANNED_FACE` bans Helvetica, Segoe UI, and Noto Sans, which `SKILL.md`'s Banned bullet 1 did not name, so the Banned list was narrower than the rule enforcing it. The bullet now names them.
+
+### Thirteen clauses move to the tier that can decide them
+- 13 new Phase 2b assertions across Color, Layout, Motion, and Honesty, covering cyan-magenta washes, purple-tinted shadows, the cream and acid-green reflexes, glassmorphism, fake chrome, sparklines, marker underlines, decorative icons, emoji and mixed icon sets, bounce easing, confetti, animated focus rings, and weightless headings. Phase 2b is read with the lock in hand, which is the context a source scanner lacks and exactly what these clauses need.
+- One over-claim corrected: a Layout line marked three clauses `[sweep]` when the sweep covers two. Contents rails and chapter headers have no rule and never did; the line is now two lines and the uncovered half says so.
+- Two boundaries recorded as render-tier on purpose: "cards inside the hero" resolves against the first viewport, which only `audit.mjs` can compute, and "icons on non-interactive elements" resolves against what a mark reads as, which fired 3/25 on clean work when attempted as a source rule.
+
+### Why nothing shipped as a rule
+- Four candidates collide with the deck. Row 3 Terminal Core's stated Signature *is* an accent-colored span inside a heading; row 15 states the torn-paper divider `marker-underline` flagged; all four cream-ground serif rows fire once the build carries the destructive colour the checklist mandates.
+- The fifth collides with the skill itself. A purple-shadow ban at OKLCH hue 272-330 fires on row 12, whose accent `#2B4BFF` sits at hue 267.1, because Step 3d **mandates** a jitter of -12 to +12 and eight of the twenty-five equally likely rolls land it inside the banned band.
+- Two more were declined on measurement: emoji-as-icons has zero emoji-presentation code points anywhere in 25 goddesign, 18 comparison, and 10 study-a artifacts, and cyan-magenta washes fire on nothing at all. No defect to reproduce means the evidence bar is unmet, not that the pattern is fine.
+- The most counter-intuitive measurement: of 22 `backdrop-filter` rules across both populations, **19 are a frosted nav or header bar**. A naive glassmorphism rule scores 2/25 against 17/18 and looks like a superb separator while actually detecting sticky headers.
+
+### Tests
+- `scripts/sweep.test.mjs` 22 to 23, adding the `@import` swallow regression and its at-rule nesting counterpart. `scripts/lint-decks.mjs` stays green at 316. Rule count stays 29.
+
 ## v1.6.2 (2026-08-04)
 
 The parity release. impeccable was re-read at v3.5.0 and, for the second time, the yield was not a mechanism to port but a set of places where goddesign stated a rule and did not enforce it. Four gaps closed: two escapes in the mechanical sweep, one gate state that had no name, and one install check that tested presence where it needed integrity. No sweep rule was added, no rule id or severity changed, and the rule count stays 29. Twenty-two of twenty-four candidate borrows were refuted, and the declines are recorded in as much detail as the adoptions. Full borrow-and-decline record: `validation/research/impeccable-evaluation-2026-08.md`.

@@ -1,0 +1,268 @@
+/* goddesign | structure: Workbench | direction: Luxury Serif | accent: 272 */
+/* Built output. Generated from styles.src.css: the @theme token block is emitted
+   as :root custom properties, which is what Tailwind v4 does and what the browser
+   needs. Do not edit; edit styles.src.css. See README.md in this directory. */
+@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500&family=Manrope:wght@300;400;600&display=swap');
+
+:root {
+  --color-bg: #0E0C08;
+  --color-surface: #171410;
+  --color-text: #EFE9DC;
+  --color-muted: #9C917C;
+  --color-hairline: #2E2A22;
+  /* Step 3d jitter: accent hue +9 (262.7 to 271.7). jitterl 0 and jitterr 0, so
+     paper lightness is unnudged and the row's radius 0 stands, both by roll. */
+  --color-accent: oklch(from #C9CFDA l c calc(h + 9));
+
+  --font-display: 'Bodoni Moda', Georgia, serif;
+  --font-body: Manrope, ui-sans-serif, sans-serif;
+}
+
+/* ---------------------------------------------------------------- ground */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: 17px;
+  line-height: 1.55;
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 { font-family: var(--font-display); font-weight: 500; line-height: 1.08; letter-spacing: -0.02em; margin: 0; text-wrap: balance; }
+p { margin: 0; text-wrap: pretty; }
+a { color: inherit; }
+
+:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
+
+.shell { width: min(100% - 48px, 1180px); margin-inline: auto; }
+
+/* The row's label treatment: body family, 600, uppercase, +12% tracking. */
+.label {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  margin: 0;
+}
+
+
+/* ---------------------------------------------------------------- top bar */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  padding-block: 24px;
+  border-bottom: 1px solid var(--color-hairline);
+}
+
+.brand { font-family: var(--font-display); font-size: 21px; letter-spacing: -0.01em; text-decoration: none; }
+
+.topnav { display: flex; gap: 28px; margin-left: auto; flex-wrap: wrap; }
+
+.topnav a {
+  font-size: 14px;
+  text-decoration: none;
+  color: var(--color-muted);
+  padding-block: 12px;
+  min-height: 24px;
+  border-bottom: 1px solid transparent;
+}
+
+.topnav a:hover { color: var(--color-text); border-bottom-color: var(--color-accent); }
+
+/* ---------------------------------------------------------------- hero */
+
+.hero { padding-block: 160px 96px; }
+
+.hero-grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 64px; align-items: end; }
+
+.reading {
+  font-size: clamp(4rem, 13vw, 6rem);
+  font-family: var(--font-display);
+  line-height: 0.86;
+  letter-spacing: -0.04em;
+  font-variant-numeric: lining-nums tabular-nums;
+  margin: 0;
+}
+
+.reading-unit { display: block; font-family: var(--font-body); font-weight: 600; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-muted); margin-top: 16px; }
+
+.hero h1 { font-size: clamp(2.25rem, 5.2vw, 4rem); }
+
+.hero-lede { max-width: 46ch; color: var(--color-muted); margin-top: 24px; font-size: 19px; }
+
+.cta-row { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 48px; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 12px 32px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: 1px solid var(--color-accent);
+  color: var(--color-bg);
+  background: var(--color-accent);
+  transition: opacity 0.2s cubic-bezier(0.25, 1, 0.5, 1), border-color 0.2s cubic-bezier(0.25, 1, 0.5, 1), background-color 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.btn:hover { opacity: 0.82; }
+.btn:active { opacity: 0.7; }
+.btn[disabled] { opacity: 0.35; pointer-events: none; }
+
+/* The boundary is --muted, not --hairline: hairline on the page ground is 1.37:1,
+   under the craft floor's 3:1 for a UI boundary, and the button read as absent. */
+.btn-quiet { background: transparent; color: var(--color-text); border-color: var(--color-muted); }
+.btn-quiet:hover { border-color: var(--color-accent); opacity: 1; }
+
+/* ---------------------------------------------------------------- pan log */
+
+/* Grammar break (a): the panel escapes the shell full-bleed and overlaps the
+   hero band above it by 96px. This is also the atmosphere layer's depth move. */
+.panlog {
+  background: var(--color-surface);
+  border-block: 1px solid var(--color-hairline);
+  padding-block: 64px;
+  margin-top: -96px;
+  position: relative;
+}
+
+.panlog-head { display: flex; flex-wrap: wrap; gap: 16px 48px; align-items: baseline; margin-bottom: 32px; }
+.panlog h2 { font-size: clamp(1.75rem, 3vw, 2.5rem); }
+.panlog-note { color: var(--color-muted); font-size: 14px; max-width: 52ch; }
+
+.log-scroll { overflow-x: auto; }
+
+table { border-collapse: collapse; width: 100%; min-width: 720px; font-variant-numeric: lining-nums tabular-nums; }
+
+caption { text-align: left; padding-bottom: 24px; }
+
+thead th {
+  text-align: left;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  padding: 0 24px 12px 0;
+  border-bottom: 1px solid var(--color-hairline);
+  white-space: nowrap;
+}
+
+tbody td { padding: 16px 24px 16px 0; border-bottom: 1px solid var(--color-hairline); font-size: 16px; }
+tbody tr:last-child td { border-bottom: 0; }
+
+.baume { font-family: var(--font-display); font-size: 26px; letter-spacing: -0.02em; }
+
+.state { font-weight: 600; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; }
+.state-open { color: var(--color-accent); }
+.state-shut { color: var(--color-muted); }
+
+/* Grammar break (c): the bittern row spans every column instead of holding cells. */
+.spanrow td { border-bottom: 0; padding-top: 24px; color: var(--color-muted); font-size: 15px; }
+
+/* ---------------------------------------------------------------- grain */
+
+/* Grammar break (b): this band opens on a bare measurement. No eyebrow, no
+   label-heading-lead ritual. The number is the heading. */
+.grain { padding-block: 128px; position: relative; }
+
+/* Atmosphere: the pan lattice, the flat seen from above, drawn in the row's own
+   1px hairline. Declared in the lock; it is ground treatment, not ornament. */
+.grain::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(to right, var(--color-hairline) 0 1px, transparent 1px 96px),
+    repeating-linear-gradient(to bottom, var(--color-hairline) 0 1px, transparent 1px 96px);
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.grain > * { position: relative; }
+
+.grain-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 96px 64px; }
+
+.grain-lead { font-size: clamp(2.5rem, 6vw, 4rem); letter-spacing: -0.03em; }
+.grain-name { margin-top: 16px; font-weight: 600; font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; }
+.grain-body { margin-top: 16px; color: var(--color-muted); max-width: 48ch; }
+
+/* Grammar break (c), second half: the pack note spans both columns. */
+.grain-span { grid-column: 1 / -1; border-top: 1px solid var(--color-hairline); padding-top: 32px; color: var(--color-muted); max-width: 62ch; }
+
+/* ---------------------------------------------------------------- tours */
+
+/* Grammar break (d): this band is the page's shortest by a wide margin. */
+.tours { padding-block: 128px; border-top: 1px solid var(--color-hairline); }
+.tours h2 { font-size: clamp(1.75rem, 3vw, 2.5rem); margin-top: 12px; max-width: 20ch; }
+.tours p { margin-top: 24px; color: var(--color-muted); max-width: 54ch; }
+.tours-link { display: inline-block; margin-top: 32px; font-weight: 600; font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; text-decoration: none; padding-block: 12px; border-bottom: 1px solid var(--color-accent); transition: opacity 0.2s cubic-bezier(0.25, 1, 0.5, 1); }
+.tours-link:hover { opacity: 0.7; }
+
+/* ---------------------------------------------------------------- contact */
+
+.contact { padding-block: 128px; background: var(--color-surface); border-top: 1px solid var(--color-hairline); }
+.contact h2 { font-size: clamp(1.75rem, 3vw, 2.5rem); max-width: 18ch; }
+.contact-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 64px; margin-top: 48px; }
+.contact dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 12px 32px; font-size: 16px; }
+.contact dt { color: var(--color-muted); font-weight: 600; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; padding-top: 4px; }
+.contact dd { margin: 0; }
+.contact dd a { display: inline-flex; align-items: center; min-height: 44px; text-decoration-thickness: 1px; text-underline-offset: 4px; transition: opacity 0.2s cubic-bezier(0.25, 1, 0.5, 1); }
+.contact dd a:hover { opacity: 0.7; }
+.terms { color: var(--color-muted); font-size: 15px; }
+.terms p + p { margin-top: 12px; }
+
+.demo-note { margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--color-hairline); color: var(--color-muted); font-size: 14px; max-width: 70ch; }
+
+.foot { padding-block: 64px; font-size: 14px; color: var(--color-muted); border-top: 1px solid var(--color-hairline); }
+
+/* ---------------------------------------------------------------- motion */
+
+/* Two intentional motions on the page. The row states opacity fades only and
+   nothing moving position, so neither animates transform. */
+@media (prefers-reduced-motion: no-preference) {
+  .hero-grid { animation: settle 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  @keyframes settle { from { opacity: 0; } }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+/* ---------------------------------------------------------------- responsive */
+
+@media (max-width: 900px) {
+  .hero-grid, .grain-grid, .contact-grid { grid-template-columns: minmax(0, 1fr); }
+  .hero-grid { gap: 40px; }
+  .grain-grid { gap: 64px; }
+  /* The panel's declared -96px overlap must land on padding, never on content.
+     Below 900px the hero's bottom padding is what gives it somewhere to go. */
+  .hero { padding-block: 96px 160px; }
+}
+
+@media (max-width: 640px) {
+  body { font-size: 17px; }
+  .shell { width: calc(100% - 32px); }
+  .topbar { flex-wrap: wrap; gap: 16px; }
+  .topnav { margin-left: 0; gap: 20px; }
+  .topnav a, .btn, .tours-link { min-height: 44px; }
+  .btn { width: 100%; justify-content: center; }
+  .grain::before { background-size: 48px 48px; }
+}
