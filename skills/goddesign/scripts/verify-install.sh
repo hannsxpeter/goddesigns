@@ -31,6 +31,47 @@ if [ "$missing" -ne 0 ]; then
   exit 1
 fi
 
+# Deck integrity: present and non-empty is not the same as complete. A copied
+# rather than symlinked install, a half-synced tree, or a stale vendored copy
+# passes the loop above while a deck holds fewer rows than Step 3b's modulus
+# rolls, and then the seed lands on a row that does not exist and the model
+# improvises it. That is the failure this script's header exists to stop.
+# The moduli are grepped out of SKILL.md, never hardcoded, so a deck that grows
+# does not have to be remembered here as well.
+seedline=$(grep -F 'direction=$((' "$root/SKILL.md" | head -1)
+set -- $(printf '%s' "$seedline" | grep -oE '% [0-9]+' | head -4 | grep -oE '[0-9]+')
+
+if [ "$#" -ne 4 ]; then
+  echo "INCOMPLETE INSTALL: SKILL.md Step 3b seed line not found or unreadable (stale or partial copy: reinstall, see docs/INSTALL.md)"
+  exit 1
+fi
+
+drift=0
+# grep -c prints its count and exits 1 when that count is zero, so the exit
+# status is not the answer here and must not be branched on: a gutted deck has
+# to read as 0 rows, not as "check skipped".
+count_rows() {
+  n=$(grep -cE "$2" "$root/references/$1" 2>/dev/null)
+  case "$n" in ''|*[!0-9]*) n=0 ;; esac
+  printf '%s' "$n"
+}
+check_deck() {
+  found=$(count_rows "$1" "$2")
+  if [ "$found" -ne "$3" ]; then
+    echo "INCOMPLETE INSTALL: references/$1 has $found rows, SKILL.md Step 3b rolls % $3 (stale or partial copy: reinstall, see docs/INSTALL.md)"
+    drift=$((drift + 1))
+  fi
+}
+check_deck directions.md '^## [0-9]+\. ' "$1"
+check_deck layouts.md '^[0-9]+\. \*\*' "$2"
+check_deck palettes.md '^[0-9]+\. \*\*' "$3"
+check_deck fonts.md '^\| [0-9]+ \|' "$4"
+
+if [ "$drift" -ne 0 ]; then
+  echo "goddesign: $drift deck(s) do not match the seed moduli. Do not run: the seed can select a row that is not there."
+  exit 1
+fi
+
 # Report optional gaps as notes, not failures.
 for f in $optional; do
   [ -r "$root/$f" ] && [ -s "$root/$f" ] || echo "note: optional $f absent (that capability will DEGRADE)"

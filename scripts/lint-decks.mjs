@@ -140,6 +140,24 @@ check("checklist.md keeps the sweep and the audit as complements",
 check("checklist.md requires a reason on every waiver",
   checklist.includes("the reason is mandatory"));
 
+// The sweep is the half of the gate that survives a sandbox, but two hosts cannot
+// run it at all, and a run that cannot run it has to say so rather than report a
+// pass count it never measured. The label is the contract; keep all three sites.
+check("checklist.md names the no-sweep degraded state",
+  checklist.includes("DEGRADED: no sweep"));
+check("checklist.md hands off the unrunnable sweep like the unrunnable audit",
+  checklist.includes("sweep-handoff.sh"));
+check("SKILL.md Step 5 names the no-sweep degraded state",
+  skill.includes("DEGRADED: no sweep"));
+
+// Install integrity: the deck-row-to-modulus contract is checked by this script
+// for the maintainer, and lint-decks never ships inside skills/goddesign/, so
+// verify-install.sh has to carry the same check for everyone who installs it.
+check("verify-install.sh checks deck row counts against the seed moduli",
+  verifyInstall.includes("direction=$((") && /INCOMPLETE INSTALL: references\/\$1 has \$found rows/.test(verifyInstall));
+check("verify-install.sh greps the moduli rather than hardcoding them",
+  /grep -oE '% \[0-9\]\+'/.test(verifyInstall));
+
 // 9. Repo style: no em dashes or en dashes in prose files.
 import { execSync } from "node:child_process";
 const prose = execSync(
