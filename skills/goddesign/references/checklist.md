@@ -1,6 +1,6 @@
 # QA Gate
 
-Load this file only when the build is complete. Run all three phases. What decides done: Phase 2's boolean sweep and Phase 3's measured audit are the pass/fail gate. Phase 1 is advisory with mandatory evidence citations; it catches what booleans cannot, and its known weakness (you grade your own homework) is why it cannot pass or fail a run by itself. Report the results in your final message: cited scores, gate pass count, and any DEGRADED notes. Do not skip phases to save time; an unverified page is not done.
+Load this file only when the build is complete. Run all three phases. What decides done: Phase 2's boolean sweep and Phase 3's measured audit are the pass/fail gate. Phase 1 is advisory with mandatory evidence citations; it catches what booleans cannot, and its known weakness (you grade your own homework) is why it cannot pass or fail a run by itself. Report the results in your final message: cited scores, gate pass count, and any DEGRADED notes. Every pass count says whether it was measured by a script or hand-checked, because a number that does not say which is indistinguishable from a number nobody ran. Do not skip phases to save time; an unverified page is not done.
 
 Phase 2 runs in two halves, and the mechanical half runs first. `scripts/sweep.mjs` executes every assertion below that resolves to a string, a number, or a count, reading source only: no browser, no network, no model. It is the half of the gate that survives a sandbox, because Phase 3's audit needs a browser and exits 2 without one. Run it, fix what it names, then work the remaining assertions by hand.
 
@@ -32,9 +32,11 @@ It takes files or directories (`node <skill-root>/scripts/sweep.mjs src/ index.h
 
 Fix every failure it names, then re-run until it exits 0. The DIRECTION LOCK is frozen during this loop exactly as it is during Phase 3's: no changing direction, palette, type, or structure to make a finding go away. A sweep failure means the code drifted from the lock, not that the lock was wrong.
 
+Cannot run it at all? The sweep needs `node` and nothing else, but two hosts reach this state: one with no shell (SKILL.md Step 0 supports it, and Step 3b ships an arithmetic seed for it), and one whose install carries the decks but not `scripts/` (`scripts/verify-install.sh` lists the sweep as optional and says so). Then state exactly `DEGRADED: no sweep (<reason>)` in your final message, name the command that failed, write it into `./sweep-handoff.sh` and mark it executable so an operator or wrapper can pick it up, and hand-check every `[sweep]`-marked assertion in Phase 2b against the Banned list, reporting the pass count as hand-checked rather than measured. This is not the same state as `DEGRADED: no visual check`: a host can render natively and still never run the sweep, in which case Phase 3 completes clean and nothing else would have said so. A run that reports neither a sweep exit code nor this label is not gated, and must not claim a pass count.
+
 | Rule | Severity | What it catches |
 |---|---|---|
-| `banned-font` | fail | Inter, Roboto, Arial, Open Sans, Lato, or Poppins as a chosen face |
+| `banned-font` | fail | Inter, Roboto, Arial, Arial Black, Open Sans, Lato, Poppins, Helvetica, Segoe UI, or Noto Sans as a chosen face |
 | `mono-body` | fail | a monospace face in the body or display slot (a stated numerals or code slot is legal) |
 | `space-grotesk` | advisory | Space Grotesk present; legal as body only under `fonts.md` pairing 6 |
 | `no-webfont` | fail | a named face with no import and no `@font-face`: the silent system fallback |
@@ -144,7 +146,7 @@ Responsive
 
 Brief
 - [ ] The brief re-read as a checklist: every requested page, section, state, and behavior exists in the build; nothing silently trimmed.
-- [ ] If the brief supplied a reference (image, mockup, URL, existing screens), or the run generated its own comp (comp-first mode), the render was compared against it side by side; it matches on layout, spacing, and color, or the deviations are stated and justified.
+- [ ] If the brief supplied a reference (image, mockup, URL, existing screens), or the run generated its own comp (comp-first mode), the render was compared against it side by side; it matches on layout, spacing, color, and medium, or the deviations are stated and justified. Medium is the axis that quietly goes missing: a comp region reading as a lit, dimensional object that shipped as a flat CSS panel is a deviation like any other, and it is stated or it is fixed.
 
 Map (run this group only when `.design-map.md` exists at the project root)
 - [ ] `node <skill-root>/scripts/verify-map.mjs .design-map.md` exits 0, both before the session started and after this surface was recorded.

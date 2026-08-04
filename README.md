@@ -68,7 +68,7 @@ Then invoke `/goddesign <brief>` in Claude Code or `$goddesign <brief>` in Codex
 | `skills/goddesign/scripts/codex-audit-loop.sh` | Operator wrapper for sandboxed Codex: build inside the sandbox, audit outside, feed failures back into the same session |
 | `skills/goddesign/scripts/detect-clis.sh` | Presence-only inventory of known agent CLIs, including distinct Cursor Agent and Cursor editor entries |
 | `skills/goddesign/scripts/genimage.sh` | Cross-host image generation: hosts without native image tools delegate to an installed image-capable CLI |
-| `skills/goddesign/scripts/verify-install.sh` | Install-integrity check: fails loud if a deck is missing rather than letting the model improvise it |
+| `skills/goddesign/scripts/verify-install.sh` | Install-integrity check: fails loud if a deck is missing, or if a deck holds fewer rows than the seed rolls against, rather than letting the model improvise it |
 | `skills/goddesign/scripts/blind-read.sh` | Optional blind post-render critic: a separate process reads only the screenshots and reconstructs the page's identity |
 | [`validation/`](validation/README.md) | Indexed evidence library: research, protocols, experiments, comparative runs, studies, and tools |
 | `docs/` | Install guide, architecture, contributing |

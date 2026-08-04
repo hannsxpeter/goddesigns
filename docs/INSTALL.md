@@ -31,6 +31,14 @@ sh skills/goddesign/scripts/verify-install.sh
 
 It prints `goddesign: install OK` and exits 0 when `SKILL.md` and the eight `references/*.md` decks are present, or `INCOMPLETE INSTALL: <file> not found` and exits 1 otherwise (optional scripts and files are reported as notes, not failures). Hosts without a shell get the same protection lazily: the skill stops with the same message at Step 3 if a deck it needs cannot be read.
 
+Presence is not completeness, so the check goes one step further. A copied rather than symlinked install, a half-synced tree, or a stale vendored copy can carry every file while a deck holds fewer rows than the seed rolls against, and then Step 3b's `% 17` selects a row that is not there. The script counts the rows in all four seeded decks and compares them against the moduli it greps out of `SKILL.md`, so a mismatch is named rather than improvised:
+
+```
+INCOMPLETE INSTALL: references/directions.md has 14 rows, SKILL.md Step 3b rolls % 17 (stale or partial copy: reinstall, see docs/INSTALL.md)
+```
+
+Seeing that means the install is stale: re-run the symlink step above rather than editing the deck.
+
 The skill also inventories known agent commands before a run:
 
 ```sh

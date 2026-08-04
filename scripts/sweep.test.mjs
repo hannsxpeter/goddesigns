@@ -102,6 +102,41 @@ test('a banned face is reported with the property that names it', () => {
   rmSync(dir, { recursive: true, force: true });
 });
 
+test('a system display face is banned by name, and stays legal as a fallback', () => {
+  // BANNED_FACE is anchored on the whole family string, so "Arial Black" never
+  // matched "arial" and shipped as a display voice. Its one backstop, no-webfont,
+  // is a whole-build boolean that any single import silences.
+  const bad = clean('\n.hero-title { font-family: "Arial Black", sans-serif; }');
+  assert.ok(rulesOf(sweepJson([bad]), 'fail').includes('banned-font'));
+  rmSync(bad, { recursive: true, force: true });
+
+  // firstFamily reads position 1 only, and all six corpus occurrences sit in
+  // position 2. A fallback is not a chosen face.
+  const ok = clean('\n:root { --display: "Anton", "Arial Black", sans-serif; }');
+  assert.equal(rulesOf(sweepJson([ok]), 'fail').includes('banned-font'), false);
+  rmSync(ok, { recursive: true, force: true });
+});
+
+test('@theme tokens are scanned exactly as :root tokens are', () => {
+  // @theme holds bare declarations, not rules, so walking into it as a container
+  // found no inner rule and every token in it went unscanned. Tailwind v4 writes
+  // tokens there and extract-tokens.mjs reads them, so the gate has to see them.
+  const rules = (block) => {
+    const dir = clean(`\n${block} { --bg: #FFFFFF; --text: #808080; }`);
+    const out = rulesOf(sweepJson([dir]), 'fail');
+    rmSync(dir, { recursive: true, force: true });
+    return out;
+  };
+  for (const block of ['@theme', '@theme inline']) {
+    assert.deepEqual(
+      rules(block).filter((r) => r === 'pure-base' || r === 'untinted-neutral').sort(),
+      rules(':root').filter((r) => r === 'pure-base' || r === 'untinted-neutral').sort(),
+      `${block} must be scanned like :root`,
+    );
+    assert.ok(rules(block).includes('untinted-neutral'), `${block} tokens reach the scanner`);
+  }
+});
+
 test('mono is legal in a stated numerals slot and banned in the body slot', () => {
   const ok = clean('\n:root { --font-mono: "JetBrains Mono", monospace; }');
   assert.equal(rulesOf(sweepJson([ok]), 'fail').includes('mono-body'), false);

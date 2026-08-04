@@ -28,7 +28,7 @@ import { join, extname, relative, resolve } from 'node:path';
 
 const RULES = [
   // id, severity, one-line statement of the defect
-  ['banned-font', 'fail', 'Inter, Roboto, Arial, Open Sans, Lato, or Poppins as a chosen face'],
+  ['banned-font', 'fail', 'Inter, Roboto, Arial, Arial Black, Open Sans, Lato, Poppins, Helvetica, Segoe UI, or Noto Sans as a chosen face'],
   ['mono-body', 'fail', 'a monospace face set as body or display type'],
   ['space-grotesk', 'advisory', 'Space Grotesk present; legal as body only under fonts.md pairing 6'],
   ['no-webfont', 'fail', 'a named non-system face is used but nothing imports or declares it'],
@@ -160,7 +160,11 @@ function rulesOf(css) {
       // trailing comment. Strip them or ":root" reads as a comment and every token
       // in it gets reported as a component-rule literal.
       const selector = css.slice(selStart, i).replace(/\/\*[\s\S]*?\*\//g, ' ').trim();
-      if (selector.startsWith('@')) { stack.push(selector); depth++; i++; selStart = i; continue; }
+      // Most at-rules (@media, @supports, @layer) hold rules, so walk into them and
+      // carry the at-rule as context. @theme holds bare declarations the way :root
+      // does (Tailwind v4, and extract-tokens.mjs reads it as a token source), so
+      // walking into it finds no inner rule and its tokens are never scanned at all.
+      if (selector.startsWith('@') && !/^@theme\b/i.test(selector)) { stack.push(selector); depth++; i++; selStart = i; continue; }
       let end = i + 1, inner = 1;
       while (end < css.length && inner > 0) {
         if (css[end] === '/' && css[end + 1] === '*') { const e2 = css.indexOf('*/', end); end = e2 === -1 ? css.length : e2 + 2; continue; }
@@ -214,7 +218,9 @@ const FONT_SLOT_NAME = /^--(font[\w-]*|ff|type|typeface|display|body|heading|hea
 const isFontValue = (v) => /^\s*["']?[A-Za-z]/.test(v) && !/^\s*(var|oklch|rgb|hsl|hwb|lab|lch|color|calc|url|clamp|min|max)\s*\(/i.test(v) && !/^\s*#/.test(v);
 const looksLikeFontStack = (v) => /,\s*[\w -]*(serif|sans-serif|monospace|cursive|fantasy|system-ui)\s*$/i.test(v.trim());
 
-const BANNED_FACE = /^(inter|roboto|arial|open sans|lato|poppins|helvetica|helvetica neue|segoe ui|noto sans)$/i;
+// Anchored on the whole family string, so every banned family has to be spelled
+// out: "Arial Black" is a distinct family name and never matches "arial".
+const BANNED_FACE = /^(inter|roboto|arial|arial black|open sans|lato|poppins|helvetica|helvetica neue|segoe ui|noto sans)$/i;
 const MONO_FACE = /^(jetbrains mono|ibm plex mono|roboto mono|fira code|fira mono|source code pro|space mono|courier|courier new|dm mono|geist mono|sf mono|menlo|consolas|monaco)$/i;
 const BANNED_HEX = /#(6366f1|7c3aed|8b5cf6|a78bfa|818cf8|c084fc|7e22ce|6d28d9)\b/gi;
 const METALLIC_HEX = /#(ffd700|d4af37|c9a227|b8860b|cd7f32|bfa14a|d9b56a|e6be8a)\b/gi;
