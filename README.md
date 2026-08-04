@@ -1,50 +1,102 @@
 # goddesign
 
+**Stop shipping websites that look like every other AI-built website.**
+
 [![Release](https://img.shields.io/github/v/release/hannsxpeter/goddesigns)](https://github.com/hannsxpeter/goddesigns/releases)
 [![License: MIT](https://img.shields.io/github/license/hannsxpeter/goddesigns)](LICENSE)
 [![Hosts](https://img.shields.io/badge/hosts-agnostic-blue)](docs/INSTALL.md)
-[![Scope](https://img.shields.io/badge/scope-one%20run%20or%20a%20multi--session%20map-blue)](skills/goddesign/references/map.md)
-[![Gate](https://img.shields.io/badge/gate-29%20deterministic%20sweep%20rules-blue)](skills/goddesign/references/checklist.md)
-[![Validation](https://img.shields.io/badge/validation-7%2F7%20skill%20runs%20green-success)](validation/runs/kilnhouse-2026-07/README.md)
+[![Gate](https://img.shields.io/badge/gate-29%20automated%20checks-blue)](skills/goddesign/references/checklist.md)
+[![Validation](https://img.shields.io/badge/validation-7%2F7%20runs%20green-success)](validation/runs/kilnhouse-2026-07/README.md)
 [![Evidence](https://img.shields.io/badge/evidence-346%20sourced%20comments-informational)](validation/research/sentiment-evidence-2026-07.md)
 
-A host-agnostic frontend design skill that produces distinctive,
-production-grade UI instead of recognizable AI slop. One skill, two model
-lanes: it is proven on Claude Code (`/goddesign`) and OpenAI Codex CLI
-(`$goddesign`), and any host that loads minimal markdown skill frontmatter can
-run it. One capable host is sufficient for a complete, fully scored design
-run. Cross-host work happens only when the prompt asks for comparison,
-replication, or compatibility testing, or when a maintainer protocol requires
-it.
+goddesign is a free, open-source add-on for AI coding assistants. Install it
+once, and every web page your assistant builds comes out looking like a real
+design studio made it: a distinct visual identity, professional craft, and an
+automated quality check before it ever reaches you.
 
-## Why this exists
+It works with Claude Code and OpenAI Codex CLI today, and with any assistant
+that can read a plain markdown skill file.
 
-Two failure modes produce generic AI interfaces, and they are opposites:
+![Seven runs of the same brief producing seven completely different designs: Terminal Core, Swiss International, Luxury Serif, Machine Room, Editorial Magazine, Art Deco Geometric, and a chartreuse signup flow](docs/assets/seven-directions.png)
 
-- **Convergence.** Models with strong design taste keep choosing the same tasteful things: the purple gradient hero, the cream-serif-terracotta page, the shadcn card grid. People identify these sites on sight.
-- **Literalness.** Models that execute faithfully but invent nothing ship browser defaults: unstyled buttons, one recycled template, "use gray" left as a decision.
+<sup>Real screenshots from the [Kilnhouse validation run](validation/runs/kilnhouse-2026-07/README.md). Same prompt every time.</sup>
 
-goddesign counters both with mechanisms, not advice. Every rule in it traces to one of two sources: a 346-comment verified study of what people actually mock about AI frontend design, or a defect that appeared in a real validation run.
+---
 
-## How it works
+## The problem
 
-1. **Mode check**: existing design systems get faithful extension, not reinvention.
-2. **Lane selection**: DIVERGE (taste-heavy models fight their own attractors via forced seeded picks) or EXPAND (literal models get every decision enumerated to a hex, a number, or a named row).
-3. **Variance engine**: a seed selects from 17 aesthetic directions, 12 macrostructures, 10 palettes, and 12 type pairings; a run ledger forces rotation between runs; seeded jitter rotates accent hue and nudges paper lightness so two projects landing on the same row never ship identical values.
-4. **DIRECTION LOCK**: every visual decision is written down before any code, then executed exactly. Conception can flow through multiple avenues: the seeded deck, human-genome rows extracted from real sites, and comp-first mode (an image model draws a lock-derived mockup, the code model replicates it); one page may mix up to three avenues under one lock.
-5. **QA gate**: a seven-axis self-critique (including Credibility, from controlled-study evidence that trust is where AI design measurably lags), then two measured halves. `scripts/sweep.mjs` runs 29 deterministic rules over the source with no browser, no network, and no model, reporting file, line, and value for banned faces and hexes, gradient text, stray `!important`, inline styles, container accent stripes, achromatic neutrals, hexes outside `:root`, the band metronome, missing focus-visible and reduced-motion, silent font fallback, buzzword copy, and the reveal cascade that renders a page blank. `scripts/audit.mjs` renders and detects layout collisions, hidden-content reveal bugs, silent font fallbacks, overflow, and undersized touch targets. Both feed one bounded self-correction loop (named failures only, lock frozen, maximum 3 cycles).
+You ask an AI to build you a landing page. It looks fine. It also looks exactly
+like the last four landing pages you have seen: the purple gradient headline,
+the cream background with the serif type and the terracotta button, the same
+card grid, the same fade-in as you scroll.
 
-The two halves fail for opposite reasons and neither excuses the other: the sweep cannot see a collision, and the audit cannot see a banned value behind a lock that never shipped. The sweep is the half that survives a sandbox, where the audit exits 2 for a blocked browser spawn. Rules split into `fail` and `advisory`, and an inline `goddesign-allow: <rule> <reason>` comment waives one rule for one file with the reason mandatory, so the escape hatch cannot be used silently. Across the existing validation corpus the sweep clears 14 of 19 goddesign artifacts with zero failures (the other five carry six true positives against rules the skill already had) and fails all 18 unskilled and frontend-design artifacts, at 6 to 70 findings each.
+People notice. That is the finding behind this project: we collected and
+verified 346 public comments about AI-designed websites, and the single loudest
+complaint is that these pages are **recognizable on sight**. A design that
+announces "a robot made this" undercuts the thing it was supposed to sell.
 
-## Efforts bigger than one session
+There are two ways it goes wrong, and they are opposites:
 
-A product is not a page. When a brief names 3 or more surfaces (marketing, auth, app shell, dashboard, settings, empty states), one session cannot hold them, and goddesign's own ledger works against you: its job is to make the next run **differ**, which is right across projects and backwards across the surfaces of one product.
+| Failure | What it looks like | Which assistants do it |
+|---|---|---|
+| **Convergence** | Tasteful, polished, and identical every time. The same fonts, the same palette, the same hero section. | Models with strong design instincts |
+| **Literalness** | Nothing invented at all. Browser default buttons, one recycled template, "use gray" left as an unanswered decision. | Models that follow instructions but do not improvise |
 
-So an effort that size charts a `.design-map.md` first: a destination that fixes the scope, one DIRECTION LOCK rolled once that every surface inherits verbatim, a queue of surfaces each carrying its one action and audience, a claim slot so parallel sessions do not collide, a fog section for what cannot yet be specified, an out-of-scope section that never graduates, and parked questions for the facts only a person can supply (a surface ships a labeled placeholder and records the question rather than stalling or inventing). Then one surface per session, gated in full. The seed rolls once, surfaces MATCH the system instead of rotating away from it, and the whole map writes exactly one ledger entry instead of flooding the rotation with nine near-identical rows.
+Telling an AI "don't make it look AI-generated" does not fix either one. Ban the
+purple gradient and it moves to the next most popular look. Variety has to be
+built in, not asked for.
 
-The threshold is narrow on purpose: two surfaces or fewer in one session skips the map entirely. `scripts/verify-map.mjs` validates the map mechanically. The structure is adapted from the [wayfinder skill](https://github.com/mattpocock/skills/blob/main/skills/engineering/wayfinder/SKILL.md) (MIT); what was borrowed, what was declined, and the kill criterion it ships under are recorded in [validation/research/wayfinder-evaluation-2026-07.md](validation/research/wayfinder-evaluation-2026-07.md).
+## What goddesign does about it
 
-## Install
+**It rolls the dice, then holds itself to the result.** Before any code is
+written, the skill picks a complete visual direction from a curated deck: 17
+aesthetic directions, 12 page structures, 10 color palettes, 12 typeface
+pairings. The pick is seeded, so it is genuinely different each time, and a
+running log makes sure your next project does not repeat your last one. A layer
+of controlled randomness nudges the exact colors, so two projects that draw the
+same card still ship different pages.
+
+**It writes the design down before it builds.** Every decision (exact colors,
+fonts, spacing, motion, the one signature element) is committed to a plain-text
+plan first. Then the code has to match the plan. No drifting halfway through
+into the house style.
+
+**It checks its own work, mechanically.** When the page is built, two automated
+checks run before you see it:
+
+- A **source scan** reads the code for 29 known problems: banned fonts and
+  colors, gradient text, buggy scroll animations that leave the page blank,
+  missing keyboard focus outlines, missing reduced-motion support, marketing
+  buzzword filler.
+- A **visual audit** actually opens the page in a browser at phone, tablet, and
+  desktop sizes, and takes screenshots. It catches overlapping text, content
+  that never appears, horizontal scrollbars, buttons too small to tap, and
+  fonts that silently failed to load.
+
+Anything that fails goes back for a bounded round of fixes, with the original
+design plan frozen so the assistant cannot "fix" a problem by quietly
+redesigning the page.
+
+**It handles projects bigger than one sitting.** If your brief covers three or
+more screens (marketing site, sign-up, dashboard, settings), goddesign first
+charts a shared design map: one direction locked once, inherited by every screen,
+worked through one screen at a time so they end up looking like one product
+instead of five unrelated ones.
+
+## Who it is for
+
+- **Founders and solo builders** shipping a site with an AI assistant who do not
+  want it to look like a template.
+- **Product and marketing teams** who need a landing page or dashboard that
+  passes as professionally designed, without a design hire.
+- **Developers** who can build anything but would rather not make 40 color and
+  typography decisions per page.
+- **Designers** working with AI who want their existing design system extended
+  faithfully instead of reinvented.
+
+You do not need to be a designer to use it. You do need an AI coding assistant.
+
+## Get started
 
 ```sh
 git clone https://github.com/hannsxpeter/goddesigns.git
@@ -52,62 +104,128 @@ ln -s "$PWD/goddesigns/skills/goddesign" ~/.claude/skills/goddesign   # Claude C
 ln -s "$PWD/goddesigns/skills/goddesign" ~/.agents/skills/goddesign   # Codex CLI
 ```
 
-Then invoke `/goddesign <brief>` in Claude Code or `$goddesign <brief>` in Codex. The command is optional: the skill also auto-triggers on frontend requests ("build me a signup page", "make this dashboard look better") via its description, and a one-paragraph standing instruction in `CLAUDE.md` or `AGENTS.md` makes that a guarantee. Full details, optional dependencies, auto-trigger setup, and host notes: [docs/INSTALL.md](docs/INSTALL.md).
+Then just ask for what you want:
 
-## What is inside
+```
+/goddesign a landing page for a small-batch coffee roaster
+```
+
+In Codex the command is `$goddesign`. You can also skip the command entirely:
+the skill recognizes design requests on its own ("build me a signup page", "make
+this dashboard look better"), and a one-paragraph note in your assistant's
+instructions file makes that automatic every time.
+
+Step-by-step setup, optional extras, and notes for other assistants:
+[docs/INSTALL.md](docs/INSTALL.md).
+
+## Does it actually work?
+
+We publish the evidence, including the parts that are not finished.
+
+**What has been proven.** Seven runs of the same brief produced seven completely
+different, quality-checked designs: a terminal-inspired letter, a Swiss
+manifesto, a luxury serif, a dense machine-room dashboard, an editorial print
+layout, an art deco dashboard, and a chartreuse signup page. Two runs without
+the skill reproduced the exact failures we catalogued, and both rendered as
+completely blank pages in screenshots because of a scroll-animation bug the
+automated audit caught and human review had missed. Full write-up with
+screenshots: [the Kilnhouse run](validation/runs/kilnhouse-2026-07/README.md).
+
+![Three full-page captures side by side. The two unskilled baseline pages are blank below the hero; the goddesign page renders completely](docs/assets/audit-catches.png)
+
+<sup>That blankness is the actual defect, not a capture error. The page looks
+fine while you scroll it and renders empty to anything that does not: a
+screenshot tool, a printer, a search crawler, a reader with JavaScript
+disabled.</sup>
+
+**The automated scan separates the two populations cleanly.** Run back over
+every page we have on file, it clears 14 of 19 goddesign pages with zero
+failures, and fails all 18 pages built without it, at 6 to 70 problems each.
+
+**What has not been proven yet.** All of the above is author-run testing. It
+shows the machinery produces variety and catches defects. It does not yet show
+that outside judges agree, and we are careful about that distinction. A
+pre-registered independent study is underway: 20+ outside raters, blind
+identification, results to be published either way. Generation is complete and
+the corpus is frozen; the rater responses are not in. Until they are, we do not
+claim external validation. The protocol and the current state are public in
+[validation/protocols/external-validation-protocol.md](validation/protocols/external-validation-protocol.md)
+and the [Study A completion audit](validation/studies/study-a-2026-07/completion-audit.md).
+
+**We retract things.** One test capture was withdrawn in July 2026 after it
+turned out to be contaminated, and the finding plus every claim it touched is
+recorded in public: [the withdrawal
+record](validation/runs/kilnhouse-2026-07/WITHDRAWN-codex-baseline-kilnhouse.md).
+
+Every rule in this skill traces to one of two sources: the 346-comment study of
+what people actually mock about AI design, or a defect caught in a real test run.
+Nothing is here because it sounded like good advice.
+
+## Common questions
+
+**Do I need to install anything besides the skill?**
+No. Everything core runs with no extra dependencies. The visual audit uses a
+headless browser if one is available; without it, the skill tells you plainly
+that it skipped that check rather than pretending it passed.
+
+**Will it override my company's existing design system?**
+No. If your project already has a design system, goddesign switches into
+extension mode: it reads your existing colors, fonts, and spacing, and builds
+within them instead of inventing a new look.
+
+**Does it send my code anywhere?**
+No. The automated checks run locally. No network, no accounts, no external
+service is required for a design run.
+
+**Can it make images and illustrations?**
+Yes, when a page genuinely needs them, though most designs deliberately ship
+none. Image generation goes through Codex and ChatGPT: assistants without their
+own image tool hand the art direction to the Codex CLI, which generates it with
+ChatGPT's built-in image tool. If that is not available, the page falls back to
+the hand-coded artwork the chosen direction already specifies.
+
+**Will every page look wild?**
+No. Each page takes exactly one deliberate risk and keeps the rest disciplined.
+"Distinct" is the goal, not "loud".
+
+**Is it locked to one AI vendor?**
+No. It is a plain markdown file with a couple of small scripts. Any assistant
+that reads markdown skills can run it, and no part of the core work depends on a
+particular editor, model vendor, or hosting platform.
+
+## A quick glossary
+
+Terms you will see in the output and in the deeper docs:
+
+- **Direction lock**: the written design plan, decided before any code, that the
+  finished page is graded against.
+- **The deck**: the curated set of directions, layouts, palettes, and font
+  pairings the skill picks from.
+- **Seed**: the number that drives the pick, so results vary run to run instead
+  of converging.
+- **The sweep**: the automated scan of the code for known problems.
+- **The audit**: the automated check of the rendered page in a real browser.
+- **The gate**: the two of them together, plus a scored self-critique. A page
+  either clears it or gets fixed.
+- **Design map**: the shared plan for a project with three or more screens.
+
+## What is in this repository
 
 | Path | What it is |
 |---|---|
-| `skills/goddesign/SKILL.md` | The skill: lanes, variance engine, craft floor, banned list |
-| `skills/goddesign/references/` | The decks: 17 directions (including the first human-genome row), 12 layouts, 10 palettes, 12 font pairings, motion recipes, imagery rules, the design map, the QA gate |
-| `skills/goddesign/references/map.md` | The design map: how an effort too big for one session is charted once and worked one surface at a time under a single frozen lock |
-| `skills/goddesign/scripts/verify-map.mjs` | Design-map validator: required sections, a complete System lock, surface-line shape, claims, and one-surface-one-state |
-| `skills/goddesign/scripts/sweep.mjs` | The mechanical half of the gate: 29 deterministic source rules, no browser, no network, no model; `fail`/`advisory` severity and reason-bearing inline waivers |
-| `skills/goddesign/scripts/extract-tokens.mjs` | Token extraction for extension mode: reads design-token JSON, custom properties, `@theme`, and Tailwind config, resolves the lock's role slots, and feeds `sweep.mjs --tokens` for drift reporting |
-| `skills/goddesign/scripts/audit.mjs` | Measured visual audit: collisions, reveal bugs, font fallbacks, overflow, touch targets |
-| `skills/goddesign/scripts/codex-audit-loop.sh` | Operator wrapper for sandboxed Codex: build inside the sandbox, audit outside, feed failures back into the same session |
-| `skills/goddesign/scripts/detect-clis.sh` | Presence-only inventory of known agent CLIs, including distinct Cursor Agent and Cursor editor entries |
-| `skills/goddesign/scripts/genimage.sh` | Cross-host image generation: hosts without native image tools delegate to an installed image-capable CLI |
-| `skills/goddesign/scripts/verify-install.sh` | Install-integrity check: fails loud if a deck is missing, or if a deck holds fewer rows than the seed rolls against, rather than letting the model improvise it |
-| `skills/goddesign/scripts/blind-read.sh` | Optional blind post-render critic: a separate process reads only the screenshots and reconstructs the page's identity |
-| [`validation/`](validation/README.md) | Indexed evidence library: research, protocols, experiments, comparative runs, studies, and tools |
-| `docs/` | Install guide, architecture, contributing |
-
-## Validation
-
-Seven skill runs on one brief produced seven fully distinct, gate-passing directions (terminal letter, Swiss manifesto, luxury serif, machine-room data-dense, editorial print, art deco dashboard, chartreuse signup) while two unskilled baseline runs reproduced the catalogued failures, both of them pages that render completely blank in static capture due to scroll-reveal bugs. The audit script caught defects human review missed. Full evidence with screenshots: [validation/runs/kilnhouse-2026-07/README.md](validation/runs/kilnhouse-2026-07/README.md). A third capture labelled a baseline was withdrawn on 2026-07-31 as contaminated; the finding and the claims it touched are recorded in [validation/runs/kilnhouse-2026-07/WITHDRAWN-codex-baseline-kilnhouse.md](validation/runs/kilnhouse-2026-07/WITHDRAWN-codex-baseline-kilnhouse.md).
-
-Running the new sweep back over that same corpus separates the two populations mechanically: 14 of 19 goddesign artifacts exit 0, and all 18 unskilled and frontend-design artifacts fail (the withdrawn capture is the one artifact in neither population; it scores 0 failures, with the skill runs). The mechanisms it borrows, what was declined from each source, and its kill criterion are recorded in [validation/research/design-skills-evaluation-2026-07.md](validation/research/design-skills-evaluation-2026-07.md). That is a false-positive and separation check on artifacts that already existed, not predictive evidence.
-
-The tells catalog is a living artifact. The repeatable method for refreshing it against current public discourse is documented in [validation/protocols/sentiment-refresh-protocol.md](validation/protocols/sentiment-refresh-protocol.md).
-
-Everything above is author-run validation, which proves the machinery rotates, not that outside judges agree. The pre-registered external studies that test the core claim (blind identification by 20+ outside raters, a five-brief matrix, cross-model replication), with bars fixed in advance and results published either way, live in [validation/protocols/external-validation-protocol.md](validation/protocols/external-validation-protocol.md).
-
-Study A generation is complete: all 10 live human controls are captured and
-hashed, and all 10 frozen generated brief pairs are complete across Codex and
-Claude Code. Each host has 5 green skill audits, 5 same-model baselines
-executed in neutral temporary workspaces, and 5 distinct direction rows. The
-30-sample anonymized corpus and balanced 40-slot rater pack are frozen.
-See [the human-control receipt](validation/studies/study-a-2026-07/human-control-receipt.json)
-along with the [Codex replication receipt](validation/studies/study-a-2026-07/codex-replication-receipt.json)
-and [Claude replication receipt](validation/studies/study-a-2026-07/claude-replication-receipt.json).
-The 20 outside-rater responses are not complete, so this is not yet external
-validation and the evidence badge remains unchanged. The
-[Study A completion audit](validation/studies/study-a-2026-07/completion-audit.md)
-records the requirement-by-requirement state.
-
-After scoring closes, the analyzer emits a hash-sealed publication bundle and
-re-runs from its own de-identified public rows. Private submission IDs remain
-in a sealed integrity file, while deterministic recurring terms from
-goddesign AI-yes reasons become the next recalibration input.
+| `skills/goddesign/SKILL.md` | The skill itself: the instructions your assistant follows |
+| `skills/goddesign/references/` | The decks: 17 directions, 12 layouts, 10 palettes, 12 font pairings, motion, imagery, the design map, the quality checklist |
+| `skills/goddesign/scripts/` | The automated checks: source scan, visual audit, design-map validator, install verifier, token extraction, and helpers |
+| [`validation/`](validation/README.md) | The evidence library: research, test protocols, experiments, comparison runs, and studies |
+| `docs/` | Setup guide and the technical architecture |
 
 ## Documentation
 
-- [docs/INSTALL.md](docs/INSTALL.md): installation, requirements, per-host notes
-- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): how and why each mechanism works
-- [CONTRIBUTING.md](CONTRIBUTING.md): the evidence bar for new rules, how to add deck rows
-- [CHANGELOG.md](CHANGELOG.md): release history
+- [Setup guide](docs/INSTALL.md): installation, requirements, per-assistant notes
+- [Architecture](docs/ARCHITECTURE.md): how and why each mechanism works, in detail
+- [Contributing](CONTRIBUTING.md): the evidence bar for new rules, how to add deck rows
+- [Changelog](CHANGELOG.md): release history
 
 ## License
 
-[MIT](LICENSE)
+[MIT](LICENSE). Free to use, free to modify, free to ship commercially.

@@ -2,6 +2,21 @@
 
 How goddesign works and why each mechanism exists. Every design decision below traces to measured evidence: a 346-comment verified study of public sentiment about AI frontend design ([validation/research/sentiment-evidence-2026-07.md](../validation/research/sentiment-evidence-2026-07.md)) plus defects observed in real validation runs ([validation/runs/kilnhouse-2026-07/README.md](../validation/runs/kilnhouse-2026-07/README.md)).
 
+This is the deep version, written for contributors and for anyone evaluating whether the mechanisms hold up. If you only want to use the skill, the [README](../README.md) and the [setup guide](INSTALL.md) are enough.
+
+## The short version
+
+For readers who want the shape before the detail:
+
+1. **The problem is two-sided.** Some models converge on the same tasteful look every time; others invent nothing at all. A ban list cannot fix either, because banning the popular choice just promotes the next one. Variety has to come from a mechanism.
+2. **So the design is chosen, not improvised.** A seed picks a complete package (direction, layout, palette, type) from curated decks, a per-project log forces rotation between runs, and controlled jitter makes two runs on the same row still ship different values.
+3. **The choice is written down before any code.** That written plan, the DIRECTION LOCK, is what the finished page is graded against, and the repair loop is forbidden from changing it.
+4. **Then it is graded mechanically.** A scored self-critique, a source scan that needs no browser or model, and a rendered visual audit. Failures go into one bounded repair loop.
+5. **Bigger than one session gets a map.** Three or more surfaces share a single lock so a product looks like one product.
+6. **Nothing ships on taste alone.** Every rule traces to counted public evidence or to a defect caught in a real run, and mechanisms evaluated and declined are recorded alongside the ones that shipped.
+
+The rest of this document is the why behind each of those.
+
 ## The problem, measured
 
 Public discourse names two opposite failure modes:
@@ -56,11 +71,11 @@ Step 0 item 1 sends a repo that already has a design system into faithful extens
 - Host discovery is explicit and presence-only: `scripts/detect-clis.sh` inventories known agent commands on `PATH`, distinguishes Cursor Agent from the Cursor editor launcher, and never treats installation as proof of authentication or capability.
 - Discovery never becomes lock-in: core design work requires no particular CLI, editor, model vendor, deployment platform, account, domain, DNS configuration, or network service.
 - Cross-host means portable, not multi-host by default. Host scope is prompt-specified: a design run uses its active host unless the user explicitly requests comparison, replication, or compatibility testing across hosts. A second host is otherwise neither required nor scored. Named maintainer validation protocols are the only non-prompt exception.
-- Capabilities the host lacks are delegated: image generation shells out to an installed image-capable CLI (`scripts/genimage.sh`); sandboxed Codex gets an outside-the-sandbox audit loop (`scripts/codex-audit-loop.sh`).
+- Capabilities the host lacks are delegated rather than dropped. Image generation runs through Codex and ChatGPT: `scripts/genimage.sh` hands the art-directed prompt to the `codex` CLI, which generates it with ChatGPT's built-in image tool, so hosts with no native image tool (Claude Code and most CLIs) still ship imagery; exit 2 falls back to the row's CSS/SVG art rather than stalling. Sandboxed Codex gets an outside-the-sandbox audit loop (`scripts/codex-audit-loop.sh`).
 
 ## Imagery
 
-Gated, not ambient: pixels only when the seeded macrostructure, the row's signature, or the brief demands them; most runs ship zero raster images and generating an unrequested one is scored as a Restraint failure. When imagery fires, the prompt derives from the DIRECTION LOCK (locked hexes, row medium, composition, light) with mandatory negative clauses against the generic AI-image look, honesty rules against fabricated people, and a two-regeneration cap.
+Gated, not ambient: pixels only when the seeded macrostructure, the row's signature, or the brief demands them; most runs ship zero raster images and generating an unrequested one is scored as a Restraint failure. When imagery fires, the prompt derives from the DIRECTION LOCK (locked hexes, row medium, composition, light) with mandatory negative clauses against the generic AI-image look, honesty rules against fabricated people, and a two-regeneration cap. Generation itself is delegated to Codex and ChatGPT through `scripts/genimage.sh`, so the same art direction produces the same class of image regardless of which host is running the design.
 
 ## The taste loop
 

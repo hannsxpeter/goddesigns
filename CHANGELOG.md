@@ -1,5 +1,38 @@
 # Changelog
 
+## v1.6.4 (2026-08-04)
+
+The documentation release. No change to the skill, the decks, or the gate scripts: every mechanism, rule id, exit code, and threshold is identical to v1.6.3. What changed is who the documentation is written for. The README had become an architecture summary competing with `docs/ARCHITECTURE.md`, which meant a reader deciding whether to install had to parse "seeded macrostructures" and "29 deterministic sweep rules over the source" before learning what the thing does.
+
+### The README is now the front door, not the second architecture doc
+
+- Opens on the problem in the reader's terms (the purple gradient hero, the cream-serif-terracotta page, "people identify these sites on sight") before naming a single mechanism.
+- The two failure modes are a two-row table instead of a paragraph of theory.
+- Mechanisms are described by what they do for the reader: it rolls the dice and holds itself to the result, it writes the design down before it builds, it checks its own work, it keeps a multi-screen product looking like one product.
+- New sections: who it is for, a plain-English FAQ, and a glossary decoding the seven terms the skill's own output uses (direction lock, deck, seed, sweep, audit, gate, design map).
+- The evidence section keeps every caveat verbatim. External validation is still explicitly not claimed, the unfinished rater study is still named as unfinished, and the withdrawn capture is still linked. Those are the strongest thing the project has to say and they are stated more plainly, not softened.
+
+### Two figures, composited from real captures
+
+- `docs/assets/seven-directions.png`: the seven Kilnhouse skill runs side by side, the claim the README makes in its first sentence, shown rather than asserted.
+- `docs/assets/audit-catches.png`: full-page captures of both unskilled baselines beside a skill run, where the reveal bug is visible as two pages that are simply empty below the hero.
+- Both are real screenshots from `validation/runs/kilnhouse-2026-07/`, scaled and labelled. No generated imagery: a project whose thesis is that AI-made design is recognizable does not illustrate itself with AI-made design, and the actual captures are better proof anyway.
+
+### The other three documents
+
+- `docs/INSTALL.md` is now a numbered setup guide (what you need, download, link, verify, optional automation) with the optional dependencies as an if-you-install / you-get / if-you-skip-it table, and a troubleshooting section covering the four failures people actually hit. The verify step now states why it matters, since a stale copy is the most common cause of a generic-looking result.
+- `CONTRIBUTING.md` leads with why the evidence bar exists rather than asserting it, routes newcomers with a table, and states the human-genome lane as open to non-designers, which it always was. The distribution caps carry their reasoning inline. Every mechanical requirement is unchanged.
+- `validation/README.md` gains a five-item reading order for anyone auditing the claims, a "what is proven and what is not" split, the two evaluation records missing from its index (the impeccable second pass, the banned-list refusal), and the `WITHDRAWN-` retention convention.
+- `docs/ARCHITECTURE.md` keeps its depth and gains a six-point summary plus a pointer sending casual readers elsewhere.
+
+### Image generation is documented as Codex and ChatGPT
+
+`scripts/genimage.sh` has always delegated to the `codex` CLI's built-in image tool, and the docs described it as "an installed image-capable CLI", which told a reader nothing about what to install. README, INSTALL, and ARCHITECTURE now name the path, and INSTALL carries a "Generating images" section with the usage, the exit-2 fallback to the row's CSS/SVG art, and the one requirement.
+
+### Repo hygiene
+
+`audit.mjs` writes `audit-<viewport>.png` and a sandboxed run writes `audit-handoff.sh` into the working directory, so running the gate at the repository root left untracked artifacts behind every time. Both are now ignored at root only, which leaves the named captures under `validation/` tracked as before.
+
 ## v1.6.3 (2026-08-04)
 
 The refusal release. An attempt to mechanize the five Banned-list clauses v1.6.2 left open produced **zero new sweep rules** and two real bug fixes. Every candidate that reached a clean corpus split was then broken on legal, deck-faithful code, and four of the five died the same way: the deck states the pattern, and a source scanner cannot read the DIRECTION LOCK that makes it legal. Record: `validation/research/banned-list-mechanization-2026-08.md`.

@@ -4,5 +4,7 @@ node_modules/
 .playwright-mcp/
 .playwright-cli/
 output/playwright/
+/audit-*.png
+/audit-handoff.sh
 validation/studies/study-a-2026-07/sealed/
 validation/studies/study-a-2026-07/work/
