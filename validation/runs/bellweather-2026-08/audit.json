@@ -1,0 +1,44 @@
+{
+ "failures": 0,
+ "results": [
+  {
+   "overflowX": false,
+   "hiddenText": [],
+   "overlaps": [],
+   "smallTargets": [],
+   "loadedFonts": [
+    "Bodoni Moda",
+    "Manrope"
+   ],
+   "fontIssues": [],
+   "file": "index.html",
+   "viewport": "375x812"
+  },
+  {
+   "overflowX": false,
+   "hiddenText": [],
+   "overlaps": [],
+   "smallTargets": [],
+   "loadedFonts": [
+    "Bodoni Moda",
+    "Manrope"
+   ],
+   "fontIssues": [],
+   "file": "index.html",
+   "viewport": "768x1024"
+  },
+  {
+   "overflowX": false,
+   "hiddenText": [],
+   "overlaps": [],
+   "smallTargets": [],
+   "loadedFonts": [
+    "Bodoni Moda",
+    "Manrope"
+   ],
+   "fontIssues": [],
+   "file": "index.html",
+   "viewport": "1280x900"
+  }
+ ]
+}
