@@ -28,7 +28,7 @@ import { join, extname, relative, resolve } from 'node:path';
 
 const RULES = [
   // id, severity, one-line statement of the defect
-  ['banned-font', 'fail', 'Inter, Roboto, Arial, Arial Black, Open Sans, Lato, Poppins, Helvetica, Segoe UI, or Noto Sans as a chosen face'],
+  ['banned-font', 'fail', 'Inter, Roboto, Arial, Arial Black, Open Sans, Lato, Poppins, Helvetica, Segoe UI, or Noto Sans as a chosen face, or a system stack (system-ui, -apple-system) in the chosen-face position'],
   ['mono-body', 'fail', 'a monospace face set as body or display type'],
   ['space-grotesk', 'advisory', 'Space Grotesk present; legal as body only under fonts.md pairing 6'],
   ['no-webfont', 'fail', 'a named non-system face is used but nothing imports or declares it'],
@@ -195,7 +195,17 @@ function visibleText(text) {
     .replace(/&[a-z]+;|&#\d+;/gi, ' ');
 }
 
-const GENERIC_FAMILY = /^(system-ui|-apple-system|blinkmacsystemfont|ui-sans-serif|ui-serif|ui-monospace|ui-rounded|sans-serif|serif|monospace|cursive|fantasy|inherit|initial|unset|revert|var\(|emoji|math|fangsong)/i;
+// CSS keywords and the true generic families. These are never a chosen face and
+// never need an import, so they are skipped outright wherever they appear.
+const GENERIC_FAMILY = /^(sans-serif|serif|monospace|cursive|fantasy|inherit|initial|unset|revert|var\(|emoji|math|fangsong)/i;
+// The system stack. No direction row can state one: CONTRIBUTING.md requires
+// every row carry a real family and a working import line, and none of these
+// have one. In a fallback tail they are correct and firstFamily() never reads
+// them; in position 1 they are the placeholder floor wearing a keyword, which
+// is what SKILL.md's Banned list means by "or a system stack as a chosen face".
+const SYSTEM_STACK = /^(system-ui|-apple-system|blinkmacsystemfont|ui-sans-serif|ui-serif|ui-monospace|ui-rounded)/i;
+// Neither kind needs a webfont import or belongs to a token baseline.
+const NOT_A_FACE = (f) => GENERIC_FAMILY.test(f) || SYSTEM_STACK.test(f);
 const firstFamily = (value) => (value.split(',')[0] || '').trim().replace(/^["']|["']$/g, '');
 
 // A hex literal, not an HTML numeric entity (&#8594;) and not a longer run.
@@ -397,6 +407,12 @@ for (const file of files) {
         if (isCustomProp && !((FONT_SLOT_NAME.test(prop) && isFontValue(value)) || looksLikeFontStack(value))) continue;
         const fam = firstFamily(value);
         if (!fam || GENERIC_FAMILY.test(fam)) continue;
+        // Flagged, then dropped: a system stack is banned as the chosen face but
+        // must never be reported as a face that is missing its import.
+        if (SYSTEM_STACK.test(fam)) {
+          flag('banned-font', at(rule.index), `${fam} as a chosen face (${prop}): a system stack is not a face the deck can state`);
+          continue;
+        }
         namedFaces.push(fam);
         if (BANNED_FACE.test(fam)) flag('banned-font', at(rule.index), `${fam} as a chosen face (${prop})`);
         if (/^space grotesk$/i.test(fam)) flag('space-grotesk', at(rule.index), 'legal as body only under fonts.md pairing 6');
@@ -447,7 +463,7 @@ for (const file of files) {
           const prop = f2[1].trim(), value = f2[2];
           if (prop.startsWith('--') && !((FONT_SLOT_NAME.test(prop) && isFontValue(value)) || looksLikeFontStack(value))) continue;
           const fam = firstFamily(value);
-          if (fam && !GENERIC_FAMILY.test(fam) && !knownFonts.has(fam.toLowerCase()))
+          if (fam && !NOT_A_FACE(fam) && !knownFonts.has(fam.toLowerCase()))
             flag('token-drift', at(rule.index), `font "${fam}" is outside the token baseline`);
         }
         let rr;
@@ -469,7 +485,7 @@ const globalFlag = (rule, detail) => { if (!waivedAnywhere(rule)) add(rule, '(bu
 if (anyStyle) {
   if (!anyStamp) globalFlag('no-stamp', 'no /* goddesign | structure | direction | accent */ stamp in any stylesheet');
 
-  const named = [...new Set(namedFaces.filter((f) => !GENERIC_FAMILY.test(f)))];
+  const named = [...new Set(namedFaces.filter((f) => !NOT_A_FACE(f)))];
   if (named.length && !anyFontImport)
     globalFlag('no-webfont', `${named.slice(0, 3).join(', ')}: named but never imported or declared, so the page falls back to a system face silently`);
 

@@ -36,7 +36,7 @@ Cannot run it at all? The sweep needs `node` and nothing else, but two hosts rea
 
 | Rule | Severity | What it catches |
 |---|---|---|
-| `banned-font` | fail | Inter, Roboto, Arial, Arial Black, Open Sans, Lato, Poppins, Helvetica, Segoe UI, or Noto Sans as a chosen face |
+| `banned-font` | fail | Inter, Roboto, Arial, Arial Black, Open Sans, Lato, Poppins, Helvetica, Segoe UI, or Noto Sans as a chosen face, or a system stack (system-ui, -apple-system) in the chosen-face position |
 | `mono-body` | fail | a monospace face in the body or display slot (a stated numerals or code slot is legal) |
 | `space-grotesk` | advisory | Space Grotesk present; legal as body only under `fonts.md` pairing 6 |
 | `no-webfont` | fail | a named face with no import and no `@font-face`: the silent system fallback |
@@ -93,7 +93,7 @@ One testable assertion per line. Check each; count passes; fix fails or state wh
 
 Tokens
 - [ ] `[sweep]` Every color and font in components references a `:root` token; zero inline hex in component rules.
-- [ ] No banned values anywhere. The sweep covers `#6366f1`, `#7c3aed`, `#8b5cf6` (`banned-hex`); Inter and the rest of the banned faces (`banned-font`); Space Grotesk (`space-grotesk`, advisory); JetBrains Mono, Courier, and every other mono in the body or display slot (`mono-body`); `transition: all`, `background-clip: text`, `!important` outside the kill switch, `style="` and `style={{`, a colored side border on a container, and `<hr>` (one rule each). Read its report; grep by hand only for values the lock added that the script cannot know about.
+- [ ] No banned values anywhere. The sweep covers `#6366f1`, `#7c3aed`, `#8b5cf6` (`banned-hex`); Inter, Arial Black, and the rest of the banned faces, plus a system stack (`system-ui`, `-apple-system`, `ui-sans-serif`) sitting in the chosen-face position rather than in a fallback tail (`banned-font`); Space Grotesk (`space-grotesk`, advisory); JetBrains Mono, Courier, and every other mono in the body or display slot (`mono-body`); `transition: all`, `background-clip: text`, `!important` outside the kill switch, `style="` and `style={{`, a colored side border on a container, and `<hr>` (one rule each). Read its report; grep by hand only for values the lock added that the script cannot know about.
 - [ ] All spacing and font sizes sit on the declared scales; no orphan values like 13px or 27px (the grammar breaks declared in the lock are exempt).
 - [ ] The Step 3d jitter is stated in the lock and present in the tokens (accent hue rotated, paper lightness nudged via relative color), or its skip reason is stated (extension mode, brand pin).
 
