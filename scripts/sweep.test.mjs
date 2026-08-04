@@ -117,6 +117,24 @@ test('a system display face is banned by name, and stays legal as a fallback', (
   rmSync(ok, { recursive: true, force: true });
 });
 
+test('a system stack is banned in position 1 and correct in a fallback tail', () => {
+  // SKILL.md bans "a system stack as a chosen face", but GENERIC_FAMILY used to
+  // skip these keywords before any ban was tested, so the clause had no enforcer.
+  for (const stack of ['system-ui, sans-serif', '-apple-system, BlinkMacSystemFont, sans-serif', 'ui-serif, serif']) {
+    const bad = clean(`\n.hero-title { font-family: ${stack}; }`);
+    assert.ok(rulesOf(sweepJson([bad]), 'fail').includes('banned-font'), `${stack} must be reported`);
+    rmSync(bad, { recursive: true, force: true });
+  }
+
+  // A fallback tail is what these keywords are for, and a flagged stack must not
+  // also be reported as a face whose webfont import is missing.
+  const ok = clean('\n:root { --display: "Anton", system-ui, sans-serif; --font-mono: "IBM Plex Mono", ui-monospace, monospace; }\n.x { font-family: inherit; }');
+  const fails = rulesOf(sweepJson([ok]), 'fail');
+  assert.equal(fails.includes('banned-font'), false);
+  assert.equal(fails.includes('no-webfont'), false);
+  rmSync(ok, { recursive: true, force: true });
+});
+
 test('@theme tokens are scanned exactly as :root tokens are', () => {
   // @theme holds bare declarations, not rules, so walking into it as a container
   // found no inner rule and every token in it went unscanned. Tailwind v4 writes
