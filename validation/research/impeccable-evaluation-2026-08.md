@@ -12,7 +12,7 @@ impeccable and goddesign are near neighbours: both are cross-harness frontend de
 
 Seven mechanism clusters drawn from the release, each read against impeccable's implementing files and goddesign's own source, then every proposed borrow handed to an independent adversarial verifier instructed to refute by default. Twenty-four borrows were proposed; twenty-two were refuted. The verifiers did not argue from taste: they patched scratch copies of `scripts/sweep.mjs`, ran the proposed rules across all 49 artifacts in `validation/runs/` and `validation/experiments/`, ran `scripts/sweep.test.mjs`'s own separation assertions, and recovered `references/directions.md` at the commit each corpus artifact was built under. Every claim reproduced below was then re-run by hand.
 
-This is a multi-agent read plus hand verification, stronger than the single-session read behind `wayfinder-evaluation-2026-07.md` and weaker than a validation run. Nothing here has been implemented. See "Weight and limitations".
+This is a multi-agent read plus hand verification, stronger than the single-session read behind `wayfinder-evaluation-2026-07.md` and weaker than a validation run: it verifies mechanisms, not designs. See "Weight and limitations".
 
 ## The first finding: most of the release is doctrine, not mechanism
 
@@ -29,7 +29,7 @@ None of this makes the ideas wrong. It does mean that adopting them into goddesi
 
 ## The holes the source exposed, derived from goddesign's own rules
 
-Four, and all four are derivable from goddesign's own text rather than asserted from impeccable's claims. Two are admitted below; two are recorded and left open.
+Four, and all four are derivable from goddesign's own text rather than asserted from impeccable's claims. All four are closed in v1.6.2; each is stated below as it read **before** the fix, with the file and line it stood at, so the defect stays legible to anyone auditing the change afterwards.
 
 1. **A run that could not execute Phase 2a has no words to say.** `grep -r DEGRADED skills/goddesign/` returns `DEGRADED: no visual check` and `DEGRADED: no blind read` and nothing else. There is no `DEGRADED: no sweep`. `references/checklist.md:192` gates the visual-check label on "Only when every rung fails", so a host with no shell but a native screenshot capability completes Phase 3 clean, never fires that clause, and silently never ran Phase 2a, while `SKILL.md:176` still demands "the boolean gate sweep (pass/fail; report the pass count)" and `checklist.md:3` demands "gate pass count, and any DEGRADED notes". `SKILL.md:23` and `:75` explicitly support that host, including a full arithmetic seed fallback. `design-skills-evaluation-2026-07.md:19` names this exact failure class as the defect `sweep.mjs` was built to close; a host that cannot run the script re-enters it with no name.
 
