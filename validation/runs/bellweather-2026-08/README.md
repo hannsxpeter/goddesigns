@@ -72,6 +72,16 @@ The subject supplies the matter: degrees Baume is the density reading that decid
 
 Paper band, display class, signature, and subject all match the lock. It read `accent_band` as "warm ivory" where the lock says cool platinum; that is the expected reading of a deliberately near-neutral accent (OKLCH chroma 0.0166), where the dominant light value on the page is the ivory text rather than the accent. The `ai_tell` it named was the demo labelling itself (sample email, 555 number, disclaimer), which the honesty gate requires of a demonstration build.
 
+## Correction: this run's own tokens were not scanned when it was gated
+
+Recorded rather than quietly re-run, because the run's Phase 2a result was weaker than it looked at the time.
+
+`rulesOf()` in `sweep.mjs` read everything before the first `{` as the selector. A statement at-rule such as `@import` ends in a semicolon and carries no block, so the text before the next brace still began with `@`, the parser read the **next** rule as an at-rule container, and its declarations were never scanned. This stylesheet leads with the mandated webfont `@import` and then the token block, which is exactly the shape the skill prescribes, so **the token block was swallowed**.
+
+Measured by injecting a banned face into the token block of the shipped `styles.css`: the sweep reported green. After the parser fix it reports `banned-font ... (--font-body)` on the same file.
+
+The fix is in `sweep.mjs`, with a regression test. The corpus split for it was zero change across all 49 pre-existing artifacts, and three files in the repo had a swallowed first rule: both of this run's stylesheets and `validation/runs/kilnhouse-2026-07/codex-v2-meridian.html`. This run was re-gated afterwards and is still **sweep exit 0**, so its result stands; what changed is that the result is now actually evidence.
+
 ## Three defects the run caught, and which half caught them
 
 Recorded because the split is the point of having two halves plus a human look.

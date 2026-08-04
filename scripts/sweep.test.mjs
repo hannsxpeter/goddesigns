@@ -135,6 +135,36 @@ test('a system stack is banned in position 1 and correct in a fallback tail', ()
   rmSync(ok, { recursive: true, force: true });
 });
 
+test('an @import before the first rule does not swallow that rule', () => {
+  // rulesOf() reads everything before the first '{' as the selector. A statement
+  // at-rule ends in ';' and carries no block, so without dropping it the text
+  // still starts with '@' and the NEXT rule is read as an at-rule container and
+  // never scanned. The skill mandates an @import for webfonts and :root first for
+  // tokens, so that is the exact shape it tells you to write.
+  const withImport = fixture({
+    'index.html': CLEAN_HTML.replace('<link rel="stylesheet" href="s.css">', '<link rel="stylesheet" href="s.css">'),
+    's.css': `/* goddesign | structure: Letter | direction: Industrial | accent: 24 */
+@import url('https://fonts.googleapis.com/css2?family=Jost&display=swap');
+:root { --font-display: Inter, sans-serif; --bg: #12110E; --text: #E6E6E2; }
+body { background: var(--bg); color: var(--text); font-family: var(--font-display); }`,
+  });
+  assert.ok(rulesOf(sweepJson([withImport]), 'fail').includes('banned-font'),
+    'a banned face in the token block must be reported even behind an @import');
+  rmSync(withImport, { recursive: true, force: true });
+
+  // The at-rules that do carry blocks must still nest, not be flattened.
+  const nested = fixture({
+    'index.html': CLEAN_HTML,
+    's.css': `/* goddesign | structure: Letter | direction: Industrial | accent: 24 */
+@import url('https://fonts.googleapis.com/css2?family=Jost&display=swap');
+:root { --bg: #12110E; --text: #E6E6E2; }
+@media (min-width: 40em) { .card { color: #123456; } }`,
+  });
+  assert.ok(rulesOf(sweepJson([nested]), 'fail').includes('hex-outside-root'),
+    'a rule inside @media must still be scanned as a component rule');
+  rmSync(nested, { recursive: true, force: true });
+});
+
 test('@theme tokens are scanned exactly as :root tokens are', () => {
   // @theme holds bare declarations, not rules, so walking into it as a container
   // found no inner rule and every token in it went unscanned. Tailwind v4 writes

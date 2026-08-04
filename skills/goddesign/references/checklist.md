@@ -109,12 +109,22 @@ Color
 - [ ] Contrast: 4.5:1 body, 3:1 large text and UI boundaries and focus rings.
 - [ ] `[sweep]` No pure #000/#FFF page background; neutrals carry 0.005+ chroma (row hexes and their Step 3d jittered derivatives are exempt); dark surfaces are not black.
 - [ ] `[sweep]` No gold, brass, or bronze premium shorthand; metallics only when the locked row states them.
+- [ ] No cyan-magenta wash: no gradient carries both a cyan stop (hue 160-210) and a magenta stop (hue 285-345), unless the locked row states two accents in those bands (row 4 Retro-Futuristic is the one that does).
+- [ ] Shadow colors are tinted toward the background hue and never toward purple (hue 260-320); any shadow hue more than 40 degrees off the bg hue is named in the lock or fixed.
+- [ ] The page is neither the cream plus terracotta plus display-serif reflex nor the near-black plus lone acid green reflex, unless the seed or the brief chose that row; name the lock line that chose it.
 
 Layout
 - [ ] First viewport is one composition within the hero budget (no cards, badges, or stat chips in the hero).
 - [ ] Not the banned skeleton (hero, three equal cards, testimonials, CTA) unless the brief demanded it.
 - [ ] No nested cards, no container soup; eyebrow count within 1 per 3 sections.
-- [ ] `[sweep]` No numbered chapter cadence, contents rails, or hr dividers; sections transition by background or density shifts.
+- [ ] `[sweep]` No numbered chapter cadence and no `<hr>` divider between sections; sections transition by background or density shifts.
+- [ ] No book-style contents rail and no chapter headers: a short in-page nav is fine, a sticky list of numbered section links reading as a table of contents is not. Not sweep-covered; check the render.
+- [ ] No glassmorphism: no card, hero, or content surface is a translucent blurred panel; a scroll-under sticky header and `dialog::backdrop` are the only legal backdrop blurs.
+- [ ] No fake browser, window, or phone chrome around a screenshot or demo; product UI ships as real markup or as a plainly framed image.
+- [ ] No decorative sparklines: every chart or trend line plots real or plainly labeled sample data and carries its own axis or value labels.
+- [ ] No decorative marker underline, highlighter swipe, or hand-drawn squiggle beneath any heading; emphasis comes from scale and weight, and any flourish is the locked row's stated signature.
+- [ ] Icons appear only on interactive or status elements; none decorates a heading, a body paragraph, or a feature title.
+- [ ] Zero emoji used as icons anywhere in the markup, and exactly one icon set on the page (Lucide, Heroicons, Phosphor, Font Awesome, and Material are never mixed in one build).
 - [ ] At most one card grid per page; card radius and border weight come from the locked direction row, not kit defaults; no decorative abstract blobs unless the locked row states one.
 - [ ] The stated macrostructure is recognizable on the rendered page.
 - [ ] The page contains at least one structured artifact of the product working (a table, readout, ledger, document, queue, or state display, with plausible labeled demo data); a page of pure assertion fails this gate regardless of how beautiful its typography is.
@@ -139,6 +149,9 @@ Motion
 - [ ] Scroll-triggered entrances on at most one element group; no reveal cascade across sections; no always-running ambient motion outside the one budgeted signature.
 - [ ] `[sweep]` No content hidden at opacity 0 pending an observer without the `html.js` guard and reveal timeout; the page renders complete with JS disabled and in a full-page capture.
 - [ ] `[sweep]` `prefers-reduced-motion` honored.
+- [ ] No overshoot or bounce easing (a cubic-bezier with a control-point y above 1 or below 0) unless the locked direction row states that curve; rows 2 and 10 are the two that do, and the lock's Motion line names it.
+- [ ] No confetti or celebration burst on any success state; confirmation is carried by copy and a state change.
+- [ ] The `:focus-visible` ring is never transitioned or animated; it appears instantly at full contrast.
 
 Responsive
 - [ ] No horizontal scroll 320-1920px; verified at 375, 768, 1280.
@@ -161,6 +174,7 @@ Map (run this group only when `.design-map.md` exists at the project root)
 
 Honesty and trust surface
 - [ ] No invented metrics, fake testimonials, fake logos, or fake company names; placeholders labeled as placeholders.
+- [ ] The h1 and every section heading names a concrete thing this product does and carries a subject-specific noun; no weightless imperative pair ("Build faster. Ship smarter.") and no heading that would read identically on a different product.
 - [ ] The trust surface exists: the page answers who is behind the product (a real about or credits line, never invented people), how to reach them (a working contact route), and the material terms of the offer (pricing terms, cancellation, data handling where the product implies them). Demo builds label these sample like all other data; real projects state them truthfully or the gate fails.
 - [ ] Generated imagery (if any): its prompt is stated in the lock; it matches the locked palette on the rendered page; no text baked into images; alt text present; no generated people presented as customers, team, or testimonials; rasters over 200KB ship as sibling files, not base64.
 
