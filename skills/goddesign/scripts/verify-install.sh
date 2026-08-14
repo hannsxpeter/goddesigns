@@ -14,9 +14,11 @@ root=$(CDPATH= cd -- "$script_dir/.." && pwd)
 # load-bearing files: a missing one must stop the run, not be improvised.
 required="SKILL.md references/directions.md references/layouts.md references/palettes.md references/fonts.md references/motion.md references/imagery.md references/map.md references/checklist.md"
 
-# Optional files: the run degrades honestly without them (audit, sweep, token
-# extraction, imagery, blind read, map validation).
+# Optional gate helpers: the run degrades honestly without them.
 optional="scripts/audit.mjs scripts/sweep.mjs scripts/extract-tokens.mjs scripts/codex-audit-loop.sh scripts/detect-clis.sh scripts/genimage.sh scripts/blind-read.sh scripts/verify-map.mjs references/blind-read.md references/genome-sources.md"
+
+# Prompt-only extras do not affect an ordinary design run or its QA score.
+prompt_optional="scripts/provenance-hygiene.sh references/provenance-hygiene.md"
 
 missing=0
 for f in $required; do
@@ -75,6 +77,10 @@ fi
 # Report optional gaps as notes, not failures.
 for f in $optional; do
   [ -r "$root/$f" ] && [ -s "$root/$f" ] || echo "note: optional $f absent (that capability will DEGRADE)"
+done
+
+for f in $prompt_optional; do
+  [ -r "$root/$f" ] && [ -s "$root/$f" ] || echo "note: optional $f absent (prompt-only capability unavailable; design QA unchanged)"
 done
 
 echo "goddesign: install OK ($(printf '%s\n' $required | wc -l | tr -d ' ') required files present under $root)"

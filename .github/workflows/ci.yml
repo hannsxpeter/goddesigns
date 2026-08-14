@@ -19,6 +19,8 @@ jobs:
         run: sh skills/goddesign/scripts/verify-install.sh
       - name: CLI inventory smoke
         run: sh -n skills/goddesign/scripts/detect-clis.sh && sh skills/goddesign/scripts/detect-clis.sh
+      - name: provenance hygiene adapter tests
+        run: sh -n skills/goddesign/scripts/provenance-hygiene.sh && node --test scripts/provenance-hygiene.test.mjs
       - name: deck lint
         run: node scripts/lint-decks.mjs
       - name: study tooling tests
@@ -41,12 +43,9 @@ jobs:
       - name: dependency audit (production surface)
         working-directory: study-a-rater
         run: npm audit --audit-level=high --omit=dev
-      # Informational: the eslint toolchain reaches brace-expansion only through
-      # minimatch@3.1.5, the last 3.x release, which pins brace-expansion ^1.1.7.
-      # GHSA-mh99-v99m-4gvg lists no patched 1.x, and 5.x cannot substitute
-      # (its CommonJS build exports an object, so minimatch@3 throws "expand is
-      # not a function"). This step keeps the drift visible without blocking a
-      # dev-only advisory that has no production reachability.
+      # Informational: keep build and development dependency drift visible after
+      # the blocking production-surface audit above. Some upstream toolchain
+      # advisories do not have a compatible patched release yet.
       - name: dependency audit (full tree, informational)
         working-directory: study-a-rater
         run: npm audit --audit-level=high || true

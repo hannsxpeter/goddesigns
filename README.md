@@ -184,6 +184,16 @@ own image tool hand the art direction to the Codex CLI, which generates it with
 ChatGPT's built-in image tool. If that is not available, the page falls back to
 the hand-coded artwork the chosen direction already specifies.
 
+**Can it inspect or remove AI provenance marks?**
+Only when you explicitly ask. After the design has passed its normal quality
+gate, goddesign can hand your own deliverable to the independent
+[`remove-ai-marks`](https://github.com/guillaumemeyer/watermarks-remover)
+skill for invisible-Unicode inspection, supported metadata cleaning, optional
+text rewriting, or optional image-watermark work. That companion is not needed
+for ordinary design, its absence never lowers the design score, and lossy text
+or pixel changes trigger a fresh design gate rather than inheriting the old one.
+Frozen validation evidence is never cleaned.
+
 **Will every page look wild?**
 No. Each page takes exactly one deliberate risk and keeps the rest disciplined.
 "Distinct" is the goal, not "loud".

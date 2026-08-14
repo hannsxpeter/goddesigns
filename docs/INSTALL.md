@@ -128,6 +128,7 @@ says so plainly in its output rather than quietly skipping a check.
 | Node 18+ (no browser needed) | The source scan, the design-map validator, and design-system token extraction | The assistant checks those by hand, which is the arrangement these scripts exist to replace |
 | OpenAI Codex CLI (signed in to ChatGPT) | Image generation. Assistants without a native image tool, Claude Code included, hand the art-directed prompt to Codex, which generates it with ChatGPT's built-in image tool. Also enables the sandboxed-Codex helper | Artwork falls back to the hand-coded CSS/SVG art each direction already carries |
 | Codex or Claude Code | The optional blind read: a separate process looks only at the screenshots and describes what the page appears to be, catching pages that render fine but communicate nothing | Prints `DEGRADED: no blind read` and falls back to the builder's own inspection |
+| Python 3.10+ and the independent [`remove-ai-marks`](https://github.com/guillaumemeyer/watermarks-remover) skill | Prompt-specified inspection and cleaning of invisible Unicode, supported file metadata, C2PA, text marks, and image marks after the design gate | Ordinary design is unchanged; the requested extra reports `OPTIONAL HYGIENE UNAVAILABLE` with no score deduction |
 | `curl` and network access | A check that the webfonts actually load | The gate states that it skipped the check |
 
 ## Checking a page without a browser
@@ -181,6 +182,37 @@ direction already specifies, so a run never stalls waiting on pixels.
 
 Requirements: the `codex` command on your PATH, signed in to ChatGPT. There is
 nothing else to configure.
+
+## Optional provenance hygiene
+
+This is not part of a normal design run. It activates only when your brief asks
+to inspect or remove invisible Unicode, AI metadata, C2PA or Content
+Credentials, statistical text marks, or image watermarks from content you own
+or are authorized to process.
+
+Install the independent companion once, then link it into the same skill
+directory your assistant already reads:
+
+```sh
+git clone https://github.com/guillaumemeyer/watermarks-remover.git
+ln -s "$PWD/watermarks-remover/skills/remove-ai-marks" ~/.agents/skills/remove-ai-marks
+# Claude Code users can link the same folder under ~/.claude/skills instead.
+```
+
+goddesign's adapter discovers project-local installs, common Codex and Claude
+skill directories, or `REMOVE_AI_MARKS_SKILL_DIR`:
+
+```sh
+sh skills/goddesign/scripts/provenance-hygiene.sh locate
+sh skills/goddesign/scripts/provenance-hygiene.sh inspect-file public/hero.png --json
+sh skills/goddesign/scripts/provenance-hygiene.sh clean-file public/hero.png -o public/hero.cleaned.png --json
+```
+
+The workflow is inspect, clean a new output, verify, and report residual limits.
+Statistical rewrites and pixel regeneration are never automatic because they
+can change copy or visuals. If either runs, goddesign repeats the full design
+gate afterward. Validation evidence, signed receipts, and frozen study artifacts
+are excluded because their provenance is part of the record.
 
 ## Running Codex in a sandbox
 

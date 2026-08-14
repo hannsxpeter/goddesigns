@@ -1,5 +1,20 @@
 # Changelog
 
+## v1.7.0 (2026-08-14)
+
+### Prompt-specified provenance hygiene
+
+- Evaluated [`guillaumemeyer/watermarks-remover`](https://github.com/guillaumemeyer/watermarks-remover) v0.4.0 at commit `28eca2d91fd485213045b86896db671937432a48`. The adopted mechanism is inspect, classify confidence, clean only the requested channel, verify, and report residual risk. The anti-detection product posture, default statistical rewriting, default pixel regeneration, evidence mutation, and human-authorship implications were declined.
+- `skills/goddesign/scripts/provenance-hygiene.sh` discovers an existing `remove-ai-marks` companion through an explicit environment override, project-local skill directories, or common Codex and Claude skill directories. It delegates file, image, rewrite, directory, and website operations without installing or updating anything.
+- `skills/goddesign/references/provenance-hygiene.md` makes the feature prompt-specified and post-gate. Ordinary design remains the complete default; a missing companion never changes the design QA score. Cleaning defaults to a new output, frozen validation evidence is excluded, and lossy text or pixel work forces the full design gate to run again.
+- The direct calibration audit classified 258 repository files and produced 3 confirmed, 15 probable, 2 informational, and 1 likely-false-positive findings. It found real C2PA containers in three PNGs, but also exposed why auto-clean is unsafe: the skill description itself looked like probable AI metadata, unsupported WebP files were read as text, and a frozen corpus control character was legitimate evidence.
+- Five deterministic adapter tests cover explicit and project-local discovery, argument-safe dispatch, honest absence, and unknown operations. CI now runs them as a separate gate.
+
+### Dependency security
+
+- The current registry audit newly classified the rater app's transitive `nanoid@3.3.16` as high severity and the pinned `postcss@8.5.22` as moderate. `next` moves from 16.2.11 to 16.3.1, the PostCSS override moves to 8.5.26, and the resolved Nano ID moves to 3.3.18. The blocking production-surface audit returns to zero vulnerabilities, and the production build plus rendered-HTML tests remain green.
+- The full development-tree audit remains informational and visible in CI. Its remaining advisories sit in build or local-development tooling, including an `image-size` advisory for which the registry proposes downgrading `vinext` from 0.0.50 to 0.0.45 as a breaking change rather than offering a patched current release.
+
 ## v1.6.4 (2026-08-04)
 
 The documentation release. No change to the skill, the decks, or the gate scripts: every mechanism, rule id, exit code, and threshold is identical to v1.6.3. What changed is who the documentation is written for. The README had become an architecture summary competing with `docs/ARCHITECTURE.md`, which meant a reader deciding whether to install had to parse "seeded macrostructures" and "29 deterministic sweep rules over the source" before learning what the thing does.

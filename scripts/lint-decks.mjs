@@ -72,6 +72,7 @@ check("two newest genome rows do not share a vantage",
 
 // 6. Host portability: cross-host work is prompt-specified and never a default penalty.
 const checklist = read("skills/goddesign/references/checklist.md");
+const verifyInstall = read("skills/goddesign/scripts/verify-install.sh");
 check("single-host completion is the default",
   skill.includes("One capable host is the default and is a complete setup"));
 check("cross-host work requires prompt opt-in",
@@ -79,10 +80,38 @@ check("cross-host work requires prompt opt-in",
 check("missing a second host does not change QA",
   checklist.includes("A missing second host never changes the design score"));
 
+// 6b. Provenance hygiene is a prompt-only delivery companion. It cannot become
+// a silent design requirement, mutate evidence, or inherit a stale visual gate.
+const provenance = read("skills/goddesign/references/provenance-hygiene.md");
+const provenanceAdapter = read("skills/goddesign/scripts/provenance-hygiene.sh");
+check("provenance hygiene requires explicit prompt scope",
+  skill.includes("Provenance hygiene is prompt-specified too") &&
+  provenance.includes("only\nwhen the user's prompt explicitly asks"));
+check("ordinary design does not depend on provenance hygiene",
+  provenance.includes("A normal goddesign run never invokes it, never depends on it"));
+check("missing provenance companion does not change design QA",
+  skill.includes("without a `DEGRADED` label or score deduction") &&
+  provenanceAdapter.includes("The design QA score is unchanged"));
+check("provenance hygiene runs after the design gate",
+  skill.includes("never runs before the normal gate passes") &&
+  provenance.includes("Run this only after the page has passed the normal goddesign gate"));
+check("provenance hygiene never mutates validation evidence",
+  provenance.includes("Never clean `validation/`, frozen study inputs, receipts, manifests"));
+check("lossy provenance work forces a fresh full gate",
+  skill.includes("A statistical rewrite or pixel-regeneration pass changes the artifact and invalidates the old render"));
+check("provenance adapter exposes every documented operation",
+  ["inspect-file", "clean-file", "inspect-image", "clean-image", "rewrite-text", "audit-dir", "audit-site"]
+    .every((operation) => provenanceAdapter.includes(operation)));
+check("verify-install.sh lists provenance integration as optional",
+  /prompt_optional="[^"]*scripts\/provenance-hygiene\.sh[^"]*references\/provenance-hygiene\.md/.test(verifyInstall));
+check("verify-install.sh keeps prompt-only absence out of DEGRADED",
+  verifyInstall.includes("prompt-only capability unavailable; design QA unchanged"));
+check("provenance evaluation record is retained",
+  existsSync("validation/research/watermarks-remover-evaluation-2026-08.md"));
+
 // 7. Design map: the deck, the validator, and the skill wiring stay in sync.
 const map = read("skills/goddesign/references/map.md");
 const verifyMap = read("skills/goddesign/scripts/verify-map.mjs");
-const verifyInstall = read("skills/goddesign/scripts/verify-install.sh");
 
 check("verify-install.sh requires references/map.md",
   /required="[^"]*references\/map\.md/.test(verifyInstall));
