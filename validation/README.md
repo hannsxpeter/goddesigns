@@ -78,6 +78,10 @@ record as adopting.
 - [Banned-list mechanization](research/banned-list-mechanization-2026-08.md): an
   attempt that produced zero new rules, kept as a refusal record because the
   reason generalizes.
+- [watermarks-remover](research/watermarks-remover-evaluation-2026-08.md): its
+  inspect-clean-verify discipline and confidence reporting ship as an optional,
+  prompt-specified delivery adapter; default cleaning, automatic rewrites,
+  evidence mutation, and anti-detection claims are declined.
 
 ## Conventions
 
