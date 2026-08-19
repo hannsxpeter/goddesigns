@@ -1,5 +1,27 @@
 # Changelog
 
+## v1.8.0 (2026-08-19)
+
+### Mode-aware copy review
+
+- Evaluated [`cursor/plugins` pstack `unslop`](https://github.com/cursor/plugins/blob/60c641e4fad674784b30abcf9f8915dea39df38d/pstack/skills/unslop/SKILL.md) at commit `60c641e4fad674784b30abcf9f8915dea39df38d`. Its post-draft loop, specificity test, and source-or-delete discipline ship; universal word and grammar bans, intentional messiness, automatic rewriting, and authorship implications are declined.
+- `skills/goddesign/references/copy.md` adds a four-pass review after visible copy exists and before the QA gate. It assigns mode by block: transactional copy stays predictable, while marketing copy names a mechanism, observable result, real example, or source and may carry a point of view.
+- The Phase 2b Copy group adds seven contextual assertions for action labels, useful errors and empty states, concrete claims, named attribution, the cross-product substitution test, forced structures, sentence density, and mode-appropriate rhythm.
+- Substantial copy changes after screenshots now explicitly invalidate the old visual evidence and repeat the full gate.
+
+### Three calibrated copy advisories
+
+- `vague-attribution`, `filler-copy`, and `formulaic-copy` expand the deterministic source scan from 29 to 32 rules. They are advisory because a scanner cannot see every nearby citation, deliberate quotation, or domain context.
+- Visible-text extraction now blanks tags, scripts, styles, comments, and entities in place. Copy findings therefore report the real source line while hidden phrases remain invisible to the rules.
+- The 49 non-withdrawn HTML artifacts under `validation/runs/` and `validation/experiments/` produce zero findings from the three new rules. A regression fixture supplies one visible positive per rule, verifies source lines and advisory severity, and proves that duplicate phrases in script and comment blocks do not report.
+- The existing population-separation regression remains green. The new rules make the narrower claim of copy-quality prompting, not authorship or human-versus-model classification.
+
+### Documentation and install integrity
+
+- `SKILL.md`, the README, setup guide, architecture, validation index, checklist, and release notes now document the copy lane and its boundaries.
+- `verify-install.sh` treats `references/copy.md` as the ninth required reference file, so a partial installation cannot silently skip the pass.
+- `validation/research/unslop-evaluation-2026-08.md` freezes the evaluated source, license, adoption and refusal record, calibration result, and kill conditions.
+
 ## v1.7.0 (2026-08-14)
 
 ### Prompt-specified provenance hygiene
