@@ -109,6 +109,27 @@ check("verify-install.sh keeps prompt-only absence out of DEGRADED",
 check("provenance evaluation record is retained",
   existsSync("validation/research/watermarks-remover-evaluation-2026-08.md"));
 
+// 6c. Copy review is mode-aware, routed after copy exists, and remains a
+// quality gate rather than an authorship detector or universal word blacklist.
+const copy = read("skills/goddesign/references/copy.md");
+check("verify-install.sh requires references/copy.md",
+  /required="[^"]*references\/copy\.md/.test(verifyInstall));
+check("SKILL.md routes visible copy through copy.md before the gate",
+  skill.includes("read `references/copy.md` and run its four-pass review before Step 5"));
+check("SKILL.md reference index lists copy.md",
+  /^- `references\/copy\.md`:/m.test(skill));
+check("copy.md separates transactional and marketing modes",
+  copy.includes("**Transactional copy**") && copy.includes("**Marketing copy**"));
+check("copy.md carries the substitution and source-or-delete tests",
+  copy.includes("could move unchanged to an unrelated product") &&
+  /name the source\s+or remove the attribution/.test(copy));
+check("copy.md rejects authorship detection claims",
+  /not an authorship\s+detector/.test(copy) && copy.includes("Never claim that passing it proves a person wrote the text"));
+check("checklist.md carries the Copy gate group",
+  checklist.includes("Copy (read `references/copy.md` before checking)"));
+check("unslop evaluation record is retained",
+  existsSync("validation/research/unslop-evaluation-2026-08.md"));
+
 // 7. Design map: the deck, the validator, and the skill wiring stay in sync.
 const map = read("skills/goddesign/references/map.md");
 const verifyMap = read("skills/goddesign/scripts/verify-map.mjs");

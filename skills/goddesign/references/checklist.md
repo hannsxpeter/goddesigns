@@ -58,6 +58,9 @@ Cannot run it at all? The sweep needs `node` and nothing else, but two hosts rea
 | `no-focus-visible` | fail | interactive elements with no `:focus-visible` rule anywhere |
 | `no-reduced-motion` | fail | motion with no `prefers-reduced-motion` block |
 | `buzzword` | fail | unleash, elevate, seamless, next-gen, and the rest of the weightless set |
+| `vague-attribution` | advisory | a claim attributed to unnamed experts, reports, studies, critics, or observers |
+| `filler-copy` | advisory | a phrase that can be shortened without changing meaning |
+| `formulaic-copy` | advisory | a stock contrast, challenge frame, or generic conclusion |
 | `dash-in-copy` | fail | an em dash or en dash in UI copy |
 | `no-stamp` | fail | no `/* goddesign \| ... */` stamp in any stylesheet |
 | `token-drift` | fail | a value outside the token baseline (`--tokens` mode; extension runs only) |
@@ -66,7 +69,7 @@ Cannot run it at all? The sweep needs `node` and nothing else, but two hosts rea
 | `markup-color` | advisory | a color literal in a markup attribute |
 | `waiver-without-reason` | fail | a `goddesign-allow` comment with no stated reason |
 
-Advisories are reported and never fail the gate: each has a legal case the script cannot read (a row that states a mono face, a grammar break declared in the lock, a locked ornament). Read every advisory against the lock and either justify it in one line or fix it.
+Advisories are reported and never fail the gate: each has a legal case the script cannot read (a row that states a mono face, a grammar break declared in the lock, a locked ornament, or copy that names its source elsewhere). Read every advisory against the lock and the copy context, then justify it in one line or fix it.
 
 Waivers exist for the legal exceptions, and they are not free. Any comment in the file, in any comment syntax:
 
@@ -103,6 +106,15 @@ Typography
 - [ ] Body measure 45-75ch; body size 16px+; display line-height 1.1-1.2; body 1.5-1.6.
 - [ ] H1 renders in 3 lines or fewer at its stated max-width and clamp ceiling.
 - [ ] `[sweep]` Webfonts actually load (the import URL is present and correct), not silently falling back; when network is available, `curl -sI` the import URL and expect 200 (sandboxed with no network: state the skip). The sweep proves the import exists; only the network proves it answers.
+
+Copy (read `references/copy.md` before checking)
+- [ ] `[sweep]` Every `vague-attribution`, `filler-copy`, and `formulaic-copy` advisory was read in context, then fixed or justified in one line.
+- [ ] Every transactional label names the resulting action; every error states what failed and the next useful step; every empty state offers one relevant action.
+- [ ] Every marketing claim names a mechanism, observable result, real example, or source. A mood or adjective never carries the claim alone.
+- [ ] Every attribution names its source. Phrases such as "experts say" or "reports suggest" are sourced or deleted.
+- [ ] The substitution test passes: copy that could move unchanged to an unrelated product was rewritten with subject-specific nouns or cut.
+- [ ] No forced group of three, synonym cycling, false range, formulaic challenge frame, or generic conclusion remains unless the content genuinely requires that form.
+- [ ] Each sentence carries one main idea. Marketing copy varies rhythm and may state a real point of view; transactional copy stays consistent and predictable.
 
 Color
 - [ ] Accent occupies at most about 5% of any viewport and appears only on interactive or state elements (a row that explicitly states full-coverage accent bands overrides this; verify the row states it).

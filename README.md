@@ -5,7 +5,7 @@
 [![Release](https://img.shields.io/github/v/release/hannsxpeter/goddesigns)](https://github.com/hannsxpeter/goddesigns/releases)
 [![License: MIT](https://img.shields.io/github/license/hannsxpeter/goddesigns)](LICENSE)
 [![Hosts](https://img.shields.io/badge/hosts-agnostic-blue)](docs/INSTALL.md)
-[![Gate](https://img.shields.io/badge/gate-29%20automated%20checks-blue)](skills/goddesign/references/checklist.md)
+[![Gate](https://img.shields.io/badge/gate-32%20automated%20checks-blue)](skills/goddesign/references/checklist.md)
 [![Validation](https://img.shields.io/badge/validation-7%2F7%20runs%20green-success)](validation/runs/kilnhouse-2026-07/README.md)
 [![Evidence](https://img.shields.io/badge/evidence-346%20sourced%20comments-informational)](validation/research/sentiment-evidence-2026-07.md)
 
@@ -61,13 +61,18 @@ fonts, spacing, motion, the one signature element) is committed to a plain-text
 plan first. Then the code has to match the plan. No drifting halfway through
 into the house style.
 
+**It reviews the words for the job they do.** Controls, errors, and empty states
+stay plain and predictable. Marketing copy gets a separate pass for concrete
+claims, named sources, subject-specific language, and a real point of view. A
+sentence that could move unchanged to another product gets rewritten or cut.
+
 **It checks its own work, mechanically.** When the page is built, two automated
 checks run before you see it:
 
-- A **source scan** reads the code for 29 known problems: banned fonts and
+- A **source scan** reads the code for 32 known problems: banned fonts and
   colors, gradient text, buggy scroll animations that leave the page blank,
   missing keyboard focus outlines, missing reduced-motion support, marketing
-  buzzword filler.
+  buzzword filler, vague attribution, and formulaic copy.
 - A **visual audit** actually opens the page in a browser at phone, tablet, and
   desktop sizes, and takes screenshots. It catches overlapping text, content
   that never appears, horizontal scrollbars, buttons too small to tap, and
@@ -157,9 +162,11 @@ turned out to be contaminated, and the finding plus every claim it touched is
 recorded in public: [the withdrawal
 record](validation/runs/kilnhouse-2026-07/WITHDRAWN-codex-baseline-kilnhouse.md).
 
-Every rule in this skill traces to one of two sources: the 346-comment study of
-what people actually mock about AI design, or a defect caught in a real test run.
-Nothing is here because it sounded like good advice.
+Every visual fingerprint rule traces to the 346-comment study of what people
+actually mock about AI design or to a defect caught in a real test run. Quality
+mechanisms adapted from other projects carry a frozen source, license record,
+explicit refusals, and repository calibration under `validation/research/`.
+Nothing is here only because it sounded like good advice.
 
 ## Common questions
 
@@ -224,7 +231,7 @@ Terms you will see in the output and in the deeper docs:
 | Path | What it is |
 |---|---|
 | `skills/goddesign/SKILL.md` | The skill itself: the instructions your assistant follows |
-| `skills/goddesign/references/` | The decks: 17 directions, 12 layouts, 10 palettes, 12 font pairings, motion, imagery, the design map, the quality checklist |
+| `skills/goddesign/references/` | The decks and operating references: 17 directions, 12 layouts, 10 palettes, 12 font pairings, motion, copy review, imagery, the design map, and the quality checklist |
 | `skills/goddesign/scripts/` | The automated checks: source scan, visual audit, design-map validator, install verifier, token extraction, and helpers |
 | [`validation/`](validation/README.md) | The evidence library: research, test protocols, experiments, comparison runs, and studies |
 | `docs/` | Setup guide and the technical architecture |

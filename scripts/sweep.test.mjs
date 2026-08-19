@@ -68,8 +68,8 @@ test('--rules prints the whole table and exits 0', () => {
   const r = run(SWEEP, ['--rules']);
   assert.equal(r.code, 0);
   const lines = r.out.trim().split('\n');
-  assert.equal(lines.length, 29, 'the rule table is 29 rules');
-  for (const id of ['banned-font', 'reveal-cascade', 'token-drift', 'waiver-without-reason'])
+  assert.equal(lines.length, 32, 'the rule table is 32 rules');
+  for (const id of ['banned-font', 'vague-attribution', 'filler-copy', 'formulaic-copy', 'reveal-cascade', 'token-drift', 'waiver-without-reason'])
     assert.ok(r.out.includes(id), `${id} is documented`);
 });
 
@@ -233,6 +233,31 @@ test('an HTML numeric entity is not a hex literal', () => {
   const dir = clean('', '<p>Next &#8594; step</p>');
   const j = sweepJson([dir]);
   assert.equal(j.failures, 0, JSON.stringify(j.findings));
+  rmSync(dir, { recursive: true, force: true });
+});
+
+test('copy advisories scan visible text with source lines and ignore hidden text', () => {
+  const dir = fixture({
+    'app.css': CLEAN_CSS,
+    'index.html': `<!doctype html>
+<html lang="en">
+<body>
+<p>Experts believe scheduling reduces missed firings.</p>
+<p>In order to reserve a firing, choose an open slot.</p>
+<p>This is not just a scheduler, but a complete studio companion.</p>
+<script>const hidden = "in order to test";</script>
+<!-- Reports suggest this hidden note should never count. -->
+</body>
+</html>`,
+  });
+  const j = sweepJson([dir]);
+  assert.equal(j.code, 0, 'advisories never fail the gate');
+  for (const [rule, line] of [['vague-attribution', 4], ['filler-copy', 5], ['formulaic-copy', 6]]) {
+    const hits = j.findings.filter((f) => f.rule === rule);
+    assert.equal(hits.length, 1, `${rule} should report only the visible phrase`);
+    assert.equal(hits[0].line, line, `${rule} should preserve the source line`);
+    assert.equal(hits[0].severity, 'advisory');
+  }
   rmSync(dir, { recursive: true, force: true });
 });
 

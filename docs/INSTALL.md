@@ -148,6 +148,11 @@ Useful flags: `--rules` prints the full rule table, `--json` gives
 machine-readable output, and `--tokens <baseline.json>` reports drift against an
 existing design system.
 
+The scan also reports three copy advisories: vague attribution, filler phrases,
+and formulaic contrasts or conclusions. Advisories do not fail the gate. Read
+them in context, then fix the copy or state why the phrase is precise, sourced,
+or deliberately quoted.
+
 Some rules are legitimately breakable when a chosen design direction calls for
 them. You can waive one rule for one file with an inline comment, and the reason
 is mandatory, so the escape hatch cannot be used silently:

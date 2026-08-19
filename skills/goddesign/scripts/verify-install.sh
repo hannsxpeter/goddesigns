@@ -4,15 +4,15 @@
 # memory, which recreates the exact model-authored distribution the skill exists to
 # escape. This script fails loud instead. Host-neutral POSIX sh, zero dependencies.
 # Usage: sh verify-install.sh
-# Exit 0: all eight required decks + SKILL.md present. Exit 1: something missing.
+# Exit 0: all nine required references + SKILL.md present. Exit 1: something missing.
 
 # Resolve the skill root as the parent of this script's directory.
 script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 root=$(CDPATH= cd -- "$script_dir/.." && pwd)
 
-# The eight reference decks a design run reads, plus the skill body. These are the
+# The nine reference files a design run reads, plus the skill body. These are the
 # load-bearing files: a missing one must stop the run, not be improvised.
-required="SKILL.md references/directions.md references/layouts.md references/palettes.md references/fonts.md references/motion.md references/imagery.md references/map.md references/checklist.md"
+required="SKILL.md references/directions.md references/layouts.md references/palettes.md references/fonts.md references/motion.md references/copy.md references/imagery.md references/map.md references/checklist.md"
 
 # Optional gate helpers: the run degrades honestly without them.
 optional="scripts/audit.mjs scripts/sweep.mjs scripts/extract-tokens.mjs scripts/codex-audit-loop.sh scripts/detect-clis.sh scripts/genimage.sh scripts/blind-read.sh scripts/verify-map.mjs references/blind-read.md references/genome-sources.md"

@@ -82,6 +82,10 @@ record as adopting.
   inspect-clean-verify discipline and confidence reporting ship as an optional,
   prompt-specified delivery adapter; default cleaning, automatic rewrites,
   evidence mutation, and anti-detection claims are declined.
+- [pstack unslop](research/unslop-evaluation-2026-08.md): its post-draft review
+  loop, specificity test, and source-or-delete discipline ship as a mode-aware
+  frontend copy pass; universal word and grammar bans, automatic rewriting, and
+  authorship implications are declined.
 
 ## Conventions
 

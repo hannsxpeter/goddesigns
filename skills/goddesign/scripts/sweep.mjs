@@ -50,6 +50,9 @@ const RULES = [
   ['no-focus-visible', 'fail', 'interactive elements ship with no :focus-visible rule'],
   ['no-reduced-motion', 'fail', 'motion ships with no prefers-reduced-motion block'],
   ['buzzword', 'fail', 'weightless marketing copy (unleash, elevate, seamless, next-gen)'],
+  ['vague-attribution', 'advisory', 'a claim attributed to unnamed experts, reports, studies, critics, or observers'],
+  ['filler-copy', 'advisory', 'a filler phrase that can be shortened without changing meaning'],
+  ['formulaic-copy', 'advisory', 'a stock contrast, challenge frame, or generic conclusion'],
   ['dash-in-copy', 'fail', 'an em dash or en dash in UI copy'],
   ['no-stamp', 'fail', 'the stylesheet carries no /* goddesign | ... */ stamp'],
   ['token-drift', 'fail', 'a value outside the supplied token baseline (--tokens mode only)'],
@@ -195,14 +198,16 @@ function rulesOf(css) {
 const ROOT_SELECTOR = /(^|,)\s*(:root|:host|html|\[data-theme[^\]]*\]|\.dark|\.light)\s*(,|$)/i;
 const isRootRule = (r) => ROOT_SELECTOR.test(r.selector) || /^@theme/i.test(r.at) || /^@theme/i.test(r.selector);
 
-// Visible text of a markup file: tags, script, and style stripped.
+// Visible text of a markup file: tags, script, and style blanked in place. Keeping
+// length and newlines stable lets copy findings report their real source line.
 function visibleText(text) {
+  const blank = (m) => m.replace(/[^\n]/g, ' ');
   return text
-    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
-    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
-    .replace(/<!--[\s\S]*?-->/g, ' ')
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/&[a-z]+;|&#\d+;/gi, ' ');
+    .replace(/<script[\s\S]*?<\/script>/gi, blank)
+    .replace(/<style[\s\S]*?<\/style>/gi, blank)
+    .replace(/<!--[\s\S]*?-->/g, blank)
+    .replace(/<[^>]+>/g, blank)
+    .replace(/&[a-z]+;|&#(?:x[0-9a-f]+|\d+);/gi, blank);
 }
 
 // CSS keywords and the true generic families. These are never a chosen face and
@@ -246,6 +251,9 @@ const BANNED_HEX = /#(6366f1|7c3aed|8b5cf6|a78bfa|818cf8|c084fc|7e22ce|6d28d9)\b
 const METALLIC_HEX = /#(ffd700|d4af37|c9a227|b8860b|cd7f32|bfa14a|d9b56a|e6be8a)\b/gi;
 const METALLIC_WORD = /\b(gold|brass|bronze)\b/gi;
 const BUZZWORD = /\b(unleash|unleashing|elevate|elevating|seamless|seamlessly|next[- ]gen(eration)?|supercharge|supercharged|empower|empowering|streamline|streamlining|cutting[- ]edge|world[- ]class|revolutioniz\w*|game[- ]chang\w*|effortless(ly)?|best[- ]in[- ]class|frictionless)\b/gi;
+const VAGUE_ATTRIBUTION = /\b(?:experts|analysts|researchers|studies|reports|industry (?:leaders|reports|research)|some (?:critics|observers))\s+(?:say|says|believe|believes|suggest|suggests|show|shows|indicate|indicates|argue|argues|agree|agrees|find|finds|have found)\b/gi;
+const FILLER_COPY = /\b(?:in order to|due to the fact that|it is important to note that|it should be noted that|at this point in time|in the event that|for the purpose of)\b/gi;
+const FORMULAIC_COPY = /\b(?:not (?:just|only) [^.!?]{1,80},?\s+but (?:also )?[^.!?]{1,80}|despite (?:the|these|those|its|many|numerous)?\s*challenges[^.!?]{0,100}\bcontinues? to (?:thrive|grow|evolve|succeed)|the future (?:looks|is) bright|the possibilities are endless|this is (?:just|only) the beginning|only time will tell)\b/gi;
 const SPACING_SCALE = new Set([0, 1, 2, 3, 4, 8, 12, 16, 24, 32, 48, 64, 96, 128, 160]);
 
 const ORNAMENTS = [
@@ -312,14 +320,20 @@ for (const file of files) {
 
     const vis = visibleText(text);
     allText.push(vis);
-    let bm;
-    const bz = new RegExp(BUZZWORD.source, 'gi');
-    while ((bm = bz.exec(vis))) flag('buzzword', 1, bm[0]);
+    const scanVisible = (rule, pattern) => {
+      const re = new RegExp(pattern.source, pattern.flags);
+      let hit;
+      while ((hit = re.exec(vis))) flag(rule, lineOf(vis, hit.index), hit[0].trim().slice(0, 120));
+    };
+    scanVisible('buzzword', BUZZWORD);
+    scanVisible('vague-attribution', VAGUE_ATTRIBUTION);
+    scanVisible('filler-copy', FILLER_COPY);
+    scanVisible('formulaic-copy', FORMULAIC_COPY);
 
     // Written as escapes so this file obeys the rule it enforces.
     const dashRe = /[\u2013\u2014]/g;
     let dm;
-    while ((dm = dashRe.exec(vis))) { flag('dash-in-copy', 1, 'em or en dash in visible copy'); break; }
+    while ((dm = dashRe.exec(vis))) { flag('dash-in-copy', lineOf(vis, dm.index), 'em or en dash in visible copy'); break; }
 
     // Numbered chapter cadence: 01 / 02 / 03 standing alone as element text.
     const chapters = [...text.matchAll(/>\s*(0[1-9])\s*</g)].map((c) => c[1]);
