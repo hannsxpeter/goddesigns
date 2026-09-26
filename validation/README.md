@@ -19,12 +19,14 @@ order:
 2. [Kilnhouse comparative run](runs/kilnhouse-2026-07/README.md): the main
    demonstration. Seven runs of one brief, seven distinct designs, plus the
    unskilled baselines that reproduced the catalogued failures.
-3. [External validation protocol](protocols/external-validation-protocol.md):
-   the study designed to test the core claim with outside judges, pre-registered
-   with the bars fixed in advance.
-4. [Study A frozen protocol](studies/study-a-2026-07/protocol.md) and its
-   [completion audit](studies/study-a-2026-07/completion-audit.md): where that
-   study currently stands, requirement by requirement.
+3. [Study A closure](studies/study-a-2026-07/completion-audit.md): the
+   outside-rater study built to test the core claim, and why it closed in
+   September 2026 without a single response. The
+   [external validation protocol](protocols/external-validation-protocol.md) it
+   implemented is retired, and records what a real test would require.
+4. [Lean-core comparison](studies/lean-core-2026-09/protocol.md): the
+   pre-registered four-arm test of v2.0.0's bet that a frontier model needs far
+   less instruction, with its decision rules frozen before any run.
 5. [The withdrawal record](runs/kilnhouse-2026-07/WITHDRAWN-codex-baseline-kilnhouse.md):
    a test capture that was retracted after it turned out to be contaminated,
    along with every claim it touched.
@@ -38,11 +40,14 @@ Stated plainly, because the distinction is the point:
   including ones human review missed. The source scan cleanly separates
   goddesign pages from pages built without it. All of this is reproducible from
   the artifacts in `runs/` and `experiments/`.
-- **External validation (not complete).** Whether outside judges can tell
-  goddesign pages from human-designed ones is the actual claim, and it is not
-  settled. Study A generation is finished and the corpus is frozen; the outside
-  rater responses are not in. Until they are, this project does not claim
-  external validation, and the evidence badge on the front page stays as it is.
+- **External validation (none).** Whether outside judges can tell goddesign
+  pages from human-designed ones is the actual claim, and it is unvalidated.
+  Study A closed on 2026-09-26 with zero rater responses; closure is not a
+  result. This project does not claim external validation anywhere.
+- **The v2.0.0 cut (not yet measured).** The lean core rests on a
+  recommendation that current frontier models no longer need most of the old
+  instructions. The four-arm comparison measures it for the one person it
+  serves; until it runs, the cut is an argument, not a finding.
 
 Author-run proofs move the machinery. Only external studies move the claim.
 
@@ -55,7 +60,6 @@ Author-run proofs move the machinery. Only external studies move the claim.
 | [`experiments/`](experiments/) | Bounded tests of a single mechanism, each dated folder self-contained |
 | [`runs/`](runs/) | Comparative render runs, with the built pages and screenshots kept alongside the report |
 | [`studies/`](studies/) | Full evidence programs, including inputs, public receipts, and completion audits |
-| [`tools/`](tools/) | Command-line entry points used only by validation work |
 
 ## Mechanism evaluations
 
