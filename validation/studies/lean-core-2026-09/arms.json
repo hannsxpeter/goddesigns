@@ -1,0 +1,32 @@
+{
+  "study": "goddesign-lean-core-2026-09",
+  "effort": "high",
+  "budget_usd_per_run": 20,
+  "timeout_minutes": 45,
+  "arms": [
+    {
+      "id": "A",
+      "label": "frontier model, no skill",
+      "model": "opus",
+      "skill": null
+    },
+    {
+      "id": "B",
+      "label": "frontier model, v2.0.0 lean core",
+      "model": "opus",
+      "skill": "v2.0.0"
+    },
+    {
+      "id": "C",
+      "label": "frontier model, v1.8.0 full skill",
+      "model": "opus",
+      "skill": "v1.8.0"
+    },
+    {
+      "id": "D",
+      "label": "cheaper model, v2.0.0 routed to the full lane",
+      "model": "sonnet",
+      "skill": "v2.0.0"
+    }
+  ]
+}

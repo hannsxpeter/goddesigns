@@ -1,0 +1,37 @@
+{
+  "study": "goddesign-lean-core-2026-09",
+  "frozen_at": "2026-09-26",
+  "note": "Five briefs copied verbatim from validation/studies/study-a-2026-07/briefs.json, which was frozen on 2026-07-23, so no brief was written after the decision this study informs.",
+  "briefs": [
+    {
+      "id": "L01",
+      "source": "study-a-2026-07 B01",
+      "category": "saas-analytics",
+      "brief": "Build a production-quality single-file index.html marketing page for Northstar Signal, a privacy-first web analytics product for small software teams. Include a compact nav, a hero that drives Start a free trial, one concrete analytics product artifact, feature proof, transparent pricing without invented customer claims, a trust surface naming data ownership and support, and a footer. The page must work at 375, 768, and 1280 pixels."
+    },
+    {
+      "id": "L02",
+      "source": "study-a-2026-07 B03",
+      "category": "single-product-commerce",
+      "brief": "Build a production-quality single-file index.html product page for Rill One, a precision electric pour-over kettle. Include a strong product presentation, price of $179, color selection, quantity, Add to cart, the temperature and hold controls shown in use, material and care details, shipping and returns, and a support contact. Do not invent reviews, press logos, or scarcity. The page must work at 375, 768, and 1280 pixels."
+    },
+    {
+      "id": "L03",
+      "source": "study-a-2026-07 B04",
+      "category": "developer-documentation",
+      "brief": "Build a production-quality single-file index.html documentation landing page for Pinion, a command-line tool that validates release manifests before deployment. Include documentation navigation, a working search control, installation commands, a first validation example with output, configuration reference links, error and empty search states, version information, and a GitHub link. Drive the reader to run the first command. The page must work at 375, 768, and 1280 pixels."
+    },
+    {
+      "id": "L04",
+      "source": "study-a-2026-07 B06",
+      "category": "restaurant-reservation",
+      "brief": "Build a production-quality single-file index.html site for Morrow Table, a 34-seat Toronto restaurant serving a short seasonal menu after 5pm. Include the current sample menu with honest placeholder labeling where prices are unknown, hours, location, dietary and accessibility notes, reservation policy, contact details, and a Reserve a table action. Do not invent awards, reviews, or suppliers. The page must work at 375, 768, and 1280 pixels."
+    },
+    {
+      "id": "L05",
+      "source": "study-a-2026-07 B10",
+      "category": "independent-magazine",
+      "brief": "Build a production-quality single-file index.html home page for Current Review, an independent quarterly magazine of essays, interviews, photography, and criticism. Include a current issue lead, a varied article index, archive access, contributor information, print and digital subscription options, editorial contact and masthead links, and a Subscribe action. Do not invent readership numbers, famous contributors, or endorsements. The page must work at 375, 768, and 1280 pixels."
+    }
+  ]
+}
