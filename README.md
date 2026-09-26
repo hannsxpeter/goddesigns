@@ -166,8 +166,11 @@ judges can tell goddesign pages from human-designed ones is the core claim, and
 it is **unvalidated**: the study built to test it closed in September 2026 with
 no rater responses ([closure record](validation/studies/study-a-2026-07/completion-audit.md)).
 Version 2's own bet (that the smaller instruction set costs no quality) has a
-pre-registered four-way test with its decision rules fixed in advance, ready to
-run: [validation/studies/lean-core-2026-09](validation/studies/lean-core-2026-09/protocol.md).
+pre-registered four-way test with its decision rules fixed in advance:
+[validation/studies/lean-core-2026-09](validation/studies/lean-core-2026-09/protocol.md).
+A first smoke pair, one brief under each version, passed the same gate and used
+18% fewer tokens under version 2; it also caught a lost honesty rule before
+release ([record](validation/runs/lean-core-smoke-2026-09/README.md)).
 
 **We retract things.** One test capture was withdrawn in July 2026 after it
 turned out to be contaminated, and the finding plus every claim it touched is
@@ -184,7 +187,7 @@ under `validation/research/`.
 **What does a run cost?**
 On a frontier model, a new page reads about 16 KB of instructions (the skill
 plus the picker's output), about four thousand tokens; version 1.8 read about
-95 KB. An edit to an existing page reads only the 12.6 KB skill file and runs
+95 KB. An edit to an existing page reads only the 12.7 KB skill file and runs
 the source scan. The checks themselves are scripts and cost no model tokens
 until they find something.
 

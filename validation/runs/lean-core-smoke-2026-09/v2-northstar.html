@@ -1,0 +1,963 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Northstar Signal: cookieless web analytics for small software teams</title>
+<meta name="description" content="Northstar Signal shows which pages, referrers and campaigns lead to trial signups, without cookies and without storing IP addresses. Start a 30-day free trial.">
+<meta name="color-scheme" content="light">
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Nunito+Sans:wght@400;700&display=swap">
+<script>document.documentElement.classList.add('js');</script>
+<style>
+/* goddesign | structure: Specimen | direction: Organic Modern | accent: 150 */
+:root {
+  --bg: oklch(from #EFEDE3 calc(l + 0.01) c h);
+  --surface: oklch(from #E4E1D2 calc(l + 0.01) c h);
+  --text: #23291F;
+  --muted: #5E644E;
+  --accent: oklch(from #3E5A3A l c calc(h + 9));
+  --secondary: #C89B3C;
+
+  --accent-hover: oklch(from var(--accent) calc(l - 0.06) c h);
+  --deep: oklch(from var(--accent) calc(l - 0.15) calc(c * 0.85) h);
+  --plate: oklch(from #EFEDE3 calc(l + 0.035) c h);
+  --on-deep: var(--bg);
+  --on-deep-muted: color-mix(in oklch, var(--bg) 76%, var(--deep));
+  --rule-deep: color-mix(in oklch, var(--bg) 20%, transparent);
+  --line: color-mix(in oklch, var(--text) 13%, transparent);
+  --line-strong: color-mix(in oklch, var(--text) 26%, transparent);
+  --bar: color-mix(in oklch, var(--muted) 70%, var(--plate));
+  --row-fill: color-mix(in oklch, var(--surface) 85%, var(--plate));
+  --shadow: 0 1px 0 color-mix(in oklch, var(--text) 5%, transparent), 0 48px 96px -48px color-mix(in oklch, var(--deep) 60%, transparent);
+
+  --font-display: "Young Serif", Georgia, serif;
+  --font-body: "Nunito Sans", system-ui, sans-serif;
+  --h2: clamp(2rem, 1.3rem + 2.4vw, 3.25rem);
+
+  --radius: 18px;
+  --radius-sm: 10px;
+  --radius-pill: 999px;
+
+  --wrap: 1240px;
+  --gutter: clamp(16px, 4vw, 40px);
+  --overlap: 64px;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.14 0 0 0 0 0.16 0 0 0 0 0.12 0 0 0 1.7 -0.35'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.1'/%3E%3C/svg%3E");
+}
+@media (min-width: 1024px) {
+  :root { --overlap: 160px; }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html {
+  background: var(--grain), var(--bg);
+  color: var(--text);
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  font-weight: 400;
+  font-variant-numeric: lining-nums;
+}
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+  margin: 0;
+  text-wrap: balance;
+}
+p { margin: 0; text-wrap: pretty; }
+a {
+  color: var(--accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+a:hover { color: var(--accent-hover); text-decoration-thickness: 2px; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.skip {
+  position: absolute; left: 16px; top: -80px; z-index: 50;
+  padding: 12px 16px; border-radius: var(--radius-sm);
+  background: var(--accent); color: var(--bg); font-weight: 700; text-decoration: none;
+}
+.skip:focus { top: 12px; color: var(--bg); }
+
+.wrap {
+  width: 100%;
+  max-width: var(--wrap);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+.label,
+.kpis dt, .list-head, .tag, .glyph dt, .terms dt, .colophon-list dt, .mini th, .sizes thead th, .email-meta span {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.75rem;
+  line-height: 1.3;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 48px; padding: 0 24px;
+  border: 1px solid transparent; border-radius: var(--radius);
+  font: 700 1rem/1.1 var(--font-body);
+  text-decoration: none; text-align: center;
+  cursor: pointer;
+  transition: transform 0.18s var(--ease-out), background-color 0.18s var(--ease-out), border-color 0.18s var(--ease-out), color 0.18s var(--ease-out);
+}
+.btn-primary { background: var(--accent); color: var(--bg); }
+.btn-primary:hover { background: var(--accent-hover); color: var(--bg); transform: translateY(-1px); }
+.btn-quiet { background: transparent; color: var(--text); border-color: var(--line-strong); }
+.btn-quiet:hover { background: var(--surface); color: var(--text); transform: translateY(-1px); }
+.btn:active { transform: scale(0.97); }
+.btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.btn:disabled, .btn[aria-disabled="true"] { opacity: 0.5; cursor: not-allowed; transform: none; }
+.btn-sm { min-height: 44px; padding: 0 16px; font-size: 0.9375rem; }
+
+/* Header */
+.site-head {
+  position: relative; z-index: 10;
+  background: var(--grain), var(--bg);
+}
+.head-row {
+  display: flex; flex-wrap: wrap; align-items: center;
+  column-gap: 20px;
+  min-height: 64px;
+}
+.brand {
+  margin-right: auto;
+  padding-block: 12px;
+  font-family: var(--font-display);
+  font-size: 1.1875rem;
+  line-height: 1.2;
+  color: var(--text);
+  text-decoration: none;
+}
+.brand:hover { color: var(--text); }
+.site-nav { order: 3; width: 100%; }
+.nav-links {
+  list-style: none; margin: 0 -12px; padding: 0;
+  display: flex; justify-content: space-between;
+}
+.nav-links a {
+  display: inline-flex; align-items: center;
+  min-height: 44px; padding: 0 12px;
+  border-radius: var(--radius-sm);
+  font-weight: 700; font-size: 0.9375rem;
+  color: var(--text); text-decoration: none;
+  transition: background-color 0.18s var(--ease-out);
+}
+.nav-links a:hover { background: var(--surface); color: var(--text); }
+.nav-links a:active { background: var(--line); }
+@media (min-width: 768px) {
+  .site-head { position: sticky; top: 0; border-bottom: 1px solid var(--line); }
+  .site-nav { order: 0; width: auto; }
+  .nav-links { margin: 0; gap: 4px; justify-content: flex-start; }
+  section[id] { scroll-margin-top: 80px; }
+}
+
+/* Hero */
+.hero { padding-top: 48px; }
+.hero h1 {
+  font-size: clamp(2.5rem, 1.2rem + 4.8vw, 5.25rem);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+}
+.hero-grid { display: grid; gap: 40px; margin-top: 32px; }
+.hero-copy .lede { font-size: 1.1875rem; max-width: 36ch; }
+.actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+.hero-note { margin-top: 14px; font-size: 0.9375rem; color: var(--muted); }
+@media (max-width: 479px) {
+  .actions .btn { flex: 1 1 100%; }
+}
+@media (min-width: 1024px) {
+  .hero { padding-top: 96px; }
+  .hero-grid { grid-template-columns: 5fr 7fr; gap: 56px; margin-top: 48px; align-items: start; }
+  .hero-copy { padding-top: 8px; }
+}
+
+/* Dashboard plate (the product artifact) */
+.dash {
+  position: relative; z-index: 2;
+  container-type: inline-size;
+  margin-bottom: calc(-1 * var(--overlap));
+  padding: 16px;
+  background: var(--plate);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+@media (min-width: 768px) { .dash { padding: 24px; } }
+.dash-bar {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: 10px 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+.dash-site { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+.dash-site strong { font-size: 1rem; }
+.dash-dates { font-size: 0.875rem; color: var(--muted); }
+.tag {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--muted);
+}
+.range {
+  display: none;
+  gap: 2px; padding: 3px;
+  border-radius: 13px;
+  background: var(--surface);
+}
+html.js .range { display: inline-flex; }
+.range button {
+  appearance: none; border: 0; background: transparent;
+  min-height: 40px; padding: 0 16px;
+  border-radius: var(--radius-sm);
+  font: 700 0.875rem/1 var(--font-body);
+  color: var(--muted);
+  cursor: pointer;
+  transition: background-color 0.16s var(--ease-out), color 0.16s var(--ease-out), transform 0.16s var(--ease-out);
+}
+.range button:hover { color: var(--text); background: color-mix(in oklch, var(--plate) 60%, transparent); }
+.range button:active { transform: scale(0.97); }
+.range button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.range button[aria-pressed="true"] {
+  background: var(--plate);
+  color: var(--accent);
+  box-shadow: 0 1px 2px color-mix(in oklch, var(--text) 16%, transparent);
+}
+.range button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.kpis {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+  border-bottom: 1px solid var(--line);
+}
+.kpis div { padding: 16px 12px 16px 0; }
+.kpis div:nth-child(even) { padding-left: 14px; border-left: 1px solid var(--line); }
+.kpis div:nth-child(-n + 2) { border-bottom: 1px solid var(--line); }
+.kpis dt { color: var(--muted); }
+.kpis dd {
+  margin: 6px 0 0;
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  line-height: 1.05;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+@container (min-width: 520px) {
+  .kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .kpis div:nth-child(-n + 2) { border-bottom: 0; }
+  .kpis div + div { padding-left: 14px; border-left: 1px solid var(--line); }
+  .kpis dd { font-size: 2rem; }
+}
+
+.chart { position: relative; height: 190px; margin-top: 20px; }
+.chart-axis {
+  position: absolute; inset: 0 0 28px 0;
+  display: flex; flex-direction: column; justify-content: space-between;
+}
+.chart-axis span {
+  display: flex; align-items: center; gap: 8px;
+  height: 0;
+  font-size: 0.75rem; color: var(--muted);
+  font-variant-numeric: lining-nums tabular-nums;
+}
+.chart-axis span::before { content: attr(data-v); width: 36px; text-align: right; }
+.chart-axis span::after { content: ""; flex: 1; border-top: 1px dashed var(--line); }
+.plot {
+  position: absolute; top: 0; left: 44px;
+  width: calc(100% - 44px); height: calc(100% - 28px);
+  overflow: visible;
+}
+.plot rect { fill: var(--bar); }
+.plot .plot-mark { fill: var(--secondary); }
+.ticks {
+  position: absolute; left: 44px; right: 0; bottom: 0; height: 28px;
+  display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr);
+  margin: 0; padding: 0; list-style: none;
+}
+.ticks li {
+  display: flex; justify-content: center;
+  padding-top: 8px;
+  font-size: 0.75rem; line-height: 1;
+  color: var(--muted);
+  white-space: nowrap;
+}
+@container (max-width: 479px) { .tick-date { display: none; } }
+.chart-empty {
+  position: absolute; inset: 0 0 28px 44px;
+  display: grid; place-items: center;
+  font-size: 0.9375rem; color: var(--muted); text-align: center;
+}
+.chart-empty[hidden] { display: none; }
+.chart-note {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 10px;
+  font-size: 0.8125rem; color: var(--muted);
+}
+.mark-key { flex: none; width: 9px; height: 9px; border-radius: 50%; background: var(--secondary); }
+
+.lists {
+  display: grid; gap: 22px 28px;
+  margin-top: 16px; padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+@container (min-width: 520px) { .lists { grid-template-columns: 1fr 1fr; } }
+.list-head { display: flex; justify-content: space-between; padding: 0 8px 8px; color: var(--muted); }
+.rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 3px; }
+.rows li {
+  position: relative; isolation: isolate;
+  display: flex; justify-content: space-between; gap: 12px;
+  padding: 4px 8px;
+  font-size: 0.9375rem;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+.row-fill { position: absolute; top: 0; left: 0; z-index: -1; width: 100%; height: 100%; }
+.row-fill rect { fill: var(--row-fill); }
+.row-label { min-width: 0; overflow-wrap: anywhere; }
+.row-num { flex: none; }
+
+/* Features catalog */
+.features {
+  background: var(--grain), var(--surface);
+  padding: calc(var(--overlap) + 64px) 0 96px;
+}
+.features-head { display: grid; gap: 16px; margin-bottom: 40px; }
+.features-head h2 { font-size: var(--h2); max-width: 18ch; }
+.features-head p { color: var(--muted); max-width: 50ch; }
+.spec {
+  display: grid; gap: 20px;
+  padding: 32px 0;
+  border-top: 1px solid var(--line-strong);
+}
+.spec h3 { font-size: clamp(1.5rem, 1.2rem + 0.9vw, 2rem); }
+.spec-copy p { margin-top: 12px; color: var(--muted); max-width: 42ch; }
+@media (min-width: 960px) {
+  .features { padding-top: calc(var(--overlap) + 96px); }
+  .features-head { grid-template-columns: 5fr 7fr; gap: 64px; align-items: end; margin-bottom: 56px; }
+  .spec { grid-template-columns: 5fr 7fr; gap: 64px; padding: 48px 0; }
+}
+.plate {
+  margin: 0;
+  padding: 16px;
+  background: var(--plate);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+@media (min-width: 768px) { .plate { padding: 24px; } }
+.plate > * + * { margin-top: 16px; }
+.code {
+  margin: 0;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font: 400 0.9375rem/1.6 var(--font-body);
+  color: var(--text);
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+.code code { font: inherit; }
+.code b { font-weight: 700; color: var(--text); }
+.empty-state { padding-top: 16px; border-top: 1px solid var(--line); }
+.empty-state strong { display: block; font-size: 1rem; }
+.empty-state p { margin-top: 4px; font-size: 0.9375rem; color: var(--muted); max-width: 52ch; }
+.chip {
+  display: inline-flex; align-items: center;
+  min-height: 34px; padding: 0 12px;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  font-weight: 700; font-size: 0.875rem;
+}
+.mini-kpis { display: flex; flex-wrap: wrap; gap: 12px 36px; margin: 0; }
+.mini-kpis dt { font-size: 0.8125rem; color: var(--muted); }
+.mini-kpis dd { margin: 2px 0 0; font-family: var(--font-display); font-size: 1.625rem; line-height: 1.1; font-variant-numeric: lining-nums tabular-nums; }
+.url { font-size: 0.875rem; color: var(--muted); overflow-wrap: anywhere; }
+.mini { width: 100%; border-collapse: collapse; font-size: 0.9375rem; font-variant-numeric: lining-nums tabular-nums; }
+.mini th { padding: 0 0 8px 12px; border-bottom: 1px solid var(--line); color: var(--muted); text-align: left; }
+.mini td { padding: 12px 0 12px 12px; border-bottom: 1px solid var(--line); overflow-wrap: break-word; }
+.mini th:first-child, .mini td:first-child { padding-left: 0; }
+.mini .num { text-align: right; white-space: nowrap; }
+.mini tr:last-child td { border-bottom: 0; }
+.plate-note { font-size: 0.875rem; color: var(--muted); }
+.email-meta {
+  display: grid; grid-template-columns: 76px 1fr; gap: 12px;
+  padding: 0 0 12px;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.9375rem;
+}
+.email-meta + .email-meta { margin-top: 10px; }
+.email-meta span { padding-top: 3px; color: var(--muted); }
+.email-body { display: grid; gap: 8px; font-size: 0.9375rem; }
+.email-body p { display: grid; grid-template-columns: 110px 1fr; gap: 12px; }
+.email-body b { font-weight: 700; }
+
+/* The Record: the one inversion band */
+.record {
+  background: var(--deep);
+  color: var(--on-deep);
+  padding: 96px 0;
+}
+@media (min-width: 960px) { .record { padding: 128px 0; } }
+.record-head { display: grid; gap: 18px; margin-bottom: 44px; }
+.record h2 { font-size: var(--h2); color: var(--on-deep); max-width: 16ch; }
+.record-head p { color: var(--on-deep-muted); max-width: 46ch; }
+@media (min-width: 960px) {
+  .record-head { grid-template-columns: 7fr 5fr; gap: 64px; align-items: end; margin-bottom: 56px; }
+}
+.glyphs {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+  border-top: 1px solid var(--rule-deep);
+  border-left: 1px solid var(--rule-deep);
+}
+@media (min-width: 960px) { .glyphs { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.glyph {
+  display: flex; flex-direction: column; gap: 14px;
+  min-height: 136px;
+  padding: 16px;
+  border-right: 1px solid var(--rule-deep);
+  border-bottom: 1px solid var(--rule-deep);
+}
+@media (min-width: 768px) { .glyph { min-height: 164px; padding: 24px; } }
+.glyph dt { color: var(--on-deep-muted); }
+.glyph dd { margin: 0; display: grid; gap: 12px; }
+.glyph-v {
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 0.95rem + 1.1vw, 1.875rem);
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+.glyph-n { font-size: 0.9375rem; line-height: 1.5; color: var(--on-deep-muted); max-width: 48ch; }
+.glyph-wide { grid-column: span 2; }
+.glyph-absent dt { color: var(--secondary); }
+.absent-list {
+  list-style: none; margin: 0; padding: 0;
+  display: flex; flex-wrap: wrap; gap: 6px 26px;
+}
+.absent-list li {
+  font-family: var(--font-display);
+  font-size: clamp(1.125rem, 0.95rem + 0.6vw, 1.5rem);
+  line-height: 1.3;
+  color: var(--on-deep-muted);
+  text-decoration: line-through;
+  text-decoration-color: var(--secondary);
+  text-decoration-thickness: 2px;
+}
+
+/* Pricing */
+.pricing { padding: 96px 0; }
+.pricing h2 { font-size: var(--h2); max-width: 20ch; }
+.pricing-grid { display: grid; gap: 48px; margin-top: 40px; }
+@media (min-width: 960px) {
+  .pricing { padding: 128px 0 96px; }
+  .pricing-grid { grid-template-columns: 7fr 5fr; gap: 72px; margin-top: 56px; align-items: start; }
+}
+.sizes { width: 100%; border-collapse: collapse; font-variant-numeric: lining-nums tabular-nums; }
+.sizes thead th {
+  padding: 0 0 12px 16px;
+  border-bottom: 1px solid var(--line-strong);
+  color: var(--muted);
+  text-align: right;
+  vertical-align: bottom;
+  text-wrap: balance;
+}
+.sizes thead th:first-child { padding-left: 0; text-align: left; }
+.sizes tbody th, .sizes td { border-bottom: 1px solid var(--line); }
+.sizes tbody th {
+  padding: 12px 0;
+  text-align: left;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-variant-numeric: lining-nums;
+  font-size: calc(1.125rem + var(--step, 0) * 0.15rem);
+  line-height: 1.15;
+}
+/* The size column steps up like a specimen waterfall: bigger traffic, bigger type. */
+.sizes tbody tr:nth-child(2) { --step: 1; }
+.sizes tbody tr:nth-child(3) { --step: 2; }
+.sizes tbody tr:nth-child(4) { --step: 3; }
+.sizes tbody tr:nth-child(5) { --step: 4; }
+.sizes tbody tr:nth-child(6) { --step: 5; }
+.sizes td {
+  padding: 12px 0 12px 16px;
+  text-align: right;
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  white-space: nowrap;
+}
+.terms dl { margin: 0; display: grid; gap: 20px; }
+.terms dt { color: var(--muted); }
+.terms dd { margin: 6px 0 0; max-width: 46ch; }
+.terms .btn { margin-top: 32px; }
+.fine { margin-top: 16px; font-size: 0.875rem; color: var(--muted); max-width: 52ch; }
+
+/* Colophon: ownership and support */
+.colophon {
+  background: var(--grain), var(--surface);
+  padding: 64px 0;
+}
+.colophon-list { margin: 0; display: grid; gap: 28px 48px; }
+@media (min-width: 640px) { .colophon-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { .colophon-list { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.colophon-list dt { color: var(--muted); }
+.colophon-list dd { margin: 8px 0 0; max-width: 40ch; }
+.contact {
+  display: flex; align-items: center;
+  width: fit-content; min-height: 44px;
+  font-weight: 700;
+}
+
+/* Footer */
+.site-foot { padding: 48px 0 32px; font-size: 0.9375rem; }
+.foot-grid { display: grid; gap: 20px 40px; }
+@media (min-width: 768px) { .foot-grid { grid-template-columns: 1.3fr 2fr 1fr; align-items: start; } }
+.foot-brand { font-family: var(--font-display); font-size: 1.1875rem; }
+.foot-grid p + p { margin-top: 4px; }
+.foot-sub { color: var(--muted); }
+.foot-links { list-style: none; margin: -12px 0 0; padding: 0; display: flex; flex-wrap: wrap; column-gap: 20px; }
+.foot-links a, .foot-contact a {
+  display: inline-flex; align-items: center; min-height: 44px;
+  color: var(--text);
+}
+.foot-links a:hover, .foot-contact a:hover { color: var(--accent); }
+.foot-contact { margin-top: -12px; }
+
+/* Motion: hero rise, dashboard refresh, button feedback */
+@media (prefers-reduced-motion: no-preference) {
+  .rise { animation: rise 0.5s var(--ease-out) both; }
+  .rise-2 { animation-delay: 40ms; }
+  .rise-3 { animation-delay: 80ms; }
+  .rise-4 { animation-delay: 120ms; }
+  @keyframes rise { from { opacity: 0; transform: translateY(12px); } }
+  .dash.is-fresh .plot,
+  .dash.is-fresh .kpis dd,
+  .dash.is-fresh .rows { animation: refresh 0.16s var(--ease-out); }
+  @keyframes refresh { from { opacity: 0.2; } }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-head">
+  <div class="wrap head-row">
+    <a class="brand" href="#top">Northstar Signal</a>
+    <nav class="site-nav" aria-label="Main">
+      <ul class="nav-links">
+        <li><a href="#product">Product</a></li>
+        <li><a href="#record">Privacy</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#support">Support</a></li>
+      </ul>
+    </nav>
+    <a class="btn btn-primary btn-sm" href="/signup">Start a free trial</a>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero" id="top" aria-labelledby="hero-title">
+    <div class="wrap">
+      <h1 class="rise" id="hero-title">Web analytics that forgets your visitors at midnight.</h1>
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <p class="lede rise rise-2">Northstar Signal shows a small software team which pages, referrers and campaigns lead to trial signups, without cookies and without storing a single IP address.</p>
+          <div class="actions rise rise-3">
+            <a class="btn btn-primary" href="/signup">Start a free trial</a>
+            <a class="btn btn-quiet" href="#record">See what we store</a>
+          </div>
+          <p class="hero-note rise rise-3">30 days free. No card required.</p>
+        </div>
+
+        <div class="dash rise rise-4" id="demo" role="region" aria-label="Sample dashboard for the demo site example.com">
+          <div class="dash-bar">
+            <p class="dash-site"><strong>example.com</strong> <span class="tag">Sample data</span></p>
+            <p class="dash-dates" data-range-label>14 to 20 Sep 2026</p>
+            <div class="range" role="group" aria-label="Date range">
+              <button type="button" aria-pressed="true" data-range="7">7 days</button>
+              <button type="button" aria-pressed="false" data-range="30">30 days</button>
+            </div>
+          </div>
+          <p class="sr-only" aria-live="polite" data-live></p>
+
+          <dl class="kpis">
+            <div><dt>Visitors</dt><dd data-kpi="visitors">4,812</dd></div>
+            <div><dt>Pageviews</dt><dd data-kpi="pageviews">11,960</dd></div>
+            <div><dt>Trial starts</dt><dd data-kpi="trials">87</dd></div>
+            <div><dt>Conversion</dt><dd data-kpi="rate">1.8%</dd></div>
+          </dl>
+
+          <div class="chart" role="img" aria-label="Visitors per day from Monday 14 to Sunday 20 September: 812, 904, 1,021, 766, 598, 311 and 400.">
+            <div class="chart-axis" aria-hidden="true"><span data-v="1,200"></span><span data-v="800"></span><span data-v="400"></span><span data-v="0"></span></div>
+            <svg class="plot" aria-hidden="true" focusable="false">
+              <rect x="2.57%" y="32.33%" width="9.14%" height="67.67%" rx="3"/>
+              <rect x="16.86%" y="24.67%" width="9.14%" height="75.33%" rx="3"/>
+              <rect x="31.14%" y="14.92%" width="9.14%" height="85.08%" rx="3"/>
+              <rect x="45.43%" y="36.17%" width="9.14%" height="63.83%" rx="3"/>
+              <rect x="59.71%" y="50.17%" width="9.14%" height="49.83%" rx="3"/>
+              <rect x="74.00%" y="74.08%" width="9.14%" height="25.92%" rx="3"/>
+              <rect x="88.29%" y="66.67%" width="9.14%" height="33.33%" rx="3"/>
+              <circle class="plot-mark" cx="35.71%" cy="9.92%" r="4.5"/>
+            </svg>
+            <ol class="ticks" aria-hidden="true">
+              <li>Mon<span class="tick-date">&nbsp;14</span></li>
+              <li>Tue<span class="tick-date">&nbsp;15</span></li>
+              <li>Wed<span class="tick-date">&nbsp;16</span></li>
+              <li>Thu<span class="tick-date">&nbsp;17</span></li>
+              <li>Fri<span class="tick-date">&nbsp;18</span></li>
+              <li>Sat<span class="tick-date">&nbsp;19</span></li>
+              <li>Sun<span class="tick-date">&nbsp;20</span></li>
+            </ol>
+            <p class="chart-empty" data-empty hidden>No pageviews in this range yet. Choose a longer range, or check that the tag is on your pages.</p>
+          </div>
+          <p class="chart-note"><span class="mark-key" aria-hidden="true"></span>Team note on Wed 16 Sep: launch post published</p>
+
+          <div class="lists">
+            <div class="list">
+              <p class="list-head"><span>Top pages</span><span>Visitors</span></p>
+              <ol class="rows" data-list="pages">
+                <li><svg class="row-fill" aria-hidden="true" focusable="false"><rect width="100.00%" height="100%" rx="6"/></svg><span class="row-label">/</span><span class="row-num">2,904</span></li>
+                <li><svg class="row-fill" aria-hidden="true" focusable="false"><rect width="51.24%" height="100%" rx="6"/></svg><span class="row-label">/pricing</span><span class="row-num">1,488</span></li>
+                <li><svg class="row-fill" aria-hidden="true" focusable="false"><rect width="31.10%" height="100%" rx="6"/></svg><span class="row-label">/docs/install</span><span class="row-num">903</span></li>
+                <li><svg class="row-fill" aria-hidden="true" focusable="false"><rect width="21.04%" height="100%" rx="6"/></svg><span class="row-label">/blog/no-cookies</span><span class="row-num">611</span></li>
+                <li><svg class="row-fill" aria-hidden="true" focusable="false"><rect width="11.78%" height="100%" rx="6"/></svg><span class="row-label">/changelog</span><span class="row-num">342</span></li>
+              </ol>
+            </div>
+            <div class="list">
+              <p class="list-head"><span>Top referrers</span><span>Visitors</span></p>
+              <ol class="rows" data-list="refs">
+                <li><svg class="row-fill" aria-hidden="true" focusable="false"><rect width="100.00%" height="100%" rx="6"/></svg><span class="row-label">Direct</span><span class="row-num">1,610</span></li>
+                <li><svg class="row-fill" aria-hidden="true" focusable="false"><rect width="69.69%" height="100%" rx="6"/></svg><span class="row-label">news.ycombinator.com</span><span class="row-num">1,122</span></li>
+                <li><svg class="row-fill" aria-hidden="true" focusable="false"><rect width="56.15%" height="100%" rx="6"/></svg><span class="row-label">google.com</span><span class="row-num">904</span></li>
+                <li><svg class="row-fill" aria-hidden="true" focusable="false"><rect width="30.31%" height="100%" rx="6"/></svg><span class="row-label">github.com</span><span class="row-num">488</span></li>
+                <li><svg class="row-fill" aria-hidden="true" focusable="false"><rect width="19.38%" height="100%" rx="6"/></svg><span class="row-label">Newsletter</span><span class="row-num">312</span></li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="features" id="product" aria-labelledby="product-title">
+    <div class="wrap">
+      <div class="features-head">
+        <h2 id="product-title">What your team sees after adding one script tag</h2>
+        <p>Every figure in these panels, and in the dashboard above, is sample data from a demo site, example.com.</p>
+      </div>
+
+      <article class="spec">
+        <div class="spec-copy">
+          <h3>Install with one tag</h3>
+          <p>Paste the tag into the head of your site. It sets no cookies and writes nothing to the visitor's device. Until the first pageview arrives, the dashboard tells you what to check.</p>
+        </div>
+        <figure class="plate">
+          <pre class="code"><code>&lt;script defer
+  <b>data-site="example.com"</b>
+  src="https://<wbr>cdn.northstarsignal.com/<wbr>signal.js"&gt;&lt;/script&gt;</code></pre>
+          <div class="empty-state">
+            <strong>No pageviews yet</strong>
+            <p>Load any page on example.com with the tag in place. If nothing shows up, check that data-site matches your domain exactly.</p>
+          </div>
+        </figure>
+      </article>
+
+      <article class="spec">
+        <div class="spec-copy">
+          <h3>Filter by clicking</h3>
+          <p>Click a page, referrer, country or campaign and every number on the dashboard narrows to it. The filter is part of the URL, so sending the link sends the exact view.</p>
+        </div>
+        <figure class="plate">
+          <span class="chip">Referrer is github.com</span>
+          <dl class="mini-kpis">
+            <div><dt>Visitors</dt><dd>488</dd></div>
+            <div><dt>Pageviews</dt><dd>1,204</dd></div>
+            <div><dt>Trial starts</dt><dd>19</dd></div>
+          </dl>
+          <p class="url">app.northstarsignal.com/example.com?referrer=github.com&amp;period=7d</p>
+        </figure>
+      </article>
+
+      <article class="spec">
+        <div class="spec-copy">
+          <h3>Count trial starts as goals</h3>
+          <p>Call one function from your app when a visitor starts a trial, or reaches any other step you want counted. Each goal shows how many visitors converted and the page they most often entered on.</p>
+        </div>
+        <figure class="plate">
+          <pre class="code"><code>northstar('goal', <b>'trial_started'</b>)</code></pre>
+          <table class="mini">
+            <thead><tr><th scope="col">Goal</th><th scope="col" class="num">Conversions</th><th scope="col" class="num">Rate</th></tr></thead>
+            <tbody><tr><td>trial_started</td><td class="num">87</td><td class="num">1.8%</td></tr></tbody>
+          </table>
+          <p class="plate-note">Most common entry page before trial_started: /pricing, 41% of conversions</p>
+        </figure>
+      </article>
+
+      <article class="spec">
+        <div class="spec-copy">
+          <h3>Campaigns from your UTM tags</h3>
+          <p>Links tagged with utm_source and utm_campaign get their own rows, with visitors and trial starts side by side. There is nothing to set up.</p>
+        </div>
+        <figure class="plate">
+          <table class="mini">
+            <thead><tr><th scope="col">Source</th><th scope="col">Campaign</th><th scope="col" class="num">Visitors</th><th scope="col" class="num">Trials</th></tr></thead>
+            <tbody>
+              <tr><td>newsletter</td><td>sept-digest</td><td class="num">312</td><td class="num">9</td></tr>
+              <tr><td>github</td><td>readme-badge</td><td class="num">205</td><td class="num">6</td></tr>
+              <tr><td>social</td><td>launch-thread</td><td class="num">148</td><td class="num">3</td></tr>
+            </tbody>
+          </table>
+        </figure>
+      </article>
+
+      <article class="spec">
+        <div class="spec-copy">
+          <h3>The Monday email</h3>
+          <p>Each teammate can opt in to a plain-text summary at 08:00 in their own time zone, with the week's totals and the source that moved most.</p>
+        </div>
+        <figure class="plate">
+          <p class="email-meta"><span>From</span>Northstar Signal</p>
+          <p class="email-meta"><span>Subject</span>example.com, week 38: 4,812 visitors, 87 trial starts</p>
+          <div class="email-body">
+            <p><b>Visitors</b><span>4,812, up 16% on week 37</span></p>
+            <p><b>Trial starts</b><span>87, 1.8% of visitors</span></p>
+            <p><b>Biggest mover</b><span>github.com, 488 visitors, up from 206</span></p>
+          </div>
+        </figure>
+      </article>
+    </div>
+  </section>
+
+  <section class="record" id="record" aria-labelledby="record-title">
+    <div class="wrap">
+      <div class="record-head">
+        <h2 id="record-title">The complete record of one pageview</h2>
+        <p>Northstar Signal stores nine fields for each pageview, shown here with sample values. Only the visitor field can connect one pageview to the next, and it stops working at midnight.</p>
+      </div>
+      <dl class="glyphs">
+        <div class="glyph"><dt>Page</dt><dd><span class="glyph-v">/pricing</span></dd></div>
+        <div class="glyph"><dt>Referrer</dt><dd><span class="glyph-v">github.com</span></dd></div>
+        <div class="glyph"><dt>Campaign</dt><dd><span class="glyph-v">readme-badge</span></dd></div>
+        <div class="glyph"><dt>Time</dt><dd><span class="glyph-v">16 Sep, 08:14 UTC</span></dd></div>
+        <div class="glyph"><dt>Country</dt><dd><span class="glyph-v">Germany</span><span class="glyph-n">Looked up from the IP address, which is then discarded.</span></dd></div>
+        <div class="glyph"><dt>Device</dt><dd><span class="glyph-v">Desktop</span></dd></div>
+        <div class="glyph"><dt>Browser</dt><dd><span class="glyph-v">Firefox 131</span></dd></div>
+        <div class="glyph"><dt>Operating system</dt><dd><span class="glyph-v">macOS</span></dd></div>
+        <div class="glyph glyph-wide"><dt>Visitor</dt><dd><span class="glyph-v">5c1e 0b9a 7f24</span><span class="glyph-n">A hash of the IP address, browser and site, mixed with a salt that changes every day. Each salt is deleted at 00:00 UTC, after which nobody, including us, can connect that day's visits to the next day's.</span></dd></div>
+        <div class="glyph glyph-wide glyph-absent"><dt>Never recorded</dt><dd>
+          <ul class="absent-list">
+            <li>IP address</li>
+            <li>Cookies or local storage</li>
+            <li>Device fingerprint</li>
+            <li>Name, email or account ID</li>
+          </ul>
+        </dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="pricing" id="pricing" aria-labelledby="pricing-title">
+    <div class="wrap">
+      <h2 id="pricing-title">Priced by pageviews, with every feature at every size</h2>
+      <div class="pricing-grid">
+        <table class="sizes">
+          <caption class="sr-only">Price by monthly pageviews, in US dollars</caption>
+          <thead>
+            <tr><th scope="col">Pageviews a month, up to</th><th scope="col">Monthly</th><th scope="col">Yearly</th></tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">10,000</th><td>$9</td><td>$90</td></tr>
+            <tr><th scope="row">50,000</th><td>$19</td><td>$190</td></tr>
+            <tr><th scope="row">100,000</th><td>$29</td><td>$290</td></tr>
+            <tr><th scope="row">250,000</th><td>$49</td><td>$490</td></tr>
+            <tr><th scope="row">500,000</th><td>$69</td><td>$690</td></tr>
+            <tr><th scope="row">1,000,000</th><td>$99</td><td>$990</td></tr>
+          </tbody>
+        </table>
+        <div class="terms">
+          <dl>
+            <div><dt>Every size includes</dt><dd>Unlimited sites and teammates, goals, campaigns, the Monday email, CSV export and the stats API.</dd></div>
+            <div><dt>Free trial</dt><dd>30 days with no card. When it ends, choose a size. If you don't, recording pauses and your data is kept for 60 days.</dd></div>
+            <div><dt>Going over</dt><dd>Pass your size two months in a row and we email you before moving you up at the next renewal. Counting never stops mid-month.</dd></div>
+            <div><dt>Cancelling</dt><dd>Cancel from the Billing page at any time. Access runs to the end of the period you paid for.</dd></div>
+          </dl>
+          <a class="btn btn-primary" href="/signup">Start a free trial</a>
+          <p class="fine">Prices in US dollars, before VAT. Yearly billing costs ten months' price. Above 1,000,000 pageviews, add $10 for each extra 100,000.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="colophon" id="support" aria-label="Data ownership and support">
+    <div class="wrap">
+      <dl class="colophon-list">
+        <div><dt>Who owns the data</dt><dd>Your team does. We process it only to draw your dashboard and send your reports, and we never sell it, share it, or use it to train models.</dd></div>
+        <div><dt>Export</dt><dd>Download raw pageviews as CSV from Settings, or read them through the stats API, at every size and during the trial.</dd></div>
+        <div><dt>Deletion</dt><dd>Deleting a site removes its data from the live database at once and from backups within 30 days.</dd></div>
+        <div><dt>Where it is stored</dt><dd>On servers in Frankfurt, Germany. Your data is not transferred outside the EU.</dd></div>
+        <div><dt>Processing agreement</dt><dd>A data processing agreement comes with every account. Download it from Settings; there is nothing to request.</dd></div>
+        <div><dt>Support</dt><dd>The engineers who build Northstar Signal answer email on weekdays, within one business day.<a class="contact" href="mailto:support@northstarsignal.com">support@northstarsignal.com</a></dd></div>
+      </dl>
+    </div>
+  </section>
+</main>
+
+<footer class="site-foot">
+  <div class="wrap foot-grid">
+    <div>
+      <p class="foot-brand">Northstar Signal</p>
+      <p class="foot-sub">Cookieless web analytics for small software teams.</p>
+    </div>
+    <nav aria-label="Resources and legal">
+      <ul class="foot-links">
+        <li><a href="/docs">Documentation</a></li>
+        <li><a href="/status">Status</a></li>
+        <li><a href="/privacy">Privacy policy</a></li>
+        <li><a href="/terms">Terms of service</a></li>
+        <li><a href="/dpa">Data processing agreement</a></li>
+      </ul>
+    </nav>
+    <div>
+      <p class="foot-contact"><a href="mailto:support@northstarsignal.com">support@northstarsignal.com</a></p>
+      <p class="foot-sub">&copy; 2026 Northstar Signal</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(() => {
+  const dash = document.getElementById('demo');
+  if (!dash) return;
+
+  const nf = new Intl.NumberFormat('en-US');
+  const MAX = 1200;
+  const monthTicks = { 2: '24 Aug', 9: '31 Aug', 16: '7 Sep', 23: '14 Sep' };
+  const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+  // Sample data for the demo site example.com. Totals are derived from the daily values.
+  const DATA = {
+    7: {
+      dates: '14 to 20 Sep 2026',
+      spoken: 'Monday 14 to Sunday 20 September',
+      days: [812, 904, 1021, 766, 598, 311, 400],
+      ticks: weekdays.map((d, i) => d + '<span class="tick-date">&nbsp;' + (14 + i) + '</span>'),
+      mark: 2,
+      pageviews: 11960,
+      trials: 87,
+      pages: [['/', 2904], ['/pricing', 1488], ['/docs/install', 903], ['/blog/no-cookies', 611], ['/changelog', 342]],
+      refs: [['Direct', 1610], ['news.ycombinator.com', 1122], ['google.com', 904], ['github.com', 488], ['Newsletter', 312]]
+    },
+    30: {
+      dates: '22 Aug to 20 Sep 2026',
+      spoken: '22 August to 20 September',
+      days: [290, 335, 640, 702, 688, 655, 540, 301, 352, 671, 734, 709, 690, 566, 298, 360, 702, 748, 731, 705, 571, 305, 371, 812, 904, 1021, 766, 598, 311, 400],
+      ticks: Array.from({ length: 30 }, (_, i) => monthTicks[i] || ''),
+      mark: 25,
+      pageviews: 42986,
+      trials: 280,
+      pages: [['/', 10420], ['/pricing', 5212], ['/docs/install', 3380], ['/blog/no-cookies', 2105], ['/changelog', 1288]],
+      refs: [['Direct', 6050], ['google.com', 3610], ['github.com', 1402], ['news.ycombinator.com', 1190], ['Newsletter', 1030]]
+    }
+  };
+
+  const plotEl = dash.querySelector('.plot');
+  const ticksEl = dash.querySelector('.ticks');
+  const chart = dash.querySelector('.chart');
+  const empty = dash.querySelector('[data-empty]');
+  const live = dash.querySelector('[data-live]');
+  const label = dash.querySelector('[data-range-label]');
+  const kpi = (k) => dash.querySelector('[data-kpi="' + k + '"]');
+  const buttons = dash.querySelectorAll('[data-range]');
+
+  const pct = (x) => x.toFixed(2) + '%';
+
+  const rows = (list) => {
+    const top = list[0][1];
+    return list.map(([k, v]) =>
+      '<li><svg class="row-fill" aria-hidden="true" focusable="false"><rect width="' + pct(v / top * 100) +
+      '" height="100%" rx="6"/></svg><span class="row-label">' + k +
+      '</span><span class="row-num">' + nf.format(v) + '</span></li>').join('');
+  };
+
+  // Bars are drawn in percentages of the plot, so they stay crisp at any width.
+  const plot = (r) => {
+    const n = r.days.length;
+    const slot = 100 / n;
+    const w = slot * (n <= 7 ? 0.64 : 0.78);
+    const off = (slot - w) / 2;
+    const rx = n <= 7 ? 3 : 1.5;
+    let out = r.days.map((v, i) => {
+      const h = v / MAX * 100;
+      return '<rect x="' + pct(i * slot + off) + '" y="' + pct(100 - h) + '" width="' + pct(w) +
+        '" height="' + pct(h) + '" rx="' + rx + '"/>';
+    }).join('');
+    if (r.mark !== null) {
+      const h = r.days[r.mark] / MAX * 100;
+      out += '<circle class="plot-mark" cx="' + pct((r.mark + 0.5) * slot) + '" cy="' + pct(100 - h - 5) + '" r="4.5"/>';
+    }
+    plotEl.innerHTML = out;
+    ticksEl.innerHTML = r.ticks.map((t) => '<li>' + t + '</li>').join('');
+  };
+
+  function render(key) {
+    const r = DATA[key];
+    label.textContent = r.dates;
+
+    if (!r.days.length) {
+      plotEl.innerHTML = '';
+      ticksEl.innerHTML = '';
+      empty.hidden = false;
+      chart.setAttribute('aria-label', 'No pageviews recorded from ' + r.spoken + '.');
+      live.textContent = 'No pageviews in this range.';
+      return;
+    }
+    empty.hidden = true;
+
+    const visitors = r.days.reduce((a, b) => a + b, 0);
+    kpi('visitors').textContent = nf.format(visitors);
+    kpi('pageviews').textContent = nf.format(r.pageviews);
+    kpi('trials').textContent = nf.format(r.trials);
+    kpi('rate').textContent = (r.trials / visitors * 100).toFixed(1) + '%';
+
+    plot(r);
+    chart.setAttribute('aria-label', 'Visitors per day from ' + r.spoken + ', ' + nf.format(visitors) +
+      ' in total. The busiest day had ' + nf.format(Math.max(...r.days)) + ' visitors, on the day of the launch post.');
+
+    dash.querySelector('[data-list="pages"]').innerHTML = rows(r.pages);
+    dash.querySelector('[data-list="refs"]').innerHTML = rows(r.refs);
+
+    dash.classList.remove('is-fresh');
+    void dash.offsetWidth;
+    dash.classList.add('is-fresh');
+    live.textContent = 'Showing sample data from ' + r.spoken + '.';
+  }
+
+  buttons.forEach((btn) => btn.addEventListener('click', () => {
+    if (btn.getAttribute('aria-pressed') === 'true') return;
+    buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+    render(btn.dataset.range);
+  }));
+})();
+</script>
+</body>
+</html>

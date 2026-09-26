@@ -36,7 +36,7 @@ Take the first that applies.
 - One hero composition: one headline, one supporting sentence, one action group, one dominant visual.
 - Interactive elements get hover, focus-visible, active, and disabled states; data-driven parts get empty, error, and loading states.
 - Motion: at most 3 intentional motions, transform and opacity only. Read `references/motion.md` before any entrance or scroll animation.
-- Copy names the concrete thing: labels say what happens, errors say what failed and what to do next, claims name a mechanism, result, or source. Never invent metrics, testimonials, logos, people, or company names; label sample data as sample. For copy-heavy marketing pages, run `references/copy.md`.
+- Copy names the concrete thing: labels say what happens, errors say what failed and what to do next, claims name a mechanism, result, or source. Never invent metrics, testimonials, logos, people, or company names; label sample data as sample, and label prices and terms the brief did not supply as placeholders. For copy-heavy marketing pages, run `references/copy.md`.
 - Images only when the structure, the row, or the brief calls for pixels: `references/imagery.md` (generated through the Codex CLI).
 
 ## Banned (each with its replacement)
@@ -65,7 +65,7 @@ A page that has not passed the gate is not done.
 1. **Sweep**: `node <root>/scripts/sweep.mjs <build>` reads source only. Fix every failure until it exits 0, then read each advisory against the lock and fix it or justify it in a line. A waiver comment (`goddesign-allow: <rule> <reason>`) is legal only against a lock line; rows 13 and 16 state theirs.
 2. **Audit**: `node <root>/scripts/audit.mjs index.html` (or the local URL) renders at 375, 768, and 1280 and names overflow, text collisions, hidden text, small targets, and fallen-back fonts. Fix only what it names, lock frozen, at most 3 cycles.
 3. **Look** at `audit-1280.png` and `audit-375.png`: the signature, the product artifact, and the atmosphere are visible, and nothing is occluded, clipped, or blank. Neither script sees a section painted over a button.
-4. **Lock check**: rendered fonts and colors match the lock; the macrostructure reads; the four grammar breaks shipped; accent stays on interactive and state elements; nothing is invented; the page says who is behind it, how to reach them, and the terms.
+4. **Lock check**: rendered fonts and colors match the lock; the macrostructure reads; the four grammar breaks shipped; accent stays on interactive and state elements; nothing is invented; the page says who is behind it, how to reach them, and the terms, marked as placeholders where the brief gave none.
 
 If a script cannot run, try the fallbacks in `references/checklist.md` (the audit has a renderer chain); if they fail too, write `DEGRADED: no sweep (<reason>)` or `DEGRADED: no visual check (<reason>)` with the failed command, and check the same things by reading the code. Never report a pass you did not measure. On request, `sh <root>/scripts/blind-read.sh audit-1280.png audit-375.png` gets a read from a separate process that sees only the pixels.
 

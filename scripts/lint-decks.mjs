@@ -237,6 +237,8 @@ check("the seven-axis self-critique stays retired",
   !/Score your build 1-5 on each of the seven axes/.test(checklist) && !/seven-axis self-critique \(every score/.test(skill));
 check("the blind read is opt-in and reads the files the audit writes",
   checklist.includes("Blind read, on request") && checklist.includes("blind-read.sh audit-1280.png audit-375.png"));
+check("SKILL.md keeps the placeholder rule for prices and terms the brief did not supply",
+  skill.includes("label prices and terms the brief did not supply as placeholders"));
 check("pick.mjs passes its own install check",
   execFileSync(process.execPath, ["skills/goddesign/scripts/pick.mjs", "--check"], { encoding: "utf8" }).includes("install OK"));
 
