@@ -4,6 +4,7 @@
 // Zero dependencies; reads files relative to the repo root.
 
 import { existsSync, readFileSync } from "node:fs";
+import { hexToOklch, parseDirections } from "../skills/goddesign/scripts/pick.mjs";
 
 const fail = [];
 const ok = [];
@@ -31,19 +32,18 @@ check("layouts deck has 12 rows", layoutRows === 12, `found ${layoutRows}`);
 check("palettes deck has 10 rows", paletteRows === 10, `found ${paletteRows}`);
 check("fonts deck has 12 rows", fontRows === 12, `found ${fontRows}`);
 
-// 2. Seed moduli in SKILL.md match measured deck sizes.
+// 2. The no-node fallback in SKILL.md is the only place a modulus is written
+// down; pick.mjs reads deck sizes from the decks, so it cannot drift.
 const sizes = [dirRows.length, layoutRows, paletteRows, fontRows];
-const seedLine = skill.split("\n").find((l) => l.includes("direction=$(("));
 const fbLine = skill.split("\n").find((l) => l.includes("direction = N %"));
 const moduliOf = (line) => [...line.matchAll(/% (\d+)/g)].map((m) => +m[1]).slice(0, 4);
-for (const [label, line] of [["shell seed", seedLine], ["no-shell fallback", fbLine]]) {
-  check(`${label} moduli match deck sizes [${sizes}]`,
-    line && JSON.stringify(moduliOf(line)) === JSON.stringify(sizes),
-    line ? `found [${moduliOf(line)}]` : "line not found");
-}
+check(`no-node fallback moduli match deck sizes [${sizes}]`,
+  fbLine && JSON.stringify(moduliOf(fbLine)) === JSON.stringify(sizes),
+  fbLine ? `found [${moduliOf(fbLine)}]` : "line not found");
 
 // 3. Every Banned bullet has an INSTEAD and a [fingerprint]/[craft] tag.
-const banned = skill.slice(skill.indexOf("## Banned"), skill.indexOf("## Step 5"));
+const bannedStart = skill.indexOf("## Banned");
+const banned = skill.slice(bannedStart, skill.indexOf("\n## ", bannedStart + 1));
 const bullets = banned.split("\n").filter((l) => l.startsWith("- "));
 check("banned list is non-empty", bullets.length >= 10, `found ${bullets.length}`);
 bullets.forEach((b, i) => {
@@ -54,7 +54,7 @@ bullets.forEach((b, i) => {
 
 // 4. Every direction row is a complete package.
 const chunks = directions.split(/^## \d+\. /gm).slice(1);
-const fields = ["- Colors:", "- Type:", "- Import:", "Radius:", "- Background:", "- Signature:", "- Motion:"];
+const fields = ["- Colors:", "- Type:", "- Class: display=", "- Import:", "Radius:", "- Background:", "- Signature:", "- Motion:"];
 chunks.forEach((c, i) => {
   for (const f of fields)
     check(`direction row ${i} has "${f}"`, c.includes(f));
@@ -74,9 +74,9 @@ check("two newest genome rows do not share a vantage",
 const checklist = read("skills/goddesign/references/checklist.md");
 const verifyInstall = read("skills/goddesign/scripts/verify-install.sh");
 check("single-host completion is the default",
-  skill.includes("One capable host is the default and is a complete setup"));
+  skill.includes("One host is a complete setup"));
 check("cross-host work requires prompt opt-in",
-  skill.includes("Use multiple hosts only when the user's brief explicitly asks"));
+  skill.includes("never launch a second host unless the brief asks for a cross-host comparison"));
 check("missing a second host does not change QA",
   checklist.includes("A missing second host never changes the design score"));
 
@@ -85,20 +85,20 @@ check("missing a second host does not change QA",
 const provenance = read("skills/goddesign/references/provenance-hygiene.md");
 const provenanceAdapter = read("skills/goddesign/scripts/provenance-hygiene.sh");
 check("provenance hygiene requires explicit prompt scope",
-  skill.includes("Provenance hygiene is prompt-specified too") &&
+  /references\/provenance-hygiene\.md`: only when the brief explicitly asks/.test(skill) &&
   provenance.includes("only\nwhen the user's prompt explicitly asks"));
 check("ordinary design does not depend on provenance hygiene",
   provenance.includes("A normal goddesign run never invokes it, never depends on it"));
 check("missing provenance companion does not change design QA",
-  skill.includes("without a `DEGRADED` label or score deduction") &&
+  provenance.includes("Do not call the design run degraded,\nlower its score") &&
   provenanceAdapter.includes("The design QA score is unchanged"));
 check("provenance hygiene runs after the design gate",
-  skill.includes("never runs before the normal gate passes") &&
+  skill.includes("and only after the gate passes") &&
   provenance.includes("Run this only after the page has passed the normal goddesign gate"));
 check("provenance hygiene never mutates validation evidence",
   provenance.includes("Never clean `validation/`, frozen study inputs, receipts, manifests"));
 check("lossy provenance work forces a fresh full gate",
-  skill.includes("A statistical rewrite or pixel-regeneration pass changes the artifact and invalidates the old render"));
+  provenance.includes("Statistical rewrite or pixel regeneration: re-run the full goddesign gate"));
 check("provenance adapter exposes every documented operation",
   ["inspect-file", "clean-file", "inspect-image", "clean-image", "rewrite-text", "audit-dir", "audit-site"]
     .every((operation) => provenanceAdapter.includes(operation)));
@@ -114,8 +114,11 @@ check("provenance evaluation record is retained",
 const copy = read("skills/goddesign/references/copy.md");
 check("verify-install.sh requires references/copy.md",
   /required="[^"]*references\/copy\.md/.test(verifyInstall));
-check("SKILL.md routes visible copy through copy.md before the gate",
-  skill.includes("read `references/copy.md` and run its four-pass review before Step 5"));
+const fullLane = read("skills/goddesign/references/full-lane.md");
+check("full-lane.md routes visible copy through copy.md before the gate",
+  fullLane.includes("read `copy.md` and run its four-pass review before the gate"));
+check("SKILL.md routes copy-heavy marketing pages through copy.md",
+  skill.includes("For copy-heavy marketing pages, run `references/copy.md`"));
 check("SKILL.md reference index lists copy.md",
   /^- `references\/copy\.md`:/m.test(skill));
 check("copy.md separates transactional and marketing modes",
@@ -156,10 +159,15 @@ for (const s of mapSections)
 
 // The three inversions are the whole point of the map; each is stated where the
 // single-run rule it overrides lives, not only in the deck.
-check("SKILL.md states the ledger inversion under a map",
-  skill.includes("Under a design map (Step 0 item 3) these rules run **once, at charting**"));
-check("SKILL.md forbids re-rolling the seed inside a map",
-  skill.includes("Never re-roll the seed, re-jitter the tokens"));
+const pick = read("skills/goddesign/scripts/pick.mjs");
+check("map.md states the ledger inversion under a map",
+  map.includes("Applies at charting only. Inside the map, surfaces must **match** the System lock."));
+check("map.md forbids re-rolling the seed inside a map",
+  map.includes("Inherit the System lock verbatim.** Do not roll a seed. Do not re-jitter."));
+check("pick.mjs refuses to roll once the map's System lock has a seed",
+  pick.includes("Do not roll: inherit that lock verbatim"));
+check("pick.mjs refuses a per-surface ledger entry under a map",
+  pick.includes("A map writes one ledger entry, only when its last surface locks"));
 check("checklist.md persists one ledger entry per map, not per surface",
   checklist.includes("A map is one effort, so it is **one** ledger entry, not one per surface"));
 
@@ -203,13 +211,61 @@ check("SKILL.md Step 5 names the no-sweep degraded state",
 // Install integrity: the deck-row-to-modulus contract is checked by this script
 // for the maintainer, and lint-decks never ships inside skills/goddesign/, so
 // verify-install.sh has to carry the same check for everyone who installs it.
-check("verify-install.sh checks deck row counts against the seed moduli",
-  verifyInstall.includes("direction=$((") && /INCOMPLETE INSTALL: references\/\$1 has \$found rows/.test(verifyInstall));
+check("verify-install.sh checks deck row counts against the fallback moduli",
+  verifyInstall.includes("direction = N %") && /INCOMPLETE INSTALL: references\/\$1 has \$found rows/.test(verifyInstall));
 check("verify-install.sh greps the moduli rather than hardcoding them",
   /grep -oE '% \[0-9\]\+'/.test(verifyInstall));
 
+// 10. The v2.0.0 lean core. SKILL.md is what every run pays for, so its size
+// is a budget, not an accident; the per-run rituals v2.0.0 removed must not
+// drift back in; and each lane and the picker stay wired.
+const SKILL_BUDGET_BYTES = 13000;
+const skillBytes = Buffer.byteLength(skill, "utf8");
+check(`SKILL.md stays inside its ${SKILL_BUDGET_BYTES}-byte budget (v1.8.0 was 35760)`,
+  skillBytes <= SKILL_BUDGET_BYTES, `found ${skillBytes} bytes`);
+check("SKILL.md routes the full path through pick.mjs",
+  skill.includes("node <root>/scripts/pick.mjs"));
+check("SKILL.md routes literal and smaller models to full-lane.md",
+  skill.includes("also read `references/full-lane.md` before building"));
+check("verify-install.sh requires full-lane.md and pick.mjs",
+  /required="[^"]*references\/full-lane\.md[^"]*scripts\/pick\.mjs/.test(verifyInstall));
+check("full-lane.md routes the gate through checklist.md",
+  fullLane.includes("Run the gate in `checklist.md`"));
+check("SKILL.md no longer runs install or inventory scripts on every run",
+  !skill.includes("verify-install.sh") && !skill.includes("detect-clis"));
+check("the seven-axis self-critique stays retired",
+  !/Score your build 1-5 on each of the seven axes/.test(checklist) && !/seven-axis self-critique \(every score/.test(skill));
+check("the blind read is opt-in and reads the files the audit writes",
+  checklist.includes("Blind read, on request") && checklist.includes("blind-read.sh audit-1280.png audit-375.png"));
+check("pick.mjs passes its own install check",
+  execFileSync(process.execPath, ["skills/goddesign/scripts/pick.mjs", "--check"], { encoding: "utf8" }).includes("install OK"));
+
+// 11. Deck distribution: CONTRIBUTING caps each fixed 30-degree accent hue band
+// (0-30, 30-60, ...) at 2 rows, and until v2.0.0 nothing measured it. Measured
+// on 2026-09-26, band 0-30 holds 3 rows (7, 10, 16): that breach is recorded as
+// known debt awaiting an owner decision, so it passes, while any new row that
+// crowds a band fails. A debt entry that no longer describes the deck fails too,
+// so fixing the deck forces deleting the allowance.
+const KNOWN_ACCENT_DEBT = { 0: [7, 10, 16] };
+const accentBands = {};
+for (const row of parseDirections(directions)) {
+  const { C, H } = hexToOklch(row.accent);
+  if (C < 0.02) continue;
+  const band = Math.floor(H / 30) * 30;
+  (accentBands[band] ||= []).push(row.index);
+}
+for (const [band, rows] of Object.entries(accentBands)) {
+  const debt = KNOWN_ACCENT_DEBT[band] || [];
+  check(`accent band ${band}-${+band + 30} holds at most 2 rows${debt.length ? ` (known debt: rows ${debt.join(", ")})` : ""}`,
+    rows.length <= 2 || rows.every((r) => debt.includes(r)), `rows ${rows.join(", ")}`);
+}
+for (const [band, rows] of Object.entries(KNOWN_ACCENT_DEBT))
+  check(`known accent debt for band ${band} still describes the deck`,
+    JSON.stringify((accentBands[band] || []).slice().sort((a, b) => a - b)) === JSON.stringify(rows),
+    `band holds rows ${(accentBands[band] || []).join(", ") || "none"}`);
+
 // 9. Repo style: no em dashes or en dashes in prose files.
-import { execSync } from "node:child_process";
+import { execFileSync, execSync } from "node:child_process";
 const prose = execSync(
   "git ls-files --cached --others --exclude-standard -- '*.md'",
   { encoding: "utf8" }

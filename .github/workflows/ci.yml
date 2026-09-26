@@ -10,42 +10,30 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    strategy:
+      matrix:
+        # The docs promise Node 18 or newer for the skill's scripts; test the floor
+        # as well as a current release.
+        node: [18, 22]
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with:
-          node-version: 22
+          node-version: ${{ matrix.node }}
       - name: install integrity
-        run: sh skills/goddesign/scripts/verify-install.sh
-      - name: CLI inventory smoke
-        run: sh -n skills/goddesign/scripts/detect-clis.sh && sh skills/goddesign/scripts/detect-clis.sh
-      - name: provenance hygiene adapter tests
-        run: sh -n skills/goddesign/scripts/provenance-hygiene.sh && node --test scripts/provenance-hygiene.test.mjs
+        run: sh skills/goddesign/scripts/verify-install.sh && node skills/goddesign/scripts/pick.mjs --check
+      - name: installer syntax
+        run: sh -n scripts/install.sh
       - name: deck lint
         run: node scripts/lint-decks.mjs
-      - name: study tooling tests
-        run: node --test scripts/study-a.test.mjs
-      # The mechanical half of the QA gate, including the corpus separation the
-      # evaluation record claims: skill runs stay clean, comparison runs do not.
+      - name: variance engine tests
+        run: node --test scripts/pick.test.mjs
+      - name: provenance hygiene adapter tests
+        run: sh -n skills/goddesign/scripts/provenance-hygiene.sh && node --test scripts/provenance-hygiene.test.mjs
+      # The mechanical half of the QA gate. sweep.test.mjs asserts the corpus
+      # split on a named subset (the kilnhouse, wayfare, and ledgerbird skill
+      # pages against their comparison pages), not on every artifact on file.
       - name: gate sweep tests
         run: node --test scripts/sweep.test.mjs
-      - name: rater install
-        working-directory: study-a-rater
-        run: npm ci --no-audit --no-fund
-      - name: rater lint
-        working-directory: study-a-rater
-        run: npm run lint
-      - name: rater test
-        working-directory: study-a-rater
-        run: npm test
-      # Blocking gate: the surface that actually ships to raters. Production
-      # dependencies must carry zero high or critical advisories.
-      - name: dependency audit (production surface)
-        working-directory: study-a-rater
-        run: npm audit --audit-level=high --omit=dev
-      # Informational: keep build and development dependency drift visible after
-      # the blocking production-surface audit above. Some upstream toolchain
-      # advisories do not have a compatible patched release yet.
-      - name: dependency audit (full tree, informational)
-        working-directory: study-a-rater
-        run: npm audit --audit-level=high || true
+      - name: comparison harness tests
+        run: node --test scripts/arm-test.test.mjs

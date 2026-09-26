@@ -4,18 +4,23 @@
 # memory, which recreates the exact model-authored distribution the skill exists to
 # escape. This script fails loud instead. Host-neutral POSIX sh, zero dependencies.
 # Usage: sh verify-install.sh
-# Exit 0: all nine required references + SKILL.md present. Exit 1: something missing.
+# Run it through the path your host reads (for Claude Code,
+# sh ~/.claude/skills/goddesign/scripts/verify-install.sh), not from the clone:
+# run from the clone it checks the clone, and a dangling link passes unseen.
+# Exit 0: SKILL.md, the required references, and pick.mjs present, decks complete.
+# Exit 1: something missing.
 
 # Resolve the skill root as the parent of this script's directory.
 script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 root=$(CDPATH= cd -- "$script_dir/.." && pwd)
 
-# The nine reference files a design run reads, plus the skill body. These are the
-# load-bearing files: a missing one must stop the run, not be improvised.
-required="SKILL.md references/directions.md references/layouts.md references/palettes.md references/fonts.md references/motion.md references/copy.md references/imagery.md references/map.md references/checklist.md"
+# The skill body, the reference files a design run can be routed to, and the
+# picker that reads the decks. These are load-bearing: a missing one must stop
+# the run, not be improvised.
+required="SKILL.md references/full-lane.md references/directions.md references/layouts.md references/palettes.md references/fonts.md references/motion.md references/copy.md references/imagery.md references/map.md references/checklist.md scripts/pick.mjs"
 
 # Optional gate helpers: the run degrades honestly without them.
-optional="scripts/audit.mjs scripts/sweep.mjs scripts/extract-tokens.mjs scripts/codex-audit-loop.sh scripts/detect-clis.sh scripts/genimage.sh scripts/blind-read.sh scripts/verify-map.mjs references/blind-read.md references/genome-sources.md"
+optional="scripts/audit.mjs scripts/sweep.mjs scripts/extract-tokens.mjs scripts/codex-audit-loop.sh scripts/genimage.sh scripts/blind-read.sh scripts/verify-map.mjs references/blind-read.md references/genome-sources.md"
 
 # Prompt-only extras do not affect an ordinary design run or its QA score.
 prompt_optional="scripts/provenance-hygiene.sh references/provenance-hygiene.md"
@@ -35,16 +40,17 @@ fi
 
 # Deck integrity: present and non-empty is not the same as complete. A copied
 # rather than symlinked install, a half-synced tree, or a stale vendored copy
-# passes the loop above while a deck holds fewer rows than Step 3b's modulus
-# rolls, and then the seed lands on a row that does not exist and the model
-# improvises it. That is the failure this script's header exists to stop.
-# The moduli are grepped out of SKILL.md, never hardcoded, so a deck that grows
-# does not have to be remembered here as well.
-seedline=$(grep -F 'direction=$((' "$root/SKILL.md" | head -1)
+# passes the loop above while a deck holds fewer rows than SKILL.md's no-node
+# fallback rolls, and then that seed lands on a row that does not exist and the
+# model improvises it. pick.mjs reads deck sizes directly and runs the same
+# check with --check; this is the dependency-free version for hosts with a
+# shell. The moduli are grepped out of SKILL.md, never hardcoded, so a deck that
+# grows does not have to be remembered here as well.
+seedline=$(grep -F 'direction = N %' "$root/SKILL.md" | head -1)
 set -- $(printf '%s' "$seedline" | grep -oE '% [0-9]+' | head -4 | grep -oE '[0-9]+')
 
 if [ "$#" -ne 4 ]; then
-  echo "INCOMPLETE INSTALL: SKILL.md Step 3b seed line not found or unreadable (stale or partial copy: reinstall, see docs/INSTALL.md)"
+  echo "INCOMPLETE INSTALL: SKILL.md no-node fallback line not found or unreadable (stale or partial copy: reinstall, see docs/INSTALL.md)"
   exit 1
 fi
 
@@ -60,7 +66,7 @@ count_rows() {
 check_deck() {
   found=$(count_rows "$1" "$2")
   if [ "$found" -ne "$3" ]; then
-    echo "INCOMPLETE INSTALL: references/$1 has $found rows, SKILL.md Step 3b rolls % $3 (stale or partial copy: reinstall, see docs/INSTALL.md)"
+    echo "INCOMPLETE INSTALL: references/$1 has $found rows, SKILL.md's no-node fallback rolls % $3 (stale or partial copy: reinstall, see docs/INSTALL.md)"
     drift=$((drift + 1))
   fi
 }

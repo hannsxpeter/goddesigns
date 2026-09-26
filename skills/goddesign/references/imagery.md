@@ -4,7 +4,7 @@ Load only when the run needs pixels: the seeded macrostructure is Photographic, 
 
 ## Generating
 
-Pixels come from `scripts/genimage.sh` next to this skill (it delegates to an installed image-capable CLI; Codex has built-in generation, and hosts without native image tools, including Claude, get pixels by shelling out):
+Pixels come from `scripts/genimage.sh` next to this skill. It delegates to the Codex CLI, whose built-in image tool generates the file, so hosts without native image generation (Claude Code included) get pixels by shelling out; it is the only generator the script implements today:
 
 ```sh
 sh <skill-root>/scripts/genimage.sh "<art-directed prompt>" hero.png
@@ -29,7 +29,7 @@ The negative clauses are mandatory: the default AI-image look (glossy 3D, neon g
 
 ## Comp-first mode (the image model as muse, the code model as craftsman)
 
-When an image tool is available (native, or via genimage.sh), a run may generate ONE design comp after the DIRECTION LOCK and before any code: a mockup of what the page should look like, which the build then replicates. This plays to a measured strength: literal-execution models reproduce a given design far better than they invent one, and an image model's aesthetic distribution is different DNA from a code model's. Recommended by default on the EXPAND lane; optional on DIVERGE.
+When an image tool is available (native, or via genimage.sh), a run may generate ONE design comp after the DIRECTION LOCK and before any code: a mockup of what the page should look like, which the build then replicates. This plays to a measured strength: literal-execution models reproduce a given design far better than they invent one, and an image model's aesthetic distribution is different DNA from a code model's. Recommended by default on the full lane; optional for frontier models.
 
 The comp prompt derives from the lock, like every image prompt:
 

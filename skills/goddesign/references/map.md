@@ -23,7 +23,7 @@ The full borrow-and-decline record is in
 Chart a map when any of these is true, and not otherwise:
 
 - The brief names **3 or more distinct surfaces**. A surface is a page, a
-  screen, or a coherent component set with its own one action (Step 2).
+  screen, or a coherent component set with its own one action (SKILL.md, Context).
 - The user states the work continues across sessions, or hands off to another
   person or host.
 - A `.design-map.md` already exists at the project root. Then you are working
@@ -37,18 +37,18 @@ directly.
 Three defects appear when a multi-surface effort runs without one, and each is
 a mechanism failure, not a taste failure:
 
-1. **Rotation inverts against you.** Step 3a's ledger rules exist to make the
+1. **Rotation inverts against you.** `pick.mjs`'s ledger rules exist to make the
    next run differ from the last. Across projects that is the whole point.
    Across surfaces of one product it is a defect: it pushes the pricing page
    away from the home page it must match. Under a map, rotation runs once, at
    charting, and the surfaces match.
 2. **The ledger floods.** Nine surfaces written as nine entries fill both
-   ledgers with near-identical rows, trip the popularity cap in Step 3a, and
+   ledgers with near-identical rows, trip `pick.mjs`'s popularity cap, and
    poison rotation for every future project on that machine. A map writes
    exactly one entry.
 3. **Scope collapses at the context wall.** A model given nine surfaces in one
    session builds three well and ships the rest as wireframes, which the
-   EXPAND lane's "do not silently trim scope" rule forbids but cannot prevent.
+   full lane's "do not silently trim scope" rule forbids but cannot prevent.
    One surface per session makes the rule keepable.
 
 ## The map file
@@ -129,13 +129,14 @@ signal that charting is done.
 1. **Name the destination.** One or two lines: what the finished system covers.
    Settle this first, because it fixes the scope and every later
    surface-or-out-of-scope call resolves against it.
-2. **Run the context gate once, at product scale** (Step 2): subject, audience,
+2. **Run the context step once, at product scale** (SKILL.md, Context): subject, audience,
    the one action of the *product*, tone. Individual surfaces get their own one
    action later; this one is the system's.
-3. **Run the variance engine once** (Step 3, all four sub-steps including the
-   Step 3d jitter) and write the result into **System lock**. This is the only
-   seed roll the whole effort makes. Every surface inherits these values
-   verbatim.
+3. **Run `pick.mjs` once** and copy its lock lines (Seed, Tokens, Jitter,
+   Type, Import, Motion, Atmosphere) into **System lock**. This is the only
+   seed roll the whole effort makes: once the System lock carries a seed,
+   `pick.mjs` refuses to roll again in this project. Every surface inherits
+   these values verbatim.
 4. **List the surfaces you can specify now** under **Surfaces to design**, each
    with its one action and audience, `claimed: no`. Order them so the surfaces
    that set the system's vocabulary come first (usually the densest real
@@ -163,13 +164,13 @@ locked 404 with different copy) which may ride along in the same session.
    session; a claimed one is not. Expect other sessions to be editing this file.
 4. **Inherit the System lock verbatim.** Do not roll a seed. Do not re-jitter.
    Do not read `directions.md` for a new row. Write the surface's DIRECTION
-   LOCK (Step 4a) with the System lock's Seed, Tokens, Jitter, Type, Import,
+   LOCK (SKILL.md, Lock) with the System lock's Seed, Tokens, Jitter, Type, Import,
    Motion, and Atmosphere copied exactly, and only these lines chosen fresh
    for this surface:
    - **Structure**: a macrostructure from the map's structure pool, and not the
      one the previously locked surface used.
    - **Layout**, **Signature**, **Grammar**, and the optional conception map.
-5. **Build and gate.** Steps 4c, 4d, and the full Step 5 QA gate, with the map
+5. **Build and gate.** SKILL.md's build rules and the full gate, with the map
    amendments in `checklist.md`.
 6. **Record it.** Move the surface's line from **Surfaces to design** to
    **Surfaces locked** as a markdown link to the file it produced, plus a
@@ -212,14 +213,14 @@ redrawn, and then as a new map, not a resumption of this one.
 
 ## Open questions
 
-Step 2 says to invent confidently where the brief is silent, and Step 4c
-forbids inventing metrics, testimonials, logos, and company names. Those two
+SKILL.md says to invent where the brief is silent, and its build rules
+forbid inventing metrics, testimonials, logos, and company names. Those two
 rules collide whenever a surface needs a real number the person has not given
 you. The map resolves the collision with a third option, and it is the only
 correct one:
 
 **A surface never blocks on a human-only fact.** Ship it with a placeholder
-labeled as a placeholder, per Step 4c, and record the question under **Open
+labeled as a placeholder, per SKILL.md's build rules, and record the question under **Open
 questions** with the date and the surface carrying the placeholder. Never
 invent the value, and never stall the session waiting for it. These are the
 only items on the map the agent may not answer itself; answering one on the
@@ -236,17 +237,17 @@ unrelated project, which is exactly false inside one map.
 
 | Rule | Single run | Under a map |
 |---|---|---|
-| Seed roll (Step 3b) | Once per run | Once per map, at charting. Surface sessions never roll. |
-| Jitter (Step 3d) | Once per run | Once per map, at charting. Re-jittering a surface would ship siblings with different accents. |
-| Ledger rotation (Step 3a) | Every run must differ from the last | Applies at charting only. Inside the map, surfaces must **match** the System lock. |
-| Ledger write (Persist) | One entry per run | One entry per **map**, written when the last surface locks. Nine surfaces write one entry, not nine. |
+| Seed roll (`pick.mjs`) | Once per run | Once per map, at charting. Surface sessions never roll, and `pick.mjs` refuses to once the System lock has a seed. |
+| Jitter (`pick.mjs`) | Once per run | Once per map, at charting. Re-jittering a surface would ship siblings with different accents. |
+| Ledger rotation (`pick.mjs`) | Every run must differ from the last | Applies at charting only. Inside the map, surfaces must **match** the System lock. |
+| Ledger write (Persist) | One entry per run | One entry per **map**, written with `pick.mjs --log ... --map-final` when the last surface locks. Nine surfaces write one entry, not nine. |
 | Direction row | Read per run | Read once, at charting. Surface sessions inherit and never re-read `directions.md`. |
 | Macrostructure | One per run | One per **surface**, drawn from the map's structure pool, and not the previous surface's. |
-| Variety (Phase 1 axis 6) | Differs from previous runs | Belongs to the same system while not being the previous surface's skeleton with new copy. See `checklist.md`. |
-| Anti-cliche critique (Step 4b) | Every run | At charting for the system, then per surface for its own signature and structure. |
-| Scoped-edit mode (Step 0 item 2) | Reuses the page's stamped lock | Unchanged, and it wins: a restyle of an already-locked surface stays a scoped edit. |
+| Variety | Differs from previous runs | Belongs to the same system while not being the previous surface's skeleton with new copy. The Map group in `checklist.md` checks both halves. |
+| Subject test (SKILL.md) | Every run | At charting for the system, then per surface for its own signature and structure. |
+| Edit route (SKILL.md route 1) | Reuses the page's stamped tokens | Unchanged, and it wins: a restyle of an already-locked surface stays an edit. |
 
-Everything else is unchanged. The craft floor (Step 4d), the Banned list, the
-grammar breaks, and the full QA gate apply to every surface exactly as they
+Everything else is unchanged. The build rules, the Banned list, the grammar
+breaks, and the full gate apply to every surface exactly as they
 apply to a single run. A map buys consistency across sessions; it buys no
 relief from any gate.
