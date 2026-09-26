@@ -1,5 +1,15 @@
 # External validation protocol
 
+**Status, 2026-09-26: retired without a run.** Study A closed with zero
+participant responses (see
+`validation/studies/study-a-2026-07/completion-audit.md`), and Studies B and C
+were never scheduled. The claim this protocol was written to test (output that
+outside judges cannot identify as AI-made) remains **unvalidated**, and no page
+of this repository may say otherwise. Direction decisions now rest on the
+owner-ranked comparison in `validation/studies/lean-core-2026-09/`, which is a
+decision tool for one person, not evidence for the claim. The text below is kept
+as the record of what a real test of the claim would require.
+
 Every published goddesign claim currently rests on author-run validation: the author picked the briefs, ran the runs, and ranked the outputs. That proves the machinery rotates; it does not prove the core claim (output that is not identifiable as AI-made) holds under judges who are not the author. This file pre-registers the three studies that close that gap, so the bars exist before the results do.
 
 Rule zero: results publish either way, with de-identified row-level data included as a dated file in `validation/`. The operator export containing precise timestamps remains sealed. A failed bar is a finding, not an embarrassment; a study that only publishes wins is marketing.
@@ -61,7 +71,7 @@ Bar: gates green on all skill runs, and the five per-host runs land on five dist
 
 ## Study C: cross-model replication
 
-All published runs to date are Claude-lane. The EXPAND lane exists for Codex-class models and has no independent receipts. Protocol: on a fresh machine or VM, install per `docs/INSTALL.md`, then run three of the Study B briefs under `$goddesign` with the default sandbox, collecting full artifacts (lock, stylesheet, audit JSON, screenshots).
+When this was written, the only EXPAND-lane receipts came from the author's own Kilnhouse Codex runs and the Study A Codex replication; none came from an independent installation. Protocol: on a fresh machine or VM, install per `docs/INSTALL.md`, then run three of the Study B briefs under `$goddesign` with the default sandbox, collecting full artifacts (lock, stylesheet, audit JSON, screenshots).
 
 Bar: gates green with zero operator intervention beyond the documented sandbox handoff. Any EXPAND-lane failure symptom that appears (placeholder floor, template snap-back, architecture instead of pixels) is a skill defect, not an operator error: record it in `validation/` and fix it at the rule level, never by patching the individual run.
 
