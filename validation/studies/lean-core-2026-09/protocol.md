@@ -3,6 +3,18 @@
 Status: frozen on 2026-09-26, before any run of any arm. Study ID:
 `goddesign-lean-core-2026-09`.
 
+Amendment, 2026-09-26, before any run: the per-run caps rise from $20 and 45
+minutes to $40 and 90 minutes. Two smoke runs of brief L01 outside this study,
+one per skill version, took about 25 minutes to write a first page and longer
+to finish their gates, so the old caps could have stopped the heavier arm
+mid-fix-loop and biased criterion 2 toward the lean core. The caps exist to stop
+runaway loops, not to constrain a normal run. Also before any run, the harness
+learned to run cells concurrently (`--jobs`; cells whose skill reads the home
+ledger still take turns), to strip a launching Claude Code session's
+environment so `CLAUDE_EFFORT` cannot override the protocol's effort, and to
+re-run only cells whose headless run failed at the API level. No arm, brief,
+criterion, or threshold changed.
+
 ## The question
 
 v2.0.0 cut the instructions a frontier model reads on a design run from about
@@ -61,8 +73,11 @@ node scripts/arm-test.mjs reveal   # only after ranking.json is complete
    headless run's JSON result (tokens, cost, turns, duration), and the
    harness's own measurement with the v2.0.0 scripts: `sweep.mjs` and
    `audit.mjs`, including the 1280 and 375 full-page captures. A run is capped
-   at $20 and 45 minutes; a capped or failed run is ranked on whatever it
-   produced, and a run that produced no page ranks last on its brief.
+   at $40 and 90 minutes; a capped or failed run is ranked on whatever it
+   produced, and a run that produced no page ranks last on its brief. The one
+   exception is a run that never reached the model (an unparseable result or
+   an API error): that is infrastructure, not a result, and
+   `run --retry-failed` re-runs it.
 2. **Pack.** Each brief's four captures are copied under random codes to
    `work/pack/`, with `RANK.md` to read and `ranking.json` to fill. The code key
    goes to `work/sealed/key.json`.

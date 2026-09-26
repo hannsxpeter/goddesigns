@@ -246,10 +246,20 @@ Nothing is cached per assistant.
 
 `scripts/arm-test.mjs` runs the pre-registered comparison in
 `validation/studies/lean-core-2026-09/` headless, one isolated Claude Code
-process per cell. It needs the `claude` CLI itself logged in (`claude auth
-status` must report `loggedIn: true`; run `claude auth login` once). A login in
-the Claude desktop app does not carry over to `claude -p`, and the harness stops
-with that message rather than recording twenty failed runs.
+process per cell:
+
+```sh
+node goddesigns/scripts/arm-test.mjs run --jobs 3   # resumable; --retry-failed re-runs API failures
+node goddesigns/scripts/arm-test.mjs pack           # then rank work/pack/RANK.md blind
+node goddesigns/scripts/arm-test.mjs reveal
+```
+
+It needs the `claude` CLI itself logged in (`claude auth status` must report
+`loggedIn: true`; run `claude auth login` once). A login in the Claude desktop
+app does not carry over to `claude -p`, and the harness stops with that message
+rather than recording twenty failed runs. Launched from inside a Claude Code
+session, it strips that session's environment first, so a cell behaves as if it
+were started from a terminal.
 
 ## Troubleshooting
 

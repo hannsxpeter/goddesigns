@@ -11,7 +11,7 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
-import { cellsOf, commandFor, decide, loadStudy, pack, reveal } from './arm-test.mjs';
+import { cellsOf, cleanEnv, commandFor, decide, failedAtApi, loadStudy, pack, reveal } from './arm-test.mjs';
 
 const STUDY = resolve('validation/studies/lean-core-2026-09');
 const HARNESS = resolve('scripts/arm-test.mjs');
@@ -65,6 +65,26 @@ test('an untagged skill ref stops the run instead of guessing', () => {
   const r = spawnSync(process.execPath, [HARNESS, 'run', '--dry-run', '--arms', 'B', '--skill-ref', 'no-such-ref-v9'], { encoding: 'utf8' });
   assert.equal(r.status, 1);
   assert.match(r.stderr, /git ref no-such-ref-v9 not found/);
+});
+
+test('a cell launched from inside a Claude Code session does not inherit that session', () => {
+  const inside = cleanEnv({
+    CLAUDECODE: '1', CLAUDE_CODE_SESSION_ID: 's', CLAUDE_CODE_MESSAGING_SOCKET: '/tmp/x', CLAUDE_AGENT_SDK_VERSION: '1',
+    CLAUDE_PID: '9', CLAUDE_EFFORT: 'max', ANTHROPIC_BASE_URL: 'http://127.0.0.1:1234', PATH: '/bin', HOME: '/h',
+  });
+  assert.deepEqual(Object.keys(inside).sort(), ['HOME', 'PATH']);
+  // Outside a session, a deliberate custom endpoint is the user's and stays;
+  // CLAUDE_EFFORT still goes, because it would override the protocol's effort.
+  const outside = cleanEnv({ ANTHROPIC_BASE_URL: 'https://proxy.example', CLAUDE_EFFORT: 'low', PATH: '/bin' });
+  assert.deepEqual(outside, { ANTHROPIC_BASE_URL: 'https://proxy.example', PATH: '/bin' });
+});
+
+test('only a run that never reached the model counts as failed at the API level', () => {
+  assert.equal(failedAtApi({ run: { parsed: false } }), true);
+  assert.equal(failedAtApi({ run: { parsed: true, terminal_reason: 'api_error', is_error: true } }), true);
+  assert.equal(failedAtApi({ run: { parsed: true, terminal_reason: 'completed' } }), false);
+  // A budget cap or a weak page is a result, ranked on what it produced.
+  assert.equal(failedAtApi({ run: { parsed: true, terminal_reason: 'max_budget', is_error: true } }), false);
 });
 
 // ---------------------------------------------------------------- pack and reveal

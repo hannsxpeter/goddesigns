@@ -1,8 +1,8 @@
 {
   "study": "goddesign-lean-core-2026-09",
   "effort": "high",
-  "budget_usd_per_run": 20,
-  "timeout_minutes": 45,
+  "budget_usd_per_run": 40,
+  "timeout_minutes": 90,
   "arms": [
     {
       "id": "A",

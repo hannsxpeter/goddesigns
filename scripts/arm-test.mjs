@@ -12,13 +12,17 @@
 //
 // Usage:
 //   node scripts/arm-test.mjs plan   [--study <dir>]
-//   node scripts/arm-test.mjs run    [--study <dir>] [--arms A,B] [--briefs L01,L02]
-//                                    [--skill-ref WORKTREE] [--force] [--dry-run]
+//   node scripts/arm-test.mjs run    [--study <dir>] [--arms A,B] [--briefs L01,L02] [--jobs N]
+//                                    [--skill-ref WORKTREE] [--retry-failed] [--force] [--dry-run]
 //   node scripts/arm-test.mjs pack   [--study <dir>] [--allow-missing]
 //   node scripts/arm-test.mjs reveal [--study <dir>]
 //
 // --skill-ref replaces every arm's tagged skill with another git ref, or with
 // WORKTREE (the current skills/goddesign), for smoke tests before tagging.
+// --jobs runs cells concurrently; cells whose skill reads ~/.design-log.json
+// directly (any skill without scripts/pick.mjs, such as v1.8.0) take turns,
+// because each parks the owner's ledger. --retry-failed re-runs only cells
+// whose headless run failed at the API level, never a run that completed.
 // Prerequisite for run: `claude auth status` reports loggedIn true.
 // Exit codes: 0 ok, 1 a cell or step failed, 2 usage error.
 
@@ -48,7 +52,7 @@ function usage(message) {
 function parseArgs(argv) {
   const [command, ...rest] = argv;
   if (!['plan', 'run', 'pack', 'reveal'].includes(command)) usage(command ? `unknown command ${command}` : 'no command');
-  const opt = { command, study: DEFAULT_STUDY, force: false, dryRun: false, allowMissing: false };
+  const opt = { command, study: DEFAULT_STUDY, force: false, dryRun: false, allowMissing: false, retryFailed: false, jobs: 1 };
   for (let i = 0; i < rest.length; i++) {
     const a = rest[i];
     const value = () => (i + 1 < rest.length ? rest[++i] : usage(`${a} needs a value`));
@@ -57,6 +61,11 @@ function parseArgs(argv) {
     else if (a === '--briefs') opt.briefs = value().split(',');
     else if (a === '--skill-ref') opt.skillRef = value();
     else if (a === '--force') opt.force = true;
+    else if (a === '--retry-failed') opt.retryFailed = true;
+    else if (a === '--jobs') {
+      opt.jobs = Number(value());
+      if (!Number.isInteger(opt.jobs) || opt.jobs < 1) usage('--jobs takes a positive integer');
+    }
     else if (a === '--dry-run') opt.dryRun = true;
     else if (a === '--allow-missing') opt.allowMissing = true;
     else usage(`unknown argument ${a}`);
@@ -141,6 +150,23 @@ function restoreLedger(dir) {
   if (existsSync(PARKED_LEDGER)) renameSync(PARKED_LEDGER, HOME_LEDGER);
 }
 
+// A harness launched from inside a Claude Code session inherits that session's
+// variables: its messaging socket, its session id, the desktop app's API base
+// URL, and CLAUDE_EFFORT, which would override the protocol's --effort. Strip
+// them so a cell behaves the same launched from a session or from a terminal.
+// CLAUDE_EFFORT always goes; ANTHROPIC_BASE_URL only when a session set it.
+export function cleanEnv(env) {
+  const insideSession = Boolean(env.CLAUDECODE);
+  const out = {};
+  for (const [k, v] of Object.entries(env)) {
+    if (k === 'CLAUDE_EFFORT') continue;
+    if (insideSession && (k === 'CLAUDECODE' || k.startsWith('CLAUDE_CODE_') || k === 'CLAUDE_AGENT_SDK_VERSION'
+      || k === 'CLAUDE_PID' || k === 'CLAUDE_PREVIEW_CLASSIFIER_FLOOR' || k === 'ANTHROPIC_BASE_URL')) continue;
+    out[k] = v;
+  }
+  return out;
+}
+
 function execute({ command, args, prompt }, { cwd, env, timeoutMs }) {
   return new Promise((done) => {
     const child = spawn(command, args, { cwd, env, stdio: ['pipe', 'pipe', 'pipe'] });
@@ -203,6 +229,7 @@ function summarize(stdout) {
     parsed: true,
     is_error: Boolean(j.is_error),
     subtype: j.subtype ?? null,
+    terminal_reason: j.terminal_reason ?? null,
     result_excerpt: typeof j.result === 'string' ? j.result.slice(0, 400) : null,
     total_cost_usd: j.total_cost_usd ?? null,
     num_turns: j.num_turns ?? null,
@@ -217,8 +244,15 @@ function summarize(stdout) {
   };
 }
 
+// A run that never reached the model is infrastructure, not a result: an
+// unparseable result, or a run that ended on an API error. Everything else,
+// including a budget-capped or timed-out run, is ranked on what it produced.
+export function failedAtApi(meta) {
+  return !meta?.run?.parsed || meta.run.terminal_reason === 'api_error';
+}
+
 function checkLogin() {
-  const r = spawnSync('claude', ['auth', 'status'], { encoding: 'utf8' });
+  const r = spawnSync('claude', ['auth', 'status'], { encoding: 'utf8', env: cleanEnv(process.env) });
   let status = {};
   try { status = JSON.parse(r.stdout); } catch { /* reported below */ }
   if (r.error || !status.loggedIn) {
@@ -233,15 +267,22 @@ async function runCells(study, opt) {
   const tmpRoot = mkdtempSync(join(tmpdir(), 'arm-test-'));
   if (!opt.dryRun) checkLogin();
   let failed = 0;
-  let active = null;
-  const bail = () => { if (active) restoreLedger(active); process.exit(130); };
+  const parked = new Set();
+  const bail = () => { for (const d of parked) restoreLedger(d); process.exit(130); };
   process.on('SIGINT', bail);
   process.on('SIGTERM', bail);
+
+  const pending = [];
   for (const cell of cells) {
     const dir = runDir(study, cell);
-    if (!opt.dryRun && existsSync(join(dir, 'meta.json')) && !opt.force) {
-      console.log(`[${cell.id}] done already; --force re-runs it`);
-      continue;
+    const metaPath = join(dir, 'meta.json');
+    if (!opt.dryRun && existsSync(metaPath) && !opt.force) {
+      const meta = readJson(metaPath);
+      if (!(opt.retryFailed && failedAtApi(meta))) {
+        console.log(`[${cell.id}] done already; --force re-runs it`);
+        continue;
+      }
+      console.log(`[${cell.id}] failed at the API level last time; re-running`);
     }
     const ref = cell.arm.skill ? (opt.skillRef || cell.arm.skill) : null;
     const root = ref ? skillRoot(ref, cache) : null;
@@ -251,21 +292,33 @@ async function runCells(study, opt) {
       console.log(`[${cell.id}] ${cmd.command} ${shown.join(' ')}  <<< ${cmd.prompt.slice(0, 60).replace(/\n/g, ' ')}...`);
       continue;
     }
+    // A skill without pick.mjs reads ~/.design-log.json itself, so its cells
+    // park the owner's ledger and must not overlap one another.
+    pending.push({ cell, dir, ref, root, cmd, legacyLedger: Boolean(root) && !existsSync(join(root, 'scripts/pick.mjs')) });
+  }
+
+  let ledgerTurn = Promise.resolve();
+  const exclusive = (fn) => {
+    const turn = ledgerTurn.then(fn, fn);
+    ledgerTurn = turn.catch(() => {});
+    return turn;
+  };
+
+  const runOne = async ({ cell, dir, ref, cmd, legacyLedger }) => {
     rmSync(dir, { recursive: true, force: true });
     mkdirSync(dir, { recursive: true });
     const workspace = mkdtempSync(join(tmpdir(), 'arm-ws-'));
-    const env = { ...process.env, GODDESIGN_USER_LEDGER: join(tmpRoot, `user-ledger-${cell.id}.json`) };
+    const env = { ...cleanEnv(process.env), GODDESIGN_USER_LEDGER: join(tmpRoot, `user-ledger-${cell.id}.json`) };
     console.log(`[${cell.id}] running: ${cell.arm.model}, ${ref ? `skill ${ref}` : 'no skill'}`);
     const started = new Date();
-    parkLedger();
-    active = dir;
-    let res;
-    try {
-      res = await execute(cmd, { cwd: workspace, env, timeoutMs: study.timeout_minutes * 60000 });
-    } finally {
-      restoreLedger(dir);
-      active = null;
-    }
+    const go = () => execute(cmd, { cwd: workspace, env, timeoutMs: study.timeout_minutes * 60000 });
+    const res = legacyLedger
+      ? await exclusive(async () => {
+        parkLedger();
+        parked.add(dir);
+        try { return await go(); } finally { restoreLedger(dir); parked.delete(dir); }
+      })
+      : await go();
     writeFileSync(join(dir, 'result.json'), res.stdout);
     writeFileSync(join(dir, 'stderr.log'), res.stderr);
     copyPage(workspace, join(dir, 'page'));
@@ -288,8 +341,13 @@ async function runCells(study, opt) {
     writeFileSync(join(dir, 'meta.json'), `${JSON.stringify(meta, null, 2)}\n`);
     if (res.code !== 0 || !meta.has_index) failed++;
     const cost = meta.run.total_cost_usd == null ? 'cost unknown' : `$${meta.run.total_cost_usd.toFixed(2)}`;
-    console.log(`[${cell.id}] ${meta.has_index ? 'page written' : 'NO PAGE'}, ${Math.round(meta.wall_ms / 60000)} min, ${cost}, audit exit ${meta.audit.exit}`);
-  }
+    console.log(`[${cell.id}] ${meta.has_index ? 'page written' : 'NO PAGE'}, ${Math.round(meta.wall_ms / 60000)} min, ${cost}, audit exit ${meta.audit.exit}${failedAtApi(meta) ? ', FAILED AT THE API LEVEL' : ''}`);
+  };
+
+  const workers = Array.from({ length: Math.min(opt.jobs, pending.length) }, async () => {
+    while (pending.length) await runOne(pending.shift());
+  });
+  await Promise.all(workers);
   rmSync(tmpRoot, { recursive: true, force: true });
   return failed;
 }
