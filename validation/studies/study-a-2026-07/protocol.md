@@ -2,6 +2,13 @@
 
 Status: frozen before corpus generation and before any rater response.
 
+Closure, 2026-09-26, with zero participant responses: the study is closed
+without data. No invitation was ever distributed, so no response, exclusion, or
+analysis exists to report, and none of the outcomes or bars below was tested.
+The rater application and the study tooling were removed from the repository in
+v2.0.0 and remain recoverable at tag `v1.8.0`. The corpus receipts in this
+directory stay frozen. See `completion-audit.md` for the reasons.
+
 Study ID: `goddesign-study-a-2026-07`
 
 Non-analytic amendment, 2026-07-23 before any participant response: replaced

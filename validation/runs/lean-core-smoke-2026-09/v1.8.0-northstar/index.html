@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Northstar Signal: privacy-first web analytics for small software teams</title>
+  <meta name="description" content="Northstar Signal shows which pages and sources bring in trials, without cookies and without keeping anything that identifies a person. 14-day free trial, no card.">
+  <meta property="og:title" content="Northstar Signal: privacy-first web analytics for small software teams">
+  <meta property="og:description" content="Counts every visit and forgets every visitor. Pages, sources and trial signups, with no cookies and no personal data kept.">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,600&family=Source+Serif+4:opsz,wght@8..60,400&family=Archivo:wght@600&display=swap">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip" href="#letter">Skip to main content</a>
+
+  <header class="letterhead">
+    <div class="letterhead-inner oxford-bottom">
+      <a class="wordmark" href="/">Northstar Signal</a>
+      <nav class="site-nav" aria-label="Main">
+        <button class="menu-button" type="button" popovertarget="site-menu">Menu</button>
+        <ul class="site-menu" id="site-menu" popover role="list">
+          <li><a href="#report">Sample report</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+          <li><a href="#data">Your data</a></li>
+          <li><a href="#support">Support</a></li>
+          <li class="site-menu-cta"><a class="button" href="/signup">Start a free trial</a></li>
+        </ul>
+      </nav>
+      <a class="button button-compact letterhead-cta" href="/signup">Start a free trial</a>
+    </div>
+  </header>
+
+  <main id="letter">
+    <section class="grid opening" aria-labelledby="letter-title">
+      <p class="salutation">To the small teams who ship software,</p>
+      <h1 id="letter-title">We count every visit and forget every visitor.</h1>
+      <p class="lede">Northstar Signal shows which pages and sources bring in trials, without cookies and without keeping anything that identifies a person.</p>
+      <div class="cta-row">
+        <a class="button" href="/signup">Start a free trial</a>
+        <p class="cta-note">14 days with every feature, no card. <a href="#report">Read the sample report</a></p>
+      </div>
+    </section>
+
+    <section class="grid letter-open" aria-label="Why we built Northstar Signal">
+      <p class="dropcap">Small teams need three answers from their analytics: where people came from, what they read, and whether they started a trial. The usual way to get them is a script that tracks each visitor across sites on behalf of an advertising company, and that script is why your product sits behind a consent banner.</p>
+      <p>Northstar Signal answers the three questions and stops there. The report below is the one every team gets on Monday morning, shown here for a demo site.</p>
+      <p class="enclosure-label"><strong>Enclosed:</strong> the Monday report for <span class="nowrap">demo-app.example</span>. Every figure on it is sample data.</p>
+    </section>
+
+    <section class="enclosure" id="report" aria-labelledby="report-title">
+      <article class="report">
+        <header class="report-head oxford-bottom">
+          <p class="report-brand"><span class="report-name">Northstar Signal</span> <span class="report-kind">Monday report</span></p>
+          <p class="report-site">demo-app.example</p>
+        </header>
+
+        <div class="report-titlebar">
+          <h2 id="report-title">The week of <span class="nowrap">14-20 September</span></h2>
+          <p class="report-sample caps">Sample data</p>
+        </div>
+
+        <dl class="report-totals">
+          <div><dt class="label">Visitors</dt><dd>4,812</dd></div>
+          <div><dt class="label">Pageviews</dt><dd>11,406</dd></div>
+          <div><dt class="label">Trials started</dt><dd>63</dd></div>
+          <div><dt class="label">Trial rate</dt><dd>1.3%</dd></div>
+        </dl>
+        <p class="report-delta">Visitors up 9% from the previous week. Trials up from 51 to 63.</p>
+
+        <figure class="report-chart">
+          <figcaption class="label">Visitors by day</figcaption>
+          <svg class="report-bars" viewBox="0 0 70 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+            <rect x="2" y="41.5" width="6" height="58.5"/>
+            <rect class="peak" x="12" y="1" width="6" height="99"/>
+            <rect x="22" y="30.5" width="6" height="69.5"/>
+            <rect x="32" y="44.1" width="6" height="55.9"/>
+            <rect x="42" y="50.8" width="6" height="49.2"/>
+            <rect x="52" y="67.7" width="6" height="32.3"/>
+            <rect x="62" y="63.4" width="6" height="36.6"/>
+          </svg>
+          <ol class="report-days" role="list">
+            <li><span class="day">Mon</span> <span class="num">702</span></li>
+            <li><span class="day">Tue</span> <span class="num">1,188</span></li>
+            <li><span class="day">Wed</span> <span class="num">834</span></li>
+            <li><span class="day">Thu</span> <span class="num">671</span></li>
+            <li><span class="day">Fri</span> <span class="num">590</span></li>
+            <li><span class="day">Sat</span> <span class="num">388</span></li>
+            <li><span class="day">Sun</span> <span class="num">439</span></li>
+          </ol>
+        </figure>
+
+        <div class="report-tables">
+          <table>
+            <caption class="label">Top pages</caption>
+            <thead>
+              <tr><th scope="col">Page</th><th scope="col">Visitors</th><th scope="col">Trials</th></tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">/</th><td>2,904</td><td>24</td></tr>
+              <tr><th scope="row">/pricing</th><td>1,207</td><td>19</td></tr>
+              <tr><th scope="row">/docs/quickstart</th><td>986</td><td>12</td></tr>
+              <tr><th scope="row">/changelog</th><td>512</td><td>5</td></tr>
+              <tr><th scope="row">/docs/api</th><td>377</td><td>3</td></tr>
+            </tbody>
+          </table>
+          <table>
+            <caption class="label">Top sources</caption>
+            <thead>
+              <tr><th scope="col">Source</th><th scope="col">Visitors</th><th scope="col">Trials</th></tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">Direct</th><td>1,690</td><td>17</td></tr>
+              <tr><th scope="row">news.ycombinator.com</th><td>1,122</td><td>21</td></tr>
+              <tr><th scope="row">Google</th><td>884</td><td>11</td></tr>
+              <tr><th scope="row">github.com</th><td>402</td><td>7</td></tr>
+              <tr><th scope="row">Newsletter (utm_source)</th><td>318</td><td>5</td></tr>
+              <tr><th scope="row">Everything else</th><td>396</td><td>2</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <footer class="report-footer oxford-top">
+          <p><strong>Tuesday’s peak:</strong> 804 visitors came from news.ycombinator.com, and 21 of them started a trial.</p>
+          <p class="report-foot">Counted without cookies. Each visitor is counted once a day and cannot be followed from one day to the next. Trials are credited to the page and source where the visit began.</p>
+        </footer>
+      </article>
+    </section>
+
+    <section class="grid record" id="record" aria-labelledby="record-title">
+      <figure class="record-quote oxford-both">
+        <p class="record-line">/pricing, from news.ycombinator.com, Firefox on macOS, desktop, Germany, Tuesday 14:00.</p>
+        <figcaption class="label">One visit, as Northstar Signal stores it</figcaption>
+      </figure>
+      <h2 id="record-title">That line is the whole record.</h2>
+      <p>When a visit arrives, its IP address and full browser string are used once, to find the country and tell today’s visitors apart, and then dropped. Nothing is written to the visitor’s device, so there is no cookie to ask permission for.</p>
+      <p class="note">How visitors are told apart: we hash the IP address, browser string and your domain with a salt that is deleted at midnight UTC. The next day, the same person counts as someone new.</p>
+      <div class="fields">
+        <div>
+          <h3>Kept</h3>
+          <dl>
+            <div><dt>Page</dt><dd>/pricing</dd></div>
+            <div><dt>Referrer</dt><dd>news.ycombinator.com</dd></div>
+            <div><dt>Campaign tags</dt><dd>utm_source=newsletter</dd></div>
+            <div><dt>Country</dt><dd>Germany</dd></div>
+            <div><dt>Browser and system</dt><dd>Firefox, macOS</dd></div>
+            <div><dt>Device</dt><dd>Desktop</dd></div>
+            <div><dt>Hour</dt><dd>Tuesday 14:00</dd></div>
+          </dl>
+        </div>
+        <div>
+          <h3>Dropped before storage</h3>
+          <dl>
+            <div><dt><del>IP address</del></dt><dd>read for the country, then discarded</dd></div>
+            <div><dt><del>Full browser string</del></dt><dd>cut to browser and system</dd></div>
+            <div><dt><del>Other query parameters</del></dt><dd>all but campaign tags</dd></div>
+            <div><dt><del>Cookies</del></dt><dd>none are ever set</dd></div>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid uses" aria-labelledby="uses-title">
+      <h2 id="uses-title">What the record is good for</h2>
+      <ul class="uses-list" role="list">
+        <li><strong>Goals you name.</strong> Mark a page or a button as a goal and it gets its own column. Trials started, in the report above, is one; adding another takes one attribute in your HTML.</li>
+        <li><strong>Sources by name.</strong> Referrers and campaign tags survive, so the newsletter and the launch post show up by name beside the trials they brought in.</li>
+        <li><strong>The Monday email.</strong> The report above arrives at 8:00 on Monday in your time zone, for anyone on the team who wants it. Replies go to the people who build Northstar Signal.</li>
+        <li><strong>Shared links.</strong> Give a contractor or an investor a private, read-only link to one site’s dashboard, and switch it off when the work is done.</li>
+        <li><strong>A script you can read.</strong> Its source is public, so you can check every claim in this letter against the code. It loads after your page and never sets a cookie. <a href="/script">Read the script’s source</a></li>
+      </ul>
+    </section>
+
+    <section class="grid pricing" id="pricing" aria-labelledby="pricing-title">
+      <h2 id="pricing-title">From $9 a month, with every feature on every tier.</h2>
+      <p>You pay for monthly pageviews and nothing else. This is the whole price list.</p>
+      <table class="price-table oxford-top">
+        <caption class="label">Prices by monthly pageviews</caption>
+        <thead>
+          <tr><th scope="col">Pageviews a month</th><th scope="col">Monthly</th><th scope="col">Yearly</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Up to 10,000</th><td>$9</td><td>$90</td></tr>
+          <tr><th scope="row">Up to 100,000</th><td>$19</td><td>$190</td></tr>
+          <tr><th scope="row">Up to 500,000</th><td>$49</td><td>$490</td></tr>
+          <tr><th scope="row">Up to 2 million</th><td>$99</td><td>$990</td></tr>
+          <tr><th scope="row">Each million after that</th><td>$30</td><td>$300</td></tr>
+        </tbody>
+      </table>
+      <p class="note">Placeholder prices and terms until launch pricing is confirmed. Prices are in US dollars; sales tax or VAT is added where it applies and shown before you pay.</p>
+      <ul class="terms">
+        <li>Every tier includes unlimited sites and seats, goals, the Monday email, shared links, CSV and API export, and email support.</li>
+        <li>Paying yearly costs ten months for twelve.</li>
+        <li>Go over your tier and we keep counting and send you an email. We move you up only after two months over in a row, and we tell you before we do.</li>
+        <li>Cancel from your settings whenever you like. Your data stays available to export for 30 days afterwards.</li>
+      </ul>
+      <div class="cta-row">
+        <a class="button" href="/signup">Start a free trial</a>
+        <p class="cta-note">14 days with every feature, no card. When it ends, pick a tier or the account pauses.</p>
+      </div>
+    </section>
+
+    <section class="grid trust" id="trust" aria-labelledby="trust-title">
+      <p class="eyebrow">Data and support</p>
+      <h2 id="trust-title">Your visitor data stays yours, and a person answers when you write.</h2>
+      <div class="trust-cols">
+        <div class="trust-col" id="data">
+          <h3>Who owns the data</h3>
+          <ul role="list">
+            <li>You do. We never sell or share it, and never use it for advertising or for training models.</li>
+            <li>Export all of it whenever you like, as CSV or through the API.</li>
+            <li>Delete a site and its data is erased within 7 days, and from backups within 30.</li>
+            <li>It is stored and processed on servers in the EU.</li>
+            <li>Our data processing agreement is public, and you can sign it from your settings.</li>
+          </ul>
+        </div>
+        <div class="trust-col" id="support">
+          <h3>Who answers</h3>
+          <ul role="list">
+            <li>Write to <a href="mailto:support@northstarsignal.com">support@northstarsignal.com</a> and one of the people who build Northstar Signal replies.</li>
+            <li>Replies come within one business day, Monday to Friday.</li>
+            <li>Setup help is part of every tier. Send us your site’s address and we will confirm the script is counting.</li>
+            <li>Outages and fixes are posted on the <a href="/status">status page</a> as they happen.</li>
+          </ul>
+        </div>
+      </div>
+      <p class="trust-draft">Placeholder terms until confirmed: the retention periods, hosting region, reply times and support address above.</p>
+    </section>
+
+    <section class="grid closing" aria-label="Sign-off">
+      <p>If Northstar Signal turns out not to suit you, delete one line from your site and take your data with you. The export works the same on your last day as on your first.</p>
+      <p class="valediction">Yours,</p>
+      <p class="signature">The Northstar Signal team</p>
+      <p class="postscript"><span class="ps">P.S.</span> The trial runs 14 days with every feature, and we never ask for a card to start it.</p>
+      <a class="button" href="/signup">Start a free trial</a>
+    </section>
+  </main>
+
+  <footer class="colophon">
+    <div class="colophon-inner">
+      <div>
+        <p class="colophon-brand">Northstar Signal</p>
+        <p class="colophon-line">Privacy-first web analytics for small software teams.</p>
+      </div>
+      <ul class="colophon-links" role="list">
+        <li><a href="/privacy">Privacy policy</a></li>
+        <li><a href="/terms">Terms of service</a></li>
+        <li><a href="/dpa">Data processing agreement</a></li>
+        <li><a href="/script">Script source</a></li>
+        <li><a href="/status">Status</a></li>
+        <li><a href="mailto:support@northstarsignal.com">support@northstarsignal.com</a></li>
+      </ul>
+      <p class="colophon-copy">© 2026 Northstar Signal</p>
+    </div>
+  </footer>
+
+  <script>
+    (() => {
+      const menu = document.getElementById('site-menu');
+      if (!menu || !('hidePopover' in menu)) return;
+      const close = () => {
+        if (menu.matches(':popover-open')) menu.hidePopover();
+      };
+      menu.addEventListener('click', (event) => {
+        if (event.target.closest('a')) close();
+      });
+      matchMedia('(min-width: 64rem)').addEventListener('change', (event) => {
+        if (event.matches) close();
+      });
+    })();
+  </script>
+</body>
+</html>

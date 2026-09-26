@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // goddesign token extraction: measure an existing design system instead of eyeballing it.
 //
-// Why this exists: Step 0 item 1 sends a repo that already has a design system into
+// Why this exists: SKILL.md route 2 sends a repo that already has a design system into
 // extension mode, where the job is faithful extension and the QA gate compares the
 // render against "the existing system's tokens". Until now nothing produced that list,
 // so the model inferred it by reading around, which is exactly the "use gray" failure
@@ -222,7 +222,7 @@ const spacingScale = [...spacing.keys()].sort((a, b) => a - b);
 const found = topHexes.length + topFonts.length + vars.size;
 if (!files.length || !found) {
   console.error('NO DESIGN SYSTEM FOUND: no custom properties, token files, or color literals under the given targets.');
-  console.error('Treat this as a greenfield run: roll the seed and take the full path (SKILL.md Step 1 onward).');
+  console.error('Treat this as a greenfield run: run pick.mjs and take the full path (SKILL.md route 4).');
   process.exit(2);
 }
 

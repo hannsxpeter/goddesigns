@@ -1,5 +1,30 @@
 # Study A completion audit
 
+**Closed on 2026-09-26 without outside data.** Nine weeks after this audit, the
+two unmet requirements below were still unmet: no neutral participant URL was
+issued and no rater responded. The owner decided the question the study would
+answer (would strangers identify goddesign pages as AI-made) is not the one that
+decides the project's direction, which is whether the skill earns its token cost
+on current models for the person who actually uses it. That decision is served
+by the owner-ranked, pre-registered comparison in
+`validation/studies/lean-core-2026-09/`, which needs no recruitment. Keeping the
+rater application alive also meant keeping a deployed Next.js and D1 stack
+patched for a study with no participants (v1.7.0 spent a release on its
+dependency advisories).
+
+What closure means, precisely:
+
+- The core external claim stays **unvalidated**. Closure is not a result, and
+  nothing here may be read as one.
+- The frozen receipts in this directory are retained unchanged.
+- The rater app (`study-a-rater/`), the nine `scripts/study-a-*.mjs` tools, their
+  tests, and `validation/tools/blind-eval-pack.sh` were removed in v2.0.0. All of
+  them are recoverable with `git checkout v1.8.0 -- <path>`.
+- The deployed collection app and its D1 database live outside this repository.
+  Deleting them is the owner's action.
+
+The audit as it stood on 2026-07-23 follows, unchanged.
+
 Audited against the frozen protocol and live operator state on
 2026-07-23. Completion is not inferred from implementation alone.
 

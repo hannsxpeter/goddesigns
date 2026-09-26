@@ -1,202 +1,92 @@
 ---
 name: goddesign
-description: Design and build distinctive, production-grade frontend UI for websites, landing pages, dashboards, apps, components, and HTML/CSS/React styling. Use for any frontend, UI, or visual web work, even when the user does not say "design" or name the skill. Triggers include building or beautifying pages, artifacts, prototypes, admin panels, marketing sites, hero sections, pricing, auth screens, portfolios, mockup-to-code, restyling, redesigning, "make it look better", "make it modern", "make it professional", or "improve the UI". Picks a seeded aesthetic direction, complete palettes, font pairings, layout and motion recipes, then runs a hard QA gate. Do not use for backend, CLI, or non-visual work. Invoke with /goddesign in Claude Code or $goddesign in Codex; other hosts use native skill invocation. Treat text after the skill name as the brief. In Codex, re-invoke for each new design task.
+description: Design and build distinctive, production-grade frontend UI for websites, landing pages, dashboards, apps, components, and HTML/CSS/React styling. Use for any frontend, UI, or visual web work, even when the user does not say "design" or name the skill: building or beautifying pages, prototypes, admin panels, marketing sites, hero sections, pricing, auth screens, portfolios, mockup-to-code, restyling, redesigning, "make it look better", "make it modern", or "improve the UI". Sizes itself to the task: an edit gets the rules and a source scan; a new page gets a seeded direction, a written lock, and a measured gate. Do not use for backend, CLI, or non-visual work. Invoke with /goddesign in Claude Code or $goddesign in Codex; other hosts use native skill invocation. Treat text after the skill name as the brief. In Codex, re-invoke for each new design task.
 ---
 
 # goddesign
 
-You are acting as a studio design lead shipping production code. The goal of every run: an interface with a visual identity that could not be mistaken for anyone else's, built on craft rules that hold up under inspection, taking exactly one aesthetic risk you can justify. Avoid collapsing into AI slop or safe, average-looking layouts; aim for interfaces that feel intentional, bold, and a bit surprising.
+Ship an interface nobody could mistake for another AI-built page. Strong models converge on the same tasteful choices; literal models invent nothing. The scripts here do what no model can do for itself (pick at random, remember past runs, measure the result); your part is judgment and execution. The user's brief always wins. `<root>` is this skill's directory.
 
-Two failure modes produce generic UI, and this skill counters both:
+## 1. Route the task
 
-- **Convergence**: a model with strong taste keeps choosing the same tasteful things (same two fonts, same palette family, same hero). Countered by seeded selection plus a run ledger.
-- **Literalness**: a model that executes faithfully but does not invent direction ships system fonts, one safe palette, and the same section skeleton every time. Countered by complete enumerated decisions: every visual choice in this skill resolves to a number, a hex value, or a named row in a reference file. If you ever find yourself deciding "use gray" or "make it modern", stop; that is not a decision, it is a placeholder. Go get the real value from the deck.
+Take the first that applies.
 
-Precedence, stated once: **the user's brief always wins.** Seeded picks spend only the freedom the brief leaves open.
+1. **Edit**: a fix, restyle, or addition inside an existing page or component, with no new page and no direction change. No pick, no lock. If the stylesheet carries a `/* goddesign | ... */` stamp, keep its tokens and jitter. Apply the Banned list and the build rules to what you touch, run `node <root>/scripts/sweep.mjs <changed files>`, and fix findings on the lines you touched (run the audit too if layout changed). Done.
+2. **Existing design system** (tokens, a themed Tailwind config, a component library, brand guidelines): run `node <root>/scripts/extract-tokens.mjs . --out .design-tokens.json`. On exit 0, build inside those tokens, gate with `sweep.mjs <build> --tokens .design-tokens.json`, stamp `/* goddesign | extension of existing system */`, and skip the pick, the lock, and the ledger. Exit 2 means nothing to extend: go on.
+3. **Multi-session effort**: a `.design-map.md` exists, the brief names 3 or more distinct surfaces, or it states a hand-off. Read `references/map.md` and follow it.
+4. **New page or surface**: the full path below. If the brief names an aesthetic ("a 70s print ad", "our brand navy"), that is the direction: run `pick.mjs --keep-direction` for the structure only.
 
-## Step 0: mode check
+**Lane.** Frontier models with strong design taste (Claude Opus and Fable class) work from this file and the pick output alone. Literal executors (Codex and GPT models), smaller or faster tiers (Sonnet, Haiku, mini, flash, lite), and any model unsure which it is also read `references/full-lane.md` before building. One host is a complete setup: never launch a second host unless the brief asks for a cross-host comparison.
 
-Before anything else, confirm the skill is fully installed. If your host has a shell, run `sh <skill-root>/scripts/verify-install.sh` once: it confirms `SKILL.md` and the nine required reference files are present and non-empty, and exits 1 with `INCOMPLETE INSTALL: <file> not found` if any is missing. Then run `sh <skill-root>/scripts/detect-clis.sh` once. It inventories known CLIs on `PATH`, including Codex, Claude Code, Cursor Agent, Cursor, Gemini CLI, OpenCode, Aider, Goose, GitHub Copilot, Amp, Amazon Q, Kiro, and Factory Droid. Treat this as presence discovery only: an installed command can still be logged out or lack a required capability. The inventory is advisory, not a dependency gate. Core design work requires no particular CLI, editor, model vendor, deployment platform, account, domain, DNS setup, or network service.
+## 2. The full path
 
-Host scope is prompt-specified. One capable host is the default and is a complete setup. Use multiple hosts only when the user's brief explicitly asks for cross-host or multi-host comparison, replication, or compatibility testing, or when running a named maintainer validation protocol. Phrases such as "run this on both Claude and Codex", "compare hosts", or "replicate on another host" opt in; merely naming the current host does not. Without that opt-in, never launch a second host, compare the user against one, lower a score, withhold completion, or record `DEGRADED` because another host is absent. If cross-host work was explicitly requested but another host is unavailable, report that requested scope as unavailable separately; do not deduct from the design's QA score.
+**Context.** In one short paragraph, pin the subject, the audience, the one action the page must drive, and a tone from the extremes (editorial, brutalist, soft, utilitarian, luxurious, playful, technical, cinematic). Invent where the brief is silent and say so. Never search for design inspiration.
 
-Provenance hygiene is prompt-specified too. Only when the brief explicitly asks to inspect or remove invisible Unicode, AI metadata, C2PA or Content Credentials, statistical text marks, or image watermarks, schedule the optional post-gate workflow in `references/provenance-hygiene.md`. It is never part of ordinary design work, never runs before the normal gate passes, and never changes the design score when its independent companion is absent. Do not expand this skill's trigger surface to provenance-removal requests that contain no frontend work.
+**Pick.** Run `node <root>/scripts/pick.mjs` from the project root. It rolls the seed, applies both run ledgers, jitters the tokens, and prints one direction row, one macrostructure, and a pre-filled lock. Take it: a seeded row always stands, and you execute it with full commitment, never drifting toward your own favorites. A brief asking for "less AI" or "something different" gets `--reroll`. Remix by the printed index only when the brief pins brand colors or type, or the audience contradicts the row's mood; swap, never blend. No node: see the fallback at the end.
 
-Prefer the current host's native tools, use only documented helper scripts for delegation, and never mistake a desktop editor launcher such as `cursor` for a headless agent such as `cursor-agent`. (The `references/` folder also holds optional blind-read and provenance-hygiene prompts plus a maintainer-only genome-sources file; those are not required to run.) With no shell, verify lazily: at Step 3c, if a reference deck you need cannot be read, STOP and report `INCOMPLETE INSTALL: <filename> not found`. Never reconstruct a missing deck row from memory; a partial install that invents rows recreates the exact model-authored distribution this skill exists to escape.
+**Lock.** Before any code, write the DIRECTION LOCK: the printed skeleton, with Layout (plus a small ASCII sketch), Signature, and Grammar filled in. Every value is a hex, a named font and weight, a number, or a named row; "use gray" is a placeholder, not a decision.
 
-Then the mode check:
+**Subject test.** The row supplies the form; the subject supplies the matter. The signature and at least one supporting motif are artifacts of the subject's world (its documents, instruments, readouts, marks) drawn in the row's formal language. Show the product working: at least one structured artifact of use (a table, readout, ledger, queue, or state display) with plainly labeled sample data. Name three moves a generic AI page would make for this brief and confirm the lock makes none of them.
 
-1. **Existing design system?** If the repo has one (design tokens, a themed Tailwind config, a component library with its own look, brand guidelines), your job is faithful extension, not reinvention. Measure it before extending it: run `node <skill-root>/scripts/extract-tokens.mjs . --out .design-tokens.json`, which reads W3C design-token JSON, CSS custom properties, `@theme` blocks, Tailwind config, and font declarations, and prints the resolved roles (bg, surface, text, muted, accent, border), fonts, radii, spacing, and palette. Exit 2 (`NO DESIGN SYSTEM FOUND`) means there is nothing to extend: this is item 5, not item 1, so roll the seed and take the full path. With a baseline in hand, skip Steps 2-3, translate everything you build into the extracted tokens, and still apply Step 4's craft rules and the Step 5 QA gate. In this mode no DIRECTION LOCK exists: at the QA gate, skip Phase 1 axis 6 (Variety) and Phase 2b's stated-macrostructure check, hold the build to the baseline with `node <skill-root>/scripts/sweep.mjs <build> --tokens .design-tokens.json`, stamp the stylesheet `/* goddesign | extension of existing system */`, and write no `.design-log.json` entry.
-2. **Scoped edit on a locked page?** If the page's stylesheet already carries a `/* goddesign | */` stamp and the task is a restyle, fix, or extension of existing components (no new page, no new macrostructure, no direction change), reuse the stamped lock: the stamp names it and `:root` holds its values, including the Step 3d jitter in relative-color form, so read both before changing anything. Skip Steps 2-3, keep the existing tokens and jitter, apply Step 4c-4d and the full Step 5 gate. A new page, a new section that introduces a new macrostructure, or any requested direction change sends you back to the full path; when in doubt, the full path.
-3. **More than one session of work?** A `.design-map.md` at the project root, a brief naming 3 or more distinct surfaces (a page, a screen, or a component set with its own one action), or a stated hand-off to another session or host means this effort is bigger than a run. Read `references/map.md` and follow it: chart the map if none exists (one session, no pixels), otherwise claim one surface and inherit the map's System lock verbatim instead of rolling a seed. Two surfaces or fewer in one session with no existing map: no map, design them directly. Under a map, items 1 and 2 still win where they apply: an existing design system supplies the System lock's tokens, and a restyle of an already-stamped surface stays a scoped edit.
-4. **Brief names an aesthetic?** If the user specified a look ("make it feel like a 70s print ad", "match our brand navy"), that IS the direction. Skip the seeded direction pick; still run the seed for the macrostructure, and still lock tokens in Step 4a's DIRECTION LOCK format. Under a map this resolves once, at charting, into the System lock.
-5. Otherwise, continue to Step 1.
-
-## Step 1: identify your lane
-
-Read both lanes; apply the one that matches you. Both lanes run the same Steps 2-5.
-
-**DIVERGE lane** (Claude and other models with strong native design taste): your enemy is your own attractor basin. You cannot self-randomize; asked for a random choice you will pick the same "random" thing every time. So you must take the external seed's pick. The reroll rule: if your instinct quietly substitutes toward any banned attractor (Inter, Space Grotesk, purple-gradient-on-white, cream plus terracotta plus display serif, near-black plus lone acid green, a chaptered essay skeleton with numbered sections, mono typewriter kickers, gold-on-dark luxury, the unthemed kit look of slate/zinc neutrals with rounded 1px-border card grids, scroll-reveal entrances on every section), advance to the next row and say you did. A deck row the seed itself selected always stands, per the Banned list's "selects them deliberately" clause. Within the locked direction, execute with full commitment and your own taste; the seed constrains WHAT you pick, not how well you execute it. Steering override: when the brief says any form of "less AI", "not like Claude", or "make it look different", that is a forced reroll; the new lock must differ from your instinctive pick on BOTH display class and accent hue band, and you state that it does.
-
-**EXPAND lane** (Codex, GPT models, and any model that executes literally; also the default when unsure): do not try to be creative, and do not soften the chosen direction toward what feels typical. Take the seeded row and execute it exactly: its hex values, its named fonts and weights, its import line, its radius, its motion numbers. The Step 3d jitter is part of those values: apply it in the lock, then execute the jittered values exactly. Never blend rows. When an image tool is available, use comp-first mode (references/imagery.md): generate one lock-derived mockup and replicate it; executing a visual spec is this lane's proven strength, inventing one is its proven weakness. Complete the entire DIRECTION LOCK before writing any code, and restate the locked tokens as a comment at the top of the stylesheet you emit, so they survive a long session. Enumerate the full deliverable up front (pages, sections, breakpoints, states) and build all of it; do not silently trim scope. Know this lane's three failure symptoms and check for them at the gate: the placeholder floor (browser-default link blue, unstyled buttons, a silent Times fallback, missing hover states), template snap-back (drifting mid-build toward one recycled Bootstrap-grade layout regardless of instructions; re-read the stylesheet comment against the lock after building), and architecture instead of pixels (a static page or component ships as markup plus tokens plus one stylesheet; no factories, wrapper layers, or config indirection).
-
-## Step 2: context gate
-
-Pin four things in one short paragraph before designing. Invent confidently where the brief is silent, state your inferences in one sentence, and proceed; do not stall on questions.
-
-- **Subject**: what is this product, concretely?
-- **Audience**: who is squinting at it?
-- **The one action** the page must drive.
-- **Tone**, chosen from extremes: editorial, brutalist, soft, utilitarian, luxurious, playful, technical, cinematic. "Clean and modern" is not a tone; it is the absence of one.
-
-Unfamiliar subject? One quick web search for the domain's own vernacular (tool names, units, process words) sharpens the copy; specificity is an anti-slop lever. Never search for design inspiration or "best X sites": the deck is the reference, and searching aesthetics re-converges you on the popular median.
-
-## Step 3: the variance engine
-
-### 3a. Read the ledger
-
-If `.design-log.json` exists at the project root, read it. Also read `~/.design-log.json` (the user-level ledger) if it exists; it tracks runs across ALL projects, because the person reviewing the work sees every project and recognizes repeats the per-project ledger cannot. Constraints for this run, applied against BOTH ledgers' recent entries:
-- The macrostructure must not match any of the last 3 entries.
-- The direction must differ from the previous entry on at least one of: paper band (dark, mid, light), display type class (serif, grotesque, mono, slab, display), accent hue band (warm 10-60, cool 200-300, neutral, other).
-- Additionally, against the user-level ledger only: if the last 2 entries share an accent hue band or a paper band, this run must not make it 3 in a row; advance the offending index until it differs.
-- Rest hot rows across BOTH ledgers' last 8 entries combined: if any one direction appears 3 or more times, or any one macrostructure 4 or more times, it is resting this run; advance the offending index until legal and say so. This is the popularity cap: a row the rotation keeps landing on is a row the population will start recognizing.
-
-State the rotation in plain text: "Last runs: Workbench, Marquee Hero, Letter. Picking from the rest."
-
-Under a design map (Step 0 item 3) these rules run **once, at charting**, and never again inside that map. Surface sessions inherit the map's System lock and must MATCH it: rotating a sibling surface away from the system is the defect, not the goal. The map also writes exactly one ledger entry, when its last surface locks, so a nine-surface product does not flood both ledgers with nine near-identical rows and trip its own popularity cap. See `references/map.md`.
-
-### 3b. Roll the seed
-
-Run this (works in bash and zsh):
-
-```sh
-SEED=$(printf '%s' "$(basename "$PWD")$(date +%Y%m%d%H%M)" | cksum | cut -d' ' -f1)
-echo "seed=$SEED direction=$((SEED % 17)) structure=$((SEED / 29 % 12)) palette=$((SEED / 7 % 10)) typepair=$((SEED / 13 % 12)) jitterh=$((SEED / 37 % 25 - 12)) jitterl=$((SEED / 43 % 3 - 1)) jitterr=$((SEED / 47 % 3 - 1))"
-```
-
-No shell available? Let N be the sum of the character codes of the user's brief (careful best-effort arithmetic) plus today's day of the month. Exactness matters less than that N varies with the brief's content; a raw character count collides whenever two briefs share a length. Then: direction = N % 17, structure = N % 12, palette = (N + 3) % 10, typepair = (N + 7) % 12, jitterh = (N % 25) - 12, jitterl = (N % 3) - 1, jitterr = ((N + 1) % 3) - 1.
-
-### 3c. Resolve the picks
-
-- `direction` indexes `references/directions.md` (17 rows). The row is a complete package: colors, fonts, imports, radius, shadows, background, signature element, motion. It is the default for everything.
-- `structure` indexes `references/layouts.md` (12 macrostructures). This decides what the page IS.
-- `palette` (10 rows in `references/palettes.md`) and `typepair` (12 rows in `references/fonts.md`) are the REMIX indices. Use them only when: the brief constrains the direction's colors or type (brand color exists), the ledger rules disqualify part of the row, a reroll landed you somewhere the brief cannot support, or the Step 2 audience-and-tone verdict contradicts the row's mood (a warm approachable audience under a cold dramatic row is a brief constraint like any other; remix by index and say so, do not freestyle). Swapping is fine; blending three palettes is not.
-- Conflicts with the ledger or brief: advance the offending index by 1 (mod its deck size) until legal, and say so.
-
-Read `references/directions.md` and `references/layouts.md` now; read `references/palettes.md` or `references/fonts.md` only if you are remixing. If any reference file you need cannot be read, stop with `INCOMPLETE INSTALL: <filename> not found` (Step 0 preflight) and do not reconstruct its rows from memory.
-
-### 3d. Jitter the lock (population-scale uniqueness)
-
-The deck rows are archetypes, not final values: two projects landing on the same row must not ship identical hexes, or the row itself becomes the next recognizable tell. Apply the three jitter numbers from the seed roll to the row before writing the lock, using the deck's own relative-color idiom:
-
-- Accent hue: `--accent: oklch(from #ROWHEX l c calc(h + jitterh))`, jitterh in degrees (-12 to 12).
-- Paper: bg and surface each get `oklch(from #ROWHEX calc(l + jitterl * 0.01) c h)`.
-- Radius: the row's radius plus jitterr * 2px, floored at 0; rows that state radius 0 keep 0, flatness is their identity.
-- Never jitter: text and muted colors (their contrast is tuned), fonts, imports, structure, signature, motion.
-- Skip jitter entirely in extension mode and wherever the brief pins a brand value; say so in the lock.
-- The lock and the ledger record post-jitter values, and the contrast gates apply to what actually renders.
-
-## Step 4: DIRECTION LOCK, then build
-
-### 4a. Write the lock
-
-Before any code, output this block in plain text. This is the accountability step: picking on the page, not in your head.
-
-```
-DIRECTION LOCK
-Seed: 2214070812 | Structure: 5 Manifesto | Direction: 12 Neo-Grotesque Poster
-Rotation: differs from last run on paper band + display class
-Tokens: --bg #EDEDEB | --surface #E2E2DF | --text #0F0F10 | --muted #5F5F63 | --accent #2B4BFF
-Jitter: h+8 L+0.01 r+0 | --accent: oklch(from #2B4BFF l c calc(h + 8)) | bg/surface L+0.01
-Type: Anton 400 display / Hanken Grotesk 400 body / Hanken Grotesk 600 caps labels
-Layout: declarative sentences at 12vw are the page; details in small type between them
-  +--------------------------------+
-  | WE MAKE                        |
-  | SLOW SOFTWARE   [detail col]   |
-  | ...                            |
-Signature: the word "SLOW" crops off the right viewport edge
-Grammar: manifesto band runs full-bleed | pricing opens on a bare claim, no eyebrow | 5 features on 2 cols, fifth spans | paddings 48/96/160
-Motion: one marquee 30s linear; hovers 180ms; nothing else
-```
-
-Under a design map, this lock is assembled, not rolled. Copy the map's System lock lines (Seed, Tokens, Jitter, Type, Import, Motion, Atmosphere) verbatim, and choose fresh only the Structure, Layout, Signature, Grammar, and conception-map lines for this surface. Add a `Map:` line naming the map and the surface. Never re-roll the seed, re-jitter the tokens, or read `references/directions.md` again inside a map: siblings that ship different accents are the failure the map exists to prevent.
-
-### 4b. Anti-cliche critique
-
-One paragraph: imagine the generic output an unskilled AI would produce for this same brief. Name three things it would do. Confirm your lock shares none of them. If it shares any, fix the lock now. Second-order check: the "tasteful" cream-serif-terracotta look is itself now a cliche; if your lock resembles it and the seed did not select it, reroll.
-
-Subject test (the direction supplies the form; the subject must supply the matter): strip the copy in your head and ask whether the visuals alone say what world this product lives in. The signature element and at least one supporting motif must be artifacts of the subject's world (its documents, tools, instruments, readouts, marks) drawn in the locked direction's formal language: a ledger's red margin rule as a Swiss rule, a kiln readout as a mono spec block, a boarding pass as a bento panel. A signature that could ship on any product in any industry is decoration, not a signature; replace it before building. Show the product working somewhere on the page: one concrete artifact of use beats a paragraph of assertion.
-
-### 4c. Build rules
-
-- All colors and fonts as CSS custom properties in `:root`; components reference tokens only, never inline hex.
-- CSS hygiene: zero `!important` (the prefers-reduced-motion kill switch is the one exception), zero inline `style` attributes; each hex value appears exactly once, in `:root`; fix layout by restructuring markup, never with pseudo-element patches or absolute-position hacks. Pasting the same declaration block twice means extract a class.
-- Webfonts load via the direction's import line. "Single file" or "self-contained" does NOT mean skip webfonts; only a hard offline requirement does, and then state the fallback stack.
-- Use modern CSS by default: `clamp()` type scales, grid with named areas, `oklch()` and `color-mix()`, container queries where components reflow, `text-wrap: balance` on headings and `text-wrap: pretty` on body, `:focus-visible`, `overflow-x: clip`, native dialog/popover for overlays (never position:absolute inside overflow:hidden).
-- Every interactive element ships default, hover, focus-visible, active, and disabled states; anything data-driven ships empty, error, and loading states.
-- Grammar breaks, mandatory and declared in the lock: forensics on real production pages shows the deepest tell is not any style but the grammar every AI page shares (one container, evenly-padded bands, the same section-opening ritual, everything symmetrized and equally polished). Every page must break that grammar in at least four declared ways: (a) one band escapes the master container (full-bleed asset, negative-margin overlap of 64px+, or a second container width differing 25%+); (b) one section ships with NO heading ceremony: a bare claim, artifact, or image carries it alone; (c) one grid holds an orphan or spanning cell, or columns of visibly unequal height left unequal (never min-height-equalize list rows); (d) section content lengths vary like real content: the shortest section well under half the longest. Write the breaks into the lock's Grammar line and vary section openers page-wide: no opening ritual repeats more than twice in a row.
-- Conception map, optional: a single page may be conceived through more than one avenue: a raster or SVG comp for the hero, artifact-first for a product section, a human-genome grammar for a utility band, copy-first for a manifesto block. Declare the map in the lock (which sections come from which avenue; three avenues maximum) and let the seams show as mode changes, which is how human pages read. The hard rule: mixed conception, never mixed identity: every avenue executes the SAME lock (one palette, one type system, one direction). Different sources of imagination, one design.
-- Atmosphere layer, mandatory: the locked row's Background line is ground treatment, not optional decoration, and it is exempt from the one-signature budget. Execute it as a real depth system: the row's stated texture or pattern actually visible, at least one element that overlaps a boundary or sits at real depth (offset, stack, tilt, layer), and surface variation between sections beyond swapping two near-identical neutrals. A page of flat solid bands containing rectangular panels reads as a wireframe wearing a palette; validation showed exactly this losing on appeal every time. Restraint still governs flourishes and motion; it does not authorize shipping a schematic.
-- Read `references/motion.md` before writing any animation; it has the budgets and copy-paste recipes.
-- Real content over lorem ipsum; when you must placeholder, label it as placeholder. Never invent metrics, testimonials, logos, or company names.
-- Imagery: when the macrostructure or direction calls for an image and pixels are needed, read `references/imagery.md` and generate via `scripts/genimage.sh`; the prompt derives from the DIRECTION LOCK and is written into it. Works from any host by delegating to an installed image-capable CLI (Codex has built-in generation). The capability is not a mandate: most runs ship zero raster images, and generating one the structure never asked for is a Restraint failure. No tool available: the row's CSS/SVG art direction is the fallback, never a stock-photo cliche.
-
-### 4d. Craft floor (non-negotiable numbers)
-
-- **Type**: scale ratio 1.2 (dense UI), 1.25 (marketing), 1.333-1.5 (display-led). Body 16-18px, never under 15. Line-height 1.5-1.6 body, 1.1-1.2 display. Measure 45-75ch. Max 3 families. Weight contrast via extremes (300 vs 800, not 400 vs 600). Display letter-spacing down to -0.04em; all-caps labels +5-12% tracking. Micro-labels and kickers come from the body family via weight, case, and tracking; a mono utility face only where the locked direction states one. Hero clamp ceiling 6rem, unless the locked direction or macrostructure specifies vw-scale display type (8-20vw); that stated range then wins and is the ceiling you state for the hero.
-- **Spacing**: only token-scale values (4, 8, 12, 16, 24, 32, 48, 64, 96, 128, 160), except the grammar breaks declared in the lock. Space within a group smaller than space between groups. Section vertical padding must take at least 3 distinct values per page with the largest at least 2x the smallest; a single global `section { padding }` rule stamping one value on every band is the metronome tell and is banned. Prefer gap over margins. A direction row marked dense or airy overrides this scale; its stated values become the declared scale for the QA gate.
-- **Color**: 60-30-10 dominance; accent under 5% of any viewport, on interactive and state elements only. Contrast 4.5:1 body, 3:1 large text and UI boundaries. No pure #000/#FFF bases. Neutrals tinted toward the brand hue (chroma 0.005-0.015). Dark mode: raise surface lightness for elevation, desaturate accents 20-30%, no black.
-- **Shadows**: one light source per page, 2:1 vertical-to-horizontal offset, layered steps (1/2/4/8/16px at about 0.07 opacity each), tinted toward the background hue. Child radius never exceeds parent radius.
-- **A11y floor**: `:focus-visible` 2px outline, never removed; targets 24px minimum (44px mobile); status never color-only; semantic heading order; alt text or aria-hidden on decorative art; honor `prefers-reduced-motion`.
-- **UX writing**: labels say what happens ("Save changes", not "Submit"); errors explain and offer the fix; empty states invite one action; sentence case; no em dashes in UI copy.
-- **Restraint**: one signature element per page. Concentrate boldness in one place and keep everything around it quiet. Before shipping, remove one thing. More animation makes work look MORE AI-generated, not less.
-
-### 4e. Copy pass
-
-After the visible copy exists, read `references/copy.md` and run its four-pass review before Step 5. Choose transactional or marketing mode for each block. Transactional copy stays predictable; marketing copy names mechanisms, results, examples, or sources and may carry a point of view when the brief supports one. Preserve user-supplied voice and facts. Never invent evidence or rewrite copy merely to evade authorship detection. A substantial copy change after Phase 3 invalidates the screenshots, so run the full gate again.
+**Build.**
+- Tokens as custom properties in `:root`; components use tokens, never raw hex. Load the row's webfont import; "single file" does not mean skip webfonts.
+- One signature element, everything around it quiet. Remove one thing before shipping.
+- Atmosphere is mandatory: the row's Background treatment visibly executed, at least one element overlapping a boundary or sitting at real depth, and surfaces that change between sections. Flat bands of rectangles read as a wireframe.
+- Grammar breaks, declared in the lock: (a) one band escapes the main container; (b) one section opens with no heading ceremony; (c) one grid has an orphan or spanning cell, or unequal columns left unequal; (d) section lengths vary like real content, the shortest well under half the longest. Section paddings take 3 or more values, the largest at least twice the smallest.
+- One hero composition: one headline, one supporting sentence, one action group, one dominant visual.
+- Interactive elements get hover, focus-visible, active, and disabled states; data-driven parts get empty, error, and loading states.
+- Motion: at most 3 intentional motions, transform and opacity only. Read `references/motion.md` before any entrance or scroll animation.
+- Copy names the concrete thing: labels say what happens, errors say what failed and what to do next, claims name a mechanism, result, or source. Never invent metrics, testimonials, logos, people, or company names; label sample data as sample, and label prices and terms the brief did not supply as placeholders. For copy-heavy marketing pages, run `references/copy.md`.
+- Images only when the structure, the row, or the brief calls for pixels: `references/imagery.md` (generated through the Codex CLI).
 
 ## Banned (each with its replacement)
 
-Tags: [fingerprint] entries avoid patterns the public identifies as AI-made on sight (evidence: `validation/research/sentiment-evidence-2026-07.md`); they exist so output is not recognized, and a human designer may legally love them. [craft] entries are quality defects no matter who ships them. The Step 4d craft floor is all [craft] unless an entry says otherwise.
+[fingerprint]: people identify it as AI-made on sight. [craft]: a defect whoever ships it. A deck row the seed selected may state one of these; the row wins.
 
-- [fingerprint] Inter, Roboto, Arial, Arial Black, Open Sans, Lato, Poppins, Helvetica, Segoe UI, Noto Sans, or a system stack (`system-ui`, `-apple-system`, `ui-sans-serif`) as a chosen face. A system face is banned as the display voice too, not only as body. What counts is the first family in the stack: these keywords are correct in a fallback tail behind a real face, and are the placeholder floor when they come first. The one exception is deck row 16 Trade Counter, whose extracted genome states Poppins as its single family; that row ships the waiver its own entry names. INSTEAD: the direction row's fonts, or a `fonts.md` pairing.
-- [fingerprint] Space Grotesk as display. INSTEAD: it may serve as body only under pairing 6.
-- [fingerprint] Indigo-violet gradients on any ground (#6366F1, #7C3AED, #8B5CF6 family), cyan-magenta washes, gradient text via background-clip, purple-tinted drop shadows. INSTEAD: the direction's palette; if you want energy, one saturated accent on a quiet field.
-- [fingerprint] The cream #F4F1EA + terracotta + display-serif reflex, and near-black + lone acid green. INSTEAD: only when the seed or brief selects them deliberately.
-- [fingerprint] Hero followed by three equal rounded cards, then testimonials, then CTA. INSTEAD: the seeded macrostructure.
-- [craft] Cards inside the hero; nested cards; container soup. INSTEAD: hero budget (one composition); whitespace and rules for grouping.
-- [fingerprint] The unthemed kit look: untinted slate/zinc/gray neutral ramps, grids of rounded cards with 1px borders, decorative abstract SVG blobs, icons sprinkled on non-interactive elements. INSTEAD: neutrals tinted per the craft floor; radius and border weight from the locked direction row; at most one card grid per page; icons only on interactive or status elements.
-- [fingerprint] Colored side-stripe borders as accent; eyebrow kickers on every section; 01/02/03 numbering on non-sequential content. INSTEAD: accent on interactive elements; eyebrows on at most 1 section in 3.
-- [fingerprint] Numbered chapter cadence: 01/02/03 section labels, book-style contents rails, chapter headers, hr dividers between uniform essay sections. INSTEAD: the macrostructure's own wayfinding; transitions via background shifts, density changes, or a full-bleed moment; numbers only for steps the user performs in order.
-- [fingerprint] Mono or typewriter micro-labels (tiny mono kickers, dates, tags offsetting display type), and JetBrains Mono or any mono as body or display face; both are recognized fingerprints. INSTEAD: labels in the body family with weight, case, and tracking contrast; mono faces only where the locked direction states one.
-- [fingerprint] Gold, brass, or bronze as shorthand for premium, especially on dark backgrounds. INSTEAD: luxury through space, restraint, and type quality; metallics only in the Art Deco row.
-- [fingerprint] Decorative marker underlines and hand-drawn squiggles beneath headings. INSTEAD: let scale and weight carry emphasis; flourishes only as a direction's stated signature.
-- [fingerprint] Glassmorphism, decorative sparklines, fake browser/phone chrome, emoji as icons, mixed icon sets. INSTEAD: one real icon set (Lucide, Heroicons, Phosphor), real UI, or nothing.
-- [fingerprint, craft] `transition: all`, uniform hover scale-ups, bounce easing (outside a direction that specifies it), scroll-reveal entrances cascading across every section, always-running ambient motion, confetti, animated focus rings. INSTEAD: motion.md budgets and recipes; scroll reveal on at most one element group per page.
-- [fingerprint, craft] Weightless headline copy ("Build faster. Ship smarter."), unleash/elevate/seamless/next-gen, fabricated numbers and testimonials. INSTEAD: say the concrete thing the product does.
-- [fingerprint] The stock ornament kit: off-canvas radial glow blobs, duplicated-span marquee tickers, giant-stat bands with tiny mono labels, hatched or striped placeholder tiles, a full-accent CTA band before the footer, and a footer that mirrors the nav. At most ONE of these per page, and only when the locked row or macrostructure states it. INSTEAD: the row's stated background, signature, and wayfinding.
-- [fingerprint] An accent-colored span highlighting one word inside a headline (the recolored-phrase reflex). INSTEAD: headline emphasis through weight, width, size, or an italic cut; accent stays on interactive and state elements.
+- [fingerprint] Inter, Roboto, Arial, Arial Black, Open Sans, Lato, Poppins, Helvetica, Segoe UI, Noto Sans, or a system stack as the chosen face (fine in a fallback tail). INSTEAD: the row's fonts or a `fonts.md` pairing.
+- [fingerprint] Space Grotesk as display. INSTEAD: body only, under pairing 6.
+- [fingerprint] Indigo-violet gradients, cyan-magenta washes, gradient text, purple-tinted shadows. INSTEAD: the row's palette; one saturated accent on a quiet field.
+- [fingerprint] Cream plus terracotta plus display serif; near-black plus lone acid green; gold, brass, or bronze as premium shorthand. INSTEAD: only when the seed or the brief selects them.
+- [fingerprint] Hero, three equal rounded cards, testimonials, CTA. INSTEAD: the seeded macrostructure.
+- [craft] Cards in the hero, nested cards, container soup. INSTEAD: one hero composition; whitespace and rules to group.
+- [fingerprint] The unthemed kit: untinted slate or zinc neutrals, rounded 1px-border card grids, decorative blobs, icons on non-interactive elements. INSTEAD: neutrals tinted toward the brand hue; one card grid at most; icons only on interactive or status elements.
+- [fingerprint] Eyebrow kickers on every section, 01/02/03 chapter numbering, contents rails, hr dividers, colored side-stripe borders. INSTEAD: eyebrows on at most 1 section in 3; numbers only for steps performed in order; transitions by background or density shifts.
+- [fingerprint] Mono or typewriter micro-labels, and any mono as body or display. INSTEAD: labels from the body family by weight, case, and tracking; mono only where the row states it.
+- [fingerprint] Marker underlines and squiggles under headings; one accent-colored word inside a headline. INSTEAD: emphasis by scale, weight, or an italic cut.
+- [fingerprint] Glassmorphism, decorative sparklines, fake browser or phone chrome, emoji as icons, mixed icon sets. INSTEAD: one real icon set, real UI, or nothing.
+- [fingerprint, craft] `transition: all`, uniform hover scale-ups, bounce easing the row does not state, scroll reveals on every section, always-running ambient motion, confetti. INSTEAD: `motion.md` budgets; a scroll reveal on one group at most, visible without JS.
+- [fingerprint] The stock ornament kit: glow blobs, marquee tickers, giant-stat bands, hatched placeholders, a full-accent CTA band before the footer, a footer mirroring the nav. INSTEAD: one at most, and only when the row states it.
+- [fingerprint, craft] Weightless copy ("Build faster. Ship smarter.", unleash, elevate, seamless, next-gen) and fabricated proof. INSTEAD: the concrete thing the product does.
 
-## Step 5: QA gate
+## 3. The gate
 
-When the build is complete, read `references/checklist.md` and run all three phases: the advisory seven-axis self-critique (every score cites the element, line, or screenshot region that earns it), the boolean gate sweep (pass/fail; report the pass count), and visual verification (the measured audit is the second half of the pass/fail gate; run the blind read by default when an image-capable CLI exists, skip only with a stated reason; a shell renderer chain stands between you and a `DEGRADED: no visual check`, and a bounded fix loop repairs only what the audit names).
+A page that has not passed the gate is not done.
 
-Phase 2 opens with its mechanical half. `node <skill-root>/scripts/sweep.mjs <your build>` executes the greppable assertions against the source and reports file, line, and value for every finding, at 32 rules split into `fail` and `advisory`, with an inline `goddesign-allow: <rule> <reason>` comment as the only exception route and the reason mandatory. It needs no browser and no network, so it is the half of the gate that still runs when the audit cannot, and where it cannot run at all the run states `DEGRADED: no sweep` rather than reporting a pass count it did not measure. The two are complements, not substitutes: source cannot show you a collision, and a render cannot show you a banned value behind a lock that never shipped. Neither one green makes the other unnecessary, and neither one unavailable excuses skipping the other. Judge the design on the active host unless the prompt explicitly opted into cross-host work. Missing a second host is not a skip, failure, or degraded state. If prompt-requested cross-host scope cannot run, report it separately from the QA verdict. Then persist the run: the CSS stamp comment and the `.design-log.json` entry, exactly as the checklist specifies. Under a design map, persist the surface instead: stamp the stylesheet, move the surface into the map's **Surfaces locked** with a link and a one-line gist, re-run `node <skill-root>/scripts/verify-map.mjs .design-map.md`, and write the single `.design-log.json` entry only when the map's last surface locks.
+1. **Sweep**: `node <root>/scripts/sweep.mjs <build>` reads source only. Fix every failure until it exits 0, then read each advisory against the lock and fix it or justify it in a line. A waiver comment (`goddesign-allow: <rule> <reason>`) is legal only against a lock line; rows 13 and 16 state theirs.
+2. **Audit**: `node <root>/scripts/audit.mjs index.html` (or the local URL) renders at 375, 768, and 1280 and names overflow, text collisions, hidden text, small targets, and fallen-back fonts. Fix only what it names, lock frozen, at most 3 cycles.
+3. **Look** at `audit-1280.png` and `audit-375.png`: the signature, the product artifact, and the atmosphere are visible, and nothing is occluded, clipped, or blank. Neither script sees a section painted over a button.
+4. **Lock check**: rendered fonts and colors match the lock; the macrostructure reads; the four grammar breaks shipped; accent stays on interactive and state elements; nothing is invented; the page says who is behind it, how to reach them, and the terms, marked as placeholders where the brief gave none.
 
-After the gate and persistence are complete, run `references/provenance-hygiene.md` only if Step 0 recorded an explicit hygiene request. Keep its inspect, clean, verify, and residual-risk report separate from the design verdict. Never alter frozen validation evidence. A statistical rewrite or pixel-regeneration pass changes the artifact and invalidates the old render, so re-run the full gate afterward. If the optional companion is unavailable, report `OPTIONAL HYGIENE UNAVAILABLE: <reason>` without a `DEGRADED` label or score deduction.
+If a script cannot run, try the fallbacks in `references/checklist.md` (the audit has a renderer chain); if they fail too, write `DEGRADED: no sweep (<reason>)` or `DEGRADED: no visual check (<reason>)` with the failed command, and check the same things by reading the code. Never report a pass you did not measure. On request, `sh <root>/scripts/blind-read.sh audit-1280.png audit-375.png` gets a read from a separate process that sees only the pixels.
 
-A page that has not passed the gate is not done. If someone could glance at the result and say "AI made that" without doubt, it failed; go back to the weakest gate and fix it.
+**Persist.** Put the stamp pick printed on the first line of the main stylesheet, then run the `pick.mjs --log` command it printed. Under a map, `references/map.md` decides instead.
+
+**Report** in a few lines: seed, direction, and structure; sweep and audit exit codes; fix cycles; any DEGRADED label.
 
 ## Reference index
 
-- `references/directions.md`: the 17-row direction deck (row 16 onward: human-genome rows derived from real human-built sites). Read at Step 3c.
-- `references/layouts.md`: 12 macrostructures, hero budget, section and responsive rules. Read at Step 3c.
-- `references/palettes.md`: 10 palette families, OKLCH ramp math, brand-hue adaptation. Read only when remixing colors.
-- `references/fonts.md`: 12 pairings with safe import lines and availability warnings. Read only when remixing type.
-- `references/motion.md`: budgets, easings, copy-paste recipes. Read at Step 4c before animating.
-- `references/copy.md`: mode-aware review for transactional and marketing copy. Read at Step 4e after visible copy exists and before the gate.
-- `references/imagery.md`: generated-image art direction and the genimage delegation chain. Read only when the run needs pixels.
-- `references/map.md`: the design map, for efforts spanning more than one session (3+ surfaces, a hand-off, or an existing `.design-map.md`). Read at Step 0 item 3, not otherwise.
-- `references/checklist.md`: the QA gate. Read at Step 5, not before.
-- `references/blind-read.md`: the fixed prompt for the optional blind post-render critic (`scripts/blind-read.sh`). Read only if you run the blind read at Step 5's visual verification.
-- `references/provenance-hygiene.md`: prompt-specified post-gate inspection and cleaning through the optional `remove-ai-marks` companion. Read only when the brief explicitly requests that delivery work.
+Read a reference only at the moment named here.
+
+- `references/full-lane.md`: full-lane models, before building.
+- `references/checklist.md`: the long-form gate and sweep rule table; the full lane runs it, any lane uses it when a script cannot run.
+- `references/directions.md`, `layouts.md`, `palettes.md`, `fonts.md`: the decks `pick.mjs` reads; open them only on the no-node fallback.
+- `references/motion.md`: before any entrance or scroll animation.
+- `references/copy.md`: the full lane always; other lanes for copy-heavy marketing pages.
+- `references/imagery.md`: only when a run needs pixels.
+- `references/map.md`: route 3 only.
+- `references/blind-read.md`: the prompt behind `blind-read.sh`.
+- `references/provenance-hygiene.md`: only when the brief explicitly asks to inspect or remove invisible Unicode, AI metadata, C2PA, text marks, or image watermarks, and only after the gate passes.
+
+## No-node fallback
+
+Let N be the sum of the character codes of the brief plus today's day of the month. Then direction = N % 17, structure = N % 12, palette = (N + 3) % 10, typepair = (N + 7) % 12, jitterh = (N % 25) - 12, jitterl = (N % 3) - 1, jitterr = ((N + 1) % 3) - 1. Read that row of `references/directions.md` and of `references/layouts.md`, jitter by hand (accent `oklch(from #HEX l c calc(h + jitterh))`, bg and surface lightness plus jitterl times 0.01, radius plus jitterr times 2px unless the row states 0), and write the ledger entry `references/checklist.md` describes. If a deck cannot be read, stop with `INCOMPLETE INSTALL: <file> not found`; never rebuild a row from memory.

@@ -1,6 +1,6 @@
 #!/bin/sh
 # goddesign blind post-render critic.
-# The QA gate's Phase 1 self-critique is written by the same context that built the
+# Any critique the builder writes is written by the same context that built the
 # page, holding the answer key. This runs a SEPARATE process that sees only the
 # rendered screenshots, staged under anonymized names in an isolated temp directory
 # (no project rules, no repo access, no code, no DIRECTION LOCK, no method-revealing

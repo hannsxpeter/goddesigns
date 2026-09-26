@@ -1,5 +1,95 @@
 # Changelog
 
+## v2.0.0 (2026-09-26)
+
+The lean-core release. The owner asked whether goddesign still earns its cost now that frontier models are better and more expensive, given that much of it re-taught things those models do unprompted while it still helped weaker ones. The answer measured in this session: the parts no model can do for itself are small (pick at random, remember past runs, measure the render, hold this owner's taste), and most of what every run read was neither. v2.0.0 keeps the first set, moves the rest to where it is needed, and pre-registers the test that decides whether the cut cost quality.
+
+### What a run reads, measured in bytes
+
+| Path | v1.8.0 | v2.0.0 | Change |
+|---|---|---|---|
+| New page, frontier model | 95,159 (SKILL.md, checklist, both decks, motion, copy) | 16,420 (SKILL.md and the picker's printout) | 5.8x less |
+| Edit to an existing page | 66,770 (SKILL.md and the checklist, then the full gate) | 12,699 (SKILL.md, then the sweep on changed files) | 5.3x less |
+| New page, full lane | 95,159 | 54,842 (adds full-lane.md, the checklist, and copy) | 1.7x less |
+
+`references/motion.md` (4,384 bytes) is read only before an entrance or scroll animation, and `references/copy.md` (3,052) on the frontier lane only for copy-heavy marketing pages. The measurement behind the decision: across the owner's six real sessions that used the skill outside this repository, its own reads and scripts were 134 of 4,643 tool calls; the cost that mattered was the fixed reading on every invocation, the self-graded critique, and the full ceremony on small jobs (two README SVGs went through a seed roll, and a truncated-headline fix loaded the whole skill).
+
+### `pick.mjs`: the variance engine is code now
+
+- `skills/goddesign/scripts/pick.mjs` rolls the seed, reads both run ledgers, applies the four rotation rules (no structure from the last 3 runs; the direction differs from the previous run on paper band, display class, or accent band; no third consecutive paper or accent band in the user ledger; a popularity cap resting any direction seen 3 times or structure 4 times in the last 8 runs), jitters the tokens, and prints one direction row, one macrostructure, paste-ready `:root` tokens, the stylesheet stamp, a pre-filled DIRECTION LOCK, and the exact `--log` command to persist the run. The model fills in three lines (Layout, Signature, Grammar).
+- The derivation is the shell seed's, with deck sizes read from the decks, so a modulus can no longer drift out of sync with a deck. The regression suite pins a real receipt: seed 2110904443, which the Bellweather run rolled and rotated by hand, lands on row 10, skips it because the user ledger's last two runs were light paper, and settles on row 11 Luxury Serif, structure 4 Workbench, jitter h+9, exactly as that run's lock recorded.
+- Paper band and accent hue band are computed from the hexes in OKLCH; every direction row gained a `- Class: display=...` line for the display class. `--reroll` is the steering override (display class and accent band both change), `--keep-direction` serves a brief that names its own aesthetic, `--show` prints one remix row, `--check` verifies the install, and `--log` writes both ledgers and refuses a malformed or placeholder entry.
+- Under a design map the picker refuses to roll once the System lock carries a seed, and `--log` refuses a per-surface entry until `--map-final`, so the map's two inversions are enforced rather than only stated.
+- The tests caught a bug worth recording: the first draft's "run only when invoked directly" guard compared `argv[1]` with the module path literally, so a run through a symlink (the way every host installs the skill) exited 0 having printed nothing. It now compares real paths, and a test invokes it through a symlink.
+
+### Lanes by capability, routing by task
+
+- `SKILL.md` is rewritten as the lean core: 12,699 bytes against 35,760, under a 13,000-byte ceiling that `lint-decks.mjs` enforces. It routes the task (edit, existing design system, multi-session map, new page), states the lanes, runs the full path in five short steps (context, pick, lock, subject test, build), and keeps the owner-taught rules as one-liners: the subject test, the substance gate, the mandatory atmosphere layer, the four grammar breaks, and the Banned list with every INSTEAD.
+- The frontier lane (Claude Opus and Fable class) works from the core and the picker's printout. The full lane (Codex and GPT models, Sonnet, Haiku, mini, flash, lite, and any model unsure which it is) also reads the new `references/full-lane.md`: the old EXPAND lane, the enumerated craft floor, the CSS hygiene and modern-CSS lists, and routing through the long-form checklist and the copy review.
+- An edit to an existing page no longer runs the pick, the lock, or the full gate: the Banned list and build rules apply to what it touches, and the sweep runs on the changed files. The standing-rule snippet in `docs/INSTALL.md` now says so, instead of "invoke it and follow it fully" for every frontend task.
+
+### Retired from the per-run path
+
+- **The seven-axis self-critique (checklist Phase 1).** Scored by the context that made every choice, advisory, and the gate's most output-heavy step. Its useful parts live where they can be checked: the subject test and substance gate, the trust-surface gate, and the picker's ledger rules.
+- **The blind read as a default.** It now runs on request, because it spends a second model call on every run.
+- **`verify-install.sh` and `detect-clis.sh` on every run.** The install check moves to install time (`scripts/install.sh`) and into the picker, which stops with `INCOMPLETE INSTALL` on a missing or partial deck. `detect-clis.sh` had no consumer left and is removed; `blind-read.sh` and `genimage.sh` detect their own CLIs.
+- **Governance prose in the core.** Cross-host scope is one sentence; provenance hygiene is one pointer, with its guard rails in `references/provenance-hygiene.md`, where `lint-decks.mjs` now checks them.
+
+### Study A closed, the four-arm comparison pre-registered
+
+- Study A closed with zero rater responses, nine weeks after its generation finished. The core external claim stays **unvalidated**, and the README, validation index, and contributing guide now say so plainly. The closure is recorded in `validation/studies/study-a-2026-07/` (the frozen receipts are unchanged), and `validation/protocols/external-validation-protocol.md` is marked retired.
+- Removed, all recoverable with `git checkout v1.8.0 -- <path>`: the `study-a-rater/` Next.js and D1 application (58 files, and the dependency upkeep v1.7.0 spent a release on), the nine `scripts/study-a-*.mjs` tools and their test file, `validation/tools/blind-eval-pack.sh`, and the six CI steps that tested the study tooling and built, tested, and audited the rater app. The deployed rater and its D1 database live outside the repository and are the owner's to delete.
+- `validation/studies/lean-core-2026-09/` pre-registers what decides v2.0.0's bet: five of Study A's frozen briefs, four arms (a frontier model with no skill, the lean core, v1.8.0, and a cheaper model on the lean core's full lane), one owner-ranked blind pack, and three decision rules fixed in advance. `scripts/arm-test.mjs` runs it: each cell in an isolated workspace under `claude -p --safe-mode` (no CLAUDE.md, installed skill, plugin, hook, or MCP server), the skill appended the way a host loads one, both ledgers empty, then the harness's own sweep and audit, a blind pack with a sealed key, and a mechanical reveal. It needs the `claude` CLI logged in: the desktop app's login does not carry over to `claude -p`, and on the maintainer's machine it was logged out until the owner ran `claude auth login` on 2026-09-26. Launched from inside a Claude Code session, the harness strips that session's environment (its messaging socket, session id, API base URL, and `CLAUDE_EFFORT`, which would override the protocol's effort). `--jobs` runs cells concurrently while the cells that park the home ledger (v1.8.0 reads `~/.design-log.json` itself) take turns, and `--retry-failed` re-runs only a cell that never reached the model.
+- One amendment before any run: the per-run caps rose from $20 and 45 minutes to $40 and 90 minutes, after the smoke runs below took about 25 minutes to reach a first page, so the caps could not cut off the heavier arm mid-fix-loop and bias the lean-versus-full criterion. No arm, brief, criterion, or threshold changed.
+
+### Smoke validation: one brief, both versions
+
+`validation/runs/lean-core-smoke-2026-09/` designed Study A's B01 once under the v2.0.0 working tree and once under v1.8.0, each by a fresh-context subagent on the same model, and re-measured both pages with the repository's own scripts. It is one pair, not the comparison.
+
+- Both gates are green on re-measurement: sweep exit 0 and audit exit 0 with no finding at 375, 768, or 1280.
+- v2 read 16 KB of instructions to v1.8.0's 95 KB, but its total subagent tokens were only 18% lower (319,474 against 388,883) and it finished 4.2 minutes sooner (32.8 against 37.0). Building and verifying the page dominates a full run's cost, so the reading cut moves the total far less than it moves the reading. The four-arm study measures this properly.
+- **A regression, found and fixed before the tag.** The v2 page stated prices and terms the brief never gave without marking them as placeholders; v1.8.0's checklist had required that for demo builds, and the rule was compressed out of the core. `SKILL.md` restores it in the build rules and the lock check (12,699 bytes, still under the ceiling), and `lint-decks.mjs` pins the sentence.
+- **Both versions converged on the same content**: a stored pageview record as the signature, a midnight-salted visitor hash, pricing from $9, a Monday report. The seed varied the form (Organic Modern with Specimen, against Editorial Magazine with Letter); nothing varied what the model believes the subject is. Recorded as the open frontier, not as a v2 regression.
+
+### Install integrity
+
+- **The skill was not loading in Claude Code on the maintainer's machine.** `~/.claude/skills/goddesign` pointed at `/Users/hprincivil/Projects/goddesigns/...`, a path that stopped existing when the account was renamed, while the global rule kept telling every session to use the skill. The Codex links had been re-pointed on 2026-09-05; the Claude link was missed. Nothing reported it: `verify-install.sh` run from the clone checks the clone, and Claude Code simply stops listing a skill it cannot resolve.
+- `scripts/install.sh` links the skill into Claude Code and Codex with `ln -sfn`, repairs stale links, refuses to overwrite a real directory, and runs the install check through every link. `--check` verifies without changing anything, and names a dangling link with its dead target.
+- `verify-install.sh` now requires `references/full-lane.md` and `scripts/pick.mjs`, reads its moduli from the no-node fallback line, and says in its header to run it through the installed path.
+- The installer repaired the maintainer's Claude Code link on 2026-09-26. The same account rename had also broken the `godaudits` and `godplans` skill links in all three host directories; those belong to other projects and were re-pointed by hand at the owner's request.
+
+### Drift found and corrected
+
+A read-only audit of the documentation against the code at v1.8.0 found these; each is fixed in this release unless it says otherwise.
+
+1. The Claude Code install link dangled (above), and `docs/INSTALL.md` Step 3 could not have caught it: run from the parent directory its command exits 127, and run inside the clone it checks the clone.
+2. The documented repair, "redo Step 2", failed on an existing link, because plain `ln -s` stops with "File exists". The docs now use the installer or `ln -sfn`, and warn that moving the folder or renaming the account breaks absolute links.
+3. The README's install block omitted the `mkdir -p` that `docs/INSTALL.md` included; the installer replaces both.
+4. `references/directions.md` said row 16 was the only row needing a waiver, but row 13's `#D4AF37` is on the sweep's metallic list at `fail`: the repository's own Art Deco build fails `metallic-premium`. Row 13 now carries its exact waiver line, and the sentence names both rows.
+5. The deck's spacing scale stopped at 128 with "airy" adding 160, while `SKILL.md` and `sweep.mjs` put 160 in the base scale. The deck now states the scale the sweep enforces.
+6. The checklist told the blind read to use `shot-1280.png shot-375.png`, but the audit writes `audit-1280.png` and `audit-375.png`, so followed literally `blind-read.sh` exited 1. Corrected everywhere.
+7. The checklist listed seven file types for the sweep; it reads fifteen and skips build directories. The list is complete now.
+8. The example lock in `SKILL.md` was not reproducible from its own formula (seed 2214070812 gives direction 9, not 12; it predated the 17-row deck). The example is gone: the picker prints real locks.
+9. The edit route and `references/map.md` sent work through "Steps 4c-4d", skipping the copy step v1.8.0 added. Both are rewritten around the new routes.
+10. `SKILL.md` and `references/imagery.md` said image generation used "an installed image-capable CLI"; `genimage.sh` implements Codex only. Both now name it.
+11. `CONTRIBUTING.md` capped each 30-degree accent band at 2 rows and `docs/ARCHITECTURE.md` said `lint-decks.mjs` enforced the deck caps; nothing measured them. Measured now: band 0-30 holds rows 7, 10, and 16, five red-orange rows (10, 7, 16, 0, 1) sit within 23 degrees, and rows 0 and 16 fail the confusable-pair test. `lint-decks.mjs` now measures the cap, records the existing breach as dated known debt, and fails on any new one. **Not fixed**: rebalancing the deck changes designs, so it waits for the owner.
+12. `CONTRIBUTING.md` made tilt exclusive to row 6 (the 2026-07-18 rule), but rows 10 and 15 still tilt. Recorded as deck debt; **not fixed**, for the same reason.
+13. `CONTRIBUTING.md` named only `SKILL.md`'s moduli to update when a deck grows, while `lint-decks.mjs` also hard-codes the sizes. It now lists all three places.
+14. The README's "clears 14 of 19 goddesign pages" was the v1.6.0 subset. Re-measured over all 49 artifacts: 21 of 31 goddesign pages clean (the other 10 have one or two failures), all 18 other pages failing at 6 to 70. The README now also says the split measures compliance with goddesign's own rules, not quality.
+15. The README called Study A "underway" with "20+ outside raters" when no participant URL had been issued and no rater had responded. It is now described as closed.
+16. `docs/ARCHITECTURE.md` said the scripts "now carry 21 sweep tests and 316 lint checks"; v1.8.0 had 24 and 348, and v1.6.2 shipped 22 and 316. The sentence is dated to v1.6.2.
+17. The external validation protocol said every published run was Claude-lane, contradicted by the Kilnhouse Codex runs and Study A's Codex replication receipt. Corrected in the retired protocol's record.
+18. The CI comment said the sweep test checked "the corpus separation the evaluation record claims"; it checks a named subset. The comment says so now, and CI runs on Node 18 as well as 22, since the docs promise Node 18 or newer.
+19. `study-a-rater/DESIGN-QA.md` cited screenshots in the ignored `output/` directory. Moot: the app is removed.
+20. Orphans: `scripts/study-a-secrets.mjs` and `scripts/study-a-replication-receipt.mjs` had no caller, doc, or test. Removed with the rest of the Study A tooling.
+
+### Tests
+
+- `scripts/pick.test.mjs`: 18 tests, including the Bellweather receipt, every ledger rule, the map guards, a symlinked invocation, and three partial-install shapes.
+- `scripts/arm-test.test.mjs`: 11 tests. No model is called: they pin `--safe-mode` on every arm, the skill on skill arms only, the variadic `--add-dir` ordering, Study A's brief text verbatim, the launching session's environment stripped, only API-level failures counted as retryable, a blind pack that names no arm, model, or skill, and the frozen 4-of-5 decision rule.
+- `scripts/lint-decks.mjs`: 381 checks, with new ones for the `SKILL.md` byte budget, pick and lane routing, the retired per-run rituals staying retired, the placeholder rule the smoke run restored, the provenance guard rails in their new home, the measured accent cap, and `pick.mjs --check`. Each new check was negative-tested against the v1.8.0 files.
+- `scripts/sweep.test.mjs` (24) and `scripts/provenance-hygiene.test.mjs` (5) are unchanged and green.
+
 ## v1.8.0 (2026-08-19)
 
 ### Mode-aware copy review

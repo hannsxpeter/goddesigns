@@ -18,6 +18,7 @@ merged as a rule.
 | Add a new visual direction to the deck | [Adding a direction row](#adding-a-direction-row) |
 | Contribute a direction extracted from a real human-built site | [Contributing a human-genome row](#contributing-a-human-genome-row) |
 | Change one of the scripts | [Changing scripts](#changing-scripts) |
+| Add or change text in `SKILL.md` | [Changing what a run reads](#changing-what-a-run-reads) |
 
 You do not need to be a designer to contribute. The human-genome lane in
 particular is open to anyone who can point at a website they admire and write
@@ -32,12 +33,14 @@ evidence, not taste.
    required), or a defect you reproduced in a validation run. The collection
    method is documented in
    [validation/protocols/sentiment-refresh-protocol.md](validation/protocols/sentiment-refresh-protocol.md).
-2. **Encode it in three places.** The DIVERGE lane's attractor list in
-   `SKILL.md`, the Banned list (with an INSTEAD that points back into the seeded
-   deck, never at one specific alternative look, plus a `[fingerprint]` tag), and
-   a greppable string or yes/no assertion in `references/checklist.md`. Pure
-   quality rules (contrast, tap targets, states) take a `[craft]` tag instead and
-   enter the craft floor or the gate without touching the attractor list.
+2. **Encode it in two places.** The Banned list in `SKILL.md` (one line, with an
+   INSTEAD that points back into the seeded deck, never at one specific
+   alternative look, plus a `[fingerprint]` tag), and the gate: a `sweep.mjs`
+   rule when a script can see it (step 3), otherwise a yes/no assertion in
+   `references/checklist.md` Phase 2b. Pure quality rules (contrast, tap
+   targets, states) take a `[craft]` tag and usually belong in
+   `references/full-lane.md` or the gate, not the Banned list. `SKILL.md` has a
+   byte budget; see [Changing what a run reads](#changing-what-a-run-reads).
 3. **Mechanize it if a script can see it.** If the pattern resolves to a string,
    a number, or a count in source, it becomes a rule in
    `skills/goddesign/scripts/sweep.mjs` and a row in the Phase 2a table in
@@ -70,27 +73,43 @@ value: colors as hex, fonts with a working import line, radius, shadows,
 background treatment, one signature element, motion numbers. **No field may be
 left as an adjective.** "Warm neutral" is not a color.
 
+Every row also carries a `- Class: display=<serif|grotesque|mono|slab|display>`
+line naming its display type class. `pick.mjs` uses it, with the paper and
+accent bands it computes from the hexes, to keep consecutive runs apart, and it
+refuses to run on a row that lacks one.
+
 Then check it against the deck-wide distribution caps, which exist because a
 deck that repeats itself is just a slower kind of convergence:
 
-- **Accent spread.** No more than 2 rows per 30-degree accent hue band. No two
-  rows may share both a paper band and an accent hue band unless their
-  saturation classes differ sharply (a candy pink and a deep oxblood are not
-  confusable; two saturated red-oranges are).
+- **Accent spread.** No more than 2 rows per fixed 30-degree OKLCH accent hue
+  band (0-30, 30-60, and so on). `lint-decks.mjs` measures this. One breach
+  predates the measurement: band 0-30 holds rows 7, 10, and 16, recorded as
+  known debt on 2026-09-26 and awaiting an owner decision; a new row may not
+  add to any band at its cap. No two rows may share both a paper band and an
+  accent hue band unless their saturation classes differ sharply (a candy pink
+  and a deep oxblood are not confusable; two saturated red-oranges are). Rows 0
+  and 16, both saturated red-orange on light paper, currently fail that test and
+  are part of the same recorded debt.
 - **Type spread.** No two rows share a display font family or superfamily.
 - **Depth spread.** Each shadow and depth treatment belongs to exactly one row.
   Hard offset shadows: row 14 only. Sticker outline: row 10. Soft layered
-  tinted: at most one dark row and one light row. Tilt as a stated device: one
-  row (Lo-Fi Riso misregistration). The hard-offset-plus-tilt-plus-chips kit is
+  tinted: at most one dark row and one light row. Tilt as a stated device:
+  row 6 (Lo-Fi Riso misregistration). Rows 10 (a tilted background shape) and 15
+  (a card tilting 2deg on hover) still carry tilt despite the 2026-07-18 rule
+  that made tilt exclusive to row 6; that is recorded as deck debt for the owner
+  to rule on, not silently rewritten. The hard-offset-plus-tilt-plus-chips kit is
   Claude's native default and reads as "an AI design variant" the moment two
   rows carry it; the owner caught this across three separate rounds, and the
   deck was rebalanced on 2026-07-18 because of it.
 - Verify every Google Fonts import URL answers 200.
 - Check the row against the entire Banned list. A banned pattern may appear only
-  as the row's stated concept.
-- Update every seed modulus if the deck size changes (`SKILL.md` Step 3b and its
-  no-shell fallback). The moduli must always match deck sizes, or the skill rolls
-  for a row that does not exist.
+  as the row's stated concept, and a row that trips a `fail` sweep rule by design
+  ships the exact waiver comment in its own text, as rows 13 and 16 do.
+- If the deck size changes, update the three places that state it: the no-node
+  fallback line in `SKILL.md`, the size assertions at the top of
+  `scripts/lint-decks.mjs`, and the `--check` expectation in
+  `scripts/pick.test.mjs`. `pick.mjs` itself reads sizes from the decks, and
+  `verify-install.sh` reads the fallback line, so neither needs editing.
 
 ## Contributing a human-genome row
 
@@ -135,8 +154,8 @@ recipe:
    "do not polish the human traits away" note at every point where the genome
    contradicts model instincts.
 5. **Check the caps.** Accent and depth caps like any row, plus the sourcing caps
-   below. Verify the import URL answers 200. Update the seed moduli if the deck
-   grew.
+   below. Verify the import URL answers 200. Update the deck size in the three
+   places listed above.
 
 **Sourcing provenance.** Left to instinct, a maintainer keeps sampling the same
 admired corner of the web, and the sourced rows re-converge, which defeats the
@@ -152,14 +171,18 @@ at most two genome rows share a `vantage=` value, and the two most recently
 added genome rows must not share one. `source=` is the real site's domain, as
 evidence of a human-built origin. Row 16 predates the schema and is grandfathered
 as `source=unrecorded-preschema`. This is deck maintenance only, so it changes
-nothing in a design run and both hosts stay identical.
+nothing in a design run and every host stays identical.
 
 ## Changing scripts
 
-`audit.mjs`, `sweep.mjs`, `extract-tokens.mjs`, `codex-audit-loop.sh`,
-`genimage.sh`, and `verify-map.mjs` must stay dependency-light, degrade
-gracefully (a clear message plus a documented exit code), and remain
-host-neutral.
+`pick.mjs`, `audit.mjs`, `sweep.mjs`, `extract-tokens.mjs`,
+`codex-audit-loop.sh`, `genimage.sh`, and `verify-map.mjs` must stay
+dependency-light, degrade gracefully (a clear message plus a documented exit
+code), remain host-neutral, and run on Node 18, which CI tests alongside a
+current release. A script meant to run directly must still run when invoked
+through a symlink, because every host installs the skill that way; compare real
+paths, not the literal `argv[1]` (`pick.test.mjs` pins this after a first draft
+of `pick.mjs` exited 0 having done nothing).
 
 Test against the defect corpus in `validation/` before and after your change:
 the audit must still catch the known collisions and reveal bugs, the sweep must
@@ -174,6 +197,29 @@ known-clean runs.
   waiver is itself a failure.
 - **Every new or changed rule reports its corpus split in the pull request**: how
   many goddesign artifacts it fires on, and how many baselines.
+
+## Changing what a run reads
+
+Every word in `SKILL.md` is paid for on every invocation, by every user, on
+every model. Until v1.8.0 that file grew by about 1 KB a week and every run also
+read the 31 KB checklist and both decks; v2.0.0 cut the frontier-model reading
+from about 95 KB to about 16 KB. Two rules keep it from growing back:
+
+- **The budget.** `SKILL.md` stays under 13,000 bytes, and `lint-decks.mjs`
+  fails when it does not. Adding a line means removing one, or moving something
+  out.
+- **The placement test.** Before adding text to `SKILL.md`, answer in the pull
+  request: does a current frontier model already do this unprompted, and can a
+  script enforce it? If a script can, write the rule into `sweep.mjs` or
+  `pick.mjs` instead. If only literal or smaller models miss it, it goes in
+  `references/full-lane.md`. If it applies only in one situation, it goes in the
+  reference file for that situation and `SKILL.md` gets a one-line pointer.
+  Only what every model needs on every run belongs in the core.
+
+Whether a cut costs quality is measured, not argued: the four-arm comparison in
+`validation/studies/lean-core-2026-09/` (harness: `scripts/arm-test.mjs`) is the
+tool, and a change that moves material between the core and the full lane
+should be judged with it.
 
 ## Changing the design map contract
 
@@ -199,14 +245,15 @@ replication, or compatibility testing.
 Run the standard maintainer proof from
 [the Kilnhouse run](validation/runs/kilnhouse-2026-07/README.md): at least one
 baseline (expect tells), skill runs on both hosts (expect clean gates), two
-same-brief DIVERGE runs (expect zero shared ledger axes), and screenshots or an
-honest DEGRADED. Add the artifacts and a dated summary to `validation/`.
+same-brief frontier-lane runs (expect zero shared ledger axes), and screenshots
+or an honest DEGRADED. Add the artifacts and a dated summary to `validation/`.
 
-Changes that touch the README's core claim (that the output is not identifiable
-as AI-made) additionally follow
-[the external validation protocol](validation/protocols/external-validation-protocol.md).
-The distinction is strict and worth internalizing: **author-run proofs move the
-machinery, only external studies move the claim.**
+The README's core claim (output that outside judges cannot identify as AI-made)
+is **unvalidated**: the only study built to test it closed without data, and
+[the external validation protocol](validation/protocols/external-validation-protocol.md)
+is retired. No change may word the README or the docs as if that claim were
+tested. The distinction is strict and worth internalizing: **author-run proofs
+move the machinery, only external studies move the claim.**
 
 ## Style
 

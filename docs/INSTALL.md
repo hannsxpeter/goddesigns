@@ -1,8 +1,8 @@
 # Setup guide
 
-goddesign is a folder of instructions, not an app. Installing it means pointing
-your AI assistant at that folder. There is no build step, no package to install,
-no account to create.
+goddesign is a folder of instructions and small scripts, not an app. Installing
+it means pointing your AI assistant at that folder. There is no build step, no
+package to install, no account to create.
 
 Total time: about a minute.
 
@@ -11,8 +11,9 @@ Total time: about a minute.
 - An AI coding assistant that supports skills. Claude Code and OpenAI Codex CLI
   are the two we test on; most others work too (see [Other assistants](#other-assistants)).
 - Git, to download the files.
-
-That is the whole list. Everything else on this page is optional.
+- Node 18 or newer. The picker and the source scan are Node scripts with no
+  dependencies. Without Node the skill still runs, on a documented fallback,
+  and says which checks it could not run.
 
 ## Step 1: download it
 
@@ -20,101 +21,102 @@ That is the whole list. Everything else on this page is optional.
 git clone https://github.com/hannsxpeter/goddesigns.git
 ```
 
-## Step 2: point your assistant at it
+## Step 2: link it into your assistants
 
-We recommend a symlink (a shortcut) rather than a copy. That way a single
-`git pull` later updates every assistant at once.
+```sh
+sh goddesigns/scripts/install.sh
+```
 
-**Claude Code:**
+The installer links the skill folder into each assistant's skill directory
+(`~/.claude/skills` for Claude Code, `~/.agents/skills` for Codex, and the older
+`~/.codex/skills` if you have it), then runs the install check through every
+link. It prints one line per assistant:
+
+```
+ok   Claude Code: ~/.claude/skills/goddesign -> /path/to/goddesigns/skills/goddesign
+ok   Codex: ~/.agents/skills/goddesign -> /path/to/goddesigns/skills/goddesign
+```
+
+Links rather than copies mean a single `git pull` later updates every assistant
+at once. A link stores an absolute path, though, so **if you move the folder or
+rename your user account, run the installer again**: it repairs stale links. If
+a real directory (a copy) already sits where a link should go, the installer
+reports it and leaves it alone.
+
+Prefer to link by hand? Use `ln -sfn`, which replaces an existing or dangling
+link, where a plain `ln -s` fails with "File exists":
 
 ```sh
 mkdir -p ~/.claude/skills
-ln -s "$PWD/goddesigns/skills/goddesign" ~/.claude/skills/goddesign
+ln -sfn "$PWD/goddesigns/skills/goddesign" ~/.claude/skills/goddesign
 ```
 
-Use it with `/goddesign <what you want>`.
-
-**OpenAI Codex CLI:**
-
-```sh
-mkdir -p ~/.agents/skills
-ln -s "$PWD/goddesigns/skills/goddesign" ~/.agents/skills/goddesign
-```
-
-Use it with `$goddesign <what you want>`. Two notes on Codex: older versions
-read from `~/.codex/skills` instead, so link there as well if yours does, and
-Codex skills only last for one turn, so re-invoke it for each new design task.
+Use it with `/goddesign <what you want>` in Claude Code, or
+`$goddesign <what you want>` in Codex. Codex skills last for one turn, so
+re-invoke it for each new design task.
 
 ## Step 3: confirm it installed cleanly
 
-This step matters more than it sounds. The skill is only as good as its
-reference decks, and a partial install (a broken shortcut, an interrupted
-download) lets the assistant improvise the missing pieces, which recreates the
-generic look you installed this to avoid.
-
 ```sh
-sh skills/goddesign/scripts/verify-install.sh
+sh goddesigns/scripts/install.sh --check
 ```
 
-A good install prints:
+This matters more than it sounds. The check runs *through each link*, which is
+the only place a broken install shows up: run from the clone, a check inspects
+the clone and passes even while your assistant's link points at a folder that
+no longer exists, and an assistant that cannot resolve a skill simply stops
+listing it, with no error anywhere. That is not hypothetical; it is how the
+skill went missing from the maintainer's own Claude Code for weeks.
+
+A good install prints `ok` for every assistant you use. A broken one names the
+problem:
 
 ```
-goddesign: install OK
+FAIL Claude Code: ~/.claude/skills/goddesign -> /Users/old-name/goddesigns/skills/goddesign does not exist (run: sh scripts/install.sh)
 ```
 
-A broken one names the exact problem instead:
+The check also goes past "are the files there". A copied-instead-of-linked
+install or a stale old version can have every file present while one deck is
+missing rows, and then the skill reaches for a design that is not there, so it
+counts the rows too:
 
 ```
-INCOMPLETE INSTALL: references/directions.md not found
+INCOMPLETE INSTALL: references/directions.md has 14 rows, SKILL.md's no-node fallback rolls % 17 (stale or partial copy: reinstall, see docs/INSTALL.md)
 ```
 
-The check goes one step further than "are the files there". A copied-instead-of-
-linked install or a stale old version can have every file present while one deck
-is missing rows, and then the skill reaches for a design that is not there. So
-the script also counts the rows and compares them against what the skill expects:
-
-```
-INCOMPLETE INSTALL: references/directions.md has 14 rows, SKILL.md Step 3b rolls % 17 (stale or partial copy: reinstall, see docs/INSTALL.md)
-```
-
-If you see that, your copy is out of date. Redo Step 2 rather than editing the
-file by hand.
-
-Assistants that cannot run shell commands get the same protection a different
-way: the skill stops with the same message the moment it tries to read a deck
-that is not there.
+The picker runs the same check on every run and stops with an
+`INCOMPLETE INSTALL` line rather than letting the assistant improvise a missing
+design, so a stale install cannot pass silently even if you skip this step.
 
 ## Step 4 (optional): make it automatic
 
-You can stop typing the command. There are two layers, and most people only need
-the first.
+**It already recognizes design work.** Assistants that pick skills automatically
+(Claude Code does) match your request against the skill's description, which
+lists the situations it covers: landing pages, dashboards, hero sections,
+pricing pages, mockup-to-code, restyling, "make it look better", any
+HTML/CSS/Tailwind/React styling.
 
-**Layer 1: it already recognizes design work.** Assistants that pick skills
-automatically (Claude Code does) match your request against the skill's
-description, which lists the situations it covers: landing pages, dashboards,
-hero sections, pricing pages, turning a mockup into code, restyling, "make it
-look better", any HTML/CSS/Tailwind/React styling. Asking for "a signup page"
-is usually enough to invoke it on its own.
-
-**Layer 2: make it a standing rule.** For a guarantee across every session, add
-one paragraph to the instructions file your assistant always loads.
+**Make it a standing rule.** For a guarantee across every session, add one
+paragraph to the instructions file your assistant always loads. The skill sizes
+itself to the task, so the rule should not force the full run on small edits.
 
 Claude Code, in `~/.claude/CLAUDE.md` (applies everywhere) or a project's own
 `CLAUDE.md`:
 
 ```
-# Frontend work: always use the goddesign skill
-For any frontend, UI, or visual web task, invoke the goddesign skill first and
-follow it fully, even when the request does not say "design" and does not name
-the skill. Do not hand-design frontend work without it unless told to skip it.
+# Frontend work: use the goddesign skill
+For frontend, UI, or visual web work (a page, site, landing page, dashboard,
+app screen, component, hero, pricing page, mockup-to-code, or HTML/CSS/Tailwind/
+React styling), invoke the goddesign skill first, even when the request does not
+say "design" or name the skill. Let it size the work: new pages and surfaces, or
+any "make it look different" request, get its full path (pick, lock, build,
+gate); edits to an existing page get its edit path (the Banned list plus the
+source scan on changed files). Do not hand-design frontend work without it
+unless told to skip it.
 ```
 
 Codex CLI: the same paragraph in `~/.codex/AGENTS.md` or a project `AGENTS.md`,
-using `$goddesign` as the invocation, plus a note to re-invoke per task.
-
-There is a third, fully deterministic option for Claude Code (a
-`UserPromptSubmit` hook in `settings.json` that watches for frontend keywords and
-injects a reminder). Most setups do not need it.
+using `$goddesign` as the invocation, plus a note to re-invoke it per task.
 
 ## Optional extras
 
@@ -123,12 +125,10 @@ says so plainly in its output rather than quietly skipping a check.
 
 | If you install | You get | If you skip it |
 |---|---|---|
-| Node 18+ and Playwright (`npm i -g playwright`, then `npx playwright install chromium`) | The visual audit: opens the built page in a real browser and catches overlapping text, hidden content, overflow, tiny tap targets, and fonts that failed to load, with screenshots | Falls back to a screenshot chain, then to an honest `DEGRADED: no visual check` note with a command you can run yourself |
+| Playwright (`npm i -g playwright`, then `npx playwright install chromium`) | The visual audit: opens the built page in a real browser and catches overlapping text, hidden content, overflow, tiny tap targets, and fonts that failed to load, with screenshots | Falls back to a screenshot chain, then to an honest `DEGRADED: no visual check` note with a command you can run yourself |
 | Playwright CLI or headless Chrome | The screenshot fallback | Same honest degraded note |
-| Node 18+ (no browser needed) | The source scan, the design-map validator, and design-system token extraction | The assistant checks those by hand, which is the arrangement these scripts exist to replace |
-| OpenAI Codex CLI (signed in to ChatGPT) | Image generation. Assistants without a native image tool, Claude Code included, hand the art-directed prompt to Codex, which generates it with ChatGPT's built-in image tool. Also enables the sandboxed-Codex helper | Artwork falls back to the hand-coded CSS/SVG art each direction already carries |
-| Codex or Claude Code | The optional blind read: a separate process looks only at the screenshots and describes what the page appears to be, catching pages that render fine but communicate nothing | Prints `DEGRADED: no blind read` and falls back to the builder's own inspection |
-| Python 3.10+ and the independent [`remove-ai-marks`](https://github.com/guillaumemeyer/watermarks-remover) skill | Prompt-specified inspection and cleaning of invisible Unicode, supported file metadata, C2PA, text marks, and image marks after the design gate | Ordinary design is unchanged; the requested extra reports `OPTIONAL HYGIENE UNAVAILABLE` with no score deduction |
+| OpenAI Codex CLI (signed in to ChatGPT) | Image generation, through ChatGPT's built-in image tool, for assistants with no native image tool (Claude Code included). Also the sandboxed-Codex helper, and the optional blind read | Artwork falls back to the hand-coded CSS/SVG art each direction already carries |
+| Python 3.10+ and the independent [`remove-ai-marks`](https://github.com/guillaumemeyer/watermarks-remover) skill | Inspection and cleaning of invisible Unicode, file metadata, C2PA, text marks, and image marks, only when your brief asks for it, after the design gate | Ordinary design is unchanged; the requested extra reports `OPTIONAL HYGIENE UNAVAILABLE` with no score deduction |
 | `curl` and network access | A check that the webfonts actually load | The gate states that it skipped the check |
 
 ## Checking a page without a browser
@@ -137,28 +137,25 @@ The visual audit needs a browser. The source scan needs nothing but Node, so it
 runs anywhere, including offline and inside a locked-down sandbox:
 
 ```sh
-node skills/goddesign/scripts/sweep.mjs index.html
+node goddesigns/skills/goddesign/scripts/sweep.mjs index.html
 ```
 
 Point it at a file or a whole folder. It prints every problem with the file,
-line number, and the offending value. It exits `0` when clean, `1` when it found
-named failures, and `2` when there was nothing to scan.
+line number, and offending value, and exits `0` when clean, `1` when it found
+named failures, and `2` when there was nothing to scan. `--rules` prints the
+full rule table, `--json` gives machine-readable output, and
+`--tokens <baseline.json>` reports drift against an existing design system.
 
-Useful flags: `--rules` prints the full rule table, `--json` gives
-machine-readable output, and `--tokens <baseline.json>` reports drift against an
-existing design system.
-
-The scan also reports three copy advisories: vague attribution, filler phrases,
-and formulaic contrasts or conclusions. Advisories do not fail the gate. Read
-them in context, then fix the copy or state why the phrase is precise, sourced,
-or deliberately quoted.
+Three copy rules (vague attribution, filler phrases, formulaic contrasts or
+conclusions) are advisories: they never fail the gate. Read them in context,
+then fix the copy or state why the phrase is precise, sourced, or quoted.
 
 Some rules are legitimately breakable when a chosen design direction calls for
-them. You can waive one rule for one file with an inline comment, and the reason
-is mandatory, so the escape hatch cannot be used silently:
+them. Waive one rule for one file with an inline comment; the reason is
+mandatory, so the escape hatch cannot be used silently:
 
 ```
-/* goddesign-allow: metallic-premium the Art Deco row is the one row that states metallics */
+/* goddesign-allow: metallic-premium row 13 Art Deco Geometric states period gold as its accent */
 ```
 
 The scan is half the check, not the whole check. It reads code, so it cannot see
@@ -167,26 +164,20 @@ whenever a browser is available.
 
 ## Generating images
 
-Most pages ship zero photographs or illustrations by design, so this is rarely
-needed. When a page genuinely calls for artwork, goddesign generates it through
-**Codex and ChatGPT**, whichever assistant you started the design in.
-
-Claude Code and most other CLIs have no built-in image generation, so the skill
-writes an art-directed prompt (derived from the locked colors, medium, and
-composition) and hands it to the Codex CLI, which produces the image with
-ChatGPT's built-in image tool:
+Most pages ship no photographs or illustrations by design, so this is rarely
+needed. When a page genuinely calls for artwork, the skill writes an
+art-directed prompt (derived from the locked colors, medium, and composition)
+and hands it to the Codex CLI, which produces the image with ChatGPT's built-in
+image tool:
 
 ```sh
-sh skills/goddesign/scripts/genimage.sh "<art-directed prompt>" hero.png
+sh goddesigns/skills/goddesign/scripts/genimage.sh "<art-directed prompt>" hero.png
 ```
 
 It exits `0` and prints where the file landed, or exits `2` with
-`IMAGE GENERATION UNAVAILABLE` when no capable tool is installed. On that
-failure the page falls back to the hand-coded CSS and SVG art the chosen design
-direction already specifies, so a run never stalls waiting on pixels.
-
-Requirements: the `codex` command on your PATH, signed in to ChatGPT. There is
-nothing else to configure.
+`IMAGE GENERATION UNAVAILABLE` when Codex is not installed. On that failure the
+page falls back to the hand-coded CSS and SVG art the chosen direction already
+specifies, so a run never stalls waiting on pixels.
 
 ## Optional provenance hygiene
 
@@ -200,7 +191,7 @@ directory your assistant already reads:
 
 ```sh
 git clone https://github.com/guillaumemeyer/watermarks-remover.git
-ln -s "$PWD/watermarks-remover/skills/remove-ai-marks" ~/.agents/skills/remove-ai-marks
+ln -sfn "$PWD/watermarks-remover/skills/remove-ai-marks" ~/.agents/skills/remove-ai-marks
 # Claude Code users can link the same folder under ~/.claude/skills instead.
 ```
 
@@ -208,16 +199,15 @@ goddesign's adapter discovers project-local installs, common Codex and Claude
 skill directories, or `REMOVE_AI_MARKS_SKILL_DIR`:
 
 ```sh
-sh skills/goddesign/scripts/provenance-hygiene.sh locate
-sh skills/goddesign/scripts/provenance-hygiene.sh inspect-file public/hero.png --json
-sh skills/goddesign/scripts/provenance-hygiene.sh clean-file public/hero.png -o public/hero.cleaned.png --json
+sh goddesigns/skills/goddesign/scripts/provenance-hygiene.sh locate
+sh goddesigns/skills/goddesign/scripts/provenance-hygiene.sh inspect-file public/hero.png --json
 ```
 
-The workflow is inspect, clean a new output, verify, and report residual limits.
-Statistical rewrites and pixel regeneration are never automatic because they
-can change copy or visuals. If either runs, goddesign repeats the full design
-gate afterward. Validation evidence, signed receipts, and frozen study artifacts
-are excluded because their provenance is part of the record.
+The workflow is inspect, clean to a new output, verify, and report residual
+limits. Statistical rewrites and pixel regeneration are never automatic because
+they can change copy or visuals; if either runs, goddesign repeats the full
+design gate afterward. Validation evidence and frozen study artifacts are
+excluded because their provenance is part of the record.
 
 ## Running Codex in a sandbox
 
@@ -226,7 +216,7 @@ inside one. Use the helper, which builds inside the sandbox, audits outside it,
 and feeds any failures back into the same session:
 
 ```sh
-sh skills/goddesign/scripts/codex-audit-loop.sh <project-dir> "<what you want>"
+sh goddesigns/skills/goddesign/scripts/codex-audit-loop.sh <project-dir> "<what you want>"
 ```
 
 A sandboxed run that cannot audit also drops an `audit-handoff.sh` file into the
@@ -239,27 +229,9 @@ can run goddesign. That minimal requirement is deliberate: there is no
 host-specific syntax anywhere in the skill. Point your assistant's skill folder
 at `skills/goddesign` and you are done.
 
-The skill does not depend on any particular editor, assistant, model vendor,
-deployment platform, account, domain, or network service. Where an assistant
-lacks an optional capability, there is a documented fallback or an honest
-`DEGRADED` note.
-
 One assistant is the complete setup. goddesign never launches a second one on its
 own, and a full, fully scored design run needs only the one you are using.
-Cross-assistant work happens only when you explicitly ask for a comparison,
-a replication, or a compatibility test.
-
-If you are curious what else is on your machine, the skill can take inventory:
-
-```sh
-sh skills/goddesign/scripts/detect-clis.sh
-```
-
-It reports which known assistant commands exist (Codex, Claude, Cursor Agent,
-Gemini CLI, OpenCode, Aider, Goose, GitHub Copilot, Amp, Amazon Q, Kiro, Factory
-Droid, and others), and distinguishes real agent commands from desktop app
-launchers. Finding a command only means it is installed; whether it is signed in
-and capable is verified later, only if something actually needs it.
+Cross-assistant work happens only when you explicitly ask for a comparison.
 
 ## Updating
 
@@ -267,18 +239,38 @@ and capable is verified later, only if something actually needs it.
 cd goddesigns && git pull
 ```
 
-If you symlinked in Step 2, every assistant picks up the update immediately.
+If you linked in Step 2, every assistant picks up the update immediately.
 Nothing is cached per assistant.
+
+## For maintainers: the four-way comparison
+
+`scripts/arm-test.mjs` runs the pre-registered comparison in
+`validation/studies/lean-core-2026-09/` headless, one isolated Claude Code
+process per cell:
+
+```sh
+node goddesigns/scripts/arm-test.mjs run --jobs 3   # resumable; --retry-failed re-runs API failures
+node goddesigns/scripts/arm-test.mjs pack           # then rank work/pack/RANK.md blind
+node goddesigns/scripts/arm-test.mjs reveal
+```
+
+It needs the `claude` CLI itself logged in (`claude auth status` must report
+`loggedIn: true`; run `claude auth login` once). A login in the Claude desktop
+app does not carry over to `claude -p`, and the harness stops with that message
+rather than recording twenty failed runs. Launched from inside a Claude Code
+session, it strips that session's environment first, so a cell behaves as if it
+were started from a terminal.
 
 ## Troubleshooting
 
-**"It ignored the skill entirely."** Confirm the install with Step 3, then check
-that your assistant actually loaded it (in Claude Code, `/goddesign` should
-autocomplete). If it loads but does not fire on its own, add the standing rule
-from Step 4.
+**"It ignored the skill entirely."** Run `sh goddesigns/scripts/install.sh
+--check`. A dangling link is the most common cause and produces no error in the
+assistant itself; in Claude Code, `/goddesign` stops autocompleting. Re-run the
+installer to repair it. If the skill loads but does not fire on its own, add the
+standing rule from Step 4.
 
-**"The design looks generic."** Run Step 3. A stale or partial copy is the most
-common cause, because a missing deck row gets improvised.
+**"The design looks generic."** Run the check in Step 3. A stale or partial copy
+is the second most common cause, because a missing deck row gets improvised.
 
 **"It said DEGRADED."** That is the skill being honest that an optional check
 could not run. See the [Optional extras](#optional-extras) table for what to

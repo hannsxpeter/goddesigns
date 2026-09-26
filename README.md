@@ -10,9 +10,8 @@
 [![Evidence](https://img.shields.io/badge/evidence-346%20sourced%20comments-informational)](validation/research/sentiment-evidence-2026-07.md)
 
 goddesign is a free, open-source add-on for AI coding assistants. Install it
-once, and every web page your assistant builds comes out looking like a real
-design studio made it: a distinct visual identity, professional craft, and an
-automated quality check before it ever reaches you.
+once, and every web page your assistant builds gets a distinct visual identity,
+professional craft, and an automated quality check before it reaches you.
 
 It works with Claude Code and OpenAI Codex CLI today, and with any assistant
 that can read a plain markdown skill file.
@@ -48,45 +47,45 @@ built in, not asked for.
 
 ## What goddesign does about it
 
-**It rolls the dice, then holds itself to the result.** Before any code is
-written, the skill picks a complete visual direction from a curated deck: 17
-aesthetic directions, 12 page structures, 10 color palettes, 12 typeface
-pairings. The pick is seeded, so it is genuinely different each time, and a
-running log makes sure your next project does not repeat your last one. A layer
-of controlled randomness nudges the exact colors, so two projects that draw the
-same card still ship different pages.
+**It rolls the dice, then holds itself to the result.** A small script picks a
+complete visual direction from a curated deck (17 aesthetic directions, 12 page
+structures, 10 color palettes, 12 typeface pairings), checks it against a
+running log so your next project does not repeat your last one, and nudges the
+exact colors so two projects that draw the same card still ship different pages.
+A model cannot do any of that for itself: asked to pick at random, it picks the
+same "random" thing every time, and it does not remember what it built for you
+last month.
 
 **It writes the design down before it builds.** Every decision (exact colors,
 fonts, spacing, motion, the one signature element) is committed to a plain-text
 plan first. Then the code has to match the plan. No drifting halfway through
 into the house style.
 
-**It reviews the words for the job they do.** Controls, errors, and empty states
-stay plain and predictable. Marketing copy gets a separate pass for concrete
-claims, named sources, subject-specific language, and a real point of view. A
-sentence that could move unchanged to another product gets rewritten or cut.
-
 **It checks its own work, mechanically.** When the page is built, two automated
 checks run before you see it:
 
 - A **source scan** reads the code for 32 known problems: banned fonts and
   colors, gradient text, buggy scroll animations that leave the page blank,
-  missing keyboard focus outlines, missing reduced-motion support, marketing
-  buzzword filler, vague attribution, and formulaic copy.
-- A **visual audit** actually opens the page in a browser at phone, tablet, and
-  desktop sizes, and takes screenshots. It catches overlapping text, content
-  that never appears, horizontal scrollbars, buttons too small to tap, and
-  fonts that silently failed to load.
+  missing keyboard focus outlines, missing reduced-motion support, buzzword
+  filler, vague attribution, and formulaic copy.
+- A **visual audit** opens the page in a browser at phone, tablet, and desktop
+  sizes and takes screenshots. It catches overlapping text, content that never
+  appears, horizontal scrollbars, buttons too small to tap, and fonts that
+  silently failed to load.
 
-Anything that fails goes back for a bounded round of fixes, with the original
-design plan frozen so the assistant cannot "fix" a problem by quietly
-redesigning the page.
+Anything that fails goes back for a bounded round of fixes, with the design plan
+frozen so the assistant cannot "fix" a problem by quietly redesigning the page.
 
-**It handles projects bigger than one sitting.** If your brief covers three or
-more screens (marketing site, sign-up, dashboard, settings), goddesign first
-charts a shared design map: one direction locked once, inherited by every screen,
-worked through one screen at a time so they end up looking like one product
-instead of five unrelated ones.
+**It sizes itself to the task.** A small edit to an existing page gets the rules
+and the source scan, nothing more. A new page gets the full treatment. A brief
+covering three or more screens first gets a shared design map, so a marketing
+site, sign-up flow, and dashboard end up looking like one product.
+
+**It only tells the model what the model needs.** Frontier models already know
+type scales, contrast ratios, and modern CSS, so version 2 stopped re-teaching
+them: a frontier model now reads about 16 KB of instructions per new page,
+where version 1.8 read about 95 KB. Models that execute literally, and smaller
+or cheaper ones, still get the fully spelled-out version.
 
 ## Who it is for
 
@@ -105,11 +104,14 @@ You do not need to be a designer to use it. You do need an AI coding assistant.
 
 ```sh
 git clone https://github.com/hannsxpeter/goddesigns.git
-ln -s "$PWD/goddesigns/skills/goddesign" ~/.claude/skills/goddesign   # Claude Code
-ln -s "$PWD/goddesigns/skills/goddesign" ~/.agents/skills/goddesign   # Codex CLI
+sh goddesigns/scripts/install.sh
 ```
 
-Then just ask for what you want:
+The installer links the skill into Claude Code and Codex, then proves each link
+resolves to a complete install. Run `sh goddesigns/scripts/install.sh --check`
+any time; re-run it without `--check` if you move the folder.
+
+Then ask for what you want:
 
 ```
 /goddesign a landing page for a small-batch coffee roaster
@@ -117,24 +119,23 @@ Then just ask for what you want:
 
 In Codex the command is `$goddesign`. You can also skip the command entirely:
 the skill recognizes design requests on its own ("build me a signup page", "make
-this dashboard look better"), and a one-paragraph note in your assistant's
-instructions file makes that automatic every time.
+this dashboard look better"), and a short note in your assistant's instructions
+file makes that automatic every time.
 
 Step-by-step setup, optional extras, and notes for other assistants:
 [docs/INSTALL.md](docs/INSTALL.md).
 
 ## Does it actually work?
 
-We publish the evidence, including the parts that are not finished.
+We publish the evidence, including the parts that went against us and the parts
+that are not finished.
 
-**What has been proven.** Seven runs of the same brief produced seven completely
-different, quality-checked designs: a terminal-inspired letter, a Swiss
-manifesto, a luxury serif, a dense machine-room dashboard, an editorial print
-layout, an art deco dashboard, and a chartreuse signup page. Two runs without
-the skill reproduced the exact failures we catalogued, and both rendered as
-completely blank pages in screenshots because of a scroll-animation bug the
-automated audit caught and human review had missed. Full write-up with
-screenshots: [the Kilnhouse run](validation/runs/kilnhouse-2026-07/README.md).
+**What the machinery does, measured.** Seven runs of the same brief produced
+seven different, quality-checked designs. Two runs without the skill reproduced
+the failures we catalogued, and both rendered as blank pages in screenshots
+because of a scroll-animation bug the automated audit caught and human review
+had missed. Full write-up with screenshots:
+[the Kilnhouse run](validation/runs/kilnhouse-2026-07/README.md).
 
 ![Three full-page captures side by side. The two unskilled baseline pages are blank below the hero; the goddesign page renders completely](docs/assets/audit-catches.png)
 
@@ -143,37 +144,57 @@ fine while you scroll it and renders empty to anything that does not: a
 screenshot tool, a printer, a search crawler, a reader with JavaScript
 disabled.</sup>
 
-**The automated scan separates the two populations cleanly.** Run back over
-every page we have on file, it clears 14 of 19 goddesign pages with zero
-failures, and fails all 18 pages built without it, at 6 to 70 problems each.
+**The source scan separates the two populations.** Across all 49 pages on file,
+it clears 21 of the 31 goddesign pages with zero failures (the other 10 have one
+or two), and fails all 18 pages built without it, at 6 to 70 problems each. Read
+that for what it is: the scan checks goddesign's own rules, so it shows the
+skill obeys itself, not that its pages are better.
 
-**What has not been proven yet.** All of the above is author-run testing. It
-shows the machinery produces variety and catches defects. It does not yet show
-that outside judges agree, and we are careful about that distinction. A
-pre-registered independent study is underway: 20+ outside raters, blind
-identification, results to be published either way. Generation is complete and
-the corpus is frozen; the rater responses are not in. Until they are, we do not
-claim external validation. The protocol and the current state are public in
-[validation/protocols/external-validation-protocol.md](validation/protocols/external-validation-protocol.md)
-and the [Study A completion audit](validation/studies/study-a-2026-07/completion-audit.md).
+**Against a much smaller skill, on appeal, the record is mixed.** In three
+rounds judged by the project's owner, Anthropic's own `frontend-design` skill
+won two (Ledgerbird, and Wayfare "in every category") and goddesign took first
+and second in the third (Bandquarter). All three ran on one day, with the rules
+retuned to the owner's verdicts between rounds, so the win shows the taste loop
+working, not a general result. The owner also picked the no-skill page as
+"really good" without knowing which one it was. Records:
+[Ledgerbird](validation/runs/ledgerbird-2026-07/README.md),
+[Wayfare](validation/runs/wayfare-2026-07/README.md),
+[Bandquarter](validation/experiments/bandquarter-2026-07/README.md).
+
+**What has not been proven.** All of the above is author-run. Whether outside
+judges can tell goddesign pages from human-designed ones is the core claim, and
+it is **unvalidated**: the study built to test it closed in September 2026 with
+no rater responses ([closure record](validation/studies/study-a-2026-07/completion-audit.md)).
+Version 2's own bet (that the smaller instruction set costs no quality) has a
+pre-registered four-way test with its decision rules fixed in advance:
+[validation/studies/lean-core-2026-09](validation/studies/lean-core-2026-09/protocol.md).
+A first smoke pair, one brief under each version, passed the same gate and used
+18% fewer tokens under version 2; it also caught a lost honesty rule before
+release ([record](validation/runs/lean-core-smoke-2026-09/README.md)).
 
 **We retract things.** One test capture was withdrawn in July 2026 after it
 turned out to be contaminated, and the finding plus every claim it touched is
 recorded in public: [the withdrawal
 record](validation/runs/kilnhouse-2026-07/WITHDRAWN-codex-baseline-kilnhouse.md).
 
-Every visual fingerprint rule traces to the 346-comment study of what people
-actually mock about AI design or to a defect caught in a real test run. Quality
-mechanisms adapted from other projects carry a frozen source, license record,
-explicit refusals, and repository calibration under `validation/research/`.
-Nothing is here only because it sounded like good advice.
+Every visual fingerprint rule traces to the 346-comment study or to a defect
+caught in a real run. Quality mechanisms adapted from other projects carry a
+frozen source, license record, explicit refusals, and repository calibration
+under `validation/research/`.
 
 ## Common questions
 
+**What does a run cost?**
+On a frontier model, a new page reads about 16 KB of instructions (the skill
+plus the picker's output), about four thousand tokens; version 1.8 read about
+95 KB. An edit to an existing page reads only the 12.7 KB skill file and runs
+the source scan. The checks themselves are scripts and cost no model tokens
+until they find something.
+
 **Do I need to install anything besides the skill?**
-No. Everything core runs with no extra dependencies. The visual audit uses a
-headless browser if one is available; without it, the skill tells you plainly
-that it skipped that check rather than pretending it passed.
+Node 18 or newer runs the picker and the checks. The visual audit also uses a
+headless browser if one is available; without it, the skill says plainly that it
+skipped that check rather than pretending it passed.
 
 **Will it override my company's existing design system?**
 No. If your project already has a design system, goddesign switches into
@@ -181,34 +202,29 @@ extension mode: it reads your existing colors, fonts, and spacing, and builds
 within them instead of inventing a new look.
 
 **Does it send my code anywhere?**
-No. The automated checks run locally. No network, no accounts, no external
-service is required for a design run.
+No. The checks run locally. No network, no accounts, no external service is
+required for a design run.
 
 **Can it make images and illustrations?**
 Yes, when a page genuinely needs them, though most designs deliberately ship
-none. Image generation goes through Codex and ChatGPT: assistants without their
-own image tool hand the art direction to the Codex CLI, which generates it with
-ChatGPT's built-in image tool. If that is not available, the page falls back to
-the hand-coded artwork the chosen direction already specifies.
+none. Image generation goes through the Codex CLI and ChatGPT's built-in image
+tool. If that is not available, the page falls back to the hand-coded artwork
+the chosen direction already specifies.
 
 **Can it inspect or remove AI provenance marks?**
-Only when you explicitly ask. After the design has passed its normal quality
-gate, goddesign can hand your own deliverable to the independent
+Only when you explicitly ask, and only after the design has passed its gate.
+goddesign then hands your own deliverable to the independent
 [`remove-ai-marks`](https://github.com/guillaumemeyer/watermarks-remover)
-skill for invisible-Unicode inspection, supported metadata cleaning, optional
-text rewriting, or optional image-watermark work. That companion is not needed
-for ordinary design, its absence never lowers the design score, and lossy text
-or pixel changes trigger a fresh design gate rather than inheriting the old one.
-Frozen validation evidence is never cleaned.
+skill. That companion is not needed for ordinary design, and its absence never
+lowers the design score.
 
 **Will every page look wild?**
 No. Each page takes exactly one deliberate risk and keeps the rest disciplined.
 "Distinct" is the goal, not "loud".
 
 **Is it locked to one AI vendor?**
-No. It is a plain markdown file with a couple of small scripts. Any assistant
-that reads markdown skills can run it, and no part of the core work depends on a
-particular editor, model vendor, or hosting platform.
+No. It is a markdown file with a few small scripts. Any assistant that reads
+markdown skills can run it.
 
 ## A quick glossary
 
@@ -218,23 +234,27 @@ Terms you will see in the output and in the deeper docs:
   finished page is graded against.
 - **The deck**: the curated set of directions, layouts, palettes, and font
   pairings the skill picks from.
-- **Seed**: the number that drives the pick, so results vary run to run instead
-  of converging.
+- **The picker**: the script that rolls the seed, applies the run logs, and
+  prints the one direction and layout this run gets.
+- **Lane**: how much of the skill a model reads. Frontier models get the lean
+  core; literal and smaller models also get the full enumeration.
 - **The sweep**: the automated scan of the code for known problems.
 - **The audit**: the automated check of the rendered page in a real browser.
-- **The gate**: the two of them together, plus a scored self-critique. A page
-  either clears it or gets fixed.
+- **The gate**: the sweep and the audit together, plus a look at the screenshots.
+  A page either clears it or gets fixed.
 - **Design map**: the shared plan for a project with three or more screens.
 
 ## What is in this repository
 
 | Path | What it is |
 |---|---|
-| `skills/goddesign/SKILL.md` | The skill itself: the instructions your assistant follows |
-| `skills/goddesign/references/` | The decks and operating references: 17 directions, 12 layouts, 10 palettes, 12 font pairings, motion, copy review, imagery, the design map, and the quality checklist |
-| `skills/goddesign/scripts/` | The automated checks: source scan, visual audit, design-map validator, install verifier, token extraction, and helpers |
-| [`validation/`](validation/README.md) | The evidence library: research, test protocols, experiments, comparison runs, and studies |
+| `skills/goddesign/SKILL.md` | The skill itself: the lean core every run reads |
+| `skills/goddesign/references/` | The full lane, the decks (17 directions, 12 layouts, 10 palettes, 12 font pairings), motion, copy review, imagery, the design map, and the long-form checklist |
+| `skills/goddesign/scripts/` | The picker, the source scan, the visual audit, token extraction, the design-map validator, the install check, and helpers |
+| `scripts/` | Repository tooling: the installer, the deck lint, the test suites, and the four-way comparison harness |
+| [`validation/`](validation/README.md) | The evidence library: research, protocols, experiments, comparison runs, and studies |
 | `docs/` | Setup guide and the technical architecture |
+| `.github/` | CI: install integrity, deck lint, and every test suite on Node 18 and 22 |
 
 ## Documentation
 
