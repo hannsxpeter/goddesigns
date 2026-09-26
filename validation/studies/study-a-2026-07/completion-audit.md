@@ -20,8 +20,20 @@ What closure means, precisely:
 - The rater app (`study-a-rater/`), the nine `scripts/study-a-*.mjs` tools, their
   tests, and `validation/tools/blind-eval-pack.sh` were removed in v2.0.0. All of
   them are recoverable with `git checkout v1.8.0 -- <path>`.
-- The deployed collection app and its D1 database live outside this repository.
-  Deleting them is the owner's action.
+- **The deployed collection app and its D1 database were deleted by the owner on
+  2026-09-26.** They were one ChatGPT-hosted project, deployed from Codex, not a
+  Cloudflare account: project `appgprj_6a619ef8f77c81918beecc63551aa33b` at
+  `goddesign-study-a.hxpxxpxh.chatgpt.site`, with the D1 database bound as `DB`
+  (the only project ID in every deploy folder). The last recorded participant
+  count was zero (`operator-readiness-receipt.json`, 2026-07-23).
+- How the deletion was verified, because the outside view misleads. Signed in as
+  the owner, the site now returns the host's not-found page. Anonymously, the
+  hostname kept answering 401 with the host's login page, which still names
+  "Website Perception Study": 39 readings of the root and `/api/study` from 13:51
+  to 14:11 UTC and one at 14:11:30, all 401, while a never-used hostname on the
+  same domain answered 404. That login page is a leftover of the host, not the
+  app, so an anonymous 401 cannot confirm or refute a deletion there; only a
+  signed-in check can.
 
 The audit as it stood on 2026-07-23 follows, unchanged.
 
