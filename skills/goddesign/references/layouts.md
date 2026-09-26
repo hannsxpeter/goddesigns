@@ -1,6 +1,6 @@
 # Macrostructures
 
-12 page skeletons, indexed 0-11. The seed picks one; it decides what the page IS before any styling. The macrostructure must not match any of the last 3 entries in `.design-log.json` (the same rule as SKILL.md Step 3a).
+12 page skeletons, indexed 0-11. `scripts/pick.mjs` picks one from the seed; it decides what the page IS before any styling. The macrostructure never repeats any of the last 3 runs in either ledger, and `pick.mjs` enforces that.
 
 A macrostructure is a reading order, not a theme. Any direction can wear any macrostructure.
 
