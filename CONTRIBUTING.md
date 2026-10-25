@@ -189,10 +189,15 @@ the audit must still catch the known collisions and reveal bugs, the sweep must
 still separate the skill runs from the baselines, and both must still pass the
 known-clean runs.
 
-`sweep.mjs` carries three extra rules of its own:
+`sweep.mjs` carries four extra rules of its own:
 
 - **Comments are not code.** The script blanks them before every scan, so a lock
   block quoting a banned hex is not a finding.
+- **A new source language gets a reader, not a regex.** Rust is lexed just far
+  enough to find its UI macros, every view is blanked in place so line numbers
+  stay exact, and the rest of the file is never read as markup. A new language
+  follows that shape and ships tests whose decoys sit in comments, in strings
+  outside the markup, and in attribute values.
 - **Waivers are read before blanking, and require a stated reason.** A reasonless
   waiver is itself a failure.
 - **Every new or changed rule reports its corpus split in the pull request**: how

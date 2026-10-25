@@ -286,6 +286,142 @@ test('the band metronome needs a page, not a fragment', () => {
   rmSync(page, { recursive: true, force: true });
 });
 
+// ---------------------------------------------------------------- rust
+
+// .rs used to exit 2 as nothing scannable, which put every Rust frontend at
+// DEGRADED: no sweep. These hold the macro reader to the shapes a real Leptos
+// codebase writes: comments inside the macro, a router <A>, quoted text nodes,
+// attribute expressions, and plain Rust all around it.
+const findingsAt = (j) => j.findings.map((f) => `${f.rule}@${f.line}`).sort();
+
+const CLEAN_RS = `use leptos::prelude::*;
+
+#[component]
+pub fn Footer() -> impl IntoView {
+    let i18n = use_i18n();
+    view! {
+        // who runs the service and where to report a problem
+        <footer class="border-t border-line">
+            <p>{t!(i18n, app.name)} " "
+                <A href="/privacy" attr:class=LINK>"Privacy notice"</A>
+            </p>
+            <button on:click=move |_| set_open.update(|o| *o = !*o)>"Report a problem"</button>
+        </footer>
+    }
+}
+`;
+
+test('a Leptos view! is read as markup, and a clean one passes', () => {
+  const dir = fixture({ 'app.css': CLEAN_CSS, 'footer.rs': CLEAN_RS });
+  const j = sweepJson([dir]);
+  assert.equal(j.scanned.markup, 1, 'the .rs file is scanned, not skipped');
+  assert.equal(j.failures, 0, JSON.stringify(j.findings, null, 1));
+  rmSync(dir, { recursive: true, force: true });
+});
+
+test('Rust markup defects report their source line, and the Rust around them is not markup', () => {
+  // Every decoy names a banned pattern somewhere the macro reader must not look:
+  // a string outside any macro, a raw string holding a quote, a brace, and a
+  // macro name, a char literal holding a quote, a nested block comment, a line
+  // comment inside the macro, and an attribute value.
+  const rs = [
+    'use leptos::prelude::*;',
+    'const NOTE: &str = "Seamless \u2014 outside any macro";',
+    'const RAW: &str = r#"view! { <hr/> " }"#;',
+    `fn quote() -> char { '"' }`,
+    '/* a block comment /* nested */ still a comment: <hr/> */',
+    '#[component]',
+    "pub fn Panel<'a>(label: &'a str) -> impl IntoView {",
+    '    view! {',
+    '        // seamless \u2014 a comment inside the macro',
+    '        <section aria-label="Seamless panel">',
+    '            <p style="color: red">"Unleash the kiln \u2014 tonight"</p>',
+    '            <hr/>',
+    '            <div style:width=move || format!("{}%", 50)></div>',
+    '            <p>{label}</p>',
+    '        </section>',
+    '    }',
+    '}',
+  ].join('\n');
+  const dir = fixture({ 'panel.rs': rs });
+  const j = sweepJson([dir]);
+  assert.deepEqual(findingsAt(j), ['buzzword@11', 'dash-in-copy@11', 'hr-divider@12', 'inline-style@11', 'inline-style@13']);
+  rmSync(dir, { recursive: true, force: true });
+});
+
+test('Dioxus rsx! element syntax is read the same way', () => {
+  const rs = [
+    'use dioxus::prelude::*;',
+    'fn Panel() -> Element {',
+    '    rsx! {',
+    '        section { class: "seamless-grid",',
+    '            p { style: "color: red", "Unleash the kiln" }',
+    '            hr {}',
+    '            button { onclick: move |_| count += 1, "Fire" }',
+    '        }',
+    '    }',
+    '}',
+  ].join('\n');
+  const dir = fixture({ 'panel.rs': rs });
+  assert.deepEqual(findingsAt(sweepJson([dir])), ['buzzword@5', 'hr-divider@6', 'inline-style@5']);
+  rmSync(dir, { recursive: true, force: true });
+});
+
+test('CSS in a <style> element inside view! is scanned as CSS, not as copy', () => {
+  const rs = [
+    'view! {',
+    '    <style>"',
+    '.seamless-card { color: #123456; }',
+    '"</style>',
+    '    <p>"Fire the kiln"</p>',
+    '}',
+  ].join('\n');
+  const dir = fixture({ 'app.css': CLEAN_CSS, 'card.rs': rs });
+  const j = sweepJson([dir]);
+  assert.deepEqual(findingsAt(j), ['hex-outside-root@3']);
+  rmSync(dir, { recursive: true, force: true });
+});
+
+test('a waiver in a Rust line comment suppresses its rule', () => {
+  const dir = fixture({
+    'meter.rs': '// goddesign-allow: inline-style the meter width is the reading itself\nview! { <div class="meter" style:width=move || pct()></div> }\n',
+  });
+  const j = sweepJson([dir]);
+  assert.equal(j.failures, 0, JSON.stringify(j.findings));
+  rmSync(dir, { recursive: true, force: true });
+});
+
+test('a .rs file with no UI macro is skipped, and alone it is nothing scannable', () => {
+  const server = 'use axum::Router;\nconst S: &str = "html! { <hr/> }";\n// view! { <hr/> } in a comment is not a macro\npub fn routes() -> Router { Router::new() }\n';
+  const only = fixture({ 'server.rs': server });
+  const r = run(SWEEP, [only]);
+  assert.equal(r.code, 2, 'a server module alone is not a green design gate');
+  assert.match(r.err, /SWEEP UNAVAILABLE/);
+  rmSync(only, { recursive: true, force: true });
+
+  const mixed = fixture({ 'server.rs': server, 'app.css': CLEAN_CSS, 'index.html': CLEAN_HTML });
+  const j = sweepJson([mixed]);
+  assert.equal(j.scanned.skipped, 1);
+  assert.equal(j.scanned.markup, 1, 'only index.html counts as markup');
+  assert.equal(j.failures, 0, JSON.stringify(j.findings));
+  rmSync(mixed, { recursive: true, force: true });
+});
+
+test('Cargo target/ output is never read as source', () => {
+  // cargo-leptos compiles the site CSS into target/, and rustdoc writes HTML there.
+  const dir = fixture({
+    'app.css': CLEAN_CSS,
+    'index.html': CLEAN_HTML,
+    'target/doc/help.html': '<p>Unleash rustdoc</p><hr>',
+    'target/site/pkg/app.css': ':root { --stray: #ABCDEF; }',
+  });
+  assert.equal(sweepJson([dir]).failures, 0);
+  const r = run(EXTRACT, [dir, '--json']);
+  assert.equal(r.code, 0);
+  assert.equal(JSON.parse(r.out).hexes.includes('#abcdef'), false, 'a build output is not a second design system');
+  rmSync(dir, { recursive: true, force: true });
+});
+
 // ---------------------------------------------------------------- waivers
 
 test('a waiver with a reason suppresses its rule for that file only', () => {

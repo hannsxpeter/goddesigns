@@ -10,6 +10,9 @@
 // It does not replace Phase 2. It executes the assertions that resolve to a string,
 // a number, or a count, and leaves the rest to the checklist.
 //
+// Rust frontends are read through their UI macros (Leptos view!, Yew html!, Dioxus
+// rsx!); a .rs file with none is skipped and counted, never scanned as markup.
+//
 // Usage:
 //   node sweep.mjs <file-or-dir> [more targets ...] [--tokens baseline.json] [--json]
 //   node sweep.mjs --rules            print the rule table and exit 0
@@ -103,8 +106,9 @@ if (baselinePath) {
 // ---------------------------------------------------------------- collection
 
 const STYLE_EXT = new Set(['.css', '.scss', '.sass', '.less', '.pcss']);
-const MARKUP_EXT = new Set(['.html', '.htm', '.jsx', '.tsx', '.vue', '.svelte', '.astro', '.js', '.ts', '.mjs']);
-const SKIP_DIR = new Set(['node_modules', '.git', 'dist', 'build', '.next', '.nuxt', 'out', 'coverage', '.svelte-kit', 'vendor', '.playwright-cli', '.playwright-mcp']);
+const MARKUP_EXT = new Set(['.html', '.htm', '.jsx', '.tsx', '.vue', '.svelte', '.astro', '.js', '.ts', '.mjs', '.rs']);
+// target is Cargo's build output: rustdoc HTML, the compiled site, generated sources.
+const SKIP_DIR = new Set(['node_modules', '.git', 'dist', 'build', '.next', '.nuxt', 'out', 'coverage', '.svelte-kit', 'vendor', 'target', '.playwright-cli', '.playwright-mcp']);
 
 function collect(target, out) {
   let st;
@@ -123,7 +127,7 @@ function collect(target, out) {
 const files = [];
 for (const t of targets) collect(t, files);
 if (!files.length) {
-  console.error('SWEEP UNAVAILABLE: no .html/.css/.jsx/.tsx/.vue/.svelte/.astro files under the given targets.');
+  console.error('SWEEP UNAVAILABLE: no .html/.css/.jsx/.tsx/.vue/.svelte/.astro/.rs files under the given targets.');
   process.exit(2);
 }
 
@@ -210,6 +214,131 @@ function visibleText(text) {
     .replace(/&[a-z]+;|&#(?:x[0-9a-f]+|\d+);/gi, blank);
 }
 
+// Rust frontends write their markup inside macros: Leptos view! and Yew html! in
+// tag syntax (<div class="x">"text"</div>), Dioxus rsx! as div { class: "x", "text" }.
+// The rest of a .rs file is Rust, which no rule here can read, and the SWEEP
+// UNAVAILABLE that .rs used to get pushed every Rust frontend to DEGRADED: no sweep.
+// So this lexes just far enough to find those bodies: comments blanked (they nest),
+// string and char literals located, so a brace or a "view!" inside either is never
+// read as code. Every view keeps the file's length and newlines, so findings report
+// their real source line. Returns null when the file has no UI macro: a server or
+// domain module has nothing for a design gate.
+//   code    the whole file, comments blanked
+//   markup  macro bodies only, comments blanked, literals intact
+//   tags    macro bodies only, literals blanked: structure without copy
+//   copy    only the literals in text position: the visible copy
+//   texts   those literals' contents, for the chapter-number check
+//   css     the literals inside <style> elements, as cssOf() returns them
+const UI_MACRO = /\b(view|html|rsx)\s*!\s*([{(\[])/g;
+const CLOSER = { '{': '}', '(': ')', '[': ']' };
+
+function rustMarkup(src) {
+  const n = src.length;
+  const isIdent = (ch) => ch !== undefined && /\w/.test(ch);
+  const blankRange = (chars, from, to) => { for (let k = from; k < to; k++) if (chars[k] !== '\n') chars[k] = ' '; };
+  const keep = (chars, ranges) => {
+    const out = chars.map((ch) => (ch === '\n' ? '\n' : ' '));
+    for (const [from, to] of ranges) for (let k = from; k < to; k++) out[k] = chars[k];
+    return out.join('');
+  };
+
+  const code = src.split('');
+  const literals = []; // open..close is the whole token, start..end its contents
+  let i = 0;
+  while (i < n) {
+    const c = src[i], d = src[i + 1];
+    if (c === '/' && d === '/') {
+      const e = src.indexOf('\n', i);
+      const end = e === -1 ? n : e;
+      blankRange(code, i, end); i = end; continue;
+    }
+    if (c === '/' && d === '*') {
+      let j = i + 2, depth = 1;
+      while (j < n && depth) {
+        if (src[j] === '/' && src[j + 1] === '*') { depth++; j += 2; }
+        else if (src[j] === '*' && src[j + 1] === '/') { depth--; j += 2; }
+        else j++;
+      }
+      blankRange(code, i, j); i = j; continue;
+    }
+    // Raw strings (r"..", r#".."#, br"..", cr"..") have no escapes and close on the
+    // same number of hashes. r#type is a raw identifier, not a string.
+    if ((c === 'r' || c === 'b' || c === 'c') && !isIdent(src[i - 1])) {
+      let j = c === 'r' ? i + 1 : d === 'r' ? i + 2 : -1;
+      if (j !== -1) {
+        let hashes = 0;
+        while (src[j] === '#') { hashes++; j++; }
+        if (src[j] === '"') {
+          const closer = '"' + '#'.repeat(hashes);
+          const e = src.indexOf(closer, j + 1);
+          const end = e === -1 ? n : e;
+          literals.push({ open: i, start: j + 1, end, close: Math.min(n, end + closer.length) });
+          i = end + closer.length; continue;
+        }
+      }
+    }
+    const quote = c === '"' ? i : (c === 'b' || c === 'c') && d === '"' && !isIdent(src[i - 1]) ? i + 1 : -1;
+    if (quote !== -1) {
+      let j = quote + 1;
+      while (j < n && src[j] !== '"') j += src[j] === '\\' ? 2 : 1;
+      const end = Math.min(j, n);
+      literals.push({ open: i, start: quote + 1, end, close: Math.min(n, end + 1) });
+      i = end + 1; continue;
+    }
+    // A char literal ('x', '\'', '"', '\u{2014}') or a lifetime ('a, 'static). Only
+    // the literal can hold a quote or a brace that would throw the scan off.
+    if (c === "'") {
+      let end = -1;
+      if (d === '\\') end = src.indexOf("'", i + 3);
+      else if (d !== undefined && d !== '\n') {
+        const w = src.codePointAt(i + 1) > 0xffff ? 2 : 1;
+        if (src[i + 1 + w] === "'") end = i + 1 + w;
+      }
+      if (end !== -1) { literals.push({ open: i, start: i + 1, end, close: end + 1, char: true }); i = end + 1; continue; }
+    }
+    i++;
+  }
+
+  const bare = code.slice();
+  for (const l of literals) blankRange(bare, l.open, l.close);
+  const bareText = bare.join('');
+
+  // Outermost macros only: a view! nested inside another's body is already in it.
+  const bodies = [];
+  const re = new RegExp(UI_MACRO.source, 'g');
+  let m;
+  while ((m = re.exec(bareText))) {
+    const opener = m[2], closer = CLOSER[opener];
+    let j = m.index + m[0].length, depth = 1;
+    while (j < n && depth) { if (bareText[j] === opener) depth++; else if (bareText[j] === closer) depth--; j++; }
+    bodies.push([m.index + m[0].length, depth ? n : j - 1]);
+    re.lastIndex = j;
+  }
+  if (!bodies.length) return null;
+  const inBody = (k) => bodies.some(([from, to]) => k >= from && k < to);
+
+  const tags = keep(bare, bodies);
+  const css = [], styleSpans = [];
+  const styleRe = /<style\b[^>]*>[\s\S]*?<\/style\s*>/gi;
+  while ((m = styleRe.exec(tags))) styleSpans.push([m.index, m.index + m[0].length]);
+  const inStyle = (k) => styleSpans.some(([from, to]) => k >= from && k < to);
+
+  // Copy is a literal in text position. One right after = or : is an attribute
+  // value (class="x" in tag syntax, class: "x" in rsx!) or a comparison, not copy.
+  const texts = [], copyRanges = [];
+  for (const l of literals) {
+    if (l.char || !inBody(l.open)) continue;
+    if (inStyle(l.open)) { css.push({ css: blankComments(src.slice(l.start, l.end)), offset: l.start }); continue; }
+    let k = l.open - 1;
+    while (k >= 0 && /\s/.test(bareText[k])) k--;
+    if (bareText[k] === '=' || bareText[k] === ':') continue;
+    texts.push(src.slice(l.start, l.end));
+    copyRanges.push([l.start, l.end]);
+  }
+
+  return { code: code.join(''), markup: keep(code, bodies), tags, copy: keep(code, copyRanges), texts, css };
+}
+
 // CSS keywords and the true generic families. These are never a chosen face and
 // never need an import, so they are skipped outright wherever they appear.
 const GENERIC_FAMILY = /^(sans-serif|serif|monospace|cursive|fantasy|inherit|initial|unset|revert|var\(|emoji|math|fangsong)/i;
@@ -266,7 +395,7 @@ const ORNAMENTS = [
 // ---------------------------------------------------------------- per-file scan
 
 const waivers = new Map(); // file -> Set(ruleId)
-const scanned = { markup: 0, style: 0 };
+const scanned = { markup: 0, style: 0, skipped: 0 };
 let anyStyle = false, anyInteractive = false, anyMotion = false, anyStamp = false, anyFontImport = false;
 let sectionCount = 0;
 let namedFaces = [];
@@ -280,6 +409,9 @@ for (const file of files) {
   const ext = extname(file).toLowerCase();
   const fromCwd = relative(process.cwd(), resolve(file));
   const rel = (!fromCwd || fromCwd.startsWith('..')) ? file : fromCwd;
+
+  const rust = ext === '.rs' ? rustMarkup(raw) : null;
+  if (ext === '.rs' && !rust) { scanned.skipped++; continue; }
 
   // Waivers first, off the raw text: they live in comments, which every rule scan
   // below deliberately cannot see.
@@ -300,25 +432,37 @@ for (const file of files) {
 
   // Every rule scan below reads the comment-blanked text, so a comment that names a
   // banned pattern (a lock block, a note about the kill switch) is never a finding.
-  const text = blankComments(raw);
-  allSourceParts.push(text);
+  const text = rust ? rust.markup : blankComments(raw);
+  allSourceParts.push(rust ? rust.code : text);
 
   // ---- markup-level checks
   if (MARKUP_EXT.has(ext)) {
-    const inlineRe = /(\sstyle\s*=\s*["'][^"']*["']|style=\{\{)/g;
+    // A Rust macro body is not HTML (rustMarkup above): structure is read from the
+    // literal-blanked body, copy from its text-position literals, and each pattern
+    // takes both macro syntaxes. A Leptos style:prop= directive is an inline style.
+    const tags = rust ? rust.tags : text;
+    const inlineRe = rust
+      ? /(?<![\w:-])style(?:(?::[\w-]+)?\s*=(?!=)|\s*:(?!:))/g
+      : /(\sstyle\s*=\s*["'][^"']*["']|style=\{\{)/g;
     let m;
-    while ((m = inlineRe.exec(text))) flag('inline-style', lineOf(text, m.index), m[0].trim().slice(0, 48));
+    while ((m = inlineRe.exec(tags)))
+      flag('inline-style', lineOf(tags, m.index), (rust ? text.slice(m.index).split('\n')[0] : m[0]).trim().slice(0, 48));
 
-    const hrRe = /<hr[\s/>]/gi;
-    while ((m = hrRe.exec(text))) flag('hr-divider', lineOf(text, m.index), '<hr> divider');
+    const hrRe = rust ? /<hr[\s/>]|(?<![\w:.-])hr\s*\{/gi : /<hr[\s/>]/gi;
+    while ((m = hrRe.exec(tags))) flag('hr-divider', lineOf(tags, m.index), '<hr> divider');
 
-    if (/<(a|button|input|select|textarea|summary)[\s>]/i.test(text)) anyInteractive = true;
-    sectionCount += (text.match(/<section[\s>]/gi) || []).length;
+    const interactive = rust
+      ? /<(a|button|input|select|textarea|summary)[\s/>]|(?<![\w:.-])(a|button|input|select|textarea|summary)\s*\{/i
+      : /<(a|button|input|select|textarea|summary)[\s>]/i;
+    if (interactive.test(tags)) anyInteractive = true;
+    sectionCount += (tags.match(rust ? /<section[\s/>]|(?<![\w:.-])section\s*\{/gi : /<section[\s>]/gi) || []).length;
 
-    const attrColor = /\b(fill|stroke|bgcolor|color)\s*=\s*["']#[0-9a-f]{3,8}["']/gi;
+    const attrColor = rust
+      ? /\b(fill|stroke|bgcolor|color)\s*[=:]\s*"#[0-9a-f]{3,8}"/gi
+      : /\b(fill|stroke|bgcolor|color)\s*=\s*["']#[0-9a-f]{3,8}["']/gi;
     while ((m = attrColor.exec(text))) flag('markup-color', lineOf(text, m.index), m[0]);
 
-    const vis = visibleText(text);
+    const vis = rust ? rust.copy : visibleText(text);
     allText.push(vis);
     const scanVisible = (rule, pattern) => {
       const re = new RegExp(pattern.source, pattern.flags);
@@ -336,14 +480,16 @@ for (const file of files) {
     while ((dm = dashRe.exec(vis))) { flag('dash-in-copy', lineOf(vis, dm.index), 'em or en dash in visible copy'); break; }
 
     // Numbered chapter cadence: 01 / 02 / 03 standing alone as element text.
-    const chapters = [...text.matchAll(/>\s*(0[1-9])\s*</g)].map((c) => c[1]);
+    const chapters = rust
+      ? rust.texts.map((t) => (/^\s*(0[1-9])\s*$/.exec(t) || [])[1]).filter(Boolean)
+      : [...text.matchAll(/>\s*(0[1-9])\s*</g)].map((c) => c[1]);
     if (new Set(chapters).size >= 3) flag('chapter-cadence', 1, `section numbers ${[...new Set(chapters)].join(', ')}`);
 
-    if (/fonts\.googleapis\.com|fonts\.bunny\.net|@font-face|fonts\.gstatic\.com|use\.typekit/i.test(text)) anyFontImport = true;
+    if (/fonts\.googleapis\.com|fonts\.bunny\.net|@font-face|fonts\.gstatic\.com|use\.typekit/i.test(rust ? rust.code : text)) anyFontImport = true;
   }
 
   // ---- CSS-level checks
-  for (const { css, offset } of cssOf(text, ext)) {
+  for (const { css, offset } of (rust ? rust.css : cssOf(text, ext))) {
     if (!css.trim()) continue;
     anyStyle = true;
     const at = (idx) => lineOf(text, offset + idx);
@@ -500,6 +646,11 @@ for (const file of files) {
   }
 }
 
+if (!scanned.markup && !scanned.style) {
+  console.error(`SWEEP UNAVAILABLE: nothing scannable under the given targets (${scanned.skipped} .rs file(s), none with a view!, html!, or rsx! macro).`);
+  process.exit(2);
+}
+
 // ---------------------------------------------------------------- whole-build checks
 
 const allSource = allSourceParts.join('\n');
@@ -556,7 +707,7 @@ if (asJson) {
     findings,
   }, null, 1));
 } else {
-  console.log(`goddesign sweep: ${files.length} file(s), ${scanned.markup} markup, ${scanned.style} stylesheet(s)${baseline ? ', token baseline active' : ''}`);
+  console.log(`goddesign sweep: ${files.length} file(s), ${scanned.markup} markup, ${scanned.style} stylesheet(s)${scanned.skipped ? `, ${scanned.skipped} .rs with no UI macro skipped` : ''}${baseline ? ', token baseline active' : ''}`);
   const print = (list, label) => {
     if (!list.length) return;
     console.log(`\n${label} (${list.length}):`);

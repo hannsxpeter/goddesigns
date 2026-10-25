@@ -1,5 +1,31 @@
 # Changelog
 
+## v2.1.0 (2026-10-24)
+
+The sweep reads Rust frontends. `.rs` was not a scannable extension, so every edit to a Leptos, Yew, or Dioxus component exited 2 with `SWEEP UNAVAILABLE`, and the run was reported as `DEGRADED: no sweep` with the Banned list checked by hand. On the owner's Leptos project that happened in three sessions on 2026-10-24. No rule, threshold, severity, or exit code changes.
+
+### Rust UI macros
+
+- `sweep.mjs` lexes each `.rs` file just far enough to find the bodies of `view!` (Leptos), `html!` (Yew), and `rsx!` (Dioxus). Comments are blanked, nested block comments included. String, raw-string, and char literals are located, so a brace, a quote, or a macro name inside one never moves the scan, and lifetimes are told apart from char literals. Every derived view keeps the file's length and newlines, so findings carry their real source line.
+- Inside those bodies, structure comes from tags (`<hr/>`, `<section>`, `<button>`, the router's `<A>`) or `rsx!` elements (`hr {}`), copy from the string literals in text position and never from attribute values, and CSS from a `<style>` element's literal. `style=`, Leptos `style:prop=`, and Dioxus `style:` count as inline styles. Waivers work in Rust `//` comments.
+- A `.rs` file with no UI macro (a server, domain, or database module) is skipped and counted, in the summary line and in `--json` as `scanned.skipped`. Targets that are all non-UI Rust still exit 2: that change has no markup for the gate, and `references/checklist.md` now says this is not `DEGRADED: no sweep`.
+- Copy served from an i18n catalog (`t!(i18n, key)`) is not in the source, so the copy rules cannot see it. The checklist now says to check the catalog against them by hand.
+
+### Cargo's `target/`
+
+- `sweep.mjs` and `extract-tokens.mjs` both skip `target/`. On the same project, `extract-tokens.mjs .` read the cargo-leptos build output (`target/site/pkg/*.css` and `target/tmp/tailwind.css`, both compiled from the real token stylesheet) as two more token sources. rustdoc writes HTML there too.
+
+### Documentation
+
+- The README answers which frameworks the source scan reads, `docs/INSTALL.md` lists the file types and the Rust behavior where it shows how to run the scan without a browser, and `CONTRIBUTING.md` gains a fourth sweep rule: a new source language gets a lexed reader with decoy tests, not a regex.
+- `references/checklist.md` and `docs/ARCHITECTURE.md` describe the Rust reader and its limits.
+
+### Verification
+
+- `scripts/sweep.test.mjs`: 31 tests, 7 new. A clean Leptos component passes. A Leptos file with five planted findings reports exactly those five on their lines, while seven decoys report nothing: a string outside any macro, a raw string holding a quote and `view! {`, a `'"'` char literal, a nested block comment, a lifetime, a comment inside the macro, and an attribute value. The same holds for Dioxus. `<style>` CSS inside `view!` is scanned as CSS and not as copy, a waiver in a `//` comment holds, a non-UI `.rs` file is skipped and exits 2 alone, and both scripts ignore `target/`. All 7 fail against the v2.0.0 scripts; the 24 existing tests are unchanged.
+- Real code: the project's crates (31 files with `view!`, 76 without) sweep green together with its stylesheet, and a scratch copy of one layout component with six planted defects reports all six on their lines. The Leptos crates in a local Cargo registry (`leptos`, `leptos_router`, `leptos_macro`, `leptos-use`) produce no finding from any `.rs` file, and crates whose only `view!` sits in doc comments are skipped.
+- `scripts/lint-decks.mjs`: 381 checks, unchanged and green.
+
 ## v2.0.0 (2026-09-26)
 
 The lean-core release. The owner asked whether goddesign still earns its cost now that frontier models are better and more expensive, given that much of it re-taught things those models do unprompted while it still helped weaker ones. The answer measured in this session: the parts no model can do for itself are small (pick at random, remember past runs, measure the render, hold this owner's taste), and most of what every run read was neither. v2.0.0 keeps the first set, moves the rest to where it is needed, and pre-registers the test that decides whether the cut cost quality.
