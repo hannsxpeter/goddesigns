@@ -40,7 +40,9 @@ if (!targets.length) {
   process.exit(2);
 }
 
-const SKIP_DIR = new Set(['node_modules', '.git', 'dist', 'build', '.next', '.nuxt', 'out', 'coverage', '.svelte-kit', 'vendor']);
+// target is Cargo's build output: cargo-leptos writes the compiled site CSS there,
+// which repeats the real token source and would be read as a second design system.
+const SKIP_DIR = new Set(['node_modules', '.git', 'dist', 'build', '.next', '.nuxt', 'out', 'coverage', '.svelte-kit', 'vendor', 'target']);
 const WANT_EXT = new Set(['.css', '.scss', '.sass', '.less', '.pcss', '.html', '.htm', '.jsx', '.tsx', '.js', '.ts', '.mjs', '.cjs', '.vue', '.svelte', '.astro', '.json']);
 
 function collect(target, out) {
