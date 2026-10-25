@@ -140,11 +140,16 @@ runs anywhere, including offline and inside a locked-down sandbox:
 node goddesigns/skills/goddesign/scripts/sweep.mjs index.html
 ```
 
-Point it at a file or a whole folder. It prints every problem with the file,
-line number, and offending value, and exits `0` when clean, `1` when it found
-named failures, and `2` when there was nothing to scan. `--rules` prints the
-full rule table, `--json` gives machine-readable output, and
-`--tokens <baseline.json>` reports drift against an existing design system.
+Point it at a file or a whole folder. It reads HTML, CSS, Sass, Less, PostCSS,
+JSX, TSX, Vue, Svelte, and Astro files. In Rust it reads only the markup inside
+Leptos `view!`, Yew `html!`, and Dioxus `rsx!` macros, skips any `.rs` file
+that has none, and never reads Cargo's `target/` folder.
+
+It prints every problem with the file, line number, and offending value, and
+exits `0` when clean, `1` when it found named failures, and `2` when there was
+nothing to scan. `--rules` prints the full rule table, `--json` gives
+machine-readable output, and `--tokens <baseline.json>` reports drift against an
+existing design system.
 
 Three copy rules (vague attribution, filler phrases, formulaic contrasts or
 conclusions) are advisories: they never fail the gate. Read them in context,

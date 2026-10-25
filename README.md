@@ -196,6 +196,13 @@ Node 18 or newer runs the picker and the checks. The visual audit also uses a
 headless browser if one is available; without it, the skill says plainly that it
 skipped that check rather than pretending it passed.
 
+**Does it work with my framework?**
+Yes, if it renders HTML and CSS: the design rules do not depend on one. The
+source scan reads HTML and CSS (Sass, Less, and PostCSS too), React, Vue,
+Svelte, and Astro components, and Rust frontends built with Leptos, Yew, or
+Dioxus. Copy kept in translation files instead of the code is outside the scan,
+so check it by hand.
+
 **Will it override my company's existing design system?**
 No. If your project already has a design system, goddesign switches into
 extension mode: it reads your existing colors, fonts, and spacing, and builds

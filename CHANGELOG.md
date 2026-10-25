@@ -15,6 +15,11 @@ The sweep reads Rust frontends. `.rs` was not a scannable extension, so every ed
 
 - `sweep.mjs` and `extract-tokens.mjs` both skip `target/`. On the same project, `extract-tokens.mjs .` read the cargo-leptos build output (`target/site/pkg/*.css` and `target/tmp/tailwind.css`, both compiled from the real token stylesheet) as two more token sources. rustdoc writes HTML there too.
 
+### Documentation
+
+- The README answers which frameworks the source scan reads, `docs/INSTALL.md` lists the file types and the Rust behavior where it shows how to run the scan without a browser, and `CONTRIBUTING.md` gains a fourth sweep rule: a new source language gets a lexed reader with decoy tests, not a regex.
+- `references/checklist.md` and `docs/ARCHITECTURE.md` describe the Rust reader and its limits.
+
 ### Verification
 
 - `scripts/sweep.test.mjs`: 31 tests, 7 new. A clean Leptos component passes. A Leptos file with five planted findings reports exactly those five on their lines, while seven decoys report nothing: a string outside any macro, a raw string holding a quote and `view! {`, a `'"'` char literal, a nested block comment, a lifetime, a comment inside the macro, and an attribute value. The same holds for Dioxus. `<style>` CSS inside `view!` is scanned as CSS and not as copy, a waiver in a `//` comment holds, a non-UI `.rs` file is skipped and exits 2 alone, and both scripts ignore `target/`. All 7 fail against the v2.0.0 scripts; the 24 existing tests are unchanged.
