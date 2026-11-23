@@ -1,0 +1,14 @@
+{
+  "name": "goddesign",
+  "owner": {
+    "name": "Goddesign"
+  },
+  "plugins": [
+    {
+      "name": "goddesign",
+      "source": "./",
+      "description": "Draw one direction from a deck, lock it before any code, and clear a measured gate.",
+      "version": "3.0.0"
+    }
+  ]
+}

@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wayfare - Plan the trip you actually want to take</title>
+<meta name="description" content="Wayfare is the trip planner for independent travelers: build itineraries, track flights and trains, and keep a daily budget, all in one place.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Albert+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f2f3ec;
+    --paper-deep: #e8eadf;
+    --ink: #16233a;
+    --ink-soft: #45536b;
+    --ink-faint: #7b869a;
+    --cobalt: #2244d6;
+    --cobalt-deep: #1a35a8;
+    --leaf: #1d7a4f;
+    --signal: #d6432c;
+    --line: #ccd0c2;
+    --card: #fbfbf7;
+    --night: #101a2c;
+    --night-ink: #dfe5f2;
+    --radius: 14px;
+    --font-display: "Young Serif", Georgia, serif;
+    --font-body: "Albert Sans", "Helvetica Neue", sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  ::selection { background: var(--cobalt); color: #fff; }
+
+  h1, h2, h3 { font-family: var(--font-display); font-weight: 400; line-height: 1.08; letter-spacing: -0.01em; }
+
+  a { color: inherit; }
+
+  .wrap { max-width: 1160px; margin: 0 auto; padding: 0 28px; }
+
+  /* Dotted route texture behind hero */
+  .route-bg {
+    position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0;
+  }
+  .route-bg svg { position: absolute; width: 1400px; height: auto; }
+  .route-bg .r1 { top: 40px; left: 50%; transform: translateX(-38%); opacity: .55; }
+
+  /* ============ NAV ============ */
+  header {
+    position: sticky; top: 0; z-index: 50;
+    background: color-mix(in srgb, var(--paper) 88%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav {
+    display: flex; align-items: center; justify-content: space-between;
+    height: 68px;
+  }
+  .brand {
+    display: flex; align-items: center; gap: 10px;
+    font-family: var(--font-display); font-size: 1.35rem; text-decoration: none;
+  }
+  .brand svg { display: block; }
+  .nav-links { display: flex; align-items: center; gap: 30px; list-style: none; }
+  .nav-links a {
+    text-decoration: none; font-size: .92rem; font-weight: 500; color: var(--ink-soft);
+    transition: color .18s ease;
+  }
+  .nav-links a:hover { color: var(--cobalt); }
+  .nav-cta {
+    display: inline-block; text-decoration: none;
+    background: var(--ink); color: var(--paper);
+    font-weight: 600; font-size: .9rem;
+    padding: 10px 20px; border-radius: 999px;
+    transition: background .18s ease, transform .18s ease;
+  }
+  .nav-cta:hover { background: var(--cobalt); transform: translateY(-1px); }
+  @media (max-width: 800px) { .nav-links li:not(:last-child) { display: none; } }
+
+  /* ============ HERO ============ */
+  .hero {
+    position: relative;
+    padding: 84px 0 110px;
+  }
+  .hero-grid {
+    position: relative; z-index: 1;
+    display: grid; grid-template-columns: 1.05fr .95fr; gap: 56px; align-items: center;
+  }
+  .stamp {
+    display: inline-flex; align-items: center; gap: 8px;
+    border: 1.5px solid var(--ink); border-radius: 999px;
+    padding: 6px 14px; font-size: .78rem; font-weight: 600;
+    letter-spacing: .08em; text-transform: uppercase;
+    transform: rotate(-1.5deg);
+    background: var(--card);
+    animation: rise .7s ease both;
+  }
+  .stamp .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--leaf); }
+  .hero h1 {
+    font-size: clamp(2.6rem, 5.4vw, 4.1rem);
+    margin: 26px 0 20px;
+    animation: rise .7s .08s ease both;
+  }
+  .hero h1 em { font-style: normal; color: var(--cobalt); position: relative; white-space: nowrap; }
+  .hero h1 em::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: .06em;
+    height: .1em; background: var(--cobalt); opacity: .25; border-radius: 2px;
+  }
+  .hero p.lede {
+    font-size: 1.13rem; color: var(--ink-soft); max-width: 46ch;
+    animation: rise .7s .16s ease both;
+  }
+  .hero-actions { display: flex; gap: 14px; margin-top: 34px; flex-wrap: wrap; animation: rise .7s .24s ease both; }
+  .btn-primary {
+    text-decoration: none; background: var(--cobalt); color: #fff;
+    font-weight: 600; padding: 14px 28px; border-radius: 999px;
+    box-shadow: 0 6px 18px -6px rgba(34, 68, 214, .55);
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+  }
+  .btn-primary:hover { transform: translateY(-2px); background: var(--cobalt-deep); box-shadow: 0 10px 24px -6px rgba(34, 68, 214, .55); }
+  .btn-ghost {
+    text-decoration: none; color: var(--ink); font-weight: 600;
+    padding: 14px 24px; border-radius: 999px; border: 1.5px solid var(--ink);
+    transition: background .18s ease, color .18s ease;
+  }
+  .btn-ghost:hover { background: var(--ink); color: var(--paper); }
+  .hero-meta {
+    margin-top: 30px; font-size: .85rem; color: var(--ink-faint);
+    animation: rise .7s .3s ease both;
+  }
+  .hero-meta strong { color: var(--ink); font-weight: 600; }
+
+  /* Hero itinerary card stack */
+  .hero-visual { position: relative; min-height: 480px; }
+  .itin-card {
+    position: absolute; width: min(400px, 100%);
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: 0 24px 48px -20px rgba(22, 35, 58, .28);
+    animation: rise .8s .2s ease both;
+  }
+  .itin-card.main { top: 0; right: 20px; z-index: 2; }
+  .itin-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 18px 20px 14px; border-bottom: 1px dashed var(--line);
+  }
+  .itin-head h3 { font-size: 1.1rem; }
+  .itin-head .day-tag { font-family: var(--font-mono); font-size: .72rem; color: var(--ink-faint); }
+  .itin-body { padding: 8px 20px 18px; }
+  .itin-row {
+    display: grid; grid-template-columns: 58px 14px 1fr auto; gap: 10px;
+    align-items: start; padding: 10px 0;
+  }
+  .itin-row + .itin-row { border-top: 1px solid color-mix(in srgb, var(--line) 55%, transparent); }
+  .itin-time { font-family: var(--font-mono); font-size: .78rem; color: var(--ink-soft); padding-top: 2px; }
+  .itin-node { display: flex; flex-direction: column; align-items: center; padding-top: 6px; }
+  .itin-node .pin { width: 9px; height: 9px; border-radius: 50%; border: 2px solid var(--cobalt); background: var(--card); flex: none; }
+  .itin-node .stem { width: 0; flex: 1; border-left: 2px dotted var(--line); margin-top: 4px; min-height: 16px; }
+  .itin-row:last-child .stem { display: none; }
+  .itin-what { font-size: .92rem; font-weight: 600; }
+  .itin-what span { display: block; font-weight: 400; font-size: .8rem; color: var(--ink-faint); }
+  .itin-cost { font-family: var(--font-mono); font-size: .78rem; color: var(--leaf); padding-top: 2px; }
+  .itin-foot {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 20px; border-top: 1px dashed var(--line);
+    font-size: .8rem; color: var(--ink-faint);
+  }
+  .itin-foot b { color: var(--ink); font-family: var(--font-mono); font-weight: 500; }
+
+  .flight-chip {
+    position: absolute; z-index: 3; left: -10px; top: 260px;
+    background: var(--night); color: var(--night-ink);
+    border-radius: 12px; padding: 14px 16px;
+    width: 250px;
+    box-shadow: 0 20px 40px -16px rgba(16, 26, 44, .5);
+    animation: rise .8s .45s ease both;
+    transform: rotate(-2deg);
+  }
+  .flight-chip .fc-top { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: .72rem; margin-bottom: 8px; }
+  .flight-chip .status { color: #6fe3a5; }
+  .flight-chip .fc-route { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 1.15rem; letter-spacing: .02em; }
+  .fc-route .path { flex: 1; border-top: 2px dotted #3a4a68; position: relative; }
+  .fc-route .path::after {
+    content: ""; position: absolute; top: -5px; left: 62%;
+    width: 8px; height: 8px; background: #6fe3a5; border-radius: 50%;
+  }
+  .flight-chip .fc-sub { font-size: .72rem; color: #8d9ab5; margin-top: 8px; }
+
+  .budget-chip {
+    position: absolute; z-index: 3; right: -6px; bottom: 6px;
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 12px; padding: 14px 16px; width: 240px;
+    box-shadow: 0 18px 36px -16px rgba(22, 35, 58, .3);
+    animation: rise .8s .6s ease both;
+    transform: rotate(1.6deg);
+  }
+  .budget-chip .bc-label { font-size: .72rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-faint); }
+  .budget-chip .bc-num { font-family: var(--font-mono); font-size: 1.3rem; margin: 4px 0 8px; }
+  .budget-chip .bc-num small { font-size: .75rem; color: var(--ink-faint); }
+  .bc-bar { height: 8px; border-radius: 999px; background: var(--paper-deep); overflow: hidden; }
+  .bc-bar i { display: block; height: 100%; width: 61%; background: linear-gradient(90deg, var(--leaf), #35a172); border-radius: 999px; }
+  .budget-chip .bc-note { font-size: .72rem; color: var(--leaf); margin-top: 6px; font-weight: 600; }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(22px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .flight-chip, .budget-chip { will-change: transform; }
+  @keyframes rise-r2 { from { opacity: 0; transform: rotate(-2deg) translateY(22px); } to { opacity: 1; transform: rotate(-2deg) translateY(0); } }
+  @keyframes rise-r3 { from { opacity: 0; transform: rotate(1.6deg) translateY(22px); } to { opacity: 1; transform: rotate(1.6deg) translateY(0); } }
+  .flight-chip { animation-name: rise-r2; }
+  .budget-chip { animation-name: rise-r3; }
+
+  @media (max-width: 960px) {
+    .hero-grid { grid-template-columns: 1fr; }
+    .hero-visual { min-height: 520px; margin-top: 10px; }
+    .itin-card.main { right: 0; left: auto; }
+    .flight-chip { left: 0; }
+  }
+
+  /* ============ SECTION SHARED ============ */
+  section { position: relative; }
+  .sec-label {
+    font-family: var(--font-mono); font-size: .75rem; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--cobalt); font-weight: 500;
+  }
+  .sec-title { font-size: clamp(1.9rem, 3.6vw, 2.7rem); margin: 12px 0 16px; }
+  .sec-copy { color: var(--ink-soft); font-size: 1.04rem; max-width: 46ch; }
+
+  .feature {
+    padding: 92px 0;
+    border-top: 1px solid var(--line);
+  }
+  .feature-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center;
+  }
+  .feature-grid.flip .f-copy { order: 2; }
+  .feature-grid.flip .f-visual { order: 1; }
+  @media (max-width: 900px) {
+    .feature-grid, .feature-grid.flip { grid-template-columns: 1fr; gap: 40px; }
+    .feature-grid.flip .f-copy { order: 1; }
+    .feature-grid.flip .f-visual { order: 2; }
+  }
+
+  .f-points { list-style: none; margin-top: 24px; display: grid; gap: 12px; }
+  .f-points li { display: flex; gap: 12px; align-items: flex-start; font-size: .95rem; color: var(--ink-soft); }
+  .f-points li svg { flex: none; margin-top: 3px; }
+  .f-points b { color: var(--ink); }
+
+  /* Reveal on scroll */
+  .reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
+  .reveal.in { opacity: 1; transform: none; }
+
+  /* ============ FEATURE 1: itinerary board ============ */
+  .board {
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    box-shadow: 0 24px 48px -24px rgba(22, 35, 58, .25);
+    overflow: hidden;
+  }
+  .board-tabs { display: flex; gap: 4px; padding: 12px 14px 0; border-bottom: 1px solid var(--line); }
+  .board-tab {
+    font-family: var(--font-mono); font-size: .72rem; padding: 8px 14px;
+    border-radius: 8px 8px 0 0; color: var(--ink-faint); background: transparent;
+  }
+  .board-tab.active { background: var(--paper-deep); color: var(--ink); font-weight: 500; }
+  .board-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+  .board-col { padding: 16px; }
+  .board-col + .board-col { border-left: 1px dashed var(--line); }
+  .board-col h4 { font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 12px; font-weight: 600; }
+  .b-card {
+    background: var(--paper); border: 1px solid var(--line); border-radius: 10px;
+    padding: 10px 12px; margin-bottom: 10px; font-size: .84rem;
+    display: flex; justify-content: space-between; gap: 8px; align-items: baseline;
+    transition: transform .18s ease, box-shadow .18s ease;
+  }
+  .b-card:hover { transform: translateX(3px); box-shadow: 0 6px 14px -8px rgba(22,35,58,.3); cursor: grab; }
+  .b-card b { font-weight: 600; }
+  .b-card small { display: block; color: var(--ink-faint); font-size: .72rem; }
+  .b-card .m { font-family: var(--font-mono); font-size: .72rem; color: var(--ink-soft); white-space: nowrap; }
+  .b-card.ghost { border-style: dashed; color: var(--ink-faint); justify-content: center; background: transparent; }
+
+  /* ============ FEATURE 2: transit tracker ============ */
+  .tracker {
+    background: var(--night); color: var(--night-ink);
+    border-radius: var(--radius); overflow: hidden;
+    box-shadow: 0 28px 56px -24px rgba(16, 26, 44, .55);
+  }
+  .tracker-head {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 16px 20px; border-bottom: 1px solid #223252;
+    font-family: var(--font-mono); font-size: .74rem;
+  }
+  .tracker-head .live { display: inline-flex; align-items: center; gap: 7px; color: #6fe3a5; }
+  .tracker-head .live i {
+    width: 7px; height: 7px; border-radius: 50%; background: #6fe3a5;
+    animation: pulse 1.6s ease infinite;
+  }
+  @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(111, 227, 165, .5); } 50% { box-shadow: 0 0 0 6px rgba(111, 227, 165, 0); } }
+  .leg { padding: 18px 20px; border-bottom: 1px solid #1b2946; }
+  .leg:last-child { border-bottom: none; }
+  .leg-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+  .leg-id { font-family: var(--font-mono); font-size: .78rem; color: #8d9ab5; }
+  .leg-status { font-family: var(--font-mono); font-size: .72rem; padding: 3px 10px; border-radius: 999px; }
+  .leg-status.ok { background: rgba(111, 227, 165, .12); color: #6fe3a5; }
+  .leg-status.warn { background: rgba(240, 177, 90, .14); color: #f0b15a; }
+  .leg-route { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 14px; }
+  .leg-city { text-align: center; }
+  .leg-city b { display: block; font-size: 1.25rem; letter-spacing: .03em; }
+  .leg-city span { font-size: .7rem; color: #8d9ab5; font-family: var(--font-mono); }
+  .leg-track { position: relative; border-top: 2px dotted #33456b; }
+  .leg-track .vehicle {
+    position: absolute; top: -8px; left: var(--pos, 50%);
+    transform: translateX(-50%);
+    color: #6fe3a5;
+  }
+  .leg-note { margin-top: 10px; font-size: .76rem; color: #8d9ab5; }
+  .leg-note b { color: var(--night-ink); font-weight: 600; }
+
+  /* ============ FEATURE 3: budget ledger ============ */
+  .ledger {
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    box-shadow: 0 24px 48px -24px rgba(22, 35, 58, .25); overflow: hidden;
+  }
+  .ledger-head { padding: 18px 20px; border-bottom: 1px dashed var(--line); display: flex; justify-content: space-between; align-items: baseline; }
+  .ledger-head h4 { font-family: var(--font-display); font-size: 1.05rem; font-weight: 400; }
+  .ledger-head .day { font-family: var(--font-mono); font-size: .72rem; color: var(--ink-faint); }
+  .ledger-summary { padding: 18px 20px 6px; }
+  .ledger-summary .big { font-family: var(--font-mono); font-size: 1.9rem; }
+  .ledger-summary .big small { font-size: .85rem; color: var(--ink-faint); }
+  .l-bar { display: flex; height: 12px; border-radius: 999px; overflow: hidden; margin: 14px 0 8px; background: var(--paper-deep); }
+  .l-bar i { height: 100%; }
+  .l-bar .food { width: 26%; background: var(--leaf); }
+  .l-bar .stay { width: 24%; background: var(--cobalt); }
+  .l-bar .transit { width: 8%; background: #f0a24a; }
+  .l-key { display: flex; gap: 16px; font-size: .72rem; color: var(--ink-faint); padding-bottom: 8px; flex-wrap: wrap; }
+  .l-key i { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 5px; }
+  .l-rows { border-top: 1px dashed var(--line); }
+  .l-row { display: flex; justify-content: space-between; padding: 11px 20px; font-size: .87rem; border-bottom: 1px solid color-mix(in srgb, var(--line) 50%, transparent); }
+  .l-row:last-child { border-bottom: none; }
+  .l-row small { display: block; color: var(--ink-faint); font-size: .72rem; }
+  .l-row .amt { font-family: var(--font-mono); font-size: .8rem; }
+  .l-row .amt.minus { color: var(--ink-soft); }
+  .l-foot { padding: 12px 20px; background: color-mix(in srgb, var(--leaf) 8%, var(--card)); font-size: .8rem; color: var(--leaf); font-weight: 600; }
+
+  /* ============ PRICING ============ */
+  .pricing { padding: 100px 0; border-top: 1px solid var(--line); }
+  .pricing-intro { text-align: center; max-width: 560px; margin: 0 auto 56px; }
+  .pricing-intro .sec-copy { margin: 0 auto; }
+  .tiers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; align-items: stretch; }
+  @media (max-width: 900px) { .tiers { grid-template-columns: 1fr; max-width: 440px; margin: 0 auto; } }
+  .tier {
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 30px 28px; display: flex; flex-direction: column;
+    transition: transform .22s ease, box-shadow .22s ease;
+  }
+  .tier:hover { transform: translateY(-6px); box-shadow: 0 22px 44px -22px rgba(22, 35, 58, .3); }
+  .tier.featured {
+    background: var(--night); color: var(--night-ink); border-color: var(--night);
+    box-shadow: 0 26px 52px -22px rgba(16, 26, 44, .5);
+    position: relative;
+  }
+  .tier.featured:hover { transform: translateY(-8px); }
+  .tier .badge {
+    position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
+    background: var(--cobalt); color: #fff; font-size: .7rem; font-weight: 700;
+    letter-spacing: .08em; text-transform: uppercase;
+    padding: 5px 14px; border-radius: 999px;
+  }
+  .tier h3 { font-size: 1.3rem; margin-bottom: 6px; }
+  .tier .tagline { font-size: .85rem; color: var(--ink-faint); min-height: 2.6em; }
+  .tier.featured .tagline { color: #8d9ab5; }
+  .tier .price { font-family: var(--font-mono); font-size: 2.2rem; margin: 18px 0 2px; }
+  .tier .price small { font-size: .8rem; color: var(--ink-faint); font-family: var(--font-body); }
+  .tier.featured .price small { color: #8d9ab5; }
+  .tier ul { list-style: none; margin: 22px 0 28px; display: grid; gap: 10px; font-size: .88rem; color: var(--ink-soft); flex: 1; }
+  .tier.featured ul { color: #b9c3d8; }
+  .tier ul li { display: flex; gap: 10px; align-items: flex-start; }
+  .tier ul li svg { flex: none; margin-top: 4px; }
+  .tier-btn {
+    text-decoration: none; text-align: center; font-weight: 600; font-size: .92rem;
+    padding: 13px 20px; border-radius: 999px; border: 1.5px solid var(--ink); color: var(--ink);
+    transition: background .18s ease, color .18s ease, transform .18s ease;
+  }
+  .tier-btn:hover { background: var(--ink); color: var(--paper); }
+  .tier.featured .tier-btn { background: var(--cobalt); border-color: var(--cobalt); color: #fff; }
+  .tier.featured .tier-btn:hover { background: var(--cobalt-deep); border-color: var(--cobalt-deep); }
+  .pricing-note { text-align: center; margin-top: 32px; font-size: .82rem; color: var(--ink-faint); }
+
+  /* ============ FOOTER ============ */
+  footer { background: var(--night); color: #8d9ab5; padding: 70px 0 36px; }
+  .foot-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 40px; }
+  @media (max-width: 800px) { .foot-grid { grid-template-columns: 1fr 1fr; } }
+  .foot-brand { font-family: var(--font-display); font-size: 1.4rem; color: var(--night-ink); display: flex; align-items: center; gap: 10px; }
+  .foot-tag { margin-top: 14px; font-size: .86rem; max-width: 30ch; }
+  .foot-col h5 { color: var(--night-ink); font-size: .78rem; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 16px; font-weight: 600; }
+  .foot-col ul { list-style: none; display: grid; gap: 10px; }
+  .foot-col a { text-decoration: none; font-size: .88rem; transition: color .18s ease; }
+  .foot-col a:hover { color: var(--night-ink); }
+  .foot-bottom {
+    margin-top: 56px; padding-top: 22px; border-top: 1px solid #223252;
+    display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    font-size: .78rem;
+  }
+  .foot-bottom .coords { font-family: var(--font-mono); }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    .reveal { opacity: 1; transform: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="#" aria-label="Wayfare home">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+        <circle cx="13" cy="13" r="11.5" stroke="#16233a" stroke-width="2"/>
+        <path d="M13 4.5 L16 16 L13 13.5 L10 16 Z" fill="#2244d6"/>
+      </svg>
+      Wayfare
+    </a>
+    <ul class="nav-links">
+      <li><a href="#itinerary">Itinerary</a></li>
+      <li><a href="#tracking">Tracking</a></li>
+      <li><a href="#budget">Budget</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a class="nav-cta" href="#pricing">Start planning</a></li>
+    </ul>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="route-bg" aria-hidden="true">
+      <svg class="r1" viewBox="0 0 1400 600" fill="none">
+        <path d="M40 480 C 300 120, 620 560, 900 220 S 1300 380, 1380 120" stroke="#2244d6" stroke-width="2" stroke-dasharray="1 10" stroke-linecap="round" opacity=".5"/>
+        <path d="M-20 200 C 260 420, 640 80, 980 420 S 1340 160, 1440 340" stroke="#16233a" stroke-width="2" stroke-dasharray="1 12" stroke-linecap="round" opacity=".25"/>
+        <circle cx="900" cy="220" r="5" fill="#2244d6" opacity=".6"/>
+        <circle cx="300" cy="253" r="4" fill="#16233a" opacity=".3"/>
+        <circle cx="1180" cy="300" r="4" fill="#2244d6" opacity=".4"/>
+      </svg>
+    </div>
+    <div class="wrap hero-grid">
+      <div>
+        <span class="stamp"><span class="dot"></span>For travelers who plan their own way</span>
+        <h1>The trip is yours. <em>Keep it that way.</em></h1>
+        <p class="lede">Wayfare puts your whole trip on one page: the itinerary you sketched, the trains and flights that carry it, and the budget that keeps it honest. No tour packages. No group-rate anything.</p>
+        <div class="hero-actions">
+          <a class="btn-primary" href="#pricing">Plan your first trip free</a>
+          <a class="btn-ghost" href="#itinerary">See how it works</a>
+        </div>
+        <p class="hero-meta"><strong>412,000 trips</strong> planned across <strong>146 countries</strong>, mostly by people traveling alone or in twos.</p>
+      </div>
+
+      <div class="hero-visual" aria-label="Preview of a Wayfare itinerary for Lisbon">
+        <article class="itin-card main">
+          <div class="itin-head">
+            <h3>Lisbon, day 3</h3>
+            <span class="day-tag">TUE 14 OCT</span>
+          </div>
+          <div class="itin-body">
+            <div class="itin-row">
+              <span class="itin-time">08:30</span>
+              <span class="itin-node"><i class="pin"></i><i class="stem"></i></span>
+              <span class="itin-what">Pasteis at Manteigaria<span>Rua do Loreto 2, opens 08:00</span></span>
+              <span class="itin-cost">EUR 6</span>
+            </div>
+            <div class="itin-row">
+              <span class="itin-time">10:15</span>
+              <span class="itin-node"><i class="pin"></i><i class="stem"></i></span>
+              <span class="itin-what">Tram 28 to Graca<span>Buy 24h Carris pass, avoid 12-2pm crowds</span></span>
+              <span class="itin-cost">EUR 7</span>
+            </div>
+            <div class="itin-row">
+              <span class="itin-time">13:00</span>
+              <span class="itin-node"><i class="pin"></i><i class="stem"></i></span>
+              <span class="itin-what">Lunch, Ze da Mouraria<span>Cash only, half portion is plenty</span></span>
+              <span class="itin-cost">EUR 14</span>
+            </div>
+            <div class="itin-row">
+              <span class="itin-time">16:40</span>
+              <span class="itin-node"><i class="pin"></i><i class="stem"></i></span>
+              <span class="itin-what">Miradouro da Senhora do Monte<span>Sunset 18:52, bring the wine</span></span>
+              <span class="itin-cost">EUR 9</span>
+            </div>
+          </div>
+          <div class="itin-foot">
+            <span>Day total</span>
+            <b>EUR 36 of EUR 60</b>
+          </div>
+        </article>
+
+        <aside class="flight-chip" aria-label="Live flight status">
+          <div class="fc-top"><span>TP 1365</span><span class="status">ON TIME</span></div>
+          <div class="fc-route">
+            <span>LIS</span>
+            <span class="path"></span>
+            <span>OPO</span>
+          </div>
+          <div class="fc-sub">Departs 09:40 &middot; Gate 14 &middot; Boarding 09:05</div>
+        </aside>
+
+        <aside class="budget-chip" aria-label="Trip budget status">
+          <div class="bc-label">Trip budget</div>
+          <div class="bc-num">EUR 512 <small>of EUR 840 left</small></div>
+          <div class="bc-bar"><i></i></div>
+          <div class="bc-note">EUR 11 under pace, day 3 of 9</div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURE 1 -->
+  <section class="feature" id="itinerary">
+    <div class="wrap feature-grid">
+      <div class="f-copy reveal">
+        <span class="sec-label">01 / Itinerary builder</span>
+        <h2 class="sec-title">Sketch loose. Land precise.</h2>
+        <p class="sec-copy">Start with a shoebox of ideas, screenshots, saved maps, that bar your friend swears by. Drag them onto days when you are ready. Wayfare fills in opening hours, walking times, and the gaps you forgot about.</p>
+        <ul class="f-points">
+          <li>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5 L6.5 12 L13 4.5" stroke="#1d7a4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span><b>Idea shelf.</b> Unscheduled finds live beside your days until they earn a slot.</span>
+          </li>
+          <li>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5 L6.5 12 L13 4.5" stroke="#1d7a4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span><b>Reality checks.</b> Closed Mondays? 40 minutes uphill? You will know before you commit.</span>
+          </li>
+          <li>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5 L6.5 12 L13 4.5" stroke="#1d7a4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span><b>Offline always.</b> The full plan lives on your phone, no signal required.</span>
+          </li>
+        </ul>
+      </div>
+      <div class="f-visual reveal">
+        <div class="board" aria-label="Itinerary builder showing idea shelf and a planned day">
+          <div class="board-tabs">
+            <span class="board-tab">Day 2</span>
+            <span class="board-tab active">Day 3</span>
+            <span class="board-tab">Day 4</span>
+          </div>
+          <div class="board-cols">
+            <div class="board-col">
+              <h4>Idea shelf</h4>
+              <div class="b-card"><span><b>Feira da Ladra market</b><small>Sat + Tue only</small></span><span class="m">~2h</span></div>
+              <div class="b-card"><span><b>LX Factory</b><small>From Rita's list</small></span><span class="m">~3h</span></div>
+              <div class="b-card"><span><b>Fado at Tasca do Chico</b><small>Get there by 20:00</small></span><span class="m">eve</span></div>
+              <div class="b-card ghost">+ Add an idea</div>
+            </div>
+            <div class="board-col">
+              <h4>Tuesday 14 Oct</h4>
+              <div class="b-card"><span><b>Manteigaria</b><small>08:30 &middot; breakfast</small></span><span class="m">EUR 6</span></div>
+              <div class="b-card"><span><b>Tram 28 to Graca</b><small>10:15 &middot; 25 min ride</small></span><span class="m">EUR 7</span></div>
+              <div class="b-card"><span><b>Ze da Mouraria</b><small>13:00 &middot; 18 min walk</small></span><span class="m">EUR 14</span></div>
+              <div class="b-card"><span><b>Senhora do Monte</b><small>16:40 &middot; sunset 18:52</small></span><span class="m">EUR 9</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURE 2 -->
+  <section class="feature" id="tracking">
+    <div class="wrap feature-grid flip">
+      <div class="f-copy reveal">
+        <span class="sec-label">02 / Flight and train tracking</span>
+        <h2 class="sec-title">Your legs, watched while you wander.</h2>
+        <p class="sec-copy">Every flight and rail leg on your itinerary is tracked live. Gate changes, platform swaps, and delays reach you before the departure board updates, along with what the delay does to the rest of your day.</p>
+        <ul class="f-points">
+          <li>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5 L6.5 12 L13 4.5" stroke="#1d7a4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span><b>Rail-first coverage.</b> 60+ national rail networks, not just the airlines.</span>
+          </li>
+          <li>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5 L6.5 12 L13 4.5" stroke="#1d7a4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span><b>Ripple alerts.</b> A 40-minute delay reflows your afternoon and tells you what still fits.</span>
+          </li>
+          <li>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5 L6.5 12 L13 4.5" stroke="#1d7a4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span><b>Connection guard.</b> Tight transfer? Wayfare flags it the moment it turns risky.</span>
+          </li>
+        </ul>
+      </div>
+      <div class="f-visual reveal">
+        <div class="tracker" aria-label="Live tracking of two transit legs">
+          <div class="tracker-head">
+            <span>TODAY'S LEGS</span>
+            <span class="live"><i></i>LIVE</span>
+          </div>
+          <div class="leg">
+            <div class="leg-top">
+              <span class="leg-id">ALFA PENDULAR 122 &middot; CARRIAGE 4, SEAT 61</span>
+              <span class="leg-status ok">ON TIME</span>
+            </div>
+            <div class="leg-route">
+              <div class="leg-city"><b>LIS</b><span>DEP 08:39</span></div>
+              <div class="leg-track" style="--pos: 64%;">
+                <svg class="vehicle" width="18" height="14" viewBox="0 0 18 14" fill="currentColor" aria-hidden="true"><rect x="2" y="2" width="14" height="8" rx="2"/><circle cx="6" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/></svg>
+              </div>
+              <div class="leg-city"><b>OPO</b><span>ARR 11:31</span></div>
+            </div>
+            <div class="leg-note">Rolling through Coimbra &middot; arriving <b>2 min early</b></div>
+          </div>
+          <div class="leg">
+            <div class="leg-top">
+              <span class="leg-id">TP 1365 &middot; GATE 14</span>
+              <span class="leg-status warn">DELAYED 25 MIN</span>
+            </div>
+            <div class="leg-route">
+              <div class="leg-city"><b>OPO</b><span>DEP 18:05</span></div>
+              <div class="leg-track" style="--pos: 8%;">
+                <svg class="vehicle" width="18" height="16" viewBox="0 0 18 16" fill="currentColor" aria-hidden="true"><path d="M8.2 1 L9.8 1 L10.5 6.2 L17 9 L17 10.6 L10.4 9.3 L9.9 13 L12 14.4 L12 15.5 L9 14.8 L6 15.5 L6 14.4 L8.1 13 L7.6 9.3 L1 10.6 L1 9 L7.5 6.2 Z"/></svg>
+              </div>
+              <div class="leg-city"><b>MAD</b><span>ARR 20:45</span></div>
+            </div>
+            <div class="leg-note">Dinner reservation moved to <b>21:45</b>, Casa Lucio confirmed</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURE 3 -->
+  <section class="feature" id="budget">
+    <div class="wrap feature-grid">
+      <div class="f-copy reveal">
+        <span class="sec-label">03 / Daily budget</span>
+        <h2 class="sec-title">Spend like a local, count like an accountant.</h2>
+        <p class="sec-copy">Set a daily number and log spends in three taps, in any currency. Wayfare converts on the day's rate, shows your pace against the plan, and tells you whether tonight is a tasting-menu night or a grocery-store picnic.</p>
+        <ul class="f-points">
+          <li>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5 L6.5 12 L13 4.5" stroke="#1d7a4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span><b>Pace, not guilt.</b> Under yesterday rolls forward. Over yesterday spreads gently across the days left.</span>
+          </li>
+          <li>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5 L6.5 12 L13 4.5" stroke="#1d7a4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span><b>160+ currencies</b> with the mid-market rate captured at the moment you spend.</span>
+          </li>
+          <li>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5 L6.5 12 L13 4.5" stroke="#1d7a4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span><b>Split with a travel partner</b> and settle once, at the end, in one number.</span>
+          </li>
+        </ul>
+      </div>
+      <div class="f-visual reveal">
+        <div class="ledger" aria-label="Daily budget ledger for day 3">
+          <div class="ledger-head">
+            <h4>Today's ledger</h4>
+            <span class="day">DAY 3 OF 9 &middot; LISBON</span>
+          </div>
+          <div class="ledger-summary">
+            <div class="big">EUR 36.40 <small>of EUR 60 daily</small></div>
+            <div class="l-bar">
+              <i class="food"></i><i class="stay"></i><i class="transit"></i>
+            </div>
+            <div class="l-key">
+              <span><i style="background:#1d7a4f"></i>Food EUR 15.80</span>
+              <span><i style="background:#2244d6"></i>Stay EUR 14.00</span>
+              <span><i style="background:#f0a24a"></i>Transit EUR 6.60</span>
+            </div>
+          </div>
+          <div class="l-rows">
+            <div class="l-row"><span>Manteigaria<small>08:41 &middot; card</small></span><span class="amt minus">-6.20</span></div>
+            <div class="l-row"><span>Carris 24h pass<small>10:02 &middot; card</small></span><span class="amt minus">-6.60</span></div>
+            <div class="l-row"><span>Ze da Mouraria<small>13:52 &middot; cash</small></span><span class="amt minus">-14.00</span></div>
+            <div class="l-row"><span>Vinho verde + cheese<small>16:15 &middot; card</small></span><span class="amt minus">-9.60</span></div>
+          </div>
+          <div class="l-foot">EUR 23.60 left today &middot; EUR 11 ahead of trip pace</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="pricing" id="pricing">
+    <div class="wrap">
+      <div class="pricing-intro reveal">
+        <span class="sec-label">Pricing</span>
+        <h2 class="sec-title">Pay for trips, not months you stayed home.</h2>
+        <p class="sec-copy">Every plan includes the full itinerary builder. Upgrade when your travel does.</p>
+      </div>
+      <div class="tiers">
+        <article class="tier reveal">
+          <h3>Daypack</h3>
+          <p class="tagline">For the one-trip-a-year planner finding their feet.</p>
+          <div class="price">$0 <small>forever</small></div>
+          <ul>
+            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5 L6.5 12 L13 4.5" stroke="#1d7a4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>1 active trip, up to 14 days</li>
+            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5 L6.5 12 L13 4.5" stroke="#1d7a4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Full itinerary builder + offline access</li>
+            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5 L6.5 12 L13 4.5" stroke="#1d7a4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Daily budget in one currency</li>
+            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5 L6.5 12 L13 4.5" stroke="#1d7a4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Flight status for 2 legs per trip</li>
+          </ul>
+          <a class="tier-btn" href="#">Start free</a>
+        </article>
+
+        <article class="tier featured reveal">
+          <span class="badge">Most packed</span>
+          <h3>Wayfarer</h3>
+          <p class="tagline">For people whose calendar has more than one boarding pass on it.</p>
+          <div class="price">$6 <small>/ month, billed yearly</small></div>
+          <ul>
+            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5 L6.5 12 L13 4.5" stroke="#6fe3a5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Unlimited trips, unlimited days</li>
+            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5 L6.5 12 L13 4.5" stroke="#6fe3a5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Live flight + rail tracking, ripple alerts</li>
+            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5 L6.5 12 L13 4.5" stroke="#6fe3a5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Multi-currency budget with live rates</li>
+            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5 L6.5 12 L13 4.5" stroke="#6fe3a5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Share and split with one travel partner</li>
+            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5 L6.5 12 L13 4.5" stroke="#6fe3a5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Connection guard on tight transfers</li>
+          </ul>
+          <a class="tier-btn" href="#">Try 30 days free</a>
+        </article>
+
+        <article class="tier reveal">
+          <h3>Expedition</h3>
+          <p class="tagline">For long-haulers, sabbaticals, and the perpetually elsewhere.</p>
+          <div class="price">$12 <small>/ month, billed yearly</small></div>
+          <ul>
+            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5 L6.5 12 L13 4.5" stroke="#1d7a4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Everything in Wayfarer</li>
+            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5 L6.5 12 L13 4.5" stroke="#1d7a4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Multi-leg trips across borders + visa notes</li>
+            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5 L6.5 12 L13 4.5" stroke="#1d7a4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Split with up to 5 travel partners</li>
+            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5 L6.5 12 L13 4.5" stroke="#1d7a4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Monthly spend reports + CSV export</li>
+            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5 L6.5 12 L13 4.5" stroke="#1d7a4f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Priority rebooking help on disruptions</li>
+          </ul>
+          <a class="tier-btn" href="#">Go long</a>
+        </article>
+      </div>
+      <p class="pricing-note reveal">Prices in USD. Cancel anytime; your itineraries stay downloadable forever.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-brand">
+          <svg width="24" height="24" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+            <circle cx="13" cy="13" r="11.5" stroke="#dfe5f2" stroke-width="2"/>
+            <path d="M13 4.5 L16 16 L13 13.5 L10 16 Z" fill="#6fe3a5"/>
+          </svg>
+          Wayfare
+        </div>
+        <p class="foot-tag">Trip planning for people who read the map themselves.</p>
+      </div>
+      <div class="foot-col">
+        <h5>Product</h5>
+        <ul>
+          <li><a href="#itinerary">Itinerary builder</a></li>
+          <li><a href="#tracking">Flight + rail tracking</a></li>
+          <li><a href="#budget">Daily budget</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <h5>Company</h5>
+        <ul>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Field notes (blog)</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Press kit</a></li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <h5>Support</h5>
+        <ul>
+          <li><a href="#">Help center</a></li>
+          <li><a href="#">Rail network coverage</a></li>
+          <li><a href="#">Privacy</a></li>
+          <li><a href="#">Terms</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>&copy; 2026 Wayfare Travel Co. Built in Porto and Portland.</span>
+      <span class="coords">41.1496 N, 8.6110 W</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Scroll reveal
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    }
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // Drift the live train marker slightly for a "live" feel
+  const track = document.querySelector('.leg-track');
+  if (track && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    let pos = 64;
+    setInterval(() => {
+      pos = Math.min(92, pos + 0.15);
+      track.style.setProperty('--pos', pos + '%');
+    }, 900);
+  }
+</script>
+
+</body>
+</html>

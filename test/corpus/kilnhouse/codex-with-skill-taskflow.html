@@ -1,0 +1,2181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="TaskFlow gives teams one clear place to plan projects, surface blockers, and finish work together.">
+  <meta name="theme-color" content="#EDEDEB">
+  <title>TaskFlow | Keep every project moving</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Hanken+Grotesk:wght@400;600&family=Space+Mono&display=swap" rel="stylesheet">
+  <style>
+    /* goddesign | structure: Long Document | direction: Neo-Grotesque Poster | accent: blue */
+    /*
+      DIRECTION LOCK
+      Seed: 2832031036 | Structure: 2 Long Document | Direction: 12 Neo-Grotesque Poster
+      Tokens: #EDEDEB / #E2E2DF / #0F0F10 / #5F5F63 / #2B4BFF
+      Type: Anton / Hanken Grotesk / Space Mono
+      Signature: MOVING breaks the reading column and crops at the viewport edge
+      Motion: one pausable 30s marquee and 180ms interaction feedback
+    */
+
+    :root {
+      --bg: #EDEDEB;
+      --surface: #E2E2DF;
+      --text: #0F0F10;
+      --muted: #5F5F63;
+      --accent: #2B4BFF;
+      --line: #C9C9C4;
+      --font-display: "Anton", sans-serif;
+      --font-body: "Hanken Grotesk", sans-serif;
+      --font-utility: "Space Mono", monospace;
+      --radius: 0px;
+      --type-micro: 0.625rem;
+      --type-label: 0.6875rem;
+      --type-utility: 0.75rem;
+      --type-small: 0.8125rem;
+      --type-caption: 0.875rem;
+      --type-compact: 0.9375rem;
+      --type-body: 1rem;
+      --type-body-large: 1.0625rem;
+      --type-lede: 1.125rem;
+      --type-title: 1.25rem;
+      --type-lede-large: 1.375rem;
+      --type-subtitle: 1.5rem;
+      --type-heading-small: 1.75rem;
+      --type-heading: 2rem;
+      --type-display-compact: 3.25rem;
+      --type-display-xs: 3rem;
+      --type-display-sm: 3.5rem;
+      --type-display-md: 3.75rem;
+      --type-display-lg: 4.5rem;
+      --type-display-xl: 5.25rem;
+      --type-display-max: 6rem;
+      --type-poster-min: 7.5rem;
+      --type-poster-mid: 12rem;
+      --type-poster-max: 18rem;
+      --s-4: 0.25rem;
+      --s-8: 0.5rem;
+      --s-12: 0.75rem;
+      --s-16: 1rem;
+      --s-24: 1.5rem;
+      --s-32: 2rem;
+      --s-48: 3rem;
+      --s-64: 4rem;
+      --s-96: 6rem;
+      --s-128: 8rem;
+      --page-pad: clamp(var(--s-16), 4vw, var(--s-64));
+      --article: 65ch;
+      --accent-hover: oklch(from var(--accent) calc(l - 0.08) c h);
+      --accent-active: oklch(from var(--accent) calc(l - 0.14) c h);
+      --surface-raised: color-mix(in oklch, var(--bg) 74%, var(--surface));
+      --focus-halo: color-mix(in oklch, var(--accent) 22%, transparent);
+      --overlay: color-mix(in oklch, var(--text) 62%, transparent);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      overflow-x: clip;
+      scroll-behavior: smooth;
+      scroll-padding-top: var(--s-96);
+    }
+
+    body {
+      min-width: 20rem;
+      margin: 0;
+      overflow-x: clip;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: var(--type-body-large);
+      line-height: 1.58;
+      text-rendering: optimizeLegibility;
+    }
+
+    body.menu-open {
+      overflow: hidden;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button,
+    a {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    a {
+      color: inherit;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 0.2em;
+    }
+
+    button {
+      color: inherit;
+    }
+
+    img,
+    svg {
+      display: block;
+      max-width: 100%;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    p {
+      max-width: 65ch;
+      text-wrap: pretty;
+    }
+
+    h1,
+    h2,
+    h3 {
+      text-wrap: balance;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 4px;
+      box-shadow: 0 0 0 4px var(--focus-halo);
+    }
+
+    ::selection {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    .skip-link {
+      position: fixed;
+      z-index: 100;
+      inset-block-start: var(--s-16);
+      inset-inline-start: var(--s-16);
+      padding: var(--s-12) var(--s-16);
+      transform: translateY(-200%);
+      background: var(--accent);
+      color: var(--bg);
+      font-family: var(--font-utility);
+      font-size: var(--type-small);
+    }
+
+    .skip-link:focus {
+      transform: translateY(0);
+    }
+
+    .skip-link:hover {
+      background: var(--accent-hover);
+    }
+
+    .skip-link:active {
+      background: var(--accent-active);
+    }
+
+    .site-header {
+      position: relative;
+      z-index: 20;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      min-height: var(--s-64);
+      padding-inline: var(--page-pad);
+      border-bottom: 1px solid var(--line);
+      background: color-mix(in oklch, var(--bg) 94%, transparent);
+      backdrop-filter: blur(12px);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      min-height: 2.75rem;
+      gap: var(--s-12);
+      color: var(--text);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      text-decoration: none;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      inline-size: 1.75rem;
+      block-size: 1.75rem;
+      border: 2px solid var(--text);
+      color: var(--accent);
+    }
+
+    .brand-mark svg {
+      inline-size: 1.125rem;
+      block-size: 1.125rem;
+    }
+
+    .brand:hover {
+      color: var(--accent);
+    }
+
+    .brand:active {
+      color: var(--accent-active);
+    }
+
+    .desktop-nav {
+      display: flex;
+      justify-content: center;
+      gap: var(--s-32);
+      font-family: var(--font-utility);
+      font-size: var(--type-utility);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .desktop-nav a,
+    .footer-links a,
+    .chapter-nav a {
+      text-decoration: none;
+    }
+
+    .desktop-nav a {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      min-height: 2.75rem;
+      color: var(--muted);
+    }
+
+    .desktop-nav a::after {
+      position: absolute;
+      inset-inline: 0;
+      inset-block-end: var(--s-8);
+      height: 2px;
+      background: var(--accent);
+      content: "";
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 180ms cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .desktop-nav a:hover {
+      color: var(--text);
+    }
+
+    .desktop-nav a:hover::after,
+    .desktop-nav a:focus-visible::after {
+      transform: scaleX(1);
+    }
+
+    .desktop-nav a:active {
+      color: var(--accent-active);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: var(--s-12);
+    }
+
+    .text-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 2.75rem;
+      padding-inline: var(--s-12);
+      color: var(--muted);
+      font-size: var(--type-compact);
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .text-link:hover {
+      color: var(--text);
+      text-decoration: underline;
+    }
+
+    .text-link:active {
+      color: var(--accent-active);
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 2.75rem;
+      gap: var(--s-8);
+      padding: var(--s-12) var(--s-24);
+      border: 1px solid var(--accent);
+      border-radius: var(--radius);
+      background: var(--accent);
+      color: var(--bg);
+      font-weight: 600;
+      line-height: 1.2;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform 180ms cubic-bezier(0.25, 1, 0.5, 1), background-color 180ms linear, border-color 180ms linear;
+    }
+
+    .button:hover {
+      transform: skewX(-2deg);
+      border-color: var(--accent-hover);
+      background: var(--accent-hover);
+    }
+
+    .button:active {
+      transform: scale(0.97);
+      border-color: var(--accent-active);
+      background: var(--accent-active);
+    }
+
+    .button:disabled {
+      border-color: var(--line);
+      background: var(--surface);
+      color: var(--muted);
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .button-secondary {
+      border-color: var(--text);
+      background: transparent;
+      color: var(--text);
+    }
+
+    .button-secondary:hover {
+      border-color: var(--text);
+      background: var(--text);
+      color: var(--bg);
+    }
+
+    .button-secondary:active {
+      border-color: var(--muted);
+      background: var(--muted);
+    }
+
+    .button svg,
+    .icon-button svg {
+      inline-size: 1rem;
+      block-size: 1rem;
+    }
+
+    .menu-button {
+      display: none;
+      inline-size: 2.75rem;
+      block-size: 2.75rem;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--text);
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .menu-button:hover {
+      background: var(--surface);
+    }
+
+    .menu-button:active {
+      background: var(--line);
+    }
+
+    .menu-button:disabled {
+      border-color: var(--line);
+      color: var(--muted);
+      cursor: not-allowed;
+    }
+
+    .menu-lines,
+    .menu-lines::before,
+    .menu-lines::after {
+      display: block;
+      inline-size: 1.125rem;
+      block-size: 2px;
+      background: currentColor;
+      content: "";
+      transition: transform 180ms cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .menu-lines::before {
+      transform: translateY(-5px);
+    }
+
+    .menu-lines::after {
+      transform: translateY(3px);
+    }
+
+    .menu-button[aria-expanded="true"] .menu-lines {
+      background: transparent;
+    }
+
+    .menu-button[aria-expanded="true"] .menu-lines::before {
+      transform: translateY(0) rotate(45deg);
+    }
+
+    .menu-button[aria-expanded="true"] .menu-lines::after {
+      transform: translateY(-2px) rotate(-45deg);
+    }
+
+    .mobile-menu {
+      position: fixed;
+      z-index: 15;
+      inset: var(--s-64) 0 auto;
+      display: grid;
+      gap: var(--s-8);
+      padding: var(--s-24) var(--page-pad) var(--s-32);
+      border-bottom: 1px solid var(--text);
+      background: var(--bg);
+    }
+
+    .mobile-menu[hidden] {
+      display: none;
+    }
+
+    .mobile-menu a {
+      display: flex;
+      align-items: center;
+      min-height: 2.75rem;
+      border-bottom: 1px solid var(--line);
+      font-family: var(--font-display);
+      font-size: var(--type-heading-small);
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .mobile-menu a:hover {
+      color: var(--accent);
+    }
+
+    .mobile-menu a:active {
+      color: var(--accent-active);
+    }
+
+    .doc-layout {
+      display: grid;
+      grid-template-columns: 11rem minmax(0, var(--article));
+      justify-content: center;
+      gap: var(--s-96);
+      padding-inline: var(--page-pad);
+    }
+
+    .chapter-rail {
+      position: relative;
+      min-width: 0;
+    }
+
+    .chapter-nav {
+      position: sticky;
+      inset-block-start: var(--s-32);
+      display: grid;
+      gap: var(--s-24);
+      padding-block-start: var(--s-64);
+    }
+
+    .chapter-label,
+    .utility-label {
+      font-family: var(--font-utility);
+      font-size: var(--type-label);
+      line-height: 1.4;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .chapter-label {
+      color: var(--muted);
+    }
+
+    .chapter-nav ol {
+      display: grid;
+      gap: var(--s-4);
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      counter-reset: chapter;
+    }
+
+    .chapter-nav li {
+      counter-increment: chapter;
+    }
+
+    .chapter-nav a {
+      display: grid;
+      grid-template-columns: 2rem 1fr;
+      align-items: center;
+      min-height: 2.75rem;
+      color: var(--muted);
+      font-size: var(--type-caption);
+    }
+
+    .chapter-nav a::before {
+      color: var(--muted);
+      content: counter(chapter, decimal-leading-zero);
+      font-family: var(--font-utility);
+      font-size: var(--type-micro);
+    }
+
+    .chapter-nav a:hover,
+    .chapter-nav a[aria-current="location"] {
+      color: var(--text);
+    }
+
+    .chapter-nav a[aria-current="location"]::before {
+      color: var(--accent);
+    }
+
+    .chapter-nav a:active {
+      color: var(--accent-active);
+    }
+
+    .document {
+      min-width: 0;
+    }
+
+    .hero {
+      display: grid;
+      align-content: space-between;
+      min-height: calc(100svh - var(--s-64));
+      gap: var(--s-48);
+      padding-block: var(--s-64) var(--s-24);
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: var(--s-32);
+    }
+
+    .hero-kicker {
+      display: flex;
+      align-items: center;
+      gap: var(--s-12);
+      color: var(--muted);
+      font-family: var(--font-utility);
+      font-size: var(--type-label);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .hero-kicker::before {
+      inline-size: var(--s-32);
+      block-size: 2px;
+      background: var(--accent);
+      content: "";
+    }
+
+    .hero h1 {
+      max-width: 12ch;
+      font-family: var(--font-display);
+      font-size: clamp(var(--type-display-md), 8.2vw, var(--type-display-max));
+      font-weight: 400;
+      line-height: 1.1;
+      letter-spacing: -0.035em;
+      text-transform: uppercase;
+    }
+
+    .hero-intro {
+      max-width: 45ch;
+      color: var(--muted);
+      font-size: clamp(var(--type-body-large), 2vw, var(--type-title));
+      line-height: 1.5;
+    }
+
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--s-12);
+    }
+
+    .hero-word-wrap {
+      width: var(--breakout-width, 100%);
+      margin-inline-start: 0;
+      overflow: clip;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .hero-word {
+      display: block;
+      inline-size: max-content;
+      color: transparent;
+      font-family: var(--font-display);
+      font-size: clamp(var(--type-poster-min), 20vw, var(--type-poster-max));
+      font-weight: 400;
+      line-height: 0.72;
+      letter-spacing: -0.045em;
+      text-transform: uppercase;
+      -webkit-text-stroke: 2px var(--line);
+    }
+
+    .hero-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: var(--s-24);
+      padding-block-start: var(--s-16);
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-family: var(--font-utility);
+      font-size: var(--type-micro);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .chapter {
+      display: grid;
+      gap: var(--s-48);
+      padding-block: var(--s-128);
+      border-top: 1px solid var(--line);
+      scroll-margin-top: var(--s-32);
+    }
+
+    .chapter-header {
+      display: grid;
+      gap: var(--s-24);
+    }
+
+    .chapter-index {
+      display: flex;
+      align-items: center;
+      gap: var(--s-16);
+      color: var(--muted);
+      font-family: var(--font-utility);
+      font-size: var(--type-label);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .chapter-index::after {
+      flex: 1;
+      height: 1px;
+      background: var(--line);
+      content: "";
+    }
+
+    .chapter h2 {
+      max-width: 14ch;
+      font-family: var(--font-display);
+      font-size: clamp(var(--type-display-xs), 7vw, var(--type-display-xl));
+      font-weight: 400;
+      line-height: 1.1;
+      letter-spacing: -0.035em;
+      text-transform: uppercase;
+    }
+
+    .chapter-lede {
+      max-width: 52ch;
+      color: var(--muted);
+      font-size: clamp(var(--type-lede), 2vw, var(--type-lede-large));
+      line-height: 1.5;
+    }
+
+    .principle-list {
+      margin: 0;
+      padding: 0;
+      border-top: 1px solid var(--text);
+      list-style: none;
+    }
+
+    .principle-list li {
+      display: grid;
+      grid-template-columns: 3.5rem minmax(0, 1fr);
+      gap: var(--s-24);
+      padding-block: var(--s-32);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .principle-number {
+      color: var(--accent);
+      font-family: var(--font-utility);
+      font-size: var(--type-utility);
+    }
+
+    .principle-copy {
+      display: grid;
+      gap: var(--s-8);
+    }
+
+    .principle-copy h3 {
+      font-size: var(--type-title);
+      line-height: 1.25;
+    }
+
+    .principle-copy p {
+      color: var(--muted);
+    }
+
+    .margin-note {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: var(--s-16);
+      padding: var(--s-24);
+      border-block: 1px solid var(--line);
+      color: var(--muted);
+      font-family: var(--font-utility);
+      font-size: var(--type-utility);
+      line-height: 1.6;
+    }
+
+    .margin-note svg {
+      inline-size: 1rem;
+      block-size: 1rem;
+      color: var(--accent);
+    }
+
+    .flow-demo {
+      container-type: inline-size;
+      border-block: 2px solid var(--text);
+      background: var(--surface-raised);
+    }
+
+    .flow-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-bottom: 1px solid var(--text);
+    }
+
+    .flow-tab {
+      min-height: var(--s-48);
+      padding: var(--s-12) var(--s-16);
+      border: 0;
+      border-inline-end: 1px solid var(--line);
+      background: transparent;
+      color: var(--muted);
+      font-family: var(--font-utility);
+      font-size: var(--type-label);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background-color 180ms linear, color 180ms linear, transform 180ms cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .flow-tab:last-child {
+      border-inline-end: 0;
+    }
+
+    .flow-tab:hover {
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    .flow-tab:active {
+      transform: scale(0.97);
+    }
+
+    .flow-tab[aria-selected="true"] {
+      background: var(--text);
+      color: var(--bg);
+    }
+
+    .flow-tab:disabled {
+      background: var(--surface);
+      color: var(--line);
+      cursor: not-allowed;
+    }
+
+    .flow-panel {
+      display: grid;
+      gap: var(--s-32);
+      min-height: 25rem;
+      padding: var(--s-32);
+    }
+
+    .flow-panel[hidden] {
+      display: none;
+    }
+
+    .panel-heading {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: var(--s-24);
+    }
+
+    .panel-heading div {
+      display: grid;
+      gap: var(--s-8);
+    }
+
+    .panel-heading h3 {
+      font-size: var(--type-subtitle);
+      line-height: 1.2;
+    }
+
+    .panel-heading p {
+      max-width: 34ch;
+      color: var(--muted);
+      font-size: var(--type-compact);
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      min-height: 1.75rem;
+      gap: var(--s-8);
+      padding-inline: var(--s-8);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-family: var(--font-utility);
+      font-size: var(--type-micro);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .status::before {
+      inline-size: var(--s-8);
+      block-size: var(--s-8);
+      border: 1px solid currentColor;
+      background: var(--accent);
+      content: "";
+    }
+
+    .task-table {
+      display: grid;
+      align-content: start;
+      margin: 0;
+      padding: 0;
+      border-top: 1px solid var(--line);
+      list-style: none;
+    }
+
+    .task-row {
+      display: grid;
+      grid-template-columns: 1.5rem minmax(0, 1fr) auto;
+      align-items: center;
+      gap: var(--s-16);
+      min-height: var(--s-64);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .task-check {
+      display: grid;
+      place-items: center;
+      inline-size: 1.25rem;
+      block-size: 1.25rem;
+      border: 1px solid var(--text);
+    }
+
+    .task-check.done {
+      background: var(--text);
+      color: var(--bg);
+    }
+
+    .task-check svg {
+      inline-size: 0.75rem;
+      block-size: 0.75rem;
+    }
+
+    .task-copy {
+      min-width: 0;
+    }
+
+    .task-copy strong {
+      display: block;
+      overflow-wrap: anywhere;
+      font-size: var(--type-compact);
+      line-height: 1.3;
+    }
+
+    .task-copy span,
+    .task-meta {
+      color: var(--muted);
+      font-family: var(--font-utility);
+      font-size: var(--type-micro);
+    }
+
+    .task-meta {
+      text-align: right;
+      text-transform: uppercase;
+    }
+
+    @container (max-width: 34rem) {
+      .flow-panel {
+        padding: var(--s-24) var(--s-16);
+      }
+
+      .panel-heading {
+        display: grid;
+      }
+
+      .task-row {
+        grid-template-columns: 1.5rem minmax(0, 1fr);
+      }
+
+      .task-meta {
+        grid-column: 2;
+        padding-block-end: var(--s-12);
+        text-align: left;
+      }
+    }
+
+    .marquee-band {
+      position: relative;
+      width: var(--breakout-width, 100%);
+      margin-block: 0;
+      border-block: 1px solid var(--text);
+      background: var(--text);
+      color: var(--bg);
+      overflow: clip;
+    }
+
+    .marquee-control {
+      position: absolute;
+      z-index: 2;
+      inset-block: 0;
+      inset-inline-end: 0;
+      display: inline-flex;
+      align-items: center;
+      min-width: 5.75rem;
+      justify-content: center;
+      border: 0;
+      border-inline-start: 1px solid var(--muted);
+      background: var(--text);
+      color: var(--bg);
+      font-family: var(--font-utility);
+      font-size: var(--type-micro);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .marquee-control:hover {
+      color: var(--accent);
+    }
+
+    .marquee-control:active {
+      background: var(--muted);
+    }
+
+    .marquee-control:disabled {
+      color: var(--muted);
+      cursor: not-allowed;
+    }
+
+    .marquee-track {
+      display: flex;
+      width: max-content;
+      padding-block: var(--s-16);
+      padding-inline-end: 5.75rem;
+      font-family: var(--font-display);
+      font-size: clamp(var(--type-heading-small), 4vw, var(--type-display-compact));
+      line-height: 1;
+      letter-spacing: 0.01em;
+      text-transform: uppercase;
+      will-change: transform;
+    }
+
+    .marquee-track span {
+      padding-inline-end: var(--s-48);
+      white-space: nowrap;
+    }
+
+    .marquee-band.is-paused .marquee-track {
+      animation-play-state: paused;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      margin: 0;
+      padding: 0;
+      border-top: 1px solid var(--text);
+      list-style: none;
+    }
+
+    .feature-item {
+      display: grid;
+      align-content: start;
+      min-height: 15rem;
+      gap: var(--s-24);
+      padding: var(--s-32);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .feature-item:nth-child(odd) {
+      border-inline-end: 1px solid var(--line);
+      padding-inline-start: 0;
+    }
+
+    .feature-item:nth-child(even) {
+      padding-inline-end: 0;
+    }
+
+    .feature-icon {
+      display: grid;
+      place-items: center;
+      inline-size: var(--s-32);
+      block-size: var(--s-32);
+      border: 1px solid var(--text);
+      color: var(--accent);
+    }
+
+    .feature-icon svg {
+      inline-size: var(--s-16);
+      block-size: var(--s-16);
+    }
+
+    .feature-item h3 {
+      font-size: var(--type-title);
+      line-height: 1.2;
+    }
+
+    .feature-item p {
+      color: var(--muted);
+      font-size: var(--type-compact);
+    }
+
+    .feature-meta {
+      margin-block-start: auto;
+      color: var(--muted);
+      font-family: var(--font-utility);
+      font-size: var(--type-micro);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .plan-compare {
+      border-top: 2px solid var(--text);
+    }
+
+    .plan-row {
+      display: grid;
+      grid-template-columns: minmax(10rem, 0.8fr) minmax(0, 1.2fr) auto;
+      align-items: center;
+      gap: var(--s-32);
+      padding-block: var(--s-32);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .plan-name {
+      display: grid;
+      gap: var(--s-8);
+    }
+
+    .plan-name h3 {
+      font-family: var(--font-display);
+      font-size: var(--type-heading);
+      font-weight: 400;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .plan-name span {
+      color: var(--muted);
+      font-family: var(--font-utility);
+      font-size: var(--type-micro);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .plan-row p {
+      color: var(--muted);
+      font-size: var(--type-compact);
+    }
+
+    .inline-link {
+      display: inline-flex;
+      align-items: center;
+      min-height: 2.75rem;
+      gap: var(--s-8);
+      padding: 0;
+      border: 0;
+      background: transparent;
+      font-weight: 600;
+      text-decoration: underline;
+      text-underline-offset: 0.2em;
+      cursor: pointer;
+    }
+
+    .inline-link:hover {
+      color: var(--accent);
+    }
+
+    .inline-link:active {
+      color: var(--accent-active);
+    }
+
+    .inline-link:disabled {
+      color: var(--muted);
+      cursor: not-allowed;
+    }
+
+    .inline-link svg {
+      inline-size: 1rem;
+      block-size: 1rem;
+    }
+
+    .faq-list {
+      border-top: 2px solid var(--text);
+    }
+
+    .faq-list details {
+      border-bottom: 1px solid var(--line);
+    }
+
+    .faq-list summary {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) var(--s-32);
+      align-items: center;
+      min-height: var(--s-64);
+      gap: var(--s-24);
+      padding-block: var(--s-16);
+      font-size: var(--type-lede);
+      font-weight: 600;
+      list-style: none;
+      cursor: pointer;
+    }
+
+    .faq-list summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .faq-list summary::after {
+      display: grid;
+      place-items: center;
+      inline-size: var(--s-32);
+      block-size: var(--s-32);
+      border: 1px solid var(--text);
+      content: "+";
+      font-family: var(--font-utility);
+      font-weight: 400;
+      transition: transform 180ms cubic-bezier(0.25, 1, 0.5, 1), background-color 180ms linear, color 180ms linear;
+    }
+
+    .faq-list summary:hover::after {
+      background: var(--text);
+      color: var(--bg);
+    }
+
+    .faq-list summary:active::after {
+      background: var(--muted);
+    }
+
+    .faq-list details[open] summary::after {
+      transform: rotate(45deg);
+    }
+
+    .faq-answer {
+      max-width: 55ch;
+      padding-block: 0 var(--s-32);
+      color: var(--muted);
+    }
+
+    .closing {
+      width: 100%;
+      padding: var(--s-128) var(--page-pad);
+      background: var(--text);
+      color: var(--bg);
+    }
+
+    .closing-inner {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: end;
+      max-width: 64rem;
+      margin-inline: auto;
+      gap: var(--s-64);
+    }
+
+    .closing-copy {
+      display: grid;
+      gap: var(--s-24);
+    }
+
+    .closing h2 {
+      max-width: 11ch;
+      color: var(--bg);
+      font-family: var(--font-display);
+      font-size: clamp(var(--type-display-sm), 8vw, var(--type-display-max));
+      font-weight: 400;
+      line-height: 1.1;
+      letter-spacing: -0.035em;
+      text-transform: uppercase;
+    }
+
+    .closing p {
+      max-width: 42ch;
+      color: var(--line);
+    }
+
+    .closing .button {
+      white-space: nowrap;
+    }
+
+    .site-footer {
+      padding: var(--s-64) var(--page-pad) var(--s-32);
+      background: var(--text);
+      color: var(--bg);
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: minmax(12rem, 1.5fr) repeat(3, minmax(8rem, 1fr));
+      max-width: 74rem;
+      margin-inline: auto;
+      gap: var(--s-48);
+      padding-block-start: var(--s-48);
+      border-top: 1px solid var(--muted);
+    }
+
+    .footer-brand {
+      display: grid;
+      align-content: start;
+      gap: var(--s-16);
+    }
+
+    .footer-brand .brand {
+      color: var(--bg);
+    }
+
+    .footer-brand .brand-mark {
+      border-color: var(--bg);
+    }
+
+    .footer-brand p {
+      max-width: 30ch;
+      color: var(--line);
+      font-size: var(--type-compact);
+    }
+
+    .footer-column {
+      display: grid;
+      align-content: start;
+      gap: var(--s-16);
+    }
+
+    .footer-column h3 {
+      color: var(--muted);
+      font-family: var(--font-utility);
+      font-size: var(--type-micro);
+      font-weight: 400;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .footer-links {
+      display: grid;
+      gap: var(--s-4);
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .footer-links a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 2.75rem;
+      color: var(--line);
+      font-size: var(--type-compact);
+    }
+
+    .footer-links a:hover {
+      color: var(--bg);
+      text-decoration: underline;
+    }
+
+    .footer-links a:active {
+      color: var(--accent);
+    }
+
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      max-width: 74rem;
+      margin-inline: auto;
+      gap: var(--s-24);
+      padding-block-start: var(--s-48);
+      color: var(--muted);
+      font-family: var(--font-utility);
+      font-size: var(--type-micro);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    dialog {
+      width: min(calc(100% - var(--s-32)), 36rem);
+      max-height: min(44rem, calc(100dvh - var(--s-32)));
+      padding: 0;
+      border: 2px solid var(--text);
+      border-radius: var(--radius);
+      background: var(--bg);
+      color: var(--text);
+      box-shadow: var(--s-16) var(--s-32) 0 color-mix(in oklch, var(--text) 18%, transparent);
+    }
+
+    dialog::backdrop {
+      background: var(--overlay);
+      backdrop-filter: blur(4px);
+    }
+
+    .dialog-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--s-24);
+      padding: var(--s-24);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .dialog-head h2 {
+      font-family: var(--font-display);
+      font-size: var(--type-heading);
+      font-weight: 400;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    .icon-button {
+      display: grid;
+      place-items: center;
+      inline-size: 2.75rem;
+      block-size: 2.75rem;
+      flex: 0 0 auto;
+      border: 1px solid var(--text);
+      background: transparent;
+      cursor: pointer;
+      transition: background-color 180ms linear, color 180ms linear, transform 180ms cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .icon-button:hover {
+      background: var(--text);
+      color: var(--bg);
+    }
+
+    .icon-button:active {
+      transform: scale(0.97);
+      background: var(--muted);
+    }
+
+    .icon-button:disabled {
+      border-color: var(--line);
+      color: var(--line);
+      cursor: not-allowed;
+    }
+
+    .signup-form {
+      display: grid;
+      gap: var(--s-24);
+      padding: var(--s-32) var(--s-24);
+    }
+
+    .signup-form > p {
+      color: var(--muted);
+    }
+
+    .field {
+      display: grid;
+      gap: var(--s-8);
+    }
+
+    .field label {
+      font-size: var(--type-compact);
+      font-weight: 600;
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      min-height: var(--s-48);
+      padding-inline: var(--s-12);
+      border: 1px solid var(--text);
+      border-radius: var(--radius);
+      background: var(--surface-raised);
+      color: var(--text);
+      font-size: var(--type-body);
+    }
+
+    .field input:hover,
+    .field select:hover {
+      background: var(--bg);
+    }
+
+    .field input:focus-visible,
+    .field select:focus-visible {
+      border-color: var(--accent);
+    }
+
+    .field input:disabled,
+    .field select:disabled {
+      border-color: var(--line);
+      color: var(--muted);
+      cursor: not-allowed;
+    }
+
+    .field-help,
+    .form-message {
+      color: var(--muted);
+      font-family: var(--font-utility);
+      font-size: var(--type-label);
+      line-height: 1.5;
+    }
+
+    .form-message {
+      min-height: 1.25rem;
+      padding-inline-start: var(--s-12);
+      border-inline-start: 2px solid var(--text);
+    }
+
+    .form-message[data-state="error"] {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    .form-message[data-state="success"] {
+      border-color: var(--text);
+      color: var(--text);
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--s-12);
+      padding-block-start: var(--s-8);
+    }
+
+    .form-actions .button {
+      min-width: 9rem;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .marquee-track {
+        animation: marquee 30s linear infinite;
+      }
+
+      @keyframes marquee {
+        to {
+          transform: translateX(-50%);
+        }
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+
+      .marquee-track span:nth-child(2) {
+        display: none;
+      }
+    }
+
+    @media (max-width: 68rem) {
+      .doc-layout {
+        grid-template-columns: minmax(0, var(--article));
+      }
+
+      .chapter-rail {
+        display: none;
+      }
+
+    }
+
+    @media (max-width: 48rem) {
+      body {
+        font-size: var(--type-body);
+      }
+
+      .site-header {
+        grid-template-columns: 1fr auto;
+      }
+
+      .desktop-nav,
+      .header-actions .text-link,
+      .header-actions .button {
+        display: none;
+      }
+
+      .menu-button {
+        display: inline-flex;
+      }
+
+      .doc-layout {
+        display: block;
+      }
+
+      .hero {
+        min-height: calc(100svh - var(--s-64));
+        padding-block-start: var(--s-48);
+      }
+
+      .hero h1 {
+        font-size: clamp(var(--type-display-sm), 17vw, var(--type-display-xl));
+      }
+
+      .hero-word {
+        font-size: clamp(var(--type-poster-min), 37vw, var(--type-poster-mid));
+      }
+
+      .chapter {
+        gap: var(--s-32);
+        padding-block: var(--s-96);
+      }
+
+      .chapter h2 {
+        font-size: clamp(var(--type-display-xs), 14vw, var(--type-display-lg));
+      }
+
+      .principle-list li {
+        grid-template-columns: 2.5rem minmax(0, 1fr);
+        gap: var(--s-16);
+      }
+
+      .feature-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .feature-item,
+      .feature-item:nth-child(odd),
+      .feature-item:nth-child(even) {
+        min-height: auto;
+        padding: var(--s-32) 0;
+        border-inline: 0;
+      }
+
+      .plan-row {
+        grid-template-columns: minmax(0, 1fr);
+        gap: var(--s-16);
+      }
+
+      .plan-row .inline-link {
+        justify-self: start;
+      }
+
+      .closing {
+        padding-block: var(--s-96);
+      }
+
+      .closing-inner {
+        grid-template-columns: minmax(0, 1fr);
+        align-items: start;
+        gap: var(--s-32);
+      }
+
+      .footer-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .footer-brand {
+        grid-column: 1 / -1;
+      }
+
+      .footer-bottom {
+        display: grid;
+      }
+    }
+
+    @media (max-width: 28rem) {
+      .cta-row,
+      .form-actions {
+        display: grid;
+      }
+
+      .cta-row .button,
+      .form-actions .button {
+        width: 100%;
+      }
+
+      .hero-meta {
+        display: grid;
+      }
+
+      .flow-tab {
+        padding-inline: var(--s-8);
+        font-size: var(--type-micro);
+      }
+
+      .footer-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .footer-brand {
+        grid-column: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="TaskFlow home">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 20 20" fill="none">
+          <path d="M3 5h9M8 10h9M3 15h9" stroke="currentColor" stroke-width="2" stroke-linecap="square"/>
+          <path d="m10 2 3 3-3 3m0 4 3 3-3 3" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      </span>
+      <span>TaskFlow</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="Primary navigation">
+      <a href="#approach">Approach</a>
+      <a href="#product">Product</a>
+      <a href="#plans">Plans</a>
+      <a href="#questions">Questions</a>
+    </nav>
+
+    <div class="header-actions">
+      <a class="text-link" href="#product">See the product</a>
+      <button class="button" type="button" data-open-dialog>Start free</button>
+      <button class="menu-button" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu">
+        <span class="menu-lines" aria-hidden="true"></span>
+      </button>
+    </div>
+  </header>
+
+  <nav class="mobile-menu" id="mobile-menu" aria-label="Mobile navigation" hidden>
+    <a href="#approach">Approach</a>
+    <a href="#product">Product</a>
+    <a href="#plans">Plans</a>
+    <a href="#questions">Questions</a>
+    <button class="button" type="button" data-open-dialog>Start free</button>
+  </nav>
+
+  <main id="main-content">
+    <div class="doc-layout">
+      <aside class="chapter-rail" aria-label="Page chapters">
+        <nav class="chapter-nav" aria-label="Page chapter navigation">
+          <span class="chapter-label">On this page</span>
+          <ol>
+            <li><a href="#approach">Approach</a></li>
+            <li><a href="#product">Product</a></li>
+            <li><a href="#plans">Plans</a></li>
+            <li><a href="#questions">Questions</a></li>
+          </ol>
+        </nav>
+      </aside>
+
+      <article class="document">
+        <section class="hero" id="top" aria-labelledby="hero-title">
+          <div class="hero-copy">
+            <p class="hero-kicker">Project coordination, without the chase</p>
+            <h1 id="hero-title">Keep every project moving.</h1>
+            <p class="hero-intro">Plan projects, clear blockers, and keep every handoff visible from one calm workspace.</p>
+            <div class="cta-row">
+              <button class="button" type="button" data-open-dialog>
+                Start your workspace
+                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M5 12h14M13 6l6 6-6 6"/>
+                </svg>
+              </button>
+              <a class="button button-secondary" href="#product">See how work flows</a>
+            </div>
+          </div>
+
+          <div>
+            <div class="hero-word-wrap" aria-hidden="true">
+              <span class="hero-word">Moving</span>
+            </div>
+            <div class="hero-meta">
+              <span>One plan</span>
+              <span>Clear ownership</span>
+              <span>Visible progress</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="chapter" id="approach" aria-labelledby="approach-title">
+          <header class="chapter-header">
+            <p class="chapter-index">Chapter 01 / The approach</p>
+            <h2 id="approach-title">Less status chasing. More shared context.</h2>
+            <p class="chapter-lede">TaskFlow connects the brief, the work, and the decisions around it, so the next step is never buried in another thread.</p>
+          </header>
+
+          <ol class="principle-list">
+            <li>
+              <span class="principle-number">01</span>
+              <div class="principle-copy">
+                <h3>Begin with a useful brief</h3>
+                <p>Give every project an outcome, owner, timeline, and definition of done before tasks start multiplying.</p>
+              </div>
+            </li>
+            <li>
+              <span class="principle-number">02</span>
+              <div class="principle-copy">
+                <h3>Make movement visible</h3>
+                <p>See what changed, what is blocked, and where a handoff needs attention without calling another status meeting.</p>
+              </div>
+            </li>
+            <li>
+              <span class="principle-number">03</span>
+              <div class="principle-copy">
+                <h3>Keep the decision with the work</h3>
+                <p>Reviews, approvals, and updates stay attached to the project, giving the whole team a reliable record.</p>
+              </div>
+            </li>
+          </ol>
+
+          <aside class="margin-note" aria-label="TaskFlow coordination principle">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="9"/>
+              <path d="M12 11v5m0-8v.01"/>
+            </svg>
+            <p>TaskFlow is built around a simple rule: people should be able to understand a project before asking its owner for an update.</p>
+          </aside>
+        </section>
+
+        <section class="chapter" id="product" aria-labelledby="product-title">
+          <header class="chapter-header">
+            <p class="chapter-index">Chapter 02 / The product</p>
+            <h2 id="product-title">One flow from idea to done.</h2>
+            <p class="chapter-lede">Move through planning, active work, and review without rebuilding context at every stage.</p>
+          </header>
+
+          <div class="flow-demo">
+            <div class="flow-tabs" role="tablist" aria-label="TaskFlow workflow stages">
+              <button class="flow-tab" id="tab-plan" type="button" role="tab" aria-selected="true" aria-controls="panel-plan" tabindex="0">Plan</button>
+              <button class="flow-tab" id="tab-work" type="button" role="tab" aria-selected="false" aria-controls="panel-work" tabindex="-1">Work</button>
+              <button class="flow-tab" id="tab-review" type="button" role="tab" aria-selected="false" aria-controls="panel-review" tabindex="-1">Review</button>
+            </div>
+
+            <div class="flow-panel" id="panel-plan" role="tabpanel" aria-labelledby="tab-plan">
+              <div class="panel-heading">
+                <div>
+                  <h3>Plan the launch</h3>
+                  <p>Turn a clear outcome into owned work before the first handoff.</p>
+                </div>
+                <span class="status">Ready to plan</span>
+              </div>
+              <ul class="task-table" aria-label="Planning tasks">
+                <li class="task-row">
+                  <span class="task-check done" role="img" aria-label="Complete">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 4 4L19 6"/></svg>
+                  </span>
+                  <span class="task-copy"><strong>Confirm the project outcome</strong><span>Brief</span></span>
+                  <span class="task-meta">Owner set</span>
+                </li>
+                <li class="task-row">
+                  <span class="task-check" role="img" aria-label="Open"></span>
+                  <span class="task-copy"><strong>Map the approval path</strong><span>Dependencies</span></span>
+                  <span class="task-meta">Next</span>
+                </li>
+                <li class="task-row">
+                  <span class="task-check" role="img" aria-label="Open"></span>
+                  <span class="task-copy"><strong>Assign the first handoffs</strong><span>People</span></span>
+                  <span class="task-meta">Unassigned</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="flow-panel" id="panel-work" role="tabpanel" aria-labelledby="tab-work" hidden>
+              <div class="panel-heading">
+                <div>
+                  <h3>Keep work in motion</h3>
+                  <p>Bring active tasks, blockers, and changes into one dependable view.</p>
+                </div>
+                <span class="status">Work active</span>
+              </div>
+              <ul class="task-table" aria-label="Active work tasks">
+                <li class="task-row">
+                  <span class="task-check done" role="img" aria-label="Complete">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 4 4L19 6"/></svg>
+                  </span>
+                  <span class="task-copy"><strong>Prepare the launch copy</strong><span>Content</span></span>
+                  <span class="task-meta">Complete</span>
+                </li>
+                <li class="task-row">
+                  <span class="task-check" role="img" aria-label="In progress"></span>
+                  <span class="task-copy"><strong>Build the release checklist</strong><span>Operations</span></span>
+                  <span class="task-meta">In progress</span>
+                </li>
+                <li class="task-row">
+                  <span class="task-check" role="img" aria-label="Blocked"></span>
+                  <span class="task-copy"><strong>Approve the final assets</strong><span>Review needed</span></span>
+                  <span class="task-meta">Blocked</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="flow-panel" id="panel-review" role="tabpanel" aria-labelledby="tab-review" hidden>
+              <div class="panel-heading">
+                <div>
+                  <h3>Close the loop</h3>
+                  <p>Collect the decision, record what changed, and carry the learning forward.</p>
+                </div>
+                <span class="status">Review open</span>
+              </div>
+              <ul class="task-table" aria-label="Review tasks">
+                <li class="task-row">
+                  <span class="task-check done" role="img" aria-label="Approved">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 4 4L19 6"/></svg>
+                  </span>
+                  <span class="task-copy"><strong>Confirm launch readiness</strong><span>Approval</span></span>
+                  <span class="task-meta">Approved</span>
+                </li>
+                <li class="task-row">
+                  <span class="task-check" role="img" aria-label="Open"></span>
+                  <span class="task-copy"><strong>Share the final update</strong><span>Communication</span></span>
+                  <span class="task-meta">Next</span>
+                </li>
+                <li class="task-row">
+                  <span class="task-check" role="img" aria-label="Open"></span>
+                  <span class="task-copy"><strong>Capture the project notes</strong><span>Learning</span></span>
+                  <span class="task-meta">Open</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="marquee-band" role="note" aria-label="TaskFlow keeps briefs, owners, dates, blockers, reviews, and decisions connected">
+            <div class="marquee-track" aria-hidden="true">
+              <span>Briefs · Owners · Dates · Blockers · Reviews · Decisions ·</span>
+              <span>Briefs · Owners · Dates · Blockers · Reviews · Decisions ·</span>
+            </div>
+            <button class="marquee-control" type="button" aria-pressed="false">Pause</button>
+          </div>
+
+          <ul class="feature-grid" aria-label="TaskFlow capabilities">
+            <li class="feature-item">
+              <span class="feature-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16M4 12h10M4 19h16"/></svg>
+              </span>
+              <h3>Project briefs</h3>
+              <p>Put the outcome, scope, milestones, and owner where the work begins.</p>
+              <span class="feature-meta">Structure before tasks</span>
+            </li>
+            <li class="feature-item">
+              <span class="feature-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="12" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="18" cy="18" r="2"/><path d="M8 12h4c3 0 3-6 4-6M8 12h4c3 0 3 6 4 6"/></svg>
+              </span>
+              <h3>Visible dependencies</h3>
+              <p>Connect handoffs and see what is waiting before a quiet delay becomes a late project.</p>
+              <span class="feature-meta">Context across teams</span>
+            </li>
+            <li class="feature-item">
+              <span class="feature-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h14v16H5zM8 9h8M8 13h5"/></svg>
+              </span>
+              <h3>Focused updates</h3>
+              <p>Share changes in a consistent format, so readers can quickly find movement, risk, and next steps.</p>
+              <span class="feature-meta">Signal without meetings</span>
+            </li>
+            <li class="feature-item">
+              <span class="feature-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6 5.6 18.4"/></svg>
+              </span>
+              <h3>Connected tools</h3>
+              <p>Bring updates from chat, email, calendars, forms, and files into the project record.</p>
+              <span class="feature-meta">Your workflow stays intact</span>
+            </li>
+          </ul>
+        </section>
+
+        <section class="chapter" id="plans" aria-labelledby="plans-title">
+          <header class="chapter-header">
+            <p class="chapter-index">Chapter 03 / Plans</p>
+            <h2 id="plans-title">Start with the way your team works.</h2>
+            <p class="chapter-lede">Choose a workspace for your current process. Move up when coordination needs to span more teams and controls.</p>
+          </header>
+
+          <div class="plan-compare">
+            <article class="plan-row">
+              <div class="plan-name">
+                <h3>Core</h3>
+                <span>For focused teams</span>
+              </div>
+              <p>Plan projects, assign work, track dependencies, and keep decisions connected in one shared workspace.</p>
+              <button class="inline-link" type="button" data-open-dialog>
+                Start free
+                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </button>
+            </article>
+            <article class="plan-row">
+              <div class="plan-name">
+                <h3>Organization</h3>
+                <span>For connected teams</span>
+              </div>
+              <p>Coordinate work across teams with shared standards, deeper permissions, and guided rollout support.</p>
+              <a class="inline-link" href="mailto:hello@taskflow.example?subject=TaskFlow%20organization%20plan">
+                Talk to sales
+                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </a>
+            </article>
+          </div>
+
+          <aside class="margin-note" aria-label="TaskFlow workspace principle">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M3 12h18"/></svg>
+            <p>Every TaskFlow workspace starts with the same core idea: clear ownership, visible movement, and context that stays attached to the work.</p>
+          </aside>
+        </section>
+
+        <section class="chapter" id="questions" aria-labelledby="questions-title">
+          <header class="chapter-header">
+            <p class="chapter-index">Chapter 04 / Questions</p>
+            <h2 id="questions-title">Before you bring the work over.</h2>
+            <p class="chapter-lede">A few straightforward answers about fitting TaskFlow into an existing team.</p>
+          </header>
+
+          <div class="faq-list">
+            <details>
+              <summary>Is TaskFlow only for product teams?</summary>
+              <p class="faq-answer">No. Any team coordinating projects with owners, milestones, handoffs, and approvals can shape TaskFlow around its process.</p>
+            </details>
+            <details>
+              <summary>Can we start with one team?</summary>
+              <p class="faq-answer">Yes. Begin with a focused workflow, learn what your team needs, and extend the same structure to connected teams when it is useful.</p>
+            </details>
+            <details>
+              <summary>Will TaskFlow replace our communication tools?</summary>
+              <p class="faq-answer">It does not need to. TaskFlow gives project work a reliable home while chat and email remain useful for conversation.</p>
+            </details>
+            <details>
+              <summary>How do we bring existing work in?</summary>
+              <p class="faq-answer">Start with active projects, their owners, and their next milestones. Add older context only when it helps a current decision.</p>
+            </details>
+          </div>
+        </section>
+
+      </article>
+    </div>
+
+    <section class="closing" aria-labelledby="closing-title">
+      <div class="closing-inner">
+        <div class="closing-copy">
+          <h2 id="closing-title">Give the work a clear way forward.</h2>
+          <p>Start a TaskFlow workspace and turn scattered project updates into one visible, shared plan.</p>
+        </div>
+        <button class="button" type="button" data-open-dialog>
+          Start your workspace
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="#top" aria-label="TaskFlow home">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 20 20" fill="none">
+              <path d="M3 5h9M8 10h9M3 15h9" stroke="currentColor" stroke-width="2" stroke-linecap="square"/>
+              <path d="m10 2 3 3-3 3m0 4 3 3-3 3" stroke="currentColor" stroke-width="2"/>
+            </svg>
+          </span>
+          <span>TaskFlow</span>
+        </a>
+        <p>Project coordination that keeps ownership, movement, and decisions in view.</p>
+      </div>
+      <nav class="footer-column" aria-label="Product links">
+        <h3>Product</h3>
+        <ul class="footer-links">
+          <li><a href="#approach">Approach</a></li>
+          <li><a href="#product">Workflow</a></li>
+          <li><a href="#plans">Plans</a></li>
+        </ul>
+      </nav>
+      <nav class="footer-column" aria-label="Company links">
+        <h3>Company</h3>
+        <ul class="footer-links">
+          <li><a href="mailto:hello@taskflow.example">Contact</a></li>
+          <li><a href="#questions">Questions</a></li>
+          <li><a href="#top">About</a></li>
+        </ul>
+      </nav>
+      <nav class="footer-column" aria-label="Legal links">
+        <h3>Legal</h3>
+        <ul class="footer-links">
+          <li><a href="#top">Privacy</a></li>
+          <li><a href="#top">Terms</a></li>
+          <li><a href="#top">Accessibility</a></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="year">2026</span> TaskFlow</span>
+      <span>Built for work that needs to move</span>
+    </div>
+  </footer>
+
+  <dialog id="signup-dialog" aria-labelledby="dialog-title">
+    <div class="dialog-head">
+      <h2 id="dialog-title">Start your workspace</h2>
+      <button class="icon-button" type="button" data-close-dialog aria-label="Close dialog">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 6 12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+    <form class="signup-form" id="signup-form" novalidate>
+      <p>Tell us where to prepare your TaskFlow workspace.</p>
+      <div class="field">
+        <label for="email">Work email</label>
+        <input id="email" name="email" type="email" autocomplete="email" placeholder="you@company.com" aria-describedby="email-help form-message" required>
+        <span class="field-help" id="email-help">Use the address you want connected to your workspace.</span>
+      </div>
+      <div class="field">
+        <label for="team-size">Team shape</label>
+        <select id="team-size" name="team-size" aria-describedby="form-message" required>
+          <option value="">Choose the closest fit</option>
+          <option value="focused">One focused team</option>
+          <option value="connected">Several connected teams</option>
+          <option value="organization">Organization-wide coordination</option>
+        </select>
+      </div>
+      <p class="form-message" id="form-message" role="status" aria-live="polite">This static preview does not transmit or store your information.</p>
+      <div class="form-actions">
+        <button class="button button-secondary" type="button" data-close-dialog>Cancel</button>
+        <button class="button" type="submit" id="signup-submit">Prepare workspace</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script>
+    const menuButton = document.querySelector('.menu-button');
+    const mobileMenu = document.querySelector('#mobile-menu');
+    const dialog = document.querySelector('#signup-dialog');
+    const form = document.querySelector('#signup-form');
+    const email = document.querySelector('#email');
+    const teamSize = document.querySelector('#team-size');
+    const formMessage = document.querySelector('#form-message');
+    const submitButton = document.querySelector('#signup-submit');
+    const marquee = document.querySelector('.marquee-band');
+    const marqueeControl = document.querySelector('.marquee-control');
+
+    function setBreakoutWidth() {
+      const documentLeft = document.querySelector('.document').getBoundingClientRect().left;
+      const widthToEdge = Math.max(0, window.innerWidth - documentLeft);
+      document.documentElement.style.setProperty('--breakout-width', `${widthToEdge}px`);
+    }
+
+    setBreakoutWidth();
+    window.addEventListener('resize', setBreakoutWidth, { passive: true });
+
+    function closeMenu() {
+      menuButton.setAttribute('aria-expanded', 'false');
+      menuButton.setAttribute('aria-label', 'Open menu');
+      mobileMenu.hidden = true;
+      document.body.classList.remove('menu-open');
+    }
+
+    menuButton.addEventListener('click', () => {
+      const willOpen = menuButton.getAttribute('aria-expanded') !== 'true';
+      menuButton.setAttribute('aria-expanded', String(willOpen));
+      menuButton.setAttribute('aria-label', willOpen ? 'Close menu' : 'Open menu');
+      mobileMenu.hidden = !willOpen;
+      document.body.classList.toggle('menu-open', willOpen);
+      if (willOpen) mobileMenu.querySelector('a').focus();
+    });
+
+    mobileMenu.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMenu));
+
+    document.querySelectorAll('[data-open-dialog]').forEach(button => {
+      button.addEventListener('click', () => {
+        closeMenu();
+        dialog.showModal();
+        window.setTimeout(() => email.focus(), 0);
+      });
+    });
+
+    document.querySelectorAll('[data-close-dialog]').forEach(button => {
+      button.addEventListener('click', () => dialog.close());
+    });
+
+    dialog.addEventListener('click', event => {
+      if (event.target === dialog) dialog.close();
+    });
+
+    dialog.addEventListener('close', () => {
+      form.reset();
+      formMessage.dataset.state = '';
+      formMessage.textContent = 'This static preview does not transmit or store your information.';
+      submitButton.disabled = false;
+      submitButton.textContent = 'Prepare workspace';
+    });
+
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+      formMessage.dataset.state = '';
+
+      if (!email.validity.valid) {
+        formMessage.dataset.state = 'error';
+        formMessage.textContent = 'Enter a valid work email, such as you@company.com.';
+        email.focus();
+        return;
+      }
+
+      if (!teamSize.value) {
+        formMessage.dataset.state = 'error';
+        formMessage.textContent = 'Choose the team shape that most closely matches your work.';
+        teamSize.focus();
+        return;
+      }
+
+      submitButton.disabled = true;
+      submitButton.textContent = 'Preparing...';
+      formMessage.textContent = 'Preparing the workspace preview.';
+
+      window.setTimeout(() => {
+        formMessage.dataset.state = 'success';
+        formMessage.textContent = 'Preview complete. Connect this form to your account service to create live workspaces.';
+        submitButton.textContent = 'Preview prepared';
+      }, 700);
+    });
+
+    const tabs = Array.from(document.querySelectorAll('[role="tab"]'));
+    const panels = Array.from(document.querySelectorAll('[role="tabpanel"]'));
+
+    function selectTab(tab) {
+      tabs.forEach(item => {
+        const selected = item === tab;
+        item.setAttribute('aria-selected', String(selected));
+        item.tabIndex = selected ? 0 : -1;
+      });
+      panels.forEach(panel => {
+        panel.hidden = panel.id !== tab.getAttribute('aria-controls');
+      });
+    }
+
+    tabs.forEach((tab, index) => {
+      tab.addEventListener('click', () => selectTab(tab));
+      tab.addEventListener('keydown', event => {
+        if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+        event.preventDefault();
+        let nextIndex = index;
+        if (event.key === 'ArrowRight') nextIndex = (index + 1) % tabs.length;
+        if (event.key === 'ArrowLeft') nextIndex = (index - 1 + tabs.length) % tabs.length;
+        if (event.key === 'Home') nextIndex = 0;
+        if (event.key === 'End') nextIndex = tabs.length - 1;
+        selectTab(tabs[nextIndex]);
+        tabs[nextIndex].focus();
+      });
+    });
+
+    marqueeControl.addEventListener('click', () => {
+      const paused = marquee.classList.toggle('is-paused');
+      marqueeControl.setAttribute('aria-pressed', String(paused));
+      marqueeControl.textContent = paused ? 'Play' : 'Pause';
+    });
+
+    const chapterLinks = Array.from(document.querySelectorAll('.chapter-nav a'));
+    const sections = chapterLinks.map(link => document.querySelector(link.getAttribute('href')));
+    const chapterObserver = new IntersectionObserver(entries => {
+      const visible = entries
+        .filter(entry => entry.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (!visible) return;
+      chapterLinks.forEach(link => {
+        if (link.getAttribute('href') === `#${visible.target.id}`) {
+          link.setAttribute('aria-current', 'location');
+        } else {
+          link.removeAttribute('aria-current');
+        }
+      });
+    }, { rootMargin: '-20% 0px -55% 0px', threshold: [0, 0.25, 0.5] });
+
+    sections.forEach(section => chapterObserver.observe(section));
+    document.querySelector('#year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ledgerbird - Bookkeeping for freelance creatives</title>
+<meta name="description" content="Ledgerbird captures your invoices, sorts your expenses, and estimates your quarterly taxes, so your books are kept to the standard of your work.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500&family=Manrope:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+/* goddesign | structure: Manifesto | direction: Luxury Serif | accent: neutral platinum (oklch h~264 c 0.017) */
+/* seed 3239853707 | direction 11 Luxury Serif | structure 5 Manifesto
+   jitter h+1 L-0.01 r+0(floor: row radius 0)
+   tokens: bg oklch(from #0E0C08 l-0.01) surface oklch(from #171410 l-0.01)
+   text #EFE9DC muted #9C917C accent oklch(from #C9CFDA h+1) hairline #2E2A22
+   type: Bodoni Moda 500 display / Manrope 300,400 body / Manrope 600 caps labels
+   motion: opacity fades only */
+:root {
+  --bg: oklch(from #0E0C08 calc(l - 0.01) c h);
+  --surface: oklch(from #171410 calc(l - 0.01) c h);
+  --text: #EFE9DC;
+  --muted: #9C917C;
+  --accent: oklch(from #C9CFDA l c calc(h + 1));
+  --accent-dim: oklch(from #C9CFDA calc(l - 0.12) c calc(h + 1));
+  --hairline: #2E2A22;
+  --ink-on-accent: #14110B;
+  --font-display: "Bodoni Moda", "Didot", "Bodoni MT", serif;
+  --font-body: "Manrope", "Avenir Next", "Segoe UI", sans-serif;
+  --s-1: 4px;  --s-2: 8px;  --s-3: 12px; --s-4: 16px;
+  --s-5: 24px; --s-6: 32px; --s-7: 48px; --s-8: 64px;
+  --s-9: 96px; --s-10: 128px; --s-11: 160px;
+  --measure: 62ch;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: 17px;
+  line-height: 1.6;
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3 { text-wrap: balance; }
+p { text-wrap: pretty; }
+a { color: var(--text); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+::selection { background: var(--accent); color: var(--ink-on-accent); }
+
+.shell { max-width: 1360px; margin-inline: auto; padding-inline: clamp(20px, 5vw, 64px); }
+
+.label {
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* ---------- nav ---------- */
+.nav {
+  display: flex;
+  align-items: center;
+  gap: var(--s-6);
+  padding-block: var(--s-5);
+  border-bottom: 1px solid var(--hairline);
+}
+.wordmark {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+}
+.nav-links {
+  display: flex;
+  gap: var(--s-6);
+  margin-left: auto;
+  list-style: none;
+}
+.nav-links a {
+  text-decoration: none;
+  color: var(--muted);
+  transition: color 0.2s ease;
+  padding-block: var(--s-3);
+}
+.nav-links a:hover, .nav-links a:active { color: var(--text); }
+
+.btn {
+  display: inline-block;
+  background: var(--accent);
+  color: var(--ink-on-accent);
+  text-decoration: none;
+  border: 1px solid var(--accent);
+  padding: 14px 32px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+}
+.btn:hover { background: var(--accent-dim); border-color: var(--accent-dim); }
+.btn:active { opacity: 0.85; }
+.btn:disabled, .btn[aria-disabled="true"] { opacity: 0.4; cursor: not-allowed; }
+.btn-ghost {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--hairline);
+}
+.btn-ghost:hover { background: transparent; border-color: var(--muted); }
+
+/* ---------- manifesto sentences ---------- */
+.sentence {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(2.6rem, 9vw, 8.75rem);
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  max-width: 12ch;
+}
+.sentence em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+/* ---------- hero ---------- */
+.hero { padding-block: clamp(var(--s-9), 14vh, var(--s-11)); }
+.hero-sub {
+  margin-top: var(--s-7);
+  max-width: 44ch;
+  font-size: 19px;
+  font-weight: 300;
+  color: var(--muted);
+}
+.hero-cta {
+  margin-top: var(--s-7);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-4);
+  align-items: center;
+}
+.hero-note { color: var(--muted); font-size: 14px; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .fade-in { animation: fade 0.5s ease-out both; }
+  @keyframes fade { from { opacity: 0; } }
+}
+
+/* ---------- feature sections ---------- */
+.feature { border-top: 1px solid var(--hairline); padding-block: clamp(var(--s-9), 12vh, var(--s-11)); }
+.feature-detail {
+  margin-top: var(--s-8);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--s-8);
+  max-width: 980px;
+  margin-left: auto;
+}
+.feature-detail p { max-width: var(--measure); color: var(--muted); font-weight: 400; }
+.feature-detail p strong { color: var(--text); font-weight: 600; }
+.spec-list { list-style: none; display: grid; gap: var(--s-4); }
+.spec-list li {
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--hairline);
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s-5);
+  font-size: 15px;
+}
+.spec-list .spec-k { color: var(--muted); font-weight: 400; }
+.spec-list .spec-v { text-align: right; font-weight: 400; }
+
+/* quiet band between loud sentences */
+.quiet {
+  background: var(--surface);
+  border-top: 1px solid var(--hairline);
+  padding-block: var(--s-9);
+}
+.quiet-inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-6) var(--s-9);
+  align-items: baseline;
+  justify-content: space-between;
+}
+.quiet p { max-width: 52ch; color: var(--muted); font-weight: 400; }
+
+/* ---------- pricing ---------- */
+.pricing { border-top: 1px solid var(--hairline); padding-block: clamp(var(--s-9), 12vh, var(--s-11)); }
+.pricing-head { max-width: 46ch; margin-top: var(--s-5); color: var(--muted); font-weight: 400; }
+.tiers {
+  margin-top: var(--s-9);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.tier {
+  border-left: 1px solid var(--hairline);
+  padding: var(--s-2) var(--s-7) var(--s-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-5);
+}
+.tier:first-child { border-left: 0; padding-left: 0; }
+.tier-name { color: var(--muted); }
+.price {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(4.5rem, 9vw, 9rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.price sup {
+  font-size: 0.28em;
+  vertical-align: 1.9em;
+  letter-spacing: 0;
+  margin-right: 0.15em;
+}
+.price-per { color: var(--muted); font-size: 14px; margin-top: var(--s-2); display: block; }
+.tier-blurb { color: var(--muted); font-weight: 400; font-size: 15px; flex-grow: 1; }
+.tier-list { list-style: none; display: grid; gap: var(--s-3); font-size: 15px; font-weight: 400; }
+.tier-list li { padding-top: var(--s-3); border-top: 1px solid var(--hairline); }
+.tier .btn { align-self: flex-start; }
+
+/* ---------- footer ---------- */
+.footer { border-top: 1px solid var(--hairline); padding-block: var(--s-8); }
+.footer-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-7) var(--s-9);
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.footer-cols { display: flex; flex-wrap: wrap; gap: var(--s-9); list-style: none; }
+.footer-cols a {
+  display: block;
+  color: var(--muted);
+  text-decoration: none;
+  padding-block: var(--s-2);
+  font-size: 15px;
+  transition: color 0.2s ease;
+}
+.footer-cols a:hover, .footer-cols a:active { color: var(--text); }
+.footer-legal {
+  margin-top: var(--s-8);
+  padding-top: var(--s-5);
+  border-top: 1px solid var(--hairline);
+  color: var(--muted);
+  font-size: 13px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-4) var(--s-6);
+  justify-content: space-between;
+}
+
+/* ---------- responsive ---------- */
+@media (max-width: 860px) {
+  .nav-links { display: none; }
+  .feature-detail { grid-template-columns: minmax(0, 1fr); margin-left: 0; }
+  .tiers { grid-template-columns: minmax(0, 1fr); gap: var(--s-8); }
+  .tier { border-left: 0; border-top: 1px solid var(--hairline); padding: var(--s-6) 0 0; }
+  .tier:first-child { border-top: 0; padding-top: 0; }
+}
+@media (max-width: 480px) {
+  .btn { padding: 14px 24px; }
+  .hero-cta .btn { width: 100%; text-align: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  html { scroll-behavior: auto; }
+}
+</style>
+</head>
+<body>
+
+<header class="shell">
+  <nav class="nav" aria-label="Main">
+    <a class="wordmark" href="#top">Ledgerbird</a>
+    <ul class="nav-links label">
+      <li><a href="#invoices">Invoices</a></li>
+      <li><a href="#expenses">Expenses</a></li>
+      <li><a href="#taxes">Taxes</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+    </ul>
+    <a class="btn label" href="#pricing">Start free month</a>
+  </nav>
+</header>
+
+<main id="top">
+
+  <section class="hero shell">
+    <h1 class="sentence fade-in">Books kept to the standard of your <em>work.</em></h1>
+    <p class="hero-sub">Ledgerbird is bookkeeping for freelance creatives. It captures your invoices, sorts your expenses, and tells you what to set aside each quarter.</p>
+    <div class="hero-cta">
+      <a class="btn label" href="#pricing">Start free month</a>
+      <span class="hero-note">One month free. No card required to begin.</span>
+    </div>
+  </section>
+
+  <section class="feature shell" id="invoices" aria-labelledby="invoices-h">
+    <h2 class="sentence" id="invoices-h">The invoice files itself.</h2>
+    <div class="feature-detail">
+      <p><strong>Invoice capture.</strong> Forward an invoice to your Ledgerbird address, or photograph a paper one, and it is read, recorded, and matched to the client. When the deposit lands in your connected account, the invoice marks itself paid.</p>
+      <ul class="spec-list">
+        <li><span class="spec-k">Accepted formats</span><span class="spec-v">PDF, image, email body</span></li>
+        <li><span class="spec-k">Client matching</span><span class="spec-v">By name, email, or bank memo</span></li>
+        <li><span class="spec-k">Payment status</span><span class="spec-v">Reconciled against your bank feed</span></li>
+        <li><span class="spec-k">Late invoices</span><span class="spec-v">Flagged after your stated terms</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="feature shell" id="expenses" aria-labelledby="expenses-h">
+    <h2 class="sentence">Every expense knows its <em>place.</em></h2>
+    <div class="feature-detail">
+      <p><strong>Expense sorting.</strong> Connect the account and card you actually use. Ledgerbird sorts each charge into categories that fit creative work, and learns yours: the difference between a client lunch and a personal one, a reference book and a novel. You confirm or correct in one tap; it remembers.</p>
+      <ul class="spec-list">
+        <li><span class="spec-k">Built for</span><span class="spec-v">Software, gear, studio rent, materials, travel</span></li>
+        <li><span class="spec-k">Deduction notes</span><span class="spec-v">Attached to every sorted charge</span></li>
+        <li><span class="spec-k">Receipts</span><span class="spec-v">Photograph once, stored with the charge</span></li>
+        <li><span class="spec-k">Mixed-use items</span><span class="spec-v">Split by percentage, kept consistent</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="feature shell" id="taxes" aria-labelledby="taxes-h">
+    <h2 class="sentence" id="taxes-h">April arrives. You already knew.</h2>
+    <div class="feature-detail">
+      <p><strong>Quarterly tax estimates.</strong> From your recorded income and sorted deductions, Ledgerbird estimates each quarterly payment, tells you the due date, and shows the running amount to set aside this week. Come filing season, you hand your accountant one clean export instead of a shoebox.</p>
+      <ul class="spec-list">
+        <li><span class="spec-k">Estimates for</span><span class="spec-v">US federal and state estimated tax</span></li>
+        <li><span class="spec-k">Due dates</span><span class="spec-v">All four deadlines, with reminders</span></li>
+        <li><span class="spec-k">Set-aside guidance</span><span class="spec-v">Updated as each payment clears</span></li>
+        <li><span class="spec-k">Year-end export</span><span class="spec-v">Schedule C categories, CSV or PDF</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="quiet">
+    <div class="shell quiet-inner">
+      <span class="label">Why the bird</span>
+      <p>Ledger keeping is old work: patient, exact, done in good light. We named the software after the magpie, a bird that collects small shining things and keeps them safe. That is the whole job.</p>
+    </div>
+  </div>
+
+  <section class="pricing shell" id="pricing" aria-labelledby="pricing-h">
+    <h2 class="sentence" id="pricing-h">Priced like a line item.</h2>
+    <p class="pricing-head">Every plan starts with a free month. Pay yearly and two months are on us. Cancel any time; your records export with you.</p>
+    <div class="tiers">
+      <div class="tier">
+        <h3 class="tier-name label">Sketch</h3>
+        <p class="price"><sup aria-hidden="true">$</sup>0<span class="price-per">per month, forever</span></p>
+        <p class="tier-blurb">For the first year of going independent. Record what comes in and what goes out, by hand, in one tidy place.</p>
+        <ul class="tier-list">
+          <li>Manual income and expense entry</li>
+          <li>15 invoice captures per month</li>
+          <li>Year-end summary export</li>
+        </ul>
+        <a class="btn btn-ghost label" href="#pricing">Start with Sketch</a>
+      </div>
+      <div class="tier">
+        <h3 class="tier-name label">Studio</h3>
+        <p class="price"><sup aria-hidden="true">$</sup>24<span class="price-per">per month, billed yearly</span></p>
+        <p class="tier-blurb">For working freelancers. Everything captures and sorts itself; quarterly estimates run all year.</p>
+        <ul class="tier-list">
+          <li>Unlimited invoice capture</li>
+          <li>Bank and card feeds, auto-sorted</li>
+          <li>Quarterly federal and state estimates</li>
+          <li>Receipt storage and mixed-use splits</li>
+        </ul>
+        <a class="btn label" href="#pricing">Start free month</a>
+      </div>
+      <div class="tier">
+        <h3 class="tier-name label">Atelier</h3>
+        <p class="price"><sup aria-hidden="true">$</sup>49<span class="price-per">per month, billed yearly</span></p>
+        <p class="tier-blurb">For creatives with an LLC or S corp, contractors to pay, and an accountant who expects clean books.</p>
+        <ul class="tier-list">
+          <li>Everything in Studio</li>
+          <li>Contractor payments and 1099 prep</li>
+          <li>Accountant seat with read access</li>
+          <li>Priority support from a bookkeeper</li>
+        </ul>
+        <a class="btn btn-ghost label" href="#pricing">Start free month</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="shell">
+    <div class="footer-grid">
+      <div>
+        <a class="wordmark" href="#top">Ledgerbird</a>
+        <p class="hero-note">Bookkeeping for freelance creatives.</p>
+      </div>
+      <ul class="footer-cols">
+        <li>
+          <span class="label">Product</span>
+          <a href="#invoices">Invoice capture</a>
+          <a href="#expenses">Expense sorting</a>
+          <a href="#taxes">Quarterly estimates</a>
+          <a href="#pricing">Pricing</a>
+        </li>
+        <li>
+          <span class="label">Company</span>
+          <a href="#top">About</a>
+          <a href="#top">Field notes</a>
+          <a href="#top">Support</a>
+        </li>
+        <li>
+          <span class="label">Legal</span>
+          <a href="#top">Privacy</a>
+          <a href="#top">Terms</a>
+          <a href="#top">Security</a>
+        </li>
+      </ul>
+    </div>
+    <div class="footer-legal">
+      <span>Copyright 2026 Ledgerbird, Inc. Estimates are informational and are not tax advice.</span>
+      <span>Made for people who make things.</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

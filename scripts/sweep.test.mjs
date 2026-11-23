@@ -3,9 +3,7 @@
 //
 // The corpus separation test is the load-bearing one. A source scanner that
 // fires on clean work gets ignored, and then the gate is worse than it was
-// before the script existed, so the calibration recorded in
-// validation/research/design-skills-evaluation-2026-07.md is asserted here
-// rather than left as a claim in prose.
+// before the script existed. The pages in test/corpus are the calibration set.
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -490,13 +488,13 @@ test('extract-tokens reads a W3C design-token file', () => {
 
 test('the sweep separates goddesign artifacts from unskilled ones', () => {
   const gd = [
-    ...pick('validation/runs/kilnhouse-2026-07', /skill.*\.html$/),
-    ...pick('validation/runs/wayfare-2026-07', /^wayfare-gd-.*\.html$/),
-    ...pick('validation/runs/ledgerbird-2026-07', /^ledgerbird-gd-.*\.html$/),
+    ...pick('test/corpus/kilnhouse', /skill.*\.html$/),
+    ...pick('test/corpus/wayfare', /^wayfare-gd-.*\.html$/),
+    ...pick('test/corpus/ledgerbird', /^ledgerbird-gd-.*\.html$/),
   ];
   const other = [
-    ...pick('validation/runs/wayfare-2026-07', /^wayfare-(fd-|base)/),
-    ...pick('validation/runs/ledgerbird-2026-07', /^ledgerbird-(fd-|base)/),
+    ...pick('test/corpus/wayfare', /^wayfare-(fd-|base)/),
+    ...pick('test/corpus/ledgerbird', /^ledgerbird-(fd-|base)/),
   ].filter((f) => f.endsWith('.html'));
   assert.ok(gd.length >= 10, `expected the skill-run corpus, found ${gd.length}`);
   assert.ok(other.length >= 6, `expected the comparison corpus, found ${other.length}`);

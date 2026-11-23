@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TaskFlow: project management that starts at $0</title>
+<meta name="description" content="TaskFlow is project management for small teams. Boards, timelines, and calendars on one shared source of truth. The full core product is free.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Karla:wght@400;700&family=Space+Mono&display=swap" rel="stylesheet">
+<style>
+/* goddesign | structure: Stat-Led | direction: Playful Pop | accent: 349deg #FF4D6D */
+/* ============================================================
+   goddesign run stamp
+   seed=2256764778 | direction=10 Playful Pop | structure=3 Stat-Led
+   palette-remix=none | typepair-remix=none | lane=DIVERGE
+   tokens: bg #FFF8EF surface #FFEFD9 text #201A33 muted #6E6680
+           accent #FF4D6D accent-ink #D22C4E secondary #2EC4B6
+           highlight #FFC53D
+   type: Bricolage Grotesque 800 / Karla 400,700 / Space Mono 400
+   radius 16px | border 2px #201A33 | shadow 6px 6px 0 #201A33
+   signature: springy buttons cubic-bezier(0.34,1.56,0.64,1) 250ms
+   motion: hero entrance 450ms/40ms stagger; hovers spring; else none
+   ============================================================ */
+
+:root {
+  --bg: #FFF8EF;
+  --surface: #FFEFD9;
+  --text: #201A33;
+  --muted: #6E6680;
+  --accent: #FF4D6D;
+  --accent-ink: #D22C4E; /* oklch(from var(--accent) calc(l - .13) c h), pinned for contrast 4.68:1 on bg */
+  --accent-down: #E63757;
+  --secondary: #2EC4B6;
+  --secondary-deep: #17766D;
+  --highlight: #FFC53D;
+  --line: #201A33;
+  --border: 2px solid var(--line);
+  --shadow: 6px 6px 0 var(--line);
+  --shadow-lift: 8px 8px 0 var(--line);
+  --radius: 16px;
+  --font-display: "Bricolage Grotesque", "Arial Black", sans-serif;
+  --font-body: "Karla", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "Space Mono", "Courier New", monospace;
+  /* type scale, ratio 1.25 on a 17px base */
+  --step--1: 0.875rem;
+  --step-0: 1.0625rem;
+  --step-1: 1.328rem;
+  --step-2: 1.66rem;
+  --step-3: 2.075rem;
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --smooth: cubic-bezier(0.25, 1, 0.5, 1);
+  /* spacing tokens: 4 8 12 16 24 32 48 64 96 128 */
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  line-height: 1.55;
+  overflow-x: clip;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+p { text-wrap: pretty; }
+
+a { color: var(--accent-ink); }
+
+:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+::selection { background: var(--highlight); color: var(--text); }
+
+.wrap {
+  max-width: 72rem;
+  margin-inline: auto;
+  padding-inline: clamp(16px, 4vw, 48px);
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--muted);
+}
+
+/* ---------- buttons: the signature element ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 12px 24px;
+  border: var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: transform 250ms var(--spring), box-shadow 250ms var(--spring), background-color 180ms var(--smooth);
+}
+.btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-lift);
+}
+.btn:active {
+  transform: translate(3px, 3px) scale(0.98);
+  box-shadow: 2px 2px 0 var(--line);
+}
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  background: var(--surface);
+  color: var(--muted);
+  box-shadow: none;
+  transform: none;
+  cursor: not-allowed;
+  border-color: var(--muted);
+}
+.btn-primary { background: var(--accent); }
+.btn-primary:hover { background: var(--accent-down); }
+.btn-ghost { background: transparent; box-shadow: none; border-color: transparent; text-decoration: underline; text-underline-offset: 4px; }
+.btn-ghost:hover { transform: none; box-shadow: none; color: var(--accent-ink); }
+.btn-ghost:active { transform: scale(0.98); }
+
+/* ---------- header ---------- */
+.skip-link {
+  position: absolute;
+  left: 16px;
+  top: -64px;
+  z-index: 20;
+  padding: 12px 16px;
+  background: var(--text);
+  color: var(--bg);
+  border-radius: 0 0 8px 8px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: top 180ms var(--smooth);
+}
+.skip-link:focus-visible { top: 0; outline-color: var(--accent); }
+
+header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--bg);
+  border-bottom: var(--border);
+}
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding-block: 12px;
+}
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: var(--step-1);
+  color: var(--text);
+  text-decoration: none;
+  letter-spacing: -0.02em;
+}
+.logo svg { flex: none; }
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  list-style: none;
+}
+.nav-links a:not(.btn) {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 8px 12px;
+  color: var(--text);
+  font-weight: 700;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: background-color 180ms var(--smooth);
+}
+.nav-links a:not(.btn):hover { background: var(--surface); }
+.nav-links a:not(.btn):active { background: var(--highlight); }
+.nav-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border: var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  cursor: pointer;
+}
+.nav-toggle:active { background: var(--highlight); }
+
+/* ---------- hero: the $0 is the page ---------- */
+.hero { padding-block: clamp(48px, 8vw, 96px); }
+.hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: clamp(24px, 5vw, 64px);
+  align-items: center;
+}
+.hero h1 {
+  font-size: clamp(2.2rem, 4.5vw, 3.6rem);
+  max-width: 16ch;
+}
+.hero-sub {
+  margin-top: 24px;
+  font-size: var(--step-1);
+  max-width: 42ch;
+  color: var(--text);
+}
+.hero-cta {
+  margin-top: 32px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+.hero-fine {
+  margin-top: 16px;
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  color: var(--muted);
+}
+.price-block {
+  position: relative;
+  justify-self: center;
+  text-align: center;
+  padding: clamp(24px, 4vw, 48px);
+}
+.price-slab {
+  position: absolute;
+  inset: 0;
+  background: var(--highlight);
+  border: var(--border);
+  border-radius: 24px;
+  transform: rotate(-4deg);
+  box-shadow: var(--shadow);
+  z-index: -1;
+}
+.price-figure {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(7rem, 19vw, 15rem);
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+  display: block;
+}
+.price-caption {
+  display: block;
+  margin-top: 8px;
+  font-family: var(--font-mono);
+  font-size: var(--step-0);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .reveal { animation: rise 450ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+  .reveal:nth-child(2) { animation-delay: 40ms; }
+  .reveal:nth-child(3) { animation-delay: 80ms; }
+  .reveal:nth-child(4) { animation-delay: 120ms; }
+  .hero-grid > .reveal-late { animation: rise 450ms cubic-bezier(0.22, 1, 0.36, 1) 160ms both; }
+  @keyframes rise { from { opacity: 0; transform: translateY(12px); } }
+}
+
+/* ---------- proof grid: the free plan, itemized ---------- */
+.proof { padding-block: clamp(48px, 8vw, 96px); border-top: var(--border); }
+.proof h2 { font-size: var(--step-3); max-width: 24ch; }
+.proof-head { display: flex; flex-direction: column; gap: 12px; margin-bottom: 48px; }
+.proof-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border: var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--line);
+  gap: 2px;
+  list-style: none;
+}
+.proof-cell {
+  background: var(--bg);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.proof-cell svg { color: var(--secondary-deep); }
+.proof-cell h3 { font-size: var(--step-1); }
+.proof-cell p { color: var(--muted); font-size: var(--step-0); }
+.proof-cell .spec {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  color: var(--text);
+  margin-top: auto;
+}
+
+/* ---------- views section with demo board ---------- */
+.views { padding-block: clamp(48px, 8vw, 96px); border-top: var(--border); background: var(--surface); }
+.views-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: clamp(32px, 5vw, 64px);
+  align-items: start;
+}
+.views h2 { font-size: var(--step-3); max-width: 18ch; }
+.views-copy { display: flex; flex-direction: column; gap: 24px; }
+.views-copy p { color: var(--text); max-width: 52ch; }
+.view-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+.view-list li {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  font-size: var(--step-0);
+}
+.view-list .k {
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 4px 8px;
+  flex: none;
+}
+.board {
+  border: var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  box-shadow: var(--shadow);
+  padding: 16px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.board-col { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.board-col-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  padding: 4px 4px 8px;
+  border-bottom: 2px solid var(--line);
+}
+.board-count { color: var(--muted); }
+.task {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg);
+  padding: 12px;
+  font-size: var(--step--1);
+  line-height: 1.4;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.task-tag {
+  align-self: flex-start;
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+}
+.tag-design { background: var(--highlight); }
+.tag-build { background: var(--secondary); }
+.tag-ship { background: var(--accent); color: var(--text); }
+.task-done { text-decoration: line-through; color: var(--muted); }
+.board-empty {
+  border: 2px dashed var(--muted);
+  border-radius: 10px;
+  padding: 16px 12px;
+  font-size: var(--step--1);
+  color: var(--muted);
+  text-align: center;
+}
+
+/* ---------- pricing ---------- */
+.pricing { padding-block: clamp(48px, 8vw, 96px); border-top: var(--border); }
+.pricing-head { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+.pricing h2 { font-size: var(--step-3); }
+.billing {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 48px;
+  font-weight: 700;
+}
+.billing-note { font-family: var(--font-mono); font-size: var(--step--1); color: var(--muted); font-weight: 400; }
+.switch {
+  --kx: 0px;
+  position: relative;
+  width: 76px;
+  height: 44px;
+  border: var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  cursor: pointer;
+  transition: background-color 200ms var(--smooth);
+}
+.switch[aria-checked="true"] { background: var(--secondary); --kx: 32px; }
+.switch .knob {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 32px;
+  height: 32px;
+  border: 2px solid var(--line);
+  border-radius: 50%;
+  background: var(--bg);
+  box-sizing: border-box;
+  transform: translateX(var(--kx));
+  transition: transform 250ms var(--spring);
+}
+.switch:hover .knob { transform: translateX(var(--kx)) scale(1.08); }
+.switch:active .knob { transform: translateX(var(--kx)) scale(0.95); }
+.tiers {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  align-items: stretch;
+}
+.tier {
+  border: var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.tier-feature { background: var(--surface); box-shadow: var(--shadow); }
+.tier-name { font-family: var(--font-display); font-size: var(--step-1); }
+.tier-flag {
+  align-self: flex-start;
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  background: var(--highlight);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 4px 12px;
+}
+.tier-price {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 3rem;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+.tier-price .per { font-family: var(--font-mono); font-size: var(--step--1); font-weight: 400; letter-spacing: 0; color: var(--muted); }
+.tier ul { list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: var(--step-0); }
+.tier li { display: flex; gap: 8px; align-items: baseline; }
+.tier li::before { content: ">"; font-family: var(--font-mono); color: var(--secondary-deep); font-weight: 700; }
+.tier .btn { margin-top: auto; }
+.pricing-note { margin-top: 24px; }
+
+/* ---------- FAQ ---------- */
+.faq { padding-block: clamp(48px, 8vw, 96px); border-top: var(--border); background: var(--surface); }
+.faq h2 { font-size: var(--step-3); margin-bottom: 48px; }
+.faq-list { max-width: 46rem; display: flex; flex-direction: column; gap: 16px; }
+.faq details {
+  border: var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  overflow: hidden;
+}
+.faq summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 16px 24px;
+  min-height: 48px;
+  font-weight: 700;
+  font-size: var(--step-0);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  transition: background-color 180ms var(--smooth);
+}
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary:hover { background: var(--surface); }
+.faq summary:active { background: var(--highlight); }
+.faq summary .mark { font-family: var(--font-mono); flex: none; transition: rotate 250ms var(--spring); }
+.faq details[open] summary .mark { rotate: 45deg; }
+.faq details p { padding: 0 24px 24px; color: var(--text); max-width: 60ch; }
+
+/* ---------- CTA band ---------- */
+.cta-band { padding-block: clamp(64px, 10vw, 128px); border-top: var(--border); text-align: center; }
+.cta-band h2 { font-size: clamp(2rem, 4vw, 3.2rem); max-width: 20ch; margin-inline: auto; }
+.cta-band p { margin-top: 16px; color: var(--muted); }
+.cta-band .btn { margin-top: 32px; }
+
+/* ---------- footer ---------- */
+footer { border-top: var(--border); background: var(--text); color: var(--bg); }
+.footer-in {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding-block: 32px;
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+}
+.footer-in a { color: var(--bg); text-decoration-color: var(--accent); text-underline-offset: 3px; display: inline-flex; min-height: 44px; align-items: center; padding-inline: 4px; }
+.footer-in a:hover { color: var(--highlight); }
+.footer-links { display: flex; flex-wrap: wrap; gap: 16px; list-style: none; }
+
+/* ---------- responsive ---------- */
+@media (max-width: 880px) {
+  .hero-grid { grid-template-columns: minmax(0, 1fr); }
+  .price-block { justify-self: start; margin-top: 16px; }
+  .views-grid { grid-template-columns: minmax(0, 1fr); }
+  .proof-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tiers { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 720px) {
+  .nav-toggle { display: inline-flex; }
+  .nav-links {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    background: var(--bg);
+    border-bottom: var(--border);
+    padding: 16px;
+    gap: 4px;
+    display: none;
+  }
+  .nav-links.open { display: flex; }
+  .nav-links a:not(.btn) { min-height: 48px; }
+  .nav-links .btn { margin-top: 8px; }
+}
+@media (max-width: 560px) {
+  .proof-grid { grid-template-columns: minmax(0, 1fr); }
+  .board { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header>
+  <div class="wrap nav">
+    <a class="logo" href="#" aria-label="TaskFlow home">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+        <rect x="2" y="2" width="24" height="24" rx="6" fill="#FF4D6D" stroke="#201A33" stroke-width="2"/>
+        <path d="M8 14.5l4 4 8-9" stroke="#FFF8EF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      TaskFlow
+    </a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="Open menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/>
+      </svg>
+    </button>
+    <nav aria-label="Main">
+      <ul class="nav-links" id="site-nav">
+        <li><a href="#plan">What is free</a></li>
+        <li><a href="#views">Views</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#faq">FAQ</a></li>
+        <li><a class="btn btn-primary" href="#pricing">Start free</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- HERO: Stat-Led. The price is the composition. -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <h1 class="reveal">Plan the sprint. See who is doing what. Ship on Friday.</h1>
+        <p class="hero-sub reveal">TaskFlow keeps every task, owner, and deadline on one board your whole team can actually read.</p>
+        <div class="hero-cta reveal">
+          <a class="btn btn-primary" href="#pricing">Start free</a>
+          <a class="btn btn-ghost" href="#views">See the board</a>
+        </div>
+        <p class="hero-fine reveal">No credit card. No trial clock. Free is a plan, not a demo.</p>
+      </div>
+      <div class="price-block reveal-late">
+        <span class="price-slab" aria-hidden="true"></span>
+        <span class="price-figure">$0</span>
+        <span class="price-caption">per month for the core product</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROOF: strict grid itemizing the number above -->
+  <section class="proof" id="plan">
+    <div class="wrap">
+      <div class="proof-head">
+        <p class="eyebrow">The free plan, itemized</p>
+        <h2>That $0 is not a teaser. It is the whole core product.</h2>
+      </div>
+      <ul class="proof-grid" role="list">
+        <li class="proof-cell">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
+          <h3>Unlimited tasks</h3>
+          <p>Every task holds an owner, a due date, comments, and attachments. No caps, no archive tax.</p>
+          <span class="spec">TASKS: UNLIMITED</span>
+        </li>
+        <li class="proof-cell">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M8 4v4"/><path d="M16 4v4"/></svg>
+          <h3>Three boards</h3>
+          <p>Enough for a product, an ops queue, and a hiring pipeline. Most small teams never fill them.</p>
+          <span class="spec">BOARDS: 3</span>
+        </li>
+        <li class="proof-cell">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M21 21v-2a4 4 0 0 0-3-3.87"/></svg>
+          <h3>Ten teammates</h3>
+          <p>Invite the whole team. Everyone gets full edit access, not view-only seats.</p>
+          <span class="spec">SEATS: 10</span>
+        </li>
+        <li class="proof-cell">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>
+          <h3>Timeline and calendar</h3>
+          <p>The same tasks, re-read as a schedule. Drag a bar, and the due date moves with it.</p>
+          <span class="spec">VIEWS: BOARD / TIMELINE / CALENDAR</span>
+        </li>
+        <li class="proof-cell">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+          <h3>File attachments</h3>
+          <p>Specs, screenshots, and contracts live on the task they belong to, up to 100 MB each.</p>
+          <span class="spec">FILES: 100 MB / FILE</span>
+        </li>
+        <li class="proof-cell">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          <h3>Keyboard first</h3>
+          <p>Create, assign, and move tasks without touching the mouse. The palette knows every command.</p>
+          <span class="spec">SHORTCUT: CMD+K</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- VIEWS: quiet section, one demo board -->
+  <section class="views" id="views">
+    <div class="wrap views-grid">
+      <div class="views-copy">
+        <h2>One board. Three ways to read it.</h2>
+        <p>Tasks live in one place. The board shows flow, the timeline shows overlap, the calendar shows deadlines. Change a task anywhere and the other two views already know.</p>
+        <ul class="view-list">
+          <li><span class="k">B</span><span>Board, for standup: what moved since yesterday.</span></li>
+          <li><span class="k">T</span><span>Timeline, for planning: what collides next week.</span></li>
+          <li><span class="k">C</span><span>Calendar, for deadlines: what Friday actually holds.</span></li>
+        </ul>
+      </div>
+      <div class="board" role="img" aria-label="Example TaskFlow board with To do, In progress, and Done columns of sample tasks">
+        <div class="board-col">
+          <div class="board-col-head"><span>TO DO</span><span class="board-count">3</span></div>
+          <div class="task"><span class="task-tag tag-design">design</span>Draft onboarding email copy</div>
+          <div class="task"><span class="task-tag tag-build">build</span>Rate-limit the invite endpoint</div>
+          <div class="task"><span class="task-tag tag-ship">ship</span>Cut v2.4 release notes</div>
+        </div>
+        <div class="board-col">
+          <div class="board-col-head"><span>IN PROGRESS</span><span class="board-count">2</span></div>
+          <div class="task"><span class="task-tag tag-build">build</span>Calendar view: drag to reschedule</div>
+          <div class="task"><span class="task-tag tag-design">design</span>Empty-state illustrations</div>
+        </div>
+        <div class="board-col">
+          <div class="board-col-head"><span>DONE</span><span class="board-count">0</span></div>
+          <div class="board-empty">Nothing shipped yet. Friday is coming.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="pricing" id="pricing">
+    <div class="wrap">
+      <div class="pricing-head">
+        <p class="eyebrow">Pricing</p>
+        <h2>Free until your team outgrows it. Cheap after.</h2>
+      </div>
+      <div class="billing">
+        <span id="billing-label">Bill yearly</span>
+        <button class="switch" role="switch" aria-checked="true" aria-labelledby="billing-label" id="billing-switch">
+          <span class="knob" aria-hidden="true"></span>
+        </button>
+        <span class="billing-note" id="billing-note">Yearly billing: two months free.</span>
+      </div>
+      <div class="tiers">
+        <div class="tier">
+          <h3 class="tier-name">Free</h3>
+          <p class="tier-price">$0 <span class="per">forever</span></p>
+          <ul>
+            <li>Unlimited tasks</li>
+            <li>3 boards, 10 teammates</li>
+            <li>Board, timeline, calendar</li>
+            <li>100 MB file attachments</li>
+          </ul>
+          <a class="btn" href="#pricing" aria-describedby="signup-note">Start free</a>
+        </div>
+        <div class="tier tier-feature">
+          <span class="tier-flag">Most teams pick this</span>
+          <h3 class="tier-name">Pro</h3>
+          <p class="tier-price"><span data-price data-monthly="$10" data-yearly="$8">$8</span> <span class="per" data-per data-monthly="per user / month" data-yearly="per user / month, billed yearly">per user / month, billed yearly</span></p>
+          <ul>
+            <li>Everything in Free</li>
+            <li>Unlimited boards and teammates</li>
+            <li>Recurring tasks and dependencies</li>
+            <li>Private boards and guest access</li>
+          </ul>
+          <a class="btn btn-primary" href="#pricing">Start Pro trial</a>
+        </div>
+        <div class="tier">
+          <h3 class="tier-name">Team</h3>
+          <p class="tier-price"><span data-price data-monthly="$17" data-yearly="$14">$14</span> <span class="per" data-per data-monthly="per user / month" data-yearly="per user / month, billed yearly">per user / month, billed yearly</span></p>
+          <ul>
+            <li>Everything in Pro</li>
+            <li>SSO and SCIM provisioning</li>
+            <li>Workload view across boards</li>
+            <li>Priority support, 99.9% uptime SLA</li>
+          </ul>
+          <a class="btn" href="#pricing">Talk to us</a>
+        </div>
+      </div>
+      <p class="hero-fine pricing-note" id="signup-note">Downgrades keep your data. Boards over the free limit go read-only, never deleted.</p>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq" id="faq">
+    <div class="wrap">
+      <h2>Fair questions</h2>
+      <div class="faq-list">
+        <details>
+          <summary>Why is the core product free? <span class="mark" aria-hidden="true">+</span></summary>
+          <p>Because paying to evaluate a project tool is backwards. Teams that outgrow three boards upgrade on their own. That conversion is our business model, stated plainly.</p>
+        </details>
+        <details>
+          <summary>What happens when we pass 10 teammates? <span class="mark" aria-hidden="true">+</span></summary>
+          <p>Nothing breaks. The eleventh invite prompts an upgrade to Pro. Until you accept it, everything you already have keeps working exactly as before.</p>
+        </details>
+        <details>
+          <summary>Can we import from our current tool? <span class="mark" aria-hidden="true">+</span></summary>
+          <p>Yes. TaskFlow imports CSV exports from Trello, Asana, and Jira, and maps columns to board lists during import. Your task history comes with you.</p>
+        </details>
+        <details>
+          <summary>Who owns our data if we leave? <span class="mark" aria-hidden="true">+</span></summary>
+          <p>You do. Export every board to CSV or JSON at any time, on any plan, including Free. Deleting your workspace removes it from our servers within 30 days.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA band -->
+  <section class="cta-band">
+    <div class="wrap">
+      <h2>Your next sprint could be on a board by lunch.</h2>
+      <p>Set up takes about four minutes. Importing your old tool takes one more.</p>
+      <a class="btn btn-primary" href="#pricing">Start free</a>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap footer-in">
+    <span>TaskFlow. Made for small teams with big boards.</span>
+    <ul class="footer-links">
+      <li><a href="#plan">Free plan</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="#main">Back to top</a></li>
+    </ul>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  // Mobile nav toggle
+  var toggle = document.querySelector(".nav-toggle");
+  var links = document.getElementById("site-nav");
+  toggle.addEventListener("click", function () {
+    var open = links.classList.toggle("open");
+    toggle.setAttribute("aria-expanded", String(open));
+    toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+  });
+  links.addEventListener("click", function (e) {
+    if (e.target.closest("a") && links.classList.contains("open")) {
+      links.classList.remove("open");
+      toggle.setAttribute("aria-expanded", "false");
+      toggle.setAttribute("aria-label", "Open menu");
+    }
+  });
+
+  // Billing period switch
+  var sw = document.getElementById("billing-switch");
+  var note = document.getElementById("billing-note");
+  var label = document.getElementById("billing-label");
+  sw.addEventListener("click", function () {
+    var yearly = sw.getAttribute("aria-checked") !== "true";
+    sw.setAttribute("aria-checked", String(yearly));
+    label.textContent = yearly ? "Bill yearly" : "Bill monthly";
+    note.textContent = yearly ? "Yearly billing: two months free." : "Monthly billing: cancel any time.";
+    document.querySelectorAll("[data-price]").forEach(function (el) {
+      el.textContent = yearly ? el.dataset.yearly : el.dataset.monthly;
+    });
+    document.querySelectorAll("[data-per]").forEach(function (el) {
+      el.textContent = yearly ? el.dataset.yearly : el.dataset.monthly;
+    });
+  });
+})();
+</script>
+</body>
+</html>

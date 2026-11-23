@@ -1,5 +1,24 @@
 # Changelog
 
+## v3.0.0 (2026-11-23)
+
+The product release. The quest is unchanged: draw one direction, lock it, clear the gate. The repository now ships as a package, and the research archive is no longer the front door.
+
+### Package
+
+- Published as `@hxp-tools/goddesign`. The command is `goddesign`. `npx @hxp-tools/goddesign --claude --global` copies the skill into the host. `scripts/install.sh` runs that same installer.
+- Claude Code, Codex, and Cursor are the hosts. `--all` installs every one. `--check` verifies. `--uninstall` removes only the `goddesign` directory.
+
+### The board
+
+- README, hero, and quest map use the Godpowers board: ink field `#101722`, mint stages `#4FD1A1`, coral boss gate `#FF6B57`.
+- GitHub about is one line. The long evidence essay left the README. One brief drawn seven ways stays, as a picture.
+
+### What left the tree
+
+- `validation/` (studies, protocols, research notes, run writeups, and the comparison harness `scripts/arm-test.mjs`) is removed. Those notes remain in git history before this tag.
+- The HTML pages the source scan is calibrated against moved to `test/corpus/`. The separation test still requires skill-run pages to stay at or under two failures, and comparison pages to fail.
+
 ## v2.1.0 (2026-10-24)
 
 The sweep reads Rust frontends. `.rs` was not a scannable extension, so every edit to a Leptos, Yew, or Dioxus component exited 2 with `SWEEP UNAVAILABLE`, and the run was reported as `DEGRADED: no sweep` with the Banned list checked by hand. On the owner's Leptos project that happened in three sessions on 2026-10-24. No rule, threshold, severity, or exit code changes.

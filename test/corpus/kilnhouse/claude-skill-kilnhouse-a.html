@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kilnhouse - studio management for ceramics studios</title>
+<meta name="description" content="Kilnhouse runs your class schedule, kiln firing queue, and member billing in one place, so you can get back to the wheel.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400&display=swap" rel="stylesheet">
+<style>
+/* goddesign | structure: Letter | direction: Terminal Core (amber variant) | accent: 72deg */
+/* seed 2222006627 | jitter h-4 L+0.00 r-2px (radius 0) | neutrals re-tinted warm for the row's amber variant | IBM Plex Mono 600 display, IBM Plex Sans 400 body */
+
+:root {
+  --bg: #100D09;
+  --surface: #1A1610;
+  --text: #EDE4D3;
+  --muted: #A89C86;
+  --line: #2A2318;
+  --accent: oklch(from #FFB000 l c calc(h - 4));
+  --accent-hover: oklch(from var(--accent) calc(l - 0.1) c h);
+  --accent-dim: oklch(from var(--accent) l c h / 0.35);
+
+  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+
+  /* type scale, ratio 1.25, base 17px */
+  --fs--1: 0.85rem;
+  --fs-0: 1.0625rem;
+  --fs-1: 1.33rem;
+  --fs-2: 1.66rem;
+  --fs-4: 2.59rem;
+  --fs-hero: clamp(1.9rem, 1.2rem + 2.8vw, 3.3rem);
+
+  /* spacing tokens: 4 8 12 16 24 32 48 64 96 128 */
+  --s-1: 4px;  --s-2: 8px;  --s-3: 12px; --s-4: 16px; --s-5: 24px;
+  --s-6: 32px; --s-7: 48px; --s-8: 64px; --s-9: 96px; --s-10: 128px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { overflow-x: clip; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: var(--fs-0);
+  line-height: 1.6;
+  overflow-x: clip;
+}
+
+::selection { background: var(--accent); color: var(--bg); }
+
+h1, h2 {
+  font-family: var(--mono);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  line-height: 1.15;
+  text-wrap: balance;
+  margin: 0;
+}
+
+p { margin: 0 0 var(--s-5); text-wrap: pretty; }
+
+a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.18s cubic-bezier(0.25, 1, 0.5, 1);
+}
+a:hover { color: var(--accent-hover); text-decoration-thickness: 2px; }
+a:active { color: var(--accent-hover); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.skip-link {
+  position: absolute;
+  left: var(--s-4);
+  top: -100px;
+  z-index: 10;
+  background: var(--accent);
+  color: var(--bg);
+  font-family: var(--mono);
+  font-size: var(--fs--1);
+  padding: var(--s-3) var(--s-4);
+  text-decoration: none;
+}
+.skip-link:focus-visible { top: var(--s-4); color: var(--bg); }
+
+/* ---------- nav ---------- */
+
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-3) var(--s-5);
+  padding: var(--s-4) var(--s-5);
+  border-bottom: 1px solid var(--line);
+}
+.wordmark {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: var(--fs-0);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text);
+  text-decoration: none;
+  margin-right: auto;
+}
+.wordmark:hover { color: var(--accent); }
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-family: var(--mono);
+  font-size: var(--fs--1);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 0 var(--s-1);
+}
+.nav-link:hover { color: var(--accent); }
+.nav-link:active { color: var(--accent-hover); }
+
+/* ---------- buttons ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: var(--s-3) var(--s-5);
+  background: var(--accent);
+  color: var(--bg);
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: var(--fs--1);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: 1px solid var(--accent);
+  cursor: pointer;
+  transition: transform 0.18s cubic-bezier(0.25, 1, 0.5, 1),
+              background-color 0.18s cubic-bezier(0.25, 1, 0.5, 1),
+              border-color 0.18s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.btn:hover { background: var(--accent-hover); border-color: var(--accent-hover); color: var(--bg); transform: translateY(-1px); }
+.btn:active { transform: scale(0.97); }
+.btn:disabled, .btn[aria-disabled="true"] {
+  background: var(--line);
+  border-color: var(--line);
+  color: var(--muted);
+  cursor: not-allowed;
+  transform: none;
+}
+.btn-ghost { background: transparent; color: var(--text); border-color: var(--line); }
+.btn-ghost:hover { background: transparent; color: var(--accent); border-color: var(--accent); }
+
+/* ---------- hero ---------- */
+
+.hero {
+  padding: var(--s-9) var(--s-5) var(--s-9);
+  max-width: 880px;
+  margin-inline: auto;
+}
+.hero-meta {
+  font-family: var(--mono);
+  font-size: var(--fs--1);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 var(--s-6);
+}
+.hero-meta span { display: block; }
+.hero h1 {
+  font-size: var(--fs-hero);
+  max-width: 22ch;
+  margin-bottom: var(--s-6);
+  min-height: 2.3em;
+}
+.cursor {
+  display: inline-block;
+  width: 0.55ch;
+  height: 0.95em;
+  background: var(--accent);
+  vertical-align: text-bottom;
+  margin-left: 0.15ch;
+}
+.hero-sub {
+  font-size: var(--fs-1);
+  max-width: 46ch;
+  margin-bottom: var(--s-6);
+}
+.hero-cta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-4); }
+.hero-note {
+  font-family: var(--mono);
+  font-size: var(--fs--1);
+  color: var(--muted);
+  margin: 0;
+}
+
+/* ---------- letter body ---------- */
+
+.letter {
+  max-width: 66ch;
+  margin-inline: auto;
+  padding: var(--s-8) var(--s-5) var(--s-9);
+}
+.letter section { padding-top: var(--s-8); }
+.letter section:first-child { padding-top: 0; }
+.letter h2 {
+  font-size: var(--fs-2);
+  margin-bottom: var(--s-5);
+}
+.letter h2::before { content: "> "; color: var(--accent); }
+
+.queue {
+  margin: var(--s-6) 0 var(--s-5);
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+.queue pre {
+  margin: 0;
+  padding: var(--s-5);
+  font-family: var(--mono);
+  font-size: var(--fs--1);
+  line-height: 1.7;
+  color: var(--text);
+  overflow-x: auto;
+}
+.queue figcaption {
+  font-family: var(--mono);
+  font-size: var(--fs--1);
+  color: var(--muted);
+  padding: var(--s-3) var(--s-5);
+  border-top: 1px solid var(--line);
+}
+
+/* ---------- pricing ---------- */
+
+.pricing {
+  background: var(--surface);
+  border-block: 1px solid var(--line);
+  padding: var(--s-9) var(--s-5) var(--s-10);
+}
+.pricing-inner { max-width: 1080px; margin-inline: auto; }
+.pricing h2 { font-size: var(--fs-2); margin-bottom: var(--s-5); }
+.pricing h2::before { content: "> "; color: var(--accent); }
+.pricing-intro { max-width: 52ch; margin-bottom: var(--s-7); }
+
+.tiers { container-type: inline-size; }
+.tier-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+@container (min-width: 720px) {
+  .tier-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+.tier {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  padding: var(--s-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+.tier-featured { border-color: var(--accent); }
+.tier h3 {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: var(--fs-0);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 0;
+}
+.tier-tag {
+  font-family: var(--mono);
+  font-size: var(--fs--1);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.tier-price {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: var(--fs-4);
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.tier-price small {
+  font-size: var(--fs--1);
+  font-weight: 400;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.tier-desc { color: var(--muted); margin: 0; }
+.tier ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--s-2);
+  flex-grow: 1;
+}
+.tier li { padding-left: var(--s-4); position: relative; }
+.tier li::before { content: "+"; position: absolute; left: 0; color: var(--muted); }
+.tier .btn { align-self: stretch; }
+
+/* ---------- sign-off ---------- */
+
+.signoff {
+  max-width: 66ch;
+  margin-inline: auto;
+  padding: var(--s-9) var(--s-5);
+}
+.signoff .signature {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: var(--fs-1);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: var(--s-6) 0 0;
+}
+.signoff .ps {
+  font-family: var(--mono);
+  font-size: var(--fs--1);
+  color: var(--muted);
+  margin: var(--s-6) 0 0;
+}
+
+/* ---------- footer ---------- */
+
+footer {
+  border-top: 1px solid var(--line);
+  padding: var(--s-7) var(--s-5);
+}
+.footer-grid {
+  max-width: 1080px;
+  margin-inline: auto;
+  display: grid;
+  grid-template-areas: "brand links" "fine fine";
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--s-6) var(--s-5);
+}
+.footer-brand { grid-area: brand; }
+.footer-brand p { color: var(--muted); font-size: var(--fs--1); margin: var(--s-2) 0 0; }
+.footer-links {
+  grid-area: links;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2) var(--s-5);
+  align-items: start;
+}
+.footer-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-family: var(--mono);
+  font-size: var(--fs--1);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+}
+.footer-links a:hover { color: var(--accent); }
+.fine-print {
+  grid-area: fine;
+  font-family: var(--mono);
+  font-size: var(--fs--1);
+  color: var(--muted);
+  margin: 0;
+}
+@media (max-width: 640px) {
+  .footer-grid { grid-template-areas: "brand" "links" "fine"; grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ---------- motion ---------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+  .cursor { animation: blink 1.1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#letter">Skip to the letter</a>
+
+<header>
+  <nav class="nav" aria-label="Main">
+    <a class="wordmark" href="#top">Kilnhouse</a>
+    <a class="nav-link" href="#scheduling">Features</a>
+    <a class="nav-link" href="#pricing">Pricing</a>
+    <a class="btn" href="#pricing">Start free trial</a>
+  </nav>
+</header>
+
+<main id="top">
+  <section class="hero" aria-labelledby="salutation">
+    <p class="hero-meta">
+      <span>From: the Kilnhouse team</span>
+      <span>Re: the whiteboard next to your kiln</span>
+    </p>
+    <h1 id="salutation" aria-label="To everyone who runs a ceramics studio,">
+      <span class="typed" aria-hidden="true" data-text="To everyone who runs a ceramics studio,">To everyone who runs a ceramics studio,</span><span class="cursor" aria-hidden="true"></span>
+    </h1>
+    <p class="hero-sub">Kilnhouse runs your class schedule, kiln queue, and member billing, so you can get back to the wheel.</p>
+    <div class="hero-cta">
+      <a class="btn" href="#pricing">Start free trial</a>
+      <p class="hero-note">Free for 30 days. No card required.</p>
+    </div>
+  </section>
+
+  <div class="letter" id="letter">
+    <section aria-label="Opening">
+      <p>If your studio is anything like the ones we come from, it runs on three systems: a spreadsheet for classes, a whiteboard grid for the kilns, and a drawer of punch cards for the money. All three work, right up until the Tuesday they don't.</p>
+      <p>Kilnhouse replaces those three systems with one quiet piece of software. Here is exactly what it does.</p>
+    </section>
+
+    <section id="scheduling" aria-labelledby="scheduling-h">
+      <h2 id="scheduling-h">Class scheduling</h2>
+      <p>Publish your term once. Members book and pay online, waitlists backfill cancellations on their own, and every instructor sees their roster before they walk in. When a wheel breaks and you cancel a session, everyone booked gets the message and a class credit without you touching a phone.</p>
+    </section>
+
+    <section id="firing" aria-labelledby="firing-h">
+      <h2 id="firing-h">The firing queue</h2>
+      <p>The whiteboard grid, made honest. Members tag their pieces for bisque or glaze, you load by cone and shelf space, and the queue updates the moment a kiln door closes. When the glaze fire comes out, everyone with work inside gets a note. No more "is my mug out yet" at the front desk.</p>
+      <figure class="queue">
+        <pre>KILN-01   SKUTT 1027     STATUS: COOLING   742 C
+------------------------------------------------
+NOW    glaze   cone 6    unload ~ 2:40 pm
+NEXT   bisque  cone 04   12 shelves tagged
+SAT    glaze   cone 6    4 shelves free
+NOTIFY 14 members on unload</pre>
+        <figcaption>An example queue, the morning after a cone 6 glaze firing.</figcaption>
+      </figure>
+    </section>
+
+    <section id="billing" aria-labelledby="billing-h">
+      <h2 id="billing-h">Member billing</h2>
+      <p>Memberships, class fees, clay, and firing charges land on one monthly invoice, and autopay collects it. A member's page shows what they owe, what they fired, and when their plan renews. The drawer of punch cards is retired with full honors.</p>
+    </section>
+  </div>
+
+  <section class="pricing" id="pricing" aria-labelledby="pricing-h">
+    <div class="pricing-inner">
+      <h2 id="pricing-h">What it costs</h2>
+      <p class="pricing-intro">Three plans, priced by studio size. Every plan starts with 30 days free, and you can change plans whenever your studio does.</p>
+      <div class="tiers">
+        <ul class="tier-grid">
+          <li class="tier">
+            <h3>Home</h3>
+            <p class="tier-price">$19<small> /month</small></p>
+            <p class="tier-desc">For a kiln in the garage and a handful of students.</p>
+            <ul>
+              <li>1 kiln</li>
+              <li>Up to 25 members</li>
+              <li>Class scheduling and online booking</li>
+              <li>Firing queue with unload notices</li>
+            </ul>
+            <a class="btn btn-ghost" href="#pricing" aria-describedby="placeholder-note">Start free trial</a>
+          </li>
+          <li class="tier tier-featured">
+            <p class="tier-tag">Most studios pick this</p>
+            <h3>Studio</h3>
+            <p class="tier-price">$49<small> /month</small></p>
+            <p class="tier-desc">For a working community studio with real member traffic.</p>
+            <ul>
+              <li>3 kilns</li>
+              <li>Up to 150 members</li>
+              <li>Everything in Home</li>
+              <li>Member billing with autopay</li>
+              <li>Waitlists and session credits</li>
+            </ul>
+            <a class="btn" href="#pricing" aria-describedby="placeholder-note">Start free trial</a>
+          </li>
+          <li class="tier">
+            <h3>Campus</h3>
+            <p class="tier-price">$99<small> /month</small></p>
+            <p class="tier-desc">For schools and multi-room programs.</p>
+            <ul>
+              <li>Unlimited kilns and members</li>
+              <li>Every Kilnhouse feature</li>
+              <li>Multiple locations, one account</li>
+              <li>We migrate your spreadsheet for you</li>
+            </ul>
+            <a class="btn btn-ghost" href="#pricing" aria-describedby="placeholder-note">Start free trial</a>
+          </li>
+        </ul>
+      </div>
+      <p class="hero-note" id="placeholder-note">Signup opens with the public beta; trial buttons on this page are placeholders until then.</p>
+    </div>
+  </section>
+
+  <section class="signoff" aria-label="Sign-off">
+    <p>That is the whole pitch. If it sounds like your studio, start a trial and set up your first kiln tonight.</p>
+    <p>See you at the wheel,</p>
+    <p class="signature">The Kilnhouse team</p>
+    <p class="ps">P.S. The whiteboard can stay on the wall. For sentimental reasons.</p>
+  </section>
+</main>
+
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a class="wordmark" href="#top">Kilnhouse</a>
+      <p>Studio management for ceramics studios.</p>
+    </div>
+    <div class="footer-links">
+      <a href="#scheduling">Scheduling</a>
+      <a href="#firing">Firing queue</a>
+      <a href="#billing">Billing</a>
+      <a href="#pricing">Pricing</a>
+    </div>
+    <p class="fine-print">&copy; 2026 Kilnhouse.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var typed = document.querySelector('.typed');
+  if (!typed) return;
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce) return; /* full salutation already in the DOM */
+  var full = typed.dataset.text;
+  typed.textContent = '';
+  var i = 0;
+  var timer = setInterval(function () {
+    i += 1;
+    typed.textContent = full.slice(0, i);
+    if (i >= full.length) clearInterval(timer);
+  }, 30);
+})();
+</script>
+</body>
+</html>

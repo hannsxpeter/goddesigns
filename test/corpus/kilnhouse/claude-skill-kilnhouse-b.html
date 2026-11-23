@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kilnhouse: studio management for ceramics studios</title>
+<meta name="description" content="Kilnhouse runs class scheduling, the kiln firing queue, and member billing for ceramics studios. One system that knows your kilns.">
+<meta name="theme-color" content="#F7F7F5">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;800&family=Schibsted+Grotesk:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* goddesign | structure: Manifesto | direction: Swiss International | accent: 23 */
+/* seed 1281978912 | direction 0 Swiss International | structure 5 Manifesto
+   tokens (post-jitter): bg #F7F7F5 surface #EDEDE9 text #111114 muted #55565C rule #D8D8D2 accent #E62D3C
+   jitter h-9 L-0.01 r0 | type Archivo 800 / Schibsted Grotesk 400,500 | radius 0 | motion 150ms linear fades */
+
+:root {
+  --bg: oklch(from #FAFAF8 calc(l - 0.01) c h);
+  --surface: oklch(from #F0F0EC calc(l - 0.01) c h);
+  --text: #111114;
+  --muted: #55565C;
+  --rule: #D8D8D2;
+  --accent: oklch(from #E63312 l c calc(h - 9));
+  --accent-text: oklch(from var(--accent) 0.52 c h);
+  --accent-text-hover: oklch(from var(--accent) 0.44 c h);
+  --ink-hover: oklch(from var(--text) calc(l + 0.14) c h);
+  --font-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --rail: 6px;
+  --pad-inline: clamp(1.5rem, 5vw, 3rem);
+  --measure: 60ch;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { overflow-x: clip; }
+
+body {
+  overflow-x: clip;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection { background: var(--accent); color: var(--bg); }
+
+p { text-wrap: pretty; }
+
+h1, h2 { text-wrap: balance; }
+
+a { color: var(--accent-text); text-decoration: underline; text-underline-offset: 3px; transition: color 150ms linear; }
+a:hover { color: var(--accent-text-hover); }
+a:active { color: var(--text); }
+
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.skip {
+  position: fixed;
+  inset-inline-start: var(--pad-inline);
+  inset-block-start: 0.5rem;
+  z-index: 10;
+  background: var(--text);
+  color: var(--bg);
+  padding: 0.75rem 1rem;
+  font: 500 0.875rem/1 var(--font-display);
+  text-decoration: none;
+  translate: 0 -300%;
+}
+.skip:focus-visible { translate: 0 0; color: var(--bg); }
+
+/* ---------- shell ---------- */
+
+.wrap {
+  width: 100%;
+  max-width: 76rem;
+  margin-inline: auto;
+  padding-inline: var(--pad-inline);
+}
+
+/* the signature: one thick red rule the whole page hangs from */
+.band { padding-block: 0; }
+.rail {
+  border-inline-start: var(--rail) solid var(--accent);
+  padding-inline-start: clamp(1rem, 4vw, 3rem);
+  padding-block: clamp(4rem, 8vw, 8rem);
+}
+
+.band-alt { background: var(--surface); }
+
+/* ---------- type ---------- */
+
+.shout {
+  font-family: var(--font-display);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+h1.shout { font-size: clamp(3rem, 10.5vw, 9.5rem); }
+h2.shout { font-size: clamp(2.5rem, 8vw, 7rem); }
+
+.label {
+  font-family: var(--font-display);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+.lead {
+  font-weight: 500;
+  font-size: clamp(1.0625rem, 1.9vw, 1.42rem);
+  line-height: 1.5;
+  max-width: 40ch;
+}
+
+/* ---------- buttons ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0.75rem 1.5rem;
+  font: 800 0.9375rem/1 var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  border: 1px solid var(--text);
+  cursor: pointer;
+  transition: background-color 150ms linear, color 150ms linear, border-color 150ms linear;
+}
+
+.btn-primary { background: var(--text); color: var(--bg); }
+.btn-primary:hover { background: var(--ink-hover); border-color: var(--ink-hover); color: var(--bg); }
+.btn-primary:active { background: var(--text); border-color: var(--text); color: var(--bg); }
+
+.btn-ghost { background: transparent; color: var(--text); }
+.btn-ghost:hover { background: var(--surface); color: var(--text); }
+.band-alt .btn-ghost:hover { background: var(--bg); }
+.btn-ghost:active { background: var(--rule); color: var(--text); }
+
+.btn:disabled, .btn[aria-disabled="true"] {
+  background: var(--rule);
+  border-color: var(--rule);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+/* ---------- nav ---------- */
+
+.top {
+  border-block-end: 1px solid var(--rule);
+  background: var(--bg);
+}
+
+.top .wrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 2rem;
+  padding-block: 1rem;
+}
+
+.brand {
+  font: 800 1.0625rem/1 var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  text-decoration: none;
+  padding-block: 0.75rem;
+}
+.brand:hover { color: var(--accent-text); }
+
+.top nav { margin-inline-start: auto; }
+
+.top ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.5rem;
+  list-style: none;
+}
+
+.top nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0.5rem 0.75rem;
+  font-weight: 500;
+  font-size: 0.9375rem;
+  color: var(--text);
+  text-decoration: none;
+}
+.top nav a:hover { color: var(--accent-text); }
+.top nav a:active { color: var(--accent-text-hover); }
+
+/* ---------- hero ---------- */
+
+.hero .rail { padding-block: clamp(4rem, 9vw, 8rem); }
+
+.hero p {
+  max-width: var(--measure);
+  margin-block-start: 2rem;
+  font-size: clamp(1.0625rem, 1.7vw, 1.42rem);
+}
+
+.cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-block-start: 3rem;
+}
+
+.cta-note {
+  margin-block-start: 1rem;
+  font-size: 0.9375rem;
+  color: var(--muted);
+}
+
+/* ---------- features ---------- */
+
+.feature { container-type: inline-size; }
+
+.detail {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 3rem;
+  margin-block-start: clamp(2rem, 4vw, 4rem);
+}
+
+.detail dl div {
+  display: grid;
+  grid-template-columns: minmax(0, 14rem) minmax(0, 1fr);
+  gap: 1rem 2rem;
+  padding-block: 1rem;
+  border-block-start: 1px solid var(--rule);
+}
+
+.detail dt { color: var(--text); padding-block-start: 0.125rem; }
+.detail dd { color: var(--muted); max-width: var(--measure); text-wrap: pretty; }
+
+@container (max-width: 47.9rem) {
+  .detail { grid-template-columns: minmax(0, 1fr); gap: 2rem; }
+  .detail dl div { grid-template-columns: minmax(0, 1fr); gap: 0.25rem; }
+}
+
+/* ---------- pricing ---------- */
+
+.pricing { container-type: inline-size; }
+
+.tiers {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-block-start: clamp(2rem, 4vw, 4rem);
+  border-block: 1px solid var(--rule);
+}
+
+.tier {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 2rem clamp(1rem, 2.5vw, 2rem);
+}
+
+.tier + .tier { border-inline-start: 1px solid var(--rule); }
+
+.tier-flag { color: var(--accent-text); min-height: 1.25rem; }
+
+.price {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 2.5rem;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.price small {
+  display: block;
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 0.9375rem;
+  letter-spacing: 0;
+  color: var(--muted);
+  margin-block-start: 0.25rem;
+}
+
+.tier > p { color: var(--muted); font-size: 0.9375rem; }
+
+.tier ul { list-style: none; flex-grow: 1; }
+
+.tier li {
+  padding-block: 0.5rem;
+  font-size: 0.9375rem;
+  border-block-start: 1px solid var(--rule);
+}
+.tier li:first-child { border-block-start: 0; }
+
+.tier .btn { align-self: stretch; }
+
+.pricing-note {
+  margin-block-start: 2rem;
+  color: var(--muted);
+  font-size: 0.9375rem;
+  max-width: var(--measure);
+}
+
+@container (max-width: 47.9rem) {
+  .tiers { grid-template-columns: minmax(0, 1fr); }
+  .tier + .tier { border-inline-start: 0; border-block-start: 1px solid var(--rule); }
+}
+
+/* ---------- footer ---------- */
+
+.foot { border-block-start: 1px solid var(--rule); }
+
+.foot .rail { padding-block: clamp(3rem, 6vw, 6rem); }
+
+.foot-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: 3rem;
+}
+
+.foot-brand { font: 800 1.0625rem/1 var(--font-display); text-transform: uppercase; letter-spacing: -0.02em; }
+
+.foot-grid p { color: var(--muted); font-size: 0.9375rem; max-width: 32ch; margin-block-start: 1rem; }
+
+.foot h2 { margin-block-end: 1rem; color: var(--muted); }
+
+.foot ul { list-style: none; }
+
+.foot li a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 0.9375rem;
+}
+.foot li a:hover { color: var(--accent-text); }
+
+.foot address { font-style: normal; font-size: 0.9375rem; color: var(--muted); overflow-wrap: anywhere; }
+.foot address a { color: var(--text); }
+.foot address a:hover { color: var(--accent-text); }
+
+.legal {
+  margin-block-start: 3rem;
+  padding-block-start: 1.5rem;
+  border-block-start: 1px solid var(--rule);
+  color: var(--muted);
+  font-size: 0.9375rem;
+}
+
+@media (max-width: 47.9rem) {
+  .foot-grid { grid-template-columns: minmax(0, 1fr); gap: 2rem; }
+  .top nav a, .foot li a { min-height: 2.75rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+</style>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#main">Kilnhouse</a>
+    <nav aria-label="Main">
+      <ul>
+        <li><a href="#scheduling">Scheduling</a></li>
+        <li><a href="#kilns">Kiln queue</a></li>
+        <li><a href="#billing">Billing</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+      </ul>
+    </nav>
+    <a class="btn btn-primary" href="#pricing">Start free trial</a>
+  </div>
+</header>
+
+<main id="main">
+
+  <section class="band hero" aria-labelledby="hero-h">
+    <div class="wrap">
+      <div class="rail">
+        <h1 class="shout" id="hero-h">The kiln does not wait.</h1>
+        <p>Class schedules, the firing queue, and member billing for ceramics studios: one system that knows your kilns.</p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="#pricing">Start free trial</a>
+          <a class="btn btn-ghost" href="#pricing">See pricing</a>
+        </div>
+        <p class="cta-note">14 days free. No card required.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="band band-alt feature" id="scheduling" aria-labelledby="scheduling-h">
+    <div class="wrap">
+      <div class="rail">
+        <h2 class="shout" id="scheduling-h">Every wheel full.</h2>
+        <div class="detail">
+          <p class="lead">One calendar for eight-week courses, weekend workshops, and open studio. Publish a term in an afternoon, not a week of spreadsheets.</p>
+          <dl>
+            <div>
+              <dt class="label">Seats and waitlists</dt>
+              <dd>When someone drops, the first person on the waitlist is enrolled and emailed. No manual shuffle.</dd>
+            </div>
+            <div>
+              <dt class="label">Capacity by equipment</dt>
+              <dd>Cap enrollment by wheels, seats, or shelf space, so a full class still means a workable room.</dd>
+            </div>
+            <div>
+              <dt class="label">Instructor schedules</dt>
+              <dd>Teaching loads, sub swaps, and per-session pay tallies in the same calendar the front desk uses.</dd>
+            </div>
+            <div>
+              <dt class="label">Open studio blocks</dt>
+              <dd>Members book bench time against real capacity, and nobody shows up to a full room.</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band feature" id="kilns" aria-labelledby="kilns-h">
+    <div class="wrap">
+      <div class="rail">
+        <h2 class="shout" id="kilns-h">Cone 6, on time.</h2>
+        <div class="detail">
+          <p class="lead">A firing queue for every kiln you run. Bisque and glaze loads line up by cone, and nothing gets fired out of order.</p>
+          <dl>
+            <div>
+              <dt class="label">Queue per kiln</dt>
+              <dd>Each kiln keeps its own bisque and glaze queue, ordered by cone and load date.</dd>
+            </div>
+            <div>
+              <dt class="label">Load manifests</dt>
+              <dd>Every pot in a load is tied to a member, so unloading day ends without a mystery shelf.</dd>
+            </div>
+            <div>
+              <dt class="label">Firing presets</dt>
+              <dd>Cone 04 bisque, cone 6 glaze, slow cools and holds: techs pick from your schedules, not from memory.</dd>
+            </div>
+            <div>
+              <dt class="label">Firing log</dt>
+              <dd>Who loaded, who unloaded, what cone, how long. Every firing stays on the record.</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band band-alt feature" id="billing" aria-labelledby="billing-h">
+    <div class="wrap">
+      <div class="rail">
+        <h2 class="shout" id="billing-h">No one chases dues.</h2>
+        <div class="detail">
+          <p class="lead">Membership, classes, clay, and firing fees on one statement. Autopay runs monthly, and the awkward reminder email retires.</p>
+          <dl>
+            <div>
+              <dt class="label">Membership autopay</dt>
+              <dd>Dues charge on schedule. Failed cards retry, then flag the front desk instead of piling up.</dd>
+            </div>
+            <div>
+              <dt class="label">Prorated changes</dt>
+              <dd>Mid-month joins, pauses, and plan changes prorate to the day, no calculator involved.</dd>
+            </div>
+            <div>
+              <dt class="label">Firing fees, attached</dt>
+              <dd>Charge by shelf, half shelf, or weight. Fees post to the member the moment the load is logged.</dd>
+            </div>
+            <div>
+              <dt class="label">One ledger per member</dt>
+              <dd>Every class, bag of clay, and firing in one statement a member can actually read.</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band pricing" id="pricing" aria-labelledby="pricing-h">
+    <div class="wrap">
+      <div class="rail">
+        <h2 class="shout" id="pricing-h">Pick your size.</h2>
+        <div class="tiers">
+          <div class="tier">
+            <p class="label tier-flag" aria-hidden="true"></p>
+            <h3 class="label">Hobby</h3>
+            <p class="price">$49<small>per studio, per month</small></p>
+            <p>For teaching studios with one kiln and a waitlist on paper.</p>
+            <ul>
+              <li>1 kiln queue</li>
+              <li>Up to 60 members</li>
+              <li>Class scheduling and rosters</li>
+              <li>Autopay billing</li>
+              <li>Email support</li>
+            </ul>
+            <a class="btn btn-ghost" href="#pricing">Start free trial</a>
+          </div>
+          <div class="tier">
+            <p class="label tier-flag">Most studios choose this</p>
+            <h3 class="label">Studio</h3>
+            <p class="price">$99<small>per studio, per month</small></p>
+            <p>For working studios juggling classes, members, and three glaze days a week.</p>
+            <ul>
+              <li>3 kiln queues</li>
+              <li>Up to 200 members</li>
+              <li>Waitlists that fill themselves</li>
+              <li>Instructor pay tallies</li>
+              <li>Firing fees by shelf or weight</li>
+              <li>Priority support</li>
+            </ul>
+            <a class="btn btn-primary" href="#pricing">Start free trial</a>
+          </div>
+          <div class="tier">
+            <p class="label tier-flag" aria-hidden="true"></p>
+            <h3 class="label">Collective</h3>
+            <p class="price">$189<small>per studio, per month</small></p>
+            <p>For multi-kiln, multi-room studios and community art centers.</p>
+            <ul>
+              <li>Unlimited kilns and members</li>
+              <li>Multiple locations</li>
+              <li>Custom roles for techs and desk staff</li>
+              <li>CSV export and API access</li>
+              <li>Onboarding with a human</li>
+            </ul>
+            <a class="btn btn-ghost" href="#pricing">Start free trial</a>
+          </div>
+        </div>
+        <p class="pricing-note">Every plan starts with 14 free days, no card required. Prices are per studio, per month; change plans or cancel any time.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="band band-alt foot">
+  <div class="wrap">
+    <div class="rail">
+      <div class="foot-grid">
+        <div>
+          <p class="foot-brand">Kilnhouse</p>
+          <p>Studio management for ceramics studios: scheduling, kilns, and billing in one place.</p>
+        </div>
+        <nav aria-label="Footer">
+          <h2 class="label">Product</h2>
+          <ul>
+            <li><a href="#scheduling">Scheduling</a></li>
+            <li><a href="#kilns">Kiln queue</a></li>
+            <li><a href="#billing">Billing</a></li>
+            <li><a href="#pricing">Pricing</a></li>
+          </ul>
+        </nav>
+        <div>
+          <h2 class="label">Contact</h2>
+          <address>
+            <a href="mailto:hello@kilnhouse.example">hello@kilnhouse.example</a><br>
+            Mon to Fri, 9 to 5 Pacific
+          </address>
+        </div>
+      </div>
+      <p class="legal">&copy; 2026 Kilnhouse. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -16,8 +16,8 @@ does not install, update, copy, or phone home on behalf of the companion.
 
 - Process only content the user owns or is authorized to modify.
 - Never describe a cleaned result as proven human-made or undetectable.
-- Never clean `validation/`, frozen study inputs, receipts, manifests, signed
-  artifacts, or captured evidence. Provenance can be the evidence there.
+- Never clean frozen evidence, receipts, manifests, signed artifacts, or
+  captured fixtures. Provenance can be the evidence there.
 - Never make statistical rewriting or pixel regeneration automatic. Both can
   degrade the deliverable and require an explicit prompt request.
 - Never make a remote website crawl, model endpoint, or external detector a

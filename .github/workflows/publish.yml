@@ -1,0 +1,67 @@
+name: Publish to npm
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Use an npm that supports trusted publishing
+        run: npm install -g npm@11 && npm --version
+
+      - name: Verify release identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag_version="${GITHUB_REF_NAME#v}"
+          for file in package.json .claude-plugin/plugin.json; do
+            version="$(node -p "require('./$file').version")"
+            if [[ "$tag_version" != "$version" ]]; then
+              echo "Tag v$tag_version does not match $file version $version."
+              exit 1
+            fi
+          done
+          git fetch --no-tags origin +refs/heads/main:refs/remotes/origin/main
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" refs/remotes/origin/main; then
+            echo "Tagged commit is not on main."
+            exit 1
+          fi
+
+      - name: Release check
+        run: npm run release:check
+
+      - name: Publish
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(node -p "require('./package.json').version")"
+          if npm view "@hxp-tools/goddesign@$version" version >/dev/null 2>&1; then
+            echo "@hxp-tools/goddesign@$version is already published."
+            exit 1
+          fi
+          npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

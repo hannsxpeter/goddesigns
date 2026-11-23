@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ledgerbird | Bookkeeping for freelance creatives</title>
+<meta name="description" content="Ledgerbird captures your invoices, sorts your expenses, and estimates your quarterly taxes so you can get back to the work you actually love.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBFAF6;
+    --paper-deep:#F3F1E9;
+    --ink:#16233B;
+    --ink-soft:#4A5670;
+    --rule:#D8DFEA;
+    --rule-strong:#B9C4D6;
+    --vermilion:#E1471D;
+    --vermilion-deep:#B93613;
+    --leaf:#1E7A5A;
+    --leaf-wash:#E2EFE7;
+    --sun:#F5B32B;
+    --line-h:2.25rem;
+    --radius:14px;
+    --shadow-card:0 1px 2px rgba(22,35,59,.06), 0 12px 32px -12px rgba(22,35,59,.18);
+    --font-display:"Young Serif", Georgia, serif;
+    --font-body:"Instrument Sans", "Helvetica Neue", sans-serif;
+    --font-figures:"Spline Sans Mono", "Courier New", monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:var(--font-body);
+    color:var(--ink);
+    background:var(--paper);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  ::selection{background:var(--vermilion);color:var(--paper)}
+
+  /* ---------- ledger paper background ---------- */
+  .ruled{
+    background-image:
+      linear-gradient(to bottom, transparent calc(var(--line-h) - 1px), var(--rule) calc(var(--line-h) - 1px), var(--rule) var(--line-h));
+    background-size:100% var(--line-h);
+  }
+  .margin-line{position:relative}
+  .margin-line::before{
+    content:"";
+    position:absolute;inset:0 auto 0 0;
+    left:clamp(1.25rem, 6vw, 5.5rem);
+    width:2px;
+    background:rgba(225,71,29,.28);
+    pointer-events:none;
+  }
+  @media (max-width:720px){ .margin-line::before{display:none} }
+
+  h1,h2,h3{font-family:var(--font-display);font-weight:400;line-height:1.08;letter-spacing:-0.01em}
+  .figures{font-family:var(--font-figures);font-variant-numeric:tabular-nums}
+
+  .wrap{max-width:1120px;margin:0 auto;padding:0 clamp(1.25rem,5vw,2.5rem)}
+
+  .entry-label{
+    display:inline-flex;align-items:center;gap:.55rem;
+    font-size:.78rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--vermilion);
+  }
+  .entry-label::before{
+    content:"";width:2.2rem;height:2px;background:var(--vermilion);
+  }
+
+  /* ---------- nav ---------- */
+  header.site{
+    position:sticky;top:0;z-index:50;
+    background:rgba(251,250,246,.88);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--rule);
+  }
+  .nav{
+    display:flex;align-items:center;justify-content:space-between;
+    height:4.25rem;
+  }
+  .brand{display:flex;align-items:center;gap:.6rem;text-decoration:none;color:var(--ink)}
+  .brand-mark{width:2.1rem;height:2.1rem;flex:none}
+  .brand-name{font-family:var(--font-display);font-size:1.28rem}
+  .nav-links{display:flex;gap:2rem;list-style:none}
+  .nav-links a{
+    text-decoration:none;color:var(--ink-soft);font-weight:500;font-size:.95rem;
+    padding-bottom:2px;border-bottom:2px solid transparent;
+    transition:color .2s,border-color .2s;
+  }
+  .nav-links a:hover{color:var(--ink);border-color:var(--vermilion)}
+  .nav-cta{display:flex;align-items:center;gap:1rem}
+  .btn{
+    display:inline-flex;align-items:center;gap:.5rem;
+    font-family:var(--font-body);font-weight:600;font-size:.95rem;
+    padding:.7rem 1.35rem;border-radius:999px;text-decoration:none;
+    border:1.5px solid var(--ink);cursor:pointer;
+    transition:transform .18s ease, box-shadow .18s ease, background .18s, color .18s;
+  }
+  .btn-solid{background:var(--ink);color:var(--paper)}
+  .btn-solid:hover{background:var(--vermilion);border-color:var(--vermilion);transform:translateY(-2px);box-shadow:0 8px 20px -8px rgba(225,71,29,.5)}
+  .btn-ghost{background:transparent;color:var(--ink)}
+  .btn-ghost:hover{background:var(--ink);color:var(--paper);transform:translateY(-2px)}
+  .btn-accent{background:var(--vermilion);border-color:var(--vermilion);color:#fff}
+  .btn-accent:hover{background:var(--vermilion-deep);border-color:var(--vermilion-deep);transform:translateY(-2px);box-shadow:0 10px 24px -8px rgba(185,54,19,.55)}
+  .nav-login{color:var(--ink-soft);text-decoration:none;font-weight:600;font-size:.95rem}
+  .nav-login:hover{color:var(--ink)}
+  @media (max-width:860px){ .nav-links,.nav-login{display:none} }
+
+  /* ---------- hero ---------- */
+  .hero{
+    padding:clamp(3.5rem,9vh,6.5rem) 0 clamp(3rem,8vh,5.5rem);
+    position:relative;
+  }
+  .hero-grid{
+    display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);
+    gap:clamp(2rem,5vw,4.5rem);align-items:center;
+  }
+  @media (max-width:920px){ .hero-grid{grid-template-columns:1fr} }
+  .hero h1{
+    font-size:clamp(2.6rem,5.6vw,4.35rem);
+    margin:1.1rem 0 1.4rem;
+  }
+  .hero h1 .strike{
+    position:relative;white-space:nowrap;color:var(--ink-soft);
+  }
+  .hero h1 .strike::after{
+    content:"";position:absolute;left:-2%;right:-2%;top:54%;height:.09em;
+    background:var(--vermilion);transform:rotate(-1.5deg);border-radius:2px;
+    transform-origin:left center;
+    animation:strike .5s .9s cubic-bezier(.7,0,.3,1) backwards;
+  }
+  @keyframes strike{from{transform:scaleX(0) rotate(-1.5deg)}to{transform:scaleX(1) rotate(-1.5deg)}}
+  .hero h1 em{font-style:normal;color:var(--vermilion)}
+  .hero p.lede{
+    font-size:1.13rem;color:var(--ink-soft);max-width:34rem;margin-bottom:2rem;
+  }
+  .hero-actions{display:flex;flex-wrap:wrap;gap:1rem;align-items:center}
+  .hero-note{font-size:.85rem;color:var(--ink-soft)}
+  .hero-note strong{color:var(--leaf)}
+
+  /* staggered rise on load */
+  .rise{animation:rise .7s cubic-bezier(.2,.7,.2,1) backwards}
+  .rise.d1{animation-delay:.08s}.rise.d2{animation-delay:.18s}.rise.d3{animation-delay:.3s}.rise.d4{animation-delay:.42s}
+  @keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+
+  /* ledger card in hero */
+  .ledger-stack{position:relative;filter:drop-shadow(0 24px 40px rgba(22,35,59,.16))}
+  .ledger-card{
+    background:#fff;border:1px solid var(--rule-strong);border-radius:var(--radius);
+    padding:1.5rem 1.6rem 1.2rem;position:relative;overflow:hidden;
+    transform:rotate(1.4deg);
+    animation:settle .9s .25s cubic-bezier(.2,.7,.2,1) backwards;
+  }
+  @keyframes settle{from{opacity:0;transform:rotate(4deg) translateY(30px)}to{opacity:1;transform:rotate(1.4deg) translateY(0)}}
+  .ledger-card::before{
+    content:"";position:absolute;top:0;bottom:0;left:2.4rem;width:1.5px;background:rgba(225,71,29,.3);
+  }
+  .ledger-head{
+    display:flex;justify-content:space-between;align-items:baseline;
+    padding:0 0 .8rem 2rem;border-bottom:2px solid var(--ink);margin-bottom:.35rem;
+  }
+  .ledger-head h3{font-size:1.05rem}
+  .ledger-head span{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);font-weight:600}
+  .ledger-row{
+    display:flex;justify-content:space-between;align-items:center;gap:1rem;
+    padding:.62rem 0 .62rem 2rem;border-bottom:1px solid var(--rule);
+    font-size:.93rem;
+    animation:rowIn .5s backwards;
+  }
+  .ledger-row:nth-child(3){animation-delay:.7s}
+  .ledger-row:nth-child(4){animation-delay:.85s}
+  .ledger-row:nth-child(5){animation-delay:1s}
+  .ledger-row:nth-child(6){animation-delay:1.15s}
+  @keyframes rowIn{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
+  .ledger-row .who{font-weight:600}
+  .ledger-row .what{color:var(--ink-soft);font-size:.82rem;display:block}
+  .amount{font-family:var(--font-figures);font-size:.95rem}
+  .amount.in{color:var(--leaf)}
+  .amount.out{color:var(--ink-soft)}
+  .tag{
+    font-size:.68rem;font-weight:600;letter-spacing:.05em;
+    padding:.18rem .55rem;border-radius:999px;white-space:nowrap;
+  }
+  .tag.paid{background:var(--leaf-wash);color:var(--leaf)}
+  .tag.sorted{background:#EEF1F7;color:var(--ink-soft)}
+  .ledger-total{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:.9rem 0 .2rem 2rem;font-weight:700;
+  }
+  .ledger-total .amount{font-size:1.15rem;color:var(--ink)}
+  .stamp{
+    position:absolute;right:1.1rem;bottom:2.9rem;
+    border:2.5px solid var(--leaf);color:var(--leaf);
+    font-family:var(--font-figures);font-size:.72rem;font-weight:500;letter-spacing:.18em;
+    padding:.3rem .7rem;border-radius:6px;text-transform:uppercase;
+    transform:rotate(-9deg);opacity:.85;
+    animation:stamp .35s 1.45s cubic-bezier(.3,1.6,.5,1) backwards;
+  }
+  @keyframes stamp{from{opacity:0;transform:rotate(-9deg) scale(2.1)}to{opacity:.85;transform:rotate(-9deg) scale(1)}}
+  .float-chip{
+    position:absolute;background:#fff;border:1px solid var(--rule-strong);
+    border-radius:10px;padding:.6rem .9rem;font-size:.8rem;font-weight:600;
+    box-shadow:var(--shadow-card);display:flex;align-items:center;gap:.5rem;
+  }
+  .float-chip svg{width:1rem;height:1rem;flex:none}
+  .chip-tax{right:-.8rem;top:-1.6rem;transform:rotate(-2deg);animation:bob 5s ease-in-out infinite, rise .6s 1.3s backwards}
+  .chip-scan{left:-1.2rem;bottom:-1.4rem;transform:rotate(2deg);animation:bob 6s .8s ease-in-out infinite, rise .6s 1.5s backwards}
+  @keyframes bob{0%,100%{translate:0 0}50%{translate:0 -7px}}
+  @media (max-width:920px){
+    .chip-tax{right:.2rem}
+    .chip-scan{left:.2rem}
+  }
+
+  /* trust strip */
+  .trust{
+    border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);
+    background:var(--paper-deep);
+    padding:1.1rem 0;
+  }
+  .trust .wrap{
+    display:flex;flex-wrap:wrap;gap:1rem 2.5rem;align-items:center;justify-content:space-between;
+    font-size:.88rem;color:var(--ink-soft);
+  }
+  .trust b{color:var(--ink);font-family:var(--font-figures);font-weight:500}
+
+  /* ---------- features ---------- */
+  .features{padding:clamp(4rem,9vh,7rem) 0 1rem}
+  .features-intro{max-width:44rem;margin-bottom:clamp(2.5rem,6vh,4.5rem)}
+  .features-intro h2{font-size:clamp(1.9rem,3.6vw,2.9rem);margin:.9rem 0 1rem}
+  .features-intro p{color:var(--ink-soft);font-size:1.05rem}
+
+  .feature{
+    display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+    gap:clamp(2rem,5vw,4.5rem);align-items:center;
+    padding:clamp(2.5rem,6vh,4.25rem) 0;
+    border-top:1px solid var(--rule);
+  }
+  .feature:nth-child(even) .feature-visual{order:-1}
+  @media (max-width:860px){
+    .feature{grid-template-columns:1fr}
+    .feature:nth-child(even) .feature-visual{order:0}
+  }
+  .feature-no{
+    font-family:var(--font-figures);font-size:.85rem;color:var(--vermilion);
+    display:block;margin-bottom:.7rem;
+  }
+  .feature h3{font-size:clamp(1.6rem,2.8vw,2.2rem);margin-bottom:1rem}
+  .feature p{color:var(--ink-soft);margin-bottom:1.1rem;max-width:30rem}
+  .feature ul{list-style:none;margin-top:.4rem}
+  .feature li{
+    display:flex;gap:.7rem;align-items:flex-start;
+    padding:.42rem 0;font-size:.96rem;
+  }
+  .feature li svg{width:1.15rem;height:1.15rem;flex:none;margin-top:.2rem;color:var(--leaf)}
+
+  .feature-visual{position:relative}
+  .panel{
+    background:#fff;border:1px solid var(--rule-strong);border-radius:var(--radius);
+    box-shadow:var(--shadow-card);padding:1.4rem;overflow:hidden;position:relative;
+  }
+
+  /* visual 1: invoice capture */
+  .inv-drop{
+    border:2px dashed var(--rule-strong);border-radius:10px;
+    padding:1.1rem;text-align:center;color:var(--ink-soft);font-size:.85rem;
+    margin-bottom:1rem;transition:border-color .25s,background .25s;
+  }
+  .panel:hover .inv-drop{border-color:var(--vermilion);background:#FFF6F2}
+  .inv-line{
+    display:flex;align-items:center;gap:.8rem;
+    padding:.65rem .4rem;border-bottom:1px solid var(--rule);font-size:.88rem;
+  }
+  .inv-line:last-child{border-bottom:none}
+  .inv-doc{width:2rem;height:2rem;border-radius:7px;background:var(--paper-deep);display:grid;place-items:center;flex:none}
+  .inv-doc svg{width:1.05rem;height:1.05rem;color:var(--ink-soft)}
+  .inv-line .grow{flex:1;min-width:0}
+  .inv-line .who{font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .inv-line .meta{font-size:.75rem;color:var(--ink-soft)}
+  .bar-track{height:4px;background:var(--rule);border-radius:99px;overflow:hidden;margin-top:.3rem}
+  .bar-fill{height:100%;background:var(--leaf);border-radius:99px;width:0}
+  .inview .bar-fill{animation:fillbar 1.2s .3s cubic-bezier(.2,.7,.2,1) forwards}
+  @keyframes fillbar{to{width:88%}}
+
+  /* visual 2: expense sorting */
+  .sort-grid{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+  .sort-col h4{
+    font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);
+    margin-bottom:.55rem;font-weight:700;
+  }
+  .sort-item{
+    background:var(--paper);border:1px solid var(--rule);border-radius:9px;
+    padding:.55rem .7rem;font-size:.82rem;margin-bottom:.5rem;
+    display:flex;justify-content:space-between;gap:.5rem;align-items:center;
+    transition:transform .2s, box-shadow .2s;
+  }
+  .sort-item:hover{transform:translateX(4px);box-shadow:0 4px 10px -4px rgba(22,35,59,.2)}
+  .sort-item .amount{font-size:.8rem}
+  .cat-dot{width:.55rem;height:.55rem;border-radius:99px;flex:none;margin-right:.45rem}
+  .sort-donut-wrap{display:flex;align-items:center;gap:1.1rem;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--rule)}
+  .sort-legend{font-size:.78rem;color:var(--ink-soft);display:grid;gap:.3rem}
+  .sort-legend span{display:flex;align-items:center}
+  .donut{transform:rotate(-90deg)}
+  .donut circle{fill:none;stroke-width:14}
+  .donut .seg{stroke-dasharray:0 999;transition:stroke-dasharray 1s cubic-bezier(.2,.7,.2,1)}
+  .inview .donut .s1{stroke-dasharray:calc(.42 * 220) 999}
+  .inview .donut .s2{stroke-dasharray:calc(.27 * 220) 999}
+  .inview .donut .s3{stroke-dasharray:calc(.19 * 220) 999}
+  .inview .donut .s4{stroke-dasharray:calc(.12 * 220) 999}
+
+  /* visual 3: quarterly taxes */
+  .tax-big{
+    display:flex;justify-content:space-between;align-items:flex-end;
+    padding-bottom:1rem;border-bottom:2px solid var(--ink);margin-bottom:1rem;
+  }
+  .tax-big .label{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);font-weight:700}
+  .tax-big .figure{font-family:var(--font-figures);font-size:2.1rem;color:var(--ink);line-height:1.1}
+  .tax-big .due{font-size:.8rem;color:var(--vermilion);font-weight:600}
+  .tax-bars{display:flex;gap:.9rem;align-items:flex-end;height:7.5rem;padding:0 .3rem}
+  .tax-bar{flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:.4rem;text-align:center}
+  .tax-bar .stick{
+    background:var(--rule);border-radius:6px 6px 3px 3px;height:0;
+    transition:height .9s cubic-bezier(.2,.7,.2,1);
+  }
+  .tax-bar.hot .stick{background:var(--vermilion)}
+  .tax-bar.done .stick{background:var(--leaf)}
+  .inview .tax-bar:nth-child(1) .stick{height:52%}
+  .inview .tax-bar:nth-child(2) .stick{height:68%}
+  .inview .tax-bar:nth-child(3) .stick{height:84%;transition-delay:.15s}
+  .inview .tax-bar:nth-child(4) .stick{height:38%;transition-delay:.3s}
+  .tax-bar b{font-family:var(--font-figures);font-weight:500;font-size:.72rem;color:var(--ink-soft)}
+  .tax-note{
+    margin-top:1rem;padding:.7rem .9rem;border-radius:9px;background:var(--leaf-wash);
+    color:var(--leaf);font-size:.83rem;font-weight:600;display:flex;gap:.55rem;align-items:center;
+  }
+  .tax-note svg{width:1rem;height:1rem;flex:none}
+
+  /* scroll reveal */
+  .reveal{opacity:0;transform:translateY(26px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
+  .reveal.inview{opacity:1;transform:none}
+
+  /* ---------- pull quote ---------- */
+  .pull{
+    background:var(--ink);color:var(--paper);
+    padding:clamp(3.5rem,9vh,6rem) 0;
+    position:relative;overflow:hidden;
+  }
+  .pull::before{
+    content:"";position:absolute;inset:0;
+    background-image:linear-gradient(to bottom, transparent calc(var(--line-h) - 1px), rgba(251,250,246,.07) calc(var(--line-h) - 1px), rgba(251,250,246,.07) var(--line-h));
+    background-size:100% var(--line-h);
+  }
+  .pull blockquote{
+    position:relative;max-width:52rem;margin:0 auto;text-align:center;
+    font-family:var(--font-display);font-size:clamp(1.5rem,3.2vw,2.4rem);line-height:1.3;
+  }
+  .pull blockquote em{font-style:normal;color:var(--sun)}
+  .pull figcaption{
+    position:relative;text-align:center;margin-top:1.6rem;font-size:.95rem;color:rgba(251,250,246,.7);
+  }
+  .pull figcaption b{color:var(--paper);font-weight:600}
+
+  /* ---------- pricing ---------- */
+  .pricing{padding:clamp(4rem,10vh,7rem) 0}
+  .pricing-head{text-align:center;max-width:40rem;margin:0 auto clamp(2.5rem,6vh,4rem)}
+  .pricing-head h2{font-size:clamp(1.9rem,3.6vw,2.9rem);margin:.9rem 0 1rem}
+  .pricing-head p{color:var(--ink-soft)}
+  .pricing-head .entry-label{justify-content:center}
+  .pricing-head .entry-label::before{display:none}
+  .pricing-head .entry-label::after{content:"";width:2.2rem;height:2px;background:var(--vermilion)}
+  .tiers{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:1.4rem;align-items:stretch;
+  }
+  @media (max-width:920px){ .tiers{grid-template-columns:1fr;max-width:26rem;margin:0 auto} }
+  .tier{
+    background:#fff;border:1px solid var(--rule-strong);border-radius:var(--radius);
+    padding:2rem 1.8rem;display:flex;flex-direction:column;position:relative;
+    transition:transform .25s cubic-bezier(.2,.7,.2,1), box-shadow .25s;
+  }
+  .tier:hover{transform:translateY(-6px);box-shadow:var(--shadow-card)}
+  .tier.star{
+    background:var(--ink);color:var(--paper);border-color:var(--ink);
+    box-shadow:0 18px 44px -14px rgba(22,35,59,.45);
+  }
+  @media (min-width:921px){ .tier.star{transform:scale(1.035)} .tier.star:hover{transform:scale(1.035) translateY(-6px)} }
+  .tier .flag{
+    position:absolute;top:-0.85rem;left:50%;transform:translateX(-50%) rotate(-1deg);
+    background:var(--vermilion);color:#fff;font-size:.72rem;font-weight:700;
+    letter-spacing:.1em;text-transform:uppercase;padding:.3rem .9rem;border-radius:999px;white-space:nowrap;
+  }
+  .tier h3{font-size:1.35rem;margin-bottom:.3rem}
+  .tier .for{font-size:.88rem;color:var(--ink-soft);margin-bottom:1.4rem;min-height:2.6em}
+  .tier.star .for{color:rgba(251,250,246,.72)}
+  .price{display:flex;align-items:baseline;gap:.35rem;margin-bottom:.35rem}
+  .price .figures{font-size:2.6rem;line-height:1}
+  .price .per{font-size:.85rem;color:var(--ink-soft)}
+  .tier.star .per{color:rgba(251,250,246,.72)}
+  .billed{font-size:.78rem;color:var(--ink-soft);margin-bottom:1.5rem}
+  .tier.star .billed{color:rgba(251,250,246,.6)}
+  .tier hr{border:none;border-top:1px solid var(--rule);margin:0 0 1.2rem}
+  .tier.star hr{border-color:rgba(251,250,246,.18)}
+  .tier ul{list-style:none;flex:1;margin-bottom:1.8rem}
+  .tier li{display:flex;gap:.65rem;align-items:flex-start;padding:.38rem 0;font-size:.92rem}
+  .tier li svg{width:1.05rem;height:1.05rem;flex:none;margin-top:.22rem;color:var(--leaf)}
+  .tier.star li svg{color:var(--sun)}
+  .tier .btn{justify-content:center}
+  .tier.star .btn-solid{background:var(--vermilion);border-color:var(--vermilion)}
+  .tier.star .btn-solid:hover{background:var(--vermilion-deep);border-color:var(--vermilion-deep)}
+  .tier .btn-ghost{width:100%}
+  .tier.star .btn{width:100%}
+  .tier:not(.star) .btn{width:100%}
+  .pricing-foot{text-align:center;margin-top:2.2rem;font-size:.88rem;color:var(--ink-soft)}
+  .pricing-foot a{color:var(--vermilion);font-weight:600;text-decoration:none}
+  .pricing-foot a:hover{text-decoration:underline}
+
+  /* ---------- final CTA ---------- */
+  .final{
+    border-top:1px solid var(--rule);
+    padding:clamp(4rem,10vh,6.5rem) 0;text-align:center;position:relative;
+  }
+  .final h2{font-size:clamp(2rem,4.2vw,3.2rem);max-width:38rem;margin:0 auto 1.2rem}
+  .final p{color:var(--ink-soft);max-width:30rem;margin:0 auto 2rem}
+  .final .bird{width:3.4rem;height:3.4rem;margin:0 auto 1.4rem;display:block;animation:bob 5s ease-in-out infinite}
+
+  /* ---------- footer ---------- */
+  footer.site{
+    background:var(--ink);color:rgba(251,250,246,.75);
+    padding:3.5rem 0 2rem;font-size:.9rem;
+  }
+  .foot-grid{
+    display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:2.5rem;margin-bottom:3rem;
+  }
+  @media (max-width:820px){ .foot-grid{grid-template-columns:1fr 1fr} }
+  @media (max-width:520px){ .foot-grid{grid-template-columns:1fr} }
+  .foot-brand .brand{color:var(--paper);margin-bottom:.9rem}
+  .foot-brand p{max-width:18rem;font-size:.88rem;color:rgba(251,250,246,.6)}
+  footer h4{
+    font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--sun);margin-bottom:1rem;font-weight:700;font-family:var(--font-body);
+  }
+  footer ul{list-style:none}
+  footer li{margin-bottom:.55rem}
+  footer a{color:rgba(251,250,246,.75);text-decoration:none;transition:color .2s}
+  footer a:hover{color:var(--paper)}
+  .foot-base{
+    border-top:1px solid rgba(251,250,246,.15);padding-top:1.6rem;
+    display:flex;flex-wrap:wrap;gap:1rem;justify-content:space-between;align-items:center;
+    font-size:.8rem;color:rgba(251,250,246,.5);
+  }
+  .foot-base .fine{display:flex;gap:1.4rem}
+
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation:none !important;transition:none !important}
+    .reveal{opacity:1;transform:none}
+    .inview .bar-fill{width:88%}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= NAV ================= -->
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="#top" aria-label="Ledgerbird home">
+      <svg class="brand-mark" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+        <rect x="3" y="6" width="26" height="30" rx="3" fill="#FBFAF6" stroke="#16233B" stroke-width="2"/>
+        <line x1="9" y1="14" x2="23" y2="14" stroke="#D8DFEA" stroke-width="2"/>
+        <line x1="9" y1="20" x2="23" y2="20" stroke="#D8DFEA" stroke-width="2"/>
+        <line x1="9" y1="26" x2="18" y2="26" stroke="#D8DFEA" stroke-width="2"/>
+        <path d="M22 24c3-6 9-8 14-7-1 6-4 10-9 11l-5 4v-8z" fill="#E1471D"/>
+        <circle cx="31" cy="20.5" r="1.3" fill="#16233B"/>
+      </svg>
+      <span class="brand-name">Ledgerbird</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#capture">Invoices</a></li>
+      <li><a href="#sorting">Expenses</a></li>
+      <li><a href="#taxes">Taxes</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+    </ul>
+    <div class="nav-cta">
+      <a class="nav-login" href="#pricing">Log in</a>
+      <a class="btn btn-solid" href="#pricing">Start free</a>
+    </div>
+  </div>
+</header>
+
+<!-- ================= HERO ================= -->
+<main id="top">
+<section class="hero ruled margin-line">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="entry-label rise d1">Books for people who make things</span>
+      <h1>
+        <span class="rise d2">You became a designer,</span><br>
+        <span class="rise d3">not a <span class="strike">bookkeeper</span>.</span><br>
+        <span class="rise d3">We'll take <em>that</em> job.</span>
+      </h1>
+      <p class="lede rise d4">Ledgerbird catches every invoice, files every expense, and tells you exactly what to set aside for quarterly taxes. Your books stay balanced while you stay in the studio.</p>
+      <div class="hero-actions rise d4">
+        <a class="btn btn-accent" href="#pricing">
+          Start your free month
+          <svg width="15" height="15" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h12m0 0-5-5m5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a class="btn btn-ghost" href="#capture">See how it works</a>
+      </div>
+      <p class="hero-note rise d4" style="margin-top:1.1rem">No card required. <strong>Free for 30 days</strong>, then from $12/mo.</p>
+    </div>
+
+    <div class="ledger-stack">
+      <div class="float-chip chip-tax">
+        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="8" stroke="#E1471D" stroke-width="2"/><path d="M10 6v4l2.5 2" stroke="#E1471D" stroke-width="2" stroke-linecap="round"/></svg>
+        Q3 estimate ready: <span class="figures" style="color:var(--vermilion)">$2,140</span>
+      </div>
+      <div class="ledger-card" role="img" aria-label="Sample Ledgerbird ledger showing invoices and expenses reconciled automatically">
+        <div class="ledger-head">
+          <h3>July ledger</h3>
+          <span>Auto-kept</span>
+        </div>
+        <div class="ledger-row">
+          <div><span class="who">Marrow Studio</span><span class="what">Invoice #047, brand identity</span></div>
+          <span class="tag paid">Paid</span>
+          <span class="amount in">+$3,800.00</span>
+        </div>
+        <div class="ledger-row">
+          <div><span class="who">Adobe</span><span class="what">Software, deductible</span></div>
+          <span class="tag sorted">Sorted</span>
+          <span class="amount out">-$59.99</span>
+        </div>
+        <div class="ledger-row">
+          <div><span class="who">Fieldnotes Cafe</span><span class="what">Client meeting, 50% deductible</span></div>
+          <span class="tag sorted">Sorted</span>
+          <span class="amount out">-$24.50</span>
+        </div>
+        <div class="ledger-row">
+          <div><span class="who">Hazel &amp; Pine Co.</span><span class="what">Invoice #048, packaging</span></div>
+          <span class="tag paid">Paid</span>
+          <span class="amount in">+$1,650.00</span>
+        </div>
+        <div class="ledger-total">
+          <span>Net this month</span>
+          <span class="amount figures">$5,365.51</span>
+        </div>
+        <span class="stamp">Reconciled</span>
+      </div>
+      <div class="float-chip chip-scan">
+        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="3" y="2.5" width="14" height="15" rx="2" stroke="#1E7A5A" stroke-width="2"/><path d="M6.5 7h7M6.5 10.5h7M6.5 14h4" stroke="#1E7A5A" stroke-width="2" stroke-linecap="round"/></svg>
+        Receipt scanned in 1.2s
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= TRUST STRIP ================= -->
+<div class="trust">
+  <div class="wrap">
+    <span><b>41,000+</b> freelance creatives keep books here</span>
+    <span><b>$212M</b> in invoices captured last year</span>
+    <span><b>9.2 hrs</b> saved per month, on average</span>
+    <span><b>Zero</b> spreadsheets harmed</span>
+  </div>
+</div>
+
+<!-- ================= FEATURES ================= -->
+<section class="features">
+  <div class="wrap">
+    <div class="features-intro reveal">
+      <span class="entry-label">The whole back office</span>
+      <h2>Three chores, crossed off for good.</h2>
+      <p>Every feature exists to answer one question: what would a very organized friend with an accounting degree do for you every day?</p>
+    </div>
+
+    <!-- Feature 1 -->
+    <article class="feature reveal" id="capture">
+      <div>
+        <span class="feature-no">01 / Invoice capture</span>
+        <h3>Every invoice, caught before it flies away.</h3>
+        <p>Forward an email, snap a photo, or connect your invoicing tool. Ledgerbird reads the client, amount, and due date, then chases the money so you don't have to.</p>
+        <ul>
+          <li><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Auto-matched to bank deposits, no manual reconciling</li>
+          <li><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Polite late-payment nudges sent under your name</li>
+          <li><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Works with Stripe, PayPal, Wise, and plain old checks</li>
+        </ul>
+      </div>
+      <div class="feature-visual">
+        <div class="panel">
+          <div class="inv-drop">Drop a PDF, photo, or forward to <b style="color:var(--ink)">in@ledgerbird.com</b></div>
+          <div class="inv-line">
+            <span class="inv-doc"><svg viewBox="0 0 20 20" fill="none"><path d="M5 2.5h7l3.5 3.5V17.5h-10.5z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></span>
+            <span class="grow"><span class="who">Invoice_047_Marrow.pdf</span><span class="meta">Read: $3,800 · due Aug 2 · Marrow Studio</span></span>
+            <span class="tag paid">Captured</span>
+          </div>
+          <div class="inv-line">
+            <span class="inv-doc"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="12" rx="2" stroke="currentColor" stroke-width="1.6"/><circle cx="10" cy="10" r="2.6" stroke="currentColor" stroke-width="1.6"/></svg></span>
+            <span class="grow"><span class="who">IMG_2291.heic</span><span class="meta">Reading photo of printed invoice...</span>
+              <span class="bar-track"><span class="bar-fill"></span></span>
+            </span>
+          </div>
+          <div class="inv-line">
+            <span class="inv-doc"><svg viewBox="0 0 20 20" fill="none"><path d="M3 5h14v10H3z" stroke="currentColor" stroke-width="1.6"/><path d="M3 6l7 5 7-5" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></span>
+            <span class="grow"><span class="who">Fwd: Retainer, Hazel &amp; Pine</span><span class="meta">Read: $1,650 · net 15 · recurring monthly</span></span>
+            <span class="tag paid">Captured</span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- Feature 2 -->
+    <article class="feature reveal" id="sorting">
+      <div>
+        <span class="feature-no">02 / Expense sorting</span>
+        <h3>Expenses sort themselves into tax-ready nests.</h3>
+        <p>Connect your card and every swipe lands in the right deduction category, tuned for creative work: software, gear, studio rent, reference books, client coffees.</p>
+        <ul>
+          <li><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Learns your habits: correct it once, sorted forever</li>
+          <li><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Flags mixed personal-and-business purchases for a quick split</li>
+          <li><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Receipt photos attach automatically to the matching charge</li>
+        </ul>
+      </div>
+      <div class="feature-visual">
+        <div class="panel">
+          <div class="sort-grid">
+            <div class="sort-col">
+              <h4>Just arrived</h4>
+              <div class="sort-item"><span><span class="cat-dot" style="background:var(--vermilion)"></span>Blick Art Supplies</span><span class="amount out">-$86.40</span></div>
+              <div class="sort-item"><span><span class="cat-dot" style="background:var(--sun)"></span>Figma annual</span><span class="amount out">-$144.00</span></div>
+            </div>
+            <div class="sort-col">
+              <h4>Filed under</h4>
+              <div class="sort-item"><span>Materials &amp; supplies</span><span class="tag paid">Deductible</span></div>
+              <div class="sort-item"><span>Software</span><span class="tag paid">Deductible</span></div>
+            </div>
+          </div>
+          <div class="sort-donut-wrap">
+            <svg class="donut" width="92" height="92" viewBox="0 0 92 92" aria-hidden="true">
+              <circle cx="46" cy="46" r="35" stroke="var(--rule)"/>
+              <circle class="seg s1" cx="46" cy="46" r="35" stroke="var(--vermilion)"/>
+              <circle class="seg s2" cx="46" cy="46" r="35" stroke="var(--leaf)" style="stroke-dashoffset:calc(-.42 * 220)"/>
+              <circle class="seg s3" cx="46" cy="46" r="35" stroke="var(--sun)" style="stroke-dashoffset:calc(-.69 * 220)"/>
+              <circle class="seg s4" cx="46" cy="46" r="35" stroke="var(--ink)" style="stroke-dashoffset:calc(-.88 * 220)"/>
+            </svg>
+            <div class="sort-legend">
+              <span><span class="cat-dot" style="background:var(--vermilion)"></span>Studio &amp; rent 42%</span>
+              <span><span class="cat-dot" style="background:var(--leaf)"></span>Software 27%</span>
+              <span><span class="cat-dot" style="background:var(--sun)"></span>Materials 19%</span>
+              <span><span class="cat-dot" style="background:var(--ink)"></span>Everything else 12%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- Feature 3 -->
+    <article class="feature reveal" id="taxes">
+      <div>
+        <span class="feature-no">03 / Quarterly tax estimates</span>
+        <h3>Quarterlies without the quarterly panic.</h3>
+        <p>Ledgerbird runs a live estimate from your real income and deductions, tells you the number, the deadline, and even the safe amount to move to savings each week.</p>
+        <ul>
+          <li><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Federal and state estimates, updated with every payment</li>
+          <li><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Deadline reminders that arrive early, not the night before</li>
+          <li><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>One-click export your accountant will genuinely thank you for</li>
+        </ul>
+      </div>
+      <div class="feature-visual">
+        <div class="panel">
+          <div class="tax-big">
+            <div>
+              <span class="label">Q3 estimated tax</span>
+              <div class="figure">$2,140</div>
+            </div>
+            <span class="due">Due Sep 15 · in 24 days</span>
+          </div>
+          <div class="tax-bars" aria-hidden="true">
+            <div class="tax-bar done"><span class="stick"></span><b>Q1 paid</b></div>
+            <div class="tax-bar done"><span class="stick"></span><b>Q2 paid</b></div>
+            <div class="tax-bar hot"><span class="stick"></span><b>Q3</b></div>
+            <div class="tax-bar"><span class="stick"></span><b>Q4 proj.</b></div>
+          </div>
+          <div class="tax-note">
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2"/><path d="M6.5 10.5l2.4 2.4 4.6-5.3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            You're on pace. Set aside $178/week and Q3 is covered.
+          </div>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ================= PULL QUOTE ================= -->
+<section class="pull">
+  <div class="wrap">
+    <figure>
+      <blockquote>"I used to lose a full Sunday every month to receipts. Now my books close themselves and <em>I paint on Sundays</em>."</blockquote>
+      <figcaption><b>June Okafor</b> · illustrator and printmaker, Portland</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ================= PRICING ================= -->
+<section class="pricing ruled margin-line" id="pricing">
+  <div class="wrap">
+    <div class="pricing-head reveal">
+      <span class="entry-label">Pricing</span>
+      <h2>Pay less than one billable hour.</h2>
+      <p>Every plan starts with a free 30-day month, real books included. Cancel anytime and take your data with you.</p>
+    </div>
+    <div class="tiers reveal">
+      <div class="tier">
+        <h3>Fledgling</h3>
+        <p class="for">For the side hustle that just got its first real client.</p>
+        <div class="price"><span class="figures">$12</span><span class="per">/month</span></div>
+        <p class="billed">Billed monthly, or $120/yr</p>
+        <hr>
+        <ul>
+          <li><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Unlimited invoice capture</li>
+          <li><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Auto expense sorting, 1 connected account</li>
+          <li><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Federal quarterly estimates</li>
+          <li><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Year-end summary export</li>
+        </ul>
+        <a class="btn btn-ghost" href="#top">Start free</a>
+      </div>
+
+      <div class="tier star">
+        <span class="flag">Most popular</span>
+        <h3>Songbird</h3>
+        <p class="for">For full-time freelancers who want the whole back office handled.</p>
+        <div class="price"><span class="figures">$24</span><span class="per">/month</span></div>
+        <p class="billed">Billed monthly, or $240/yr</p>
+        <hr>
+        <ul>
+          <li><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Everything in Fledgling</li>
+          <li><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Unlimited connected accounts &amp; cards</li>
+          <li><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Federal + state quarterly estimates</li>
+          <li><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Late-invoice nudges sent for you</li>
+          <li><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Accountant-ready exports, anytime</li>
+        </ul>
+        <a class="btn btn-solid" href="#top">Start free</a>
+      </div>
+
+      <div class="tier">
+        <h3>Aviary</h3>
+        <p class="for">For studios of 2-10 with contractors, projects, and payroll questions.</p>
+        <div class="price"><span class="figures">$59</span><span class="per">/month</span></div>
+        <p class="billed">Billed monthly, or $590/yr</p>
+        <hr>
+        <ul>
+          <li><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Everything in Songbird</li>
+          <li><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Up to 10 seats with roles</li>
+          <li><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Per-project profit tracking</li>
+          <li><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>1099 contractor tracking &amp; filing</li>
+          <li><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10.5l4 4 8-9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Priority human support</li>
+        </ul>
+        <a class="btn btn-ghost" href="#top">Start free</a>
+      </div>
+    </div>
+    <p class="pricing-foot">Switching from a spreadsheet or another tool? <a href="#top">We'll migrate your history for free.</a></p>
+  </div>
+</section>
+
+<!-- ================= FINAL CTA ================= -->
+<section class="final reveal">
+  <div class="wrap">
+    <svg class="bird" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+      <path d="M8 26c6-12 18-16 28-14-2 12-8 20-18 22l-10 8v-16z" fill="#E1471D"/>
+      <circle cx="27" cy="19" r="1.6" fill="#16233B"/>
+      <path d="M14 24c4-3 9-4 13-3" stroke="#FBFAF6" stroke-width="1.8" stroke-linecap="round"/>
+    </svg>
+    <h2>Close your books. Open your studio.</h2>
+    <p>Thirty days free, set up in about eleven minutes, and your Sundays back for good.</p>
+    <a class="btn btn-accent" href="#pricing">Start your free month
+      <svg width="15" height="15" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4 10h12m0 0-5-5m5 5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+  </div>
+</section>
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer class="site">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="brand" href="#top">
+          <svg class="brand-mark" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+            <rect x="3" y="6" width="26" height="30" rx="3" fill="none" stroke="#FBFAF6" stroke-width="2"/>
+            <line x1="9" y1="14" x2="23" y2="14" stroke="rgba(251,250,246,.35)" stroke-width="2"/>
+            <line x1="9" y1="20" x2="23" y2="20" stroke="rgba(251,250,246,.35)" stroke-width="2"/>
+            <line x1="9" y1="26" x2="18" y2="26" stroke="rgba(251,250,246,.35)" stroke-width="2"/>
+            <path d="M22 24c3-6 9-8 14-7-1 6-4 10-9 11l-5 4v-8z" fill="#E1471D"/>
+          </svg>
+          <span class="brand-name">Ledgerbird</span>
+        </a>
+        <p>Bookkeeping software for freelance creatives. Invoices captured, expenses sorted, quarterlies estimated.</p>
+      </div>
+      <div>
+        <h4>Product</h4>
+        <ul>
+          <li><a href="#capture">Invoice capture</a></li>
+          <li><a href="#sorting">Expense sorting</a></li>
+          <li><a href="#taxes">Quarterly taxes</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="#top">Freelance tax guide</a></li>
+          <li><a href="#top">Deduction dictionary</a></li>
+          <li><a href="#top">Help center</a></li>
+          <li><a href="#top">API docs</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#top">About</a></li>
+          <li><a href="#top">The Field Notes blog</a></li>
+          <li><a href="#top">Careers</a></li>
+          <li><a href="#top">Press kit</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-base">
+      <span>&copy; 2026 Ledgerbird, Inc. Not a substitute for a licensed tax professional.</span>
+      <span class="fine">
+        <a href="#top">Privacy</a>
+        <a href="#top">Terms</a>
+        <a href="#top">Security</a>
+      </span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Scroll reveal + in-view triggers for the animated panels
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (e.isIntersecting) {
+        e.target.classList.add('inview');
+        io.unobserve(e.target);
+      }
+    }
+  }, { threshold: 0.18 });
+  document.querySelectorAll('.reveal, .feature-visual').forEach(el => io.observe(el));
+</script>
+</body>
+</html>

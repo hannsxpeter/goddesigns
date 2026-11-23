@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wayfare - Plan trips you actually take</title>
+<meta name="description" content="Wayfare is the trip-planning app for independent travelers: build itineraries, track flights and trains, and keep a daily budget, all in one place.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#152325;
+  --ink-soft:#3d5254;
+  --ink-faint:#6b7f81;
+  --pine:#0f5c4e;
+  --pine-deep:#0a4238;
+  --coral:#ff5941;
+  --coral-soft:#ffe9e5;
+  --mist:#eef3f1;
+  --paper:#fafcfb;
+  --card:#ffffff;
+  --line:#dce6e2;
+  --sky:#d7ecf4;
+  --radius:14px;
+  --shadow:0 1px 2px rgba(21,35,37,.06),0 12px 32px -12px rgba(21,35,37,.16);
+  --font-display:"Fraunces",Georgia,serif;
+  --font-body:"Public Sans",system-ui,-apple-system,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);color:var(--ink);background:var(--paper);line-height:1.6;font-size:16px;-webkit-font-smoothing:antialiased}
+img,svg{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+ul{list-style:none}
+.container{max-width:1120px;margin:0 auto;padding:0 24px}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;line-height:1.12;letter-spacing:-.01em}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--pine)}
+.eyebrow::before{content:"";width:22px;height:2px;background:var(--coral);border-radius:2px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:15px;padding:12px 22px;border-radius:999px;border:1.5px solid transparent;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease,background .15s ease;font-family:var(--font-body)}
+.btn-primary{background:var(--pine);color:#fff}
+.btn-primary:hover{background:var(--pine-deep);transform:translateY(-1px);box-shadow:0 8px 20px -8px rgba(15,92,78,.5)}
+.btn-ghost{border-color:var(--line);color:var(--ink);background:transparent}
+.btn-ghost:hover{border-color:var(--pine);color:var(--pine)}
+.btn-coral{background:var(--coral);color:#fff}
+.btn-coral:hover{background:#e64830;transform:translateY(-1px);box-shadow:0 8px 20px -8px rgba(255,89,65,.55)}
+
+/* Nav */
+.nav{position:sticky;top:0;z-index:50;background:rgba(250,252,251,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;height:68px}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-size:22px;font-weight:700;letter-spacing:-.01em}
+.logo-mark{width:32px;height:32px}
+.nav-links{display:flex;gap:32px;font-size:15px;font-weight:500;color:var(--ink-soft)}
+.nav-links a:hover{color:var(--pine)}
+.nav-cta{display:flex;align-items:center;gap:12px}
+.nav-cta .signin{font-size:15px;font-weight:600;color:var(--ink-soft)}
+.nav-cta .signin:hover{color:var(--pine)}
+.nav-toggle{display:none;background:none;border:none;cursor:pointer;padding:8px}
+.nav-toggle svg{width:24px;height:24px;stroke:var(--ink)}
+
+/* Hero */
+.hero{position:relative;overflow:hidden;padding:88px 0 96px;background:
+  radial-gradient(900px 420px at 85% -10%,var(--sky) 0%,transparent 60%),
+  radial-gradient(700px 380px at -10% 30%,#e4f0ea 0%,transparent 55%),
+  var(--paper)}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center}
+.hero h1{font-size:clamp(40px,5.2vw,62px);margin:18px 0 20px}
+.hero h1 em{font-style:italic;color:var(--pine)}
+.hero-sub{font-size:18px;color:var(--ink-soft);max-width:46ch;margin-bottom:32px}
+.hero-actions{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:28px}
+.hero-proof{display:flex;align-items:center;gap:14px;font-size:14px;color:var(--ink-faint)}
+.avatars{display:flex}
+.avatars span{width:30px;height:30px;border-radius:50%;border:2px solid var(--paper);margin-left:-8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+.avatars span:first-child{margin-left:0}
+.av1{background:#0f5c4e}.av2{background:#ff5941}.av3{background:#2a7a9b}.av4{background:#7c5cbf}
+
+/* App mock */
+.app-mock{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden;font-size:13px}
+.mock-bar{display:flex;align-items:center;gap:6px;padding:12px 16px;border-bottom:1px solid var(--line);background:#f4f8f6}
+.mock-bar i{width:10px;height:10px;border-radius:50%;background:var(--line)}
+.mock-bar .trip-name{margin-left:10px;font-weight:600;font-size:13px;color:var(--ink-soft)}
+.mock-body{padding:18px}
+.mock-day{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px}
+.mock-day strong{font-family:var(--font-display);font-size:16px}
+.mock-day span{font-size:12px;color:var(--ink-faint)}
+.stop{display:flex;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;background:#fff;align-items:center}
+.stop .dot{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.stop .dot svg{width:14px;height:14px}
+.d-train{background:#e3efec;color:var(--pine)}
+.d-food{background:var(--coral-soft);color:var(--coral)}
+.d-see{background:var(--sky);color:#20708f}
+.stop .meta{flex:1;min-width:0}
+.stop .meta b{display:block;font-size:13px;font-weight:600}
+.stop .meta small{color:var(--ink-faint);font-size:11.5px}
+.stop .tag{font-size:11px;font-weight:600;padding:3px 8px;border-radius:999px;white-space:nowrap}
+.t-live{background:#e3efec;color:var(--pine)}
+.t-cost{background:var(--mist);color:var(--ink-soft)}
+.mock-budget{margin-top:12px;padding:12px;border-radius:10px;background:var(--pine);color:#fff}
+.mock-budget .row{display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px}
+.mock-budget .row b{font-size:12px}
+.meter{height:6px;border-radius:99px;background:rgba(255,255,255,.25);overflow:hidden}
+.meter i{display:block;height:100%;width:62%;background:#ffd9d2;border-radius:99px}
+.float-chip{position:absolute;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:10px 14px;font-size:12.5px;display:flex;gap:10px;align-items:center}
+.float-chip svg{width:18px;height:18px;flex-shrink:0}
+.chip-flight{right:-14px;top:34px}
+.chip-flight b{color:var(--pine)}
+.hero-visual{position:relative}
+
+/* Sections */
+.section{padding:96px 0}
+.section-head{max-width:640px;margin-bottom:56px}
+.section-head h2{font-size:clamp(30px,3.6vw,42px);margin:16px 0 14px}
+.section-head p{font-size:17px;color:var(--ink-soft)}
+.feature{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;padding:56px 0}
+.feature + .feature{border-top:1px solid var(--line)}
+.feature.flip .feature-copy{order:2}
+.feature.flip .feature-visual{order:1}
+.feature h3{font-size:clamp(24px,2.6vw,32px);margin:14px 0 12px}
+.feature p{color:var(--ink-soft);margin-bottom:20px;max-width:44ch}
+.feature-list{display:grid;gap:10px;font-size:15px}
+.feature-list li{display:flex;gap:10px;align-items:flex-start;color:var(--ink-soft)}
+.feature-list svg{width:18px;height:18px;flex-shrink:0;margin-top:3px;color:var(--pine)}
+.feature-visual .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;font-size:13px}
+
+/* Itinerary panel */
+.iti-row{display:flex;gap:12px;align-items:center;padding:12px;border-radius:10px;border:1px dashed transparent;margin-bottom:6px}
+.iti-row.dragging{border-color:var(--coral);background:var(--coral-soft)}
+.iti-row .grip{color:var(--line);font-size:14px;letter-spacing:2px;cursor:grab}
+.iti-row .time{font-variant-numeric:tabular-nums;font-weight:600;font-size:12.5px;color:var(--pine);width:48px;flex-shrink:0}
+.iti-row .what b{display:block;font-size:13.5px}
+.iti-row .what small{color:var(--ink-faint)}
+
+/* Tracker panel */
+.leg{display:flex;align-items:center;gap:14px;padding:14px 4px}
+.leg + .leg{border-top:1px solid var(--line)}
+.leg .mode{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.leg .mode svg{width:18px;height:18px}
+.leg .route{flex:1}
+.leg .route b{font-size:14px}
+.leg .route small{display:block;color:var(--ink-faint);font-size:12px}
+.status{font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:999px;white-space:nowrap}
+.s-ontime{background:#e3efec;color:var(--pine)}
+.s-delay{background:#fdeee7;color:#c2500f}
+.s-board{background:var(--sky);color:#20708f}
+.leg-progress{position:relative;height:4px;background:var(--mist);border-radius:99px;margin:6px 0 2px;overflow:visible}
+.leg-progress i{display:block;height:100%;width:68%;background:var(--pine);border-radius:99px}
+.leg-progress em{position:absolute;top:-4px;left:calc(68% - 6px);width:12px;height:12px;border-radius:50%;background:var(--coral);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+
+/* Budget panel */
+.budget-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px}
+.budget-top .big{font-family:var(--font-display);font-size:28px;font-weight:600}
+.budget-top .big small{font-family:var(--font-body);font-size:13px;color:var(--ink-faint);font-weight:500}
+.bars{display:flex;gap:10px;align-items:flex-end;height:110px;margin-bottom:8px}
+.bar{flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:6px;text-align:center}
+.bar i{display:block;border-radius:6px 6px 3px 3px;background:var(--pine);min-height:8px}
+.bar.over i{background:var(--coral)}
+.bar.today i{background:repeating-linear-gradient(45deg,var(--pine),var(--pine) 4px,#1a7a68 4px,#1a7a68 8px)}
+.bar small{font-size:10.5px;color:var(--ink-faint)}
+.budget-note{display:flex;gap:8px;align-items:center;font-size:12.5px;color:var(--ink-soft);background:var(--mist);border-radius:8px;padding:8px 12px}
+.budget-note svg{width:15px;height:15px;color:var(--coral);flex-shrink:0}
+
+/* Pricing */
+.pricing{background:var(--pine-deep);color:#fff}
+.pricing .eyebrow{color:#8fd8c5}
+.pricing .eyebrow::before{background:var(--coral)}
+.pricing .section-head p{color:#b9d4cc}
+.pricing .section-head{margin-left:auto;margin-right:auto;text-align:center}
+.pricing .section-head h2{color:#fff}
+.tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.tier{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:32px 28px;display:flex;flex-direction:column}
+.tier.hot{background:#fff;color:var(--ink);position:relative;box-shadow:0 24px 60px -20px rgba(0,0,0,.45)}
+.tier .badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--coral);color:#fff;font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:5px 14px;border-radius:999px}
+.tier h3{font-size:22px;margin-bottom:6px}
+.tier .who{font-size:13.5px;color:#a7c6bd;margin-bottom:20px;min-height:40px}
+.tier.hot .who{color:var(--ink-faint)}
+.price{font-family:var(--font-display);font-size:44px;font-weight:600;line-height:1}
+.price small{font-family:var(--font-body);font-size:14px;font-weight:500;color:#a7c6bd}
+.tier.hot .price small{color:var(--ink-faint)}
+.tier ul{margin:24px 0 28px;display:grid;gap:11px;font-size:14px;color:#d5e6df;flex:1}
+.tier.hot ul{color:var(--ink-soft)}
+.tier ul li{display:flex;gap:10px;align-items:flex-start}
+.tier ul svg{width:16px;height:16px;flex-shrink:0;margin-top:3px;color:#8fd8c5}
+.tier.hot ul svg{color:var(--pine)}
+.tier .btn{width:100%}
+.btn-outline-light{border-color:rgba(255,255,255,.35);color:#fff}
+.btn-outline-light:hover{border-color:#fff;background:rgba(255,255,255,.08)}
+.pricing-foot{text-align:center;margin-top:28px;font-size:13.5px;color:#a7c6bd}
+
+/* CTA band */
+.cta-band{padding:88px 0;text-align:center;background:
+  radial-gradient(700px 320px at 50% 120%,var(--coral-soft) 0%,transparent 65%),var(--paper)}
+.cta-band h2{font-size:clamp(30px,3.6vw,44px);margin-bottom:14px}
+.cta-band p{color:var(--ink-soft);max-width:52ch;margin:0 auto 30px;font-size:17px}
+
+/* Footer */
+footer{background:var(--ink);color:#aebfc0;padding:64px 0 32px;font-size:14px}
+.foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;margin-bottom:48px}
+.foot-brand .logo{color:#fff;margin-bottom:14px}
+.foot-brand p{max-width:30ch;font-size:13.5px}
+footer h4{font-family:var(--font-body);font-size:12.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#e8eeed;margin-bottom:16px}
+footer ul{display:grid;gap:10px}
+footer ul a:hover{color:#fff}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.12);padding-top:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;font-size:13px}
+.foot-bottom .legal{display:flex;gap:20px}
+.foot-bottom .legal a:hover{color:#fff}
+
+/* Responsive */
+@media (max-width:920px){
+  .hero-grid,.feature{grid-template-columns:1fr;gap:40px}
+  .feature.flip .feature-copy{order:1}
+  .feature.flip .feature-visual{order:2}
+  .tiers{grid-template-columns:1fr;max-width:440px;margin:0 auto}
+  .foot-grid{grid-template-columns:1fr 1fr}
+  .chip-flight{right:4px}
+}
+@media (max-width:720px){
+  .nav-links,.nav-cta .signin{display:none}
+  .nav-toggle{display:block}
+  .nav-mobile{display:none;flex-direction:column;gap:4px;padding:12px 24px 20px;border-bottom:1px solid var(--line);background:var(--paper)}
+  .nav-mobile.open{display:flex}
+  .nav-mobile a{padding:10px 0;font-weight:500;color:var(--ink-soft)}
+  .hero{padding:56px 0 72px}
+  .section{padding:72px 0}
+}
+@media (min-width:721px){.nav-mobile{display:none!important}}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="container nav-inner">
+    <a href="#" class="logo" aria-label="Wayfare home">
+      <svg class="logo-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <circle cx="16" cy="16" r="14" stroke="#0f5c4e" stroke-width="2.5"/>
+        <path d="M8 20 C12 12, 20 20, 24 11" stroke="#ff5941" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+        <circle cx="8" cy="20" r="2.4" fill="#0f5c4e"/>
+        <circle cx="24" cy="11" r="2.4" fill="#ff5941"/>
+      </svg>
+      Wayfare
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#itinerary">Itinerary</a>
+      <a href="#tracking">Tracking</a>
+      <a href="#budget">Budget</a>
+      <a href="#pricing">Pricing</a>
+    </nav>
+    <div class="nav-cta">
+      <a href="#" class="signin">Sign in</a>
+      <a href="#pricing" class="btn btn-primary">Start free</a>
+      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false" onclick="toggleMenu(this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+  </div>
+  <nav class="nav-mobile" id="mobileMenu" aria-label="Mobile">
+    <a href="#itinerary">Itinerary</a>
+    <a href="#tracking">Tracking</a>
+    <a href="#budget">Budget</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#">Sign in</a>
+  </nav>
+</header>
+
+<main>
+<section class="hero">
+  <div class="container hero-grid">
+    <div>
+      <span class="eyebrow">For independent travelers</span>
+      <h1>The whole trip, <em>one plan</em> that keeps up with you.</h1>
+      <p class="hero-sub">Wayfare pulls your itinerary, your flights and trains, and your daily spending into a single living plan. Change one thing and everything downstream adjusts. No spreadsheets, no seventeen tabs.</p>
+      <div class="hero-actions">
+        <a href="#pricing" class="btn btn-coral">Plan your first trip free</a>
+        <a href="#itinerary" class="btn btn-ghost">See how it works</a>
+      </div>
+      <div class="hero-proof">
+        <div class="avatars" aria-hidden="true">
+          <span class="av1">MK</span><span class="av2">JT</span><span class="av3">AL</span><span class="av4">RS</span>
+        </div>
+        <span>Trusted by 120,000+ travelers across 190 countries</span>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="app-mock" role="img" aria-label="Preview of the Wayfare app showing a day plan for Lisbon with a live train status and a daily budget meter">
+        <div class="mock-bar"><i></i><i></i><i></i><span class="trip-name">Portugal, Sept 12 to 26</span></div>
+        <div class="mock-body">
+          <div class="mock-day"><strong>Day 4 - Lisbon to Porto</strong><span>Tue, Sept 16</span></div>
+          <div class="stop">
+            <span class="dot d-train"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="3" width="14" height="14" rx="3"/><path d="M5 11h14M8 21l2-4M16 21l-2-4"/><circle cx="9" cy="14" r=".5"/><circle cx="15" cy="14" r=".5"/></svg></span>
+            <div class="meta"><b>Alfa Pendular 122 to Porto</b><small>Santa Apolonia 09:39 &rarr; Campanha 12:33 &middot; Car 4, seat 51</small></div>
+            <span class="tag t-live">On time</span>
+          </div>
+          <div class="stop">
+            <span class="dot d-food"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 3v8M10 3v8M8.5 11v10M16 3c-2 1.5-2.5 5-2.5 8h5c0-3-.5-6.5-2.5-8zM16 11v10"/></svg></span>
+            <div class="meta"><b>Lunch at Casa Guedes</b><small>Praca dos Poveiros &middot; 8 min walk from station</small></div>
+            <span class="tag t-cost">~ &euro;14</span>
+          </div>
+          <div class="stop">
+            <span class="dot d-see"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 21s-7-5.5-7-11a7 7 0 1 1 14 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></span>
+            <div class="meta"><b>Livraria Lello, timed entry</b><small>15:30 &middot; ticket saved to plan</small></div>
+            <span class="tag t-cost">&euro;8 paid</span>
+          </div>
+          <div class="mock-budget">
+            <div class="row"><span>Today's budget</span><b>&euro;52 of &euro;85 spent</b></div>
+            <div class="meter"><i></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="float-chip chip-flight" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#0f5c4e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 21l2-6.5L19 8c1.5-1.5 1-3-1-3l-6.5 6.5L5 13.5 3 15l4 1 1 4 2.5-2z" transform="rotate(15 12 12)"/></svg>
+        <div>Return flight TP438<br><b>Gate change: 24 &rarr; 31</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="features-intro" style="padding-bottom:0">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Why Wayfare</span>
+      <h2>Built for the way independent travel actually goes.</h2>
+      <p>You booked it yourself, you are changing it as you go, and nobody is holding your hand. Wayfare is designed for exactly that trip.</p>
+    </div>
+
+    <div class="feature" id="itinerary">
+      <div class="feature-copy">
+        <span class="eyebrow">Itinerary builder</span>
+        <h3>Drag your days into shape, then reshape them on the road.</h3>
+        <p>Sketch a loose route or plan every hour. Drop in places, notes, bookings, and tickets, then reorder with a drag. Travel times between stops update automatically so you know when a day is overstuffed before it ruins your morning.</p>
+        <ul class="feature-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>Auto-calculated walking, transit, and rail times between stops</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>Forward booking emails and they land on the right day</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>Full offline access, including maps and tickets</li>
+        </ul>
+      </div>
+      <div class="feature-visual">
+        <div class="panel" role="img" aria-label="Itinerary editor showing a reorderable list of stops for a day in Kyoto">
+          <div class="mock-day" style="margin-bottom:14px"><strong>Day 2 - Kyoto</strong><span>4 stops &middot; 6.2 km on foot</span></div>
+          <div class="iti-row">
+            <span class="grip">&#8942;&#8942;</span><span class="time">08:30</span>
+            <div class="what"><b>Fushimi Inari at sunrise</b><small>Beat the crowds; 90 min loop</small></div>
+          </div>
+          <div class="iti-row dragging">
+            <span class="grip">&#8942;&#8942;</span><span class="time">11:15</span>
+            <div class="what"><b>Nishiki Market lunch crawl</b><small>Moved from Day 3 &middot; travel time recalculated</small></div>
+          </div>
+          <div class="iti-row">
+            <span class="grip">&#8942;&#8942;</span><span class="time">14:00</span>
+            <div class="what"><b>Philosopher's Path walk</b><small>21 min by bus 203 from previous stop</small></div>
+          </div>
+          <div class="iti-row">
+            <span class="grip">&#8942;&#8942;</span><span class="time">18:30</span>
+            <div class="what"><b>Gion evening stroll</b><small>Reservation at Gion Karyo, 19:30</small></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature flip" id="tracking">
+      <div class="feature-copy">
+        <span class="eyebrow">Flight and train tracking</span>
+        <h3>Every leg watched, so you do not have to refresh a departure board.</h3>
+        <p>Wayfare monitors each flight and train in your plan and tells you what actually matters: gate and platform changes, delays that threaten a connection, and when to leave for the station based on live conditions.</p>
+        <ul class="feature-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>Live status for 700+ airlines and 40+ national rail networks</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>Connection risk alerts with rebooking suggestions</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>Push alerts that work abroad without roaming data</li>
+        </ul>
+      </div>
+      <div class="feature-visual">
+        <div class="panel" role="img" aria-label="Journey tracker showing three legs: a delayed flight, an in-progress train with position, and a boarding train">
+          <div class="leg">
+            <span class="mode d-see"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 21l2-6.5L19 8c1.5-1.5 1-3-1-3l-6.5 6.5L5 13.5 3 15l4 1 1 4 2.5-2z"/></svg></span>
+            <div class="route"><b>VY 8460 &middot; BCN &rarr; NAP</b><small>New departure 14:55, was 14:10 &middot; Gate B34</small></div>
+            <span class="status s-delay">+45 min</span>
+          </div>
+          <div class="leg" style="display:block">
+            <div style="display:flex;align-items:center;gap:14px">
+              <span class="mode d-train"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="3" width="14" height="14" rx="3"/><path d="M5 11h14M8 21l2-4M16 21l-2-4"/></svg></span>
+              <div class="route"><b>Frecciarossa 9528 &middot; Naples &rarr; Rome</b><small>Arriving Roma Termini 17:10 &middot; platform 12</small></div>
+              <span class="status s-ontime">On time</span>
+            </div>
+            <div style="padding-left:50px;margin-top:10px">
+              <div class="leg-progress"><i></i><em></em></div>
+              <small style="color:var(--ink-faint);font-size:11.5px">Now passing Latina &middot; 41 min to arrival</small>
+            </div>
+          </div>
+          <div class="leg">
+            <span class="mode d-train"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="3" width="14" height="14" rx="3"/><path d="M5 11h14M8 21l2-4M16 21l-2-4"/></svg></span>
+            <div class="route"><b>Regionale 2371 &middot; Rome &rarr; Orvieto</b><small>Departs 18:27 &middot; leave hotel by 17:50</small></div>
+            <span class="status s-board">Tonight</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature" id="budget">
+      <div class="feature-copy">
+        <span class="eyebrow">Daily budget tracking</span>
+        <h3>Know what today can cost before you spend it.</h3>
+        <p>Set a trip budget and Wayfare breaks it into a daily allowance that flexes with reality. Overspend on a splurge dinner and tomorrow's number quietly adjusts. Log expenses in three taps, in any currency, even offline.</p>
+        <ul class="feature-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>Live exchange rates with your home currency always visible</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>Split costs with travel partners and settle up at the end</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>Category breakdowns: food, transport, stays, splurges</li>
+        </ul>
+      </div>
+      <div class="feature-visual">
+        <div class="panel" role="img" aria-label="Budget view showing daily spending bars for a week with one overspent day and an adjusted allowance note">
+          <div class="budget-top">
+            <div><div class="big">&euro;61 <small>left today</small></div></div>
+            <div style="text-align:right;font-size:12px;color:var(--ink-faint)">Trip total<br><b style="color:var(--ink);font-size:14px">&euro;1,240 of &euro;1,800</b></div>
+          </div>
+          <div class="bars" aria-hidden="true">
+            <div class="bar"><i style="height:52%"></i><small>Th</small></div>
+            <div class="bar"><i style="height:64%"></i><small>Fr</small></div>
+            <div class="bar over"><i style="height:100%"></i><small>Sa</small></div>
+            <div class="bar"><i style="height:44%"></i><small>Su</small></div>
+            <div class="bar"><i style="height:58%"></i><small>Mo</small></div>
+            <div class="bar today"><i style="height:38%"></i><small>Tu</small></div>
+            <div class="bar"><i style="height:12%;background:var(--mist)"></i><small>We</small></div>
+          </div>
+          <div class="budget-note">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 9v4M12 16.5v.5"/><circle cx="12" cy="12" r="9"/></svg>
+            Saturday ran &euro;38 over, so this week's daily allowance shifted from &euro;85 to &euro;79.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section class="section pricing" id="pricing">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Pricing</span>
+      <h2>Free to wander. Cheap to go far.</h2>
+      <p>Every plan includes the itinerary builder and offline access. Upgrade when your trips get more ambitious.</p>
+    </div>
+    <div class="tiers">
+      <div class="tier">
+        <h3>Scout</h3>
+        <p class="who">For the occasional trip and seeing if Wayfare fits how you travel.</p>
+        <div class="price">$0 <small>forever</small></div>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>1 active trip</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>Full itinerary builder with offline maps</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>Basic flight status updates</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>Manual expense logging</li>
+        </ul>
+        <a href="#" class="btn btn-outline-light">Start with Scout</a>
+      </div>
+      <div class="tier hot">
+        <span class="badge">Most popular</span>
+        <h3>Wayfarer</h3>
+        <p class="who">For people with a trip on the calendar and a connection they cannot miss.</p>
+        <div class="price">$6 <small>per month, billed yearly</small></div>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>Unlimited trips</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>Live flight and train tracking with connection alerts</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>Daily budget engine with multi-currency</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>Booking email forwarding and auto-import</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>Cost splitting with travel partners</li>
+        </ul>
+        <a href="#" class="btn btn-coral">Try free for 14 days</a>
+      </div>
+      <div class="tier">
+        <h3>Nomad</h3>
+        <p class="who">For long-haul, multi-month travelers who live out of the app.</p>
+        <div class="price">$12 <small>per month, billed yearly</small></div>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>Everything in Wayfarer</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>Multi-country budget envelopes and monthly rollups</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>Visa and entry-requirement reminders</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>Priority rebooking help when a leg falls through</li>
+        </ul>
+        <a href="#" class="btn btn-outline-light">Go Nomad</a>
+      </div>
+    </div>
+    <p class="pricing-foot">Prices in USD. Monthly billing available at $8 and $15. Cancel anytime; your trips stay exportable forever.</p>
+  </div>
+</section>
+
+<section class="cta-band">
+  <div class="container">
+    <h2>Your next trip deserves better than a spreadsheet.</h2>
+    <p>Start planning in the next five minutes. Import a booking email, drag a few days into shape, and see the whole trip come together.</p>
+    <a href="#pricing" class="btn btn-primary" style="padding:14px 30px">Create your free plan</a>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a href="#" class="logo">
+          <svg class="logo-mark" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+            <circle cx="16" cy="16" r="14" stroke="#8fd8c5" stroke-width="2.5"/>
+            <path d="M8 20 C12 12, 20 20, 24 11" stroke="#ff5941" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+            <circle cx="8" cy="20" r="2.4" fill="#8fd8c5"/>
+            <circle cx="24" cy="11" r="2.4" fill="#ff5941"/>
+          </svg>
+          Wayfare
+        </a>
+        <p>Trip planning for people who book their own adventures. Made by a small team that travels too much.</p>
+      </div>
+      <div>
+        <h4>Product</h4>
+        <ul>
+          <li><a href="#itinerary">Itinerary builder</a></li>
+          <li><a href="#tracking">Flight and train tracking</a></li>
+          <li><a href="#budget">Budget tracking</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+          <li><a href="#">iOS and Android apps</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="#">Help center</a></li>
+          <li><a href="#">Travel guides</a></li>
+          <li><a href="#">Rail network coverage</a></li>
+          <li><a href="#">API for developers</a></li>
+          <li><a href="#">Status</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Press kit</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>&copy; 2026 Wayfare Travel, Inc. All rights reserved.</span>
+      <div class="legal">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Security</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+function toggleMenu(btn){
+  var m=document.getElementById('mobileMenu');
+  var open=m.classList.toggle('open');
+  btn.setAttribute('aria-expanded',open?'true':'false');
+}
+document.querySelectorAll('#mobileMenu a').forEach(function(a){
+  a.addEventListener('click',function(){
+    document.getElementById('mobileMenu').classList.remove('open');
+  });
+});
+</script>
+</body>
+</html>

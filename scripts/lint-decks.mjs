@@ -95,8 +95,8 @@ check("missing provenance companion does not change design QA",
 check("provenance hygiene runs after the design gate",
   skill.includes("and only after the gate passes") &&
   provenance.includes("Run this only after the page has passed the normal goddesign gate"));
-check("provenance hygiene never mutates validation evidence",
-  provenance.includes("Never clean `validation/`, frozen study inputs, receipts, manifests"));
+check("provenance hygiene never mutates frozen evidence",
+  provenance.includes("Never clean frozen evidence, receipts, manifests, signed artifacts"));
 check("lossy provenance work forces a fresh full gate",
   provenance.includes("Statistical rewrite or pixel regeneration: re-run the full goddesign gate"));
 check("provenance adapter exposes every documented operation",
@@ -106,8 +106,6 @@ check("verify-install.sh lists provenance integration as optional",
   /prompt_optional="[^"]*scripts\/provenance-hygiene\.sh[^"]*references\/provenance-hygiene\.md/.test(verifyInstall));
 check("verify-install.sh keeps prompt-only absence out of DEGRADED",
   verifyInstall.includes("prompt-only capability unavailable; design QA unchanged"));
-check("provenance evaluation record is retained",
-  existsSync("validation/research/watermarks-remover-evaluation-2026-08.md"));
 
 // 6c. Copy review is mode-aware, routed after copy exists, and remains a
 // quality gate rather than an authorship detector or universal word blacklist.
@@ -130,8 +128,6 @@ check("copy.md rejects authorship detection claims",
   /not an authorship\s+detector/.test(copy) && copy.includes("Never claim that passing it proves a person wrote the text"));
 check("checklist.md carries the Copy gate group",
   checklist.includes("Copy (read `references/copy.md` before checking)"));
-check("unslop evaluation record is retained",
-  existsSync("validation/research/unslop-evaluation-2026-08.md"));
 
 // 7. Design map: the deck, the validator, and the skill wiring stay in sync.
 const map = read("skills/goddesign/references/map.md");
@@ -271,7 +267,7 @@ import { execFileSync, execSync } from "node:child_process";
 const prose = execSync(
   "git ls-files --cached --others --exclude-standard -- '*.md'",
   { encoding: "utf8" }
-).trim().split("\n").filter((f) => f && existsSync(f) && !f.startsWith("validation/runs/"));
+).trim().split("\n").filter((f) => f && existsSync(f));
 for (const f of prose) {
   const t = read(f);
   check(`${f} has no em/en dashes`, !/[\u2013\u2014]/.test(t));

@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ledgerbird, bookkeeping for freelance creatives</title>
+<meta name="description" content="Ledgerbird captures invoices, sorts expenses into Schedule C categories, and estimates your quarterly taxes. Bookkeeping software for freelance creatives.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Darker+Grotesque:wght@800&family=Jost:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* goddesign | structure: Offset Cascade | direction: Neobrutalist Web | accent: 277 */
+/* seed 2249562766 | direction 14 Neobrutalist Web | structure 9 Offset Cascade
+   jitter h+6 L-0.01 r+1 | accent oklch(from #4D61FC l c calc(h+6)) | bg/surface L-0.01 | radius 10->12px
+   type: Darker Grotesque 800 display / Jost 400 body / Jost 600 caps labels +8% tracking
+   signature: Schedule C category chips on a ledger panel + pressable billing toggle */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: oklch(from #F5F5F0 calc(l - 0.01) c h);
+  --surface: oklch(from #FCFCF9 calc(l - 0.01) c h);
+  --text: #141310;
+  --muted: #55555A;
+  --accent: oklch(from #4D61FC l c calc(h + 6));
+  --secondary: #FFDD33;
+  --on-accent: #FFFFFF;
+  --accent-down: oklch(from var(--accent) calc(l - 0.1) c h);
+  --hairline: color-mix(in oklab, var(--text) 18%, transparent);
+  --radius: 12px;
+  --radius-s: 8px;
+  --bw: 3px;
+  --shadow: 5px 5px 0 var(--text);
+  --shadow-up: 7px 7px 0 var(--text);
+  --shadow-down: 1px 1px 0 var(--text);
+  --display: "Darker Grotesque", sans-serif;
+  --body: "Jost", sans-serif;
+  --pull: -112px;
+}
+
+html { overflow-x: clip; scroll-padding-top: 96px; }
+body {
+  overflow-x: clip;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--body);
+  font-size: 1.0625rem;
+  line-height: 1.55;
+  overflow-wrap: break-word;
+}
+::selection { background: var(--secondary); color: var(--text); }
+
+h1, h2, h3 {
+  font-family: var(--display);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+p { text-wrap: pretty; }
+h1 { font-size: clamp(3rem, 7.5vw, 6rem); max-width: 14ch; }
+h2 { font-size: clamp(2.1rem, 3.6vw, 3.25rem); max-width: 22ch; }
+h3 { font-size: 1.65rem; }
+
+.label {
+  font: 600 0.875rem var(--body);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.num { font-variant-numeric: tabular-nums; }
+
+/* ---------- interactive elements ---------- */
+
+a { color: inherit; }
+
+.skip {
+  position: absolute;
+  left: 16px;
+  top: -64px;
+  z-index: 20;
+  padding: 8px 16px;
+  background: var(--surface);
+  border: var(--bw) solid var(--text);
+  border-radius: var(--radius-s);
+}
+.skip:focus-visible { top: 8px; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 8px 24px;
+  background: var(--surface);
+  color: var(--text);
+  font: 600 1rem var(--body);
+  text-decoration: none;
+  border: var(--bw) solid var(--text);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: transform 0.15s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.15s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.btn:hover { transform: translate(-2px, -2px); box-shadow: var(--shadow-up); }
+.btn:active { transform: translate(2px, 2px); box-shadow: var(--shadow-down); }
+.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.btn:disabled, .btn[aria-disabled="true"] {
+  opacity: 0.55;
+  transform: none;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+.btn-primary { background: var(--accent); color: var(--on-accent); }
+.btn-primary:hover { background: var(--accent-down); }
+.btn-small { min-height: 40px; padding: 4px 16px; }
+
+.link {
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  transition: text-decoration-color 0.15s linear;
+}
+.link:hover { text-decoration-color: var(--accent); text-decoration-thickness: 3px; }
+.link:active { color: var(--accent-down); }
+.link:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+
+/* ---------- nav ---------- */
+
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--bg);
+  border-bottom: var(--bw) solid var(--text);
+}
+.nav-inner {
+  max-width: 1200px;
+  margin-inline: auto;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: 800 1.6rem var(--display);
+  text-decoration: none;
+  line-height: 1;
+}
+.brand:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-left: auto;
+  list-style: none;
+}
+.nav-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 3px solid transparent;
+  transition: border-color 0.15s linear;
+}
+.nav-links a:hover { border-bottom-color: var(--accent); }
+.nav-links a:active { color: var(--accent-down); }
+.nav-links a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+/* ---------- bands + cascade ---------- */
+
+.band-bg { background: var(--bg); }
+.band-surface { background: var(--surface); }
+.band-sec { background: var(--secondary); }
+.band-ink { background: var(--text); color: var(--bg); }
+
+.wrap { max-width: 1200px; margin-inline: auto; padding-inline: 24px; }
+
+.hero { padding-block: 64px 128px; }
+.hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 48px;
+  align-items: center;
+}
+.hero-copy > p { margin-top: 24px; font-size: 1.3rem; line-height: 1.5; max-width: 48ch; }
+.cta-row { margin-top: 32px; display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+.cta-note { margin-top: 12px; color: var(--muted); font-size: 0.9375rem; }
+.hero-art { display: block; width: min(100%, 420px); height: auto; margin-inline: auto; }
+
+.cascade { padding-block: 48px 96px; }
+.feature {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 64px;
+  align-items: start;
+}
+.feature-copy { padding-top: 24px; }
+.feature-copy p { margin-top: 16px; max-width: 52ch; }
+.feature-copy .link { display: inline-block; margin-top: 16px; }
+.feature.flip { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
+.feature.flip .feature-visual { order: 1; }
+.lead-pull { margin-top: var(--pull); position: relative; z-index: 2; }
+
+/* ---------- panels (product artifacts) ---------- */
+
+.panel {
+  background: var(--surface);
+  border: var(--bw) solid var(--text);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px;
+}
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 12px;
+  border-bottom: var(--bw) solid var(--text);
+}
+.panel-title { color: var(--muted); }
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  background: var(--secondary);
+  border: var(--bw) solid var(--text);
+  border-radius: var(--radius-s);
+  font: 600 0.875rem var(--body);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text);
+  white-space: nowrap;
+}
+.chip-ghost { background: var(--surface); }
+
+.invoice-num { font: 800 2.1rem var(--display); line-height: 1.1; margin-top: 16px; }
+.invoice-fields { margin-top: 12px; }
+.invoice-fields > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: 16px;
+  padding-block: 8px;
+  border-top: 1px solid var(--hairline);
+}
+.invoice-fields dt { color: var(--muted); }
+.invoice-fields dd { font-weight: 600; }
+.panel-foot {
+  margin-top: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ledger { list-style: none; }
+.ledger li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 12px;
+  align-items: center;
+  padding-block: 12px;
+  border-top: 1px solid var(--hairline);
+}
+.ledger li:first-child { border-top: 0; padding-top: 16px; }
+.ledger .amt {
+  font-weight: 600;
+  text-align: right;
+  padding-left: 12px;
+  border-left: 2px solid var(--text);
+}
+
+.tax-figure { font: 800 3.9rem var(--display); line-height: 1.1; margin-top: 12px; }
+.tax-due { font-weight: 600; }
+.meter {
+  margin-top: 16px;
+  height: 16px;
+  border: var(--bw) solid var(--text);
+  border-radius: var(--radius-s);
+  background: var(--surface);
+}
+.meter-fill {
+  width: 66%;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--accent);
+}
+.tax-saved { margin-top: 8px; }
+.tax-method { margin-top: 12px; color: var(--muted); font-size: 0.9375rem; }
+
+/* ---------- pricing ---------- */
+
+.pricing { position: relative; }
+.egg-shape {
+  position: absolute;
+  right: -96px;
+  top: 24px;
+  width: 460px;
+  height: 560px;
+  pointer-events: none;
+}
+.egg-shape ellipse { fill: none; stroke: var(--text); stroke-width: 3; opacity: 0.09; }
+
+.price-plate {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  background: var(--surface);
+  border: var(--bw) solid var(--text);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px 32px;
+}
+.price-plate p { color: var(--muted); max-width: 40ch; }
+
+.toggle {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--surface);
+  border: var(--bw) solid var(--text);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: transform 0.15s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.15s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.toggle:hover { transform: translate(-2px, -2px); box-shadow: var(--shadow-up); }
+.toggle:active { transform: translate(2px, 2px); box-shadow: var(--shadow-down); }
+.toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.toggle:disabled { opacity: 0.55; box-shadow: none; cursor: not-allowed; }
+.toggle-opt {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 4px 16px;
+  border-radius: var(--radius-s);
+  font: 600 0.9375rem var(--body);
+  color: var(--muted);
+  transition: background-color 0.2s cubic-bezier(0.25, 1, 0.5, 1), color 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+}
+.toggle[aria-checked="false"] .toggle-opt:first-child,
+.toggle[aria-checked="true"] .toggle-opt:last-of-type {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.toggle-note { margin-top: 8px; color: var(--muted); font-size: 0.9375rem; }
+
+.tiers {
+  margin-top: 64px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 32px;
+  list-style: none;
+  position: relative;
+  z-index: 1;
+}
+.card {
+  background: var(--surface);
+  border: var(--bw) solid var(--text);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+}
+.card-featured { background: var(--secondary); }
+.card-featured .chip { background: var(--surface); }
+.tier-tag { min-height: 32px; margin-bottom: 12px; }
+.card .tagline { margin-top: 4px; color: var(--muted); }
+.card-featured .tagline { color: var(--text); }
+.price { margin-top: 24px; display: flex; align-items: baseline; gap: 4px; }
+.price-cur { font: 800 1.65rem var(--display); }
+.price-num { font: 800 3.25rem var(--display); line-height: 1.1; }
+.per { margin-left: 8px; font-size: 0.9375rem; color: var(--muted); max-width: 12ch; line-height: 1.3; }
+.card-featured .per { color: var(--text); }
+.tier-list { list-style: none; margin-top: 24px; flex-grow: 1; }
+.tier-list li { padding-block: 8px; border-top: 1px solid var(--hairline); }
+.tier-list li:first-child { border-top: 0; }
+.card .btn { margin-top: 24px; }
+.fine-print { margin-top: 32px; color: var(--muted); font-size: 0.9375rem; }
+
+/* ---------- footer ---------- */
+
+.footer { padding-block: 96px 48px; }
+.footer-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr));
+  gap: 48px;
+}
+.footer .brand { color: var(--surface); }
+.footer-tag { margin-top: 16px; max-width: 32ch; color: color-mix(in oklab, var(--bg) 78%, transparent); }
+.footer h2 {
+  font: 600 0.875rem var(--body);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: color-mix(in oklab, var(--bg) 65%, transparent);
+}
+.footer ul { list-style: none; margin-top: 16px; }
+.footer ul a {
+  display: inline-flex;
+  min-height: 24px;
+  align-items: center;
+  margin-block: 4px;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: border-color 0.15s linear, color 0.15s linear;
+}
+.footer ul a:hover { color: var(--secondary); border-bottom-color: var(--secondary); }
+.footer ul a:active { color: var(--secondary); }
+.footer ul a:focus-visible { outline: 2px solid var(--secondary); outline-offset: 3px; }
+.footer-legal {
+  margin-top: 64px;
+  padding-top: 24px;
+  border-top: 1px solid color-mix(in oklab, var(--bg) 25%, transparent);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 48px;
+  justify-content: space-between;
+  color: color-mix(in oklab, var(--bg) 78%, transparent);
+  font-size: 0.9375rem;
+}
+.footer-legal p { max-width: 64ch; }
+
+/* ---------- svg art ---------- */
+
+.s-ink { fill: none; stroke: var(--text); stroke-width: 6; stroke-linejoin: round; stroke-linecap: round; }
+.f-sec { fill: var(--secondary); stroke: var(--text); stroke-width: 6; stroke-linejoin: round; }
+.f-sur { fill: var(--surface); stroke: var(--text); stroke-width: 6; stroke-linejoin: round; }
+.f-ink { fill: var(--text); }
+.mark .f-sec, .mark .f-sur { stroke-width: 10; }
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 960px) {
+  :root { --pull: 0px; }
+  .hero { padding-block: 48px 64px; }
+  .hero-grid { grid-template-columns: minmax(0, 1fr); }
+  .hero-art { width: min(100%, 300px); }
+  .cascade { padding-block: 48px 64px; }
+  .feature, .feature.flip { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+  .feature.flip .feature-visual { order: 0; }
+  .feature-copy { padding-top: 0; }
+  .footer { padding-block: 64px 32px; }
+  .footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .egg-shape { display: none; }
+}
+@media (max-width: 640px) {
+  .nav-links { gap: 16px; }
+  .nav-links a { min-height: 44px; }
+  .footer ul a { min-height: 44px; margin-block: 0; }
+  .btn { width: 100%; }
+  .nav .btn, .card .btn { width: auto; }
+  .nav .btn { min-height: 44px; }
+  .footer-grid { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="#top" aria-label="Ledgerbird home">
+      <svg class="mark" width="30" height="30" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+        <circle class="f-sec" cx="46" cy="50" r="38"></circle>
+        <polygon class="f-ink" points="82,42 100,50 82,60"></polygon>
+        <circle class="f-ink" cx="58" cy="40" r="6"></circle>
+      </svg>
+      Ledgerbird
+    </a>
+    <nav aria-label="Main">
+      <ul class="nav-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#pricing">Sign in</a></li>
+      </ul>
+    </nav>
+    <a class="btn btn-primary btn-small" href="#pricing">Start free trial</a>
+  </div>
+</header>
+
+<main id="main">
+
+  <section class="band-bg hero" id="top" aria-labelledby="hero-h">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <h1 id="hero-h">Snap it, sort it, set the tax aside.</h1>
+        <p>Ledgerbird captures invoices from your inbox, sorts expenses into Schedule C categories, and estimates your quarterly taxes.</p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="#pricing">Start free trial</a>
+          <a class="btn" href="#pricing">See pricing</a>
+        </div>
+        <p class="cta-note">30 days free. No card up front.</p>
+      </div>
+      <svg class="hero-art" viewBox="0 0 360 330" aria-hidden="true" focusable="false">
+        <rect class="f-ink" x="66" y="256" width="238" height="62" rx="4"></rect>
+        <rect class="f-sur" x="58" y="248" width="238" height="62" rx="4"></rect>
+        <line class="s-ink" x1="80" y1="270" x2="200" y2="270"></line>
+        <line class="s-ink" x1="80" y1="288" x2="168" y2="288"></line>
+        <rect class="f-sec" x="216" y="264" width="56" height="28" rx="6" transform="rotate(-6 244 278)"></rect>
+        <polygon class="f-sec" points="118,150 58,116 82,170"></polygon>
+        <circle class="f-sec" cx="186" cy="140" r="92"></circle>
+        <path class="f-sur" d="M150 168 q36 44 96 34 q-14 34 -60 30 q-40 -4 -36 -64 Z"></path>
+        <path class="s-ink" d="M132 128 q40 -28 84 -6"></path>
+        <polygon class="f-ink" points="272,118 322,132 272,150"></polygon>
+        <circle class="f-ink" cx="238" cy="112" r="9"></circle>
+        <line class="s-ink" x1="168" y1="230" x2="168" y2="250"></line>
+        <line class="s-ink" x1="206" y1="230" x2="206" y2="250"></line>
+        <line class="s-ink" x1="152" y1="250" x2="184" y2="250"></line>
+        <line class="s-ink" x1="190" y1="250" x2="222" y2="250"></line>
+      </svg>
+    </div>
+  </section>
+
+  <section class="band-surface cascade" id="features" aria-labelledby="f1-h">
+    <div class="wrap feature">
+      <div class="feature-visual lead-pull">
+        <div class="panel" aria-label="Invoice capture, example">
+          <div class="panel-head">
+            <span class="panel-title label">Invoice capture</span>
+            <span class="chip chip-ghost">Example</span>
+          </div>
+          <p class="invoice-num">Invoice #0047</p>
+          <dl class="invoice-fields">
+            <div><dt>Client</dt><dd>Oak Street Cafe</dd></div>
+            <div><dt>Project</dt><dd>Mural, front dining room</dd></div>
+            <div><dt>Amount</dt><dd class="num">$1,800.00</dd></div>
+            <div><dt>Due</dt><dd>Aug 1, 2026</dd></div>
+          </dl>
+          <div class="panel-foot">
+            <span class="chip chip-ghost">From forwarded email</span>
+            <span class="chip">Awaiting payment</span>
+          </div>
+        </div>
+      </div>
+      <div class="feature-copy">
+        <h2 id="f1-h">Capture invoices without retyping them</h2>
+        <p>Forward the email, snap the paper, or drop the PDF. Ledgerbird reads the client, the amount, and the due date, files the original next to the entry, and flags the invoices that go unpaid past their date.</p>
+        <p>When the deposit lands in your account, the invoice marks itself paid and your income line updates. No spreadsheet, no Sunday-night data entry.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="band-bg cascade" aria-labelledby="f2-h">
+    <div class="wrap feature flip">
+      <div class="feature-copy">
+        <h2 id="f2-h">Every swipe lands on the right Schedule C line</h2>
+        <p>Connect the card you actually use. Software subscriptions, art supplies, the 50 percent meals rule: each expense arrives pre-sorted into its Schedule C category, and one tap confirms it.</p>
+        <p>Ledgerbird learns your pattern, so the vendor you tag once stays tagged. Come January, your deductions are already a list instead of a shoebox.</p>
+      </div>
+      <div class="feature-visual lead-pull">
+        <div class="panel" aria-label="Sorted expenses, example">
+          <div class="panel-head">
+            <span class="panel-title label">July expenses</span>
+            <span class="chip chip-ghost">Example</span>
+          </div>
+          <ul class="ledger">
+            <li><span>Adobe Creative Cloud</span><span class="amt num">$59.99</span><span class="chip">Software</span></li>
+            <li><span>Blick, canvas and gesso</span><span class="amt num">$84.12</span><span class="chip">Supplies</span></li>
+            <li><span>Lunch with Oak St. client</span><span class="amt num">$31.40</span><span class="chip">Meals 50%</span></li>
+            <li><span>Epson wide-format ink</span><span class="amt num">$61.00</span><span class="chip">Equipment</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band-sec cascade" aria-labelledby="f3-h">
+    <div class="wrap feature">
+      <div class="feature-visual lead-pull">
+        <div class="panel" aria-label="Quarterly tax estimate, example">
+          <div class="panel-head">
+            <span class="panel-title label">Q3 2026 estimate</span>
+            <span class="chip chip-ghost">Example</span>
+          </div>
+          <p class="tax-figure num">$2,340</p>
+          <p class="tax-due">Due September 15, 2026</p>
+          <div class="meter" aria-hidden="true"><div class="meter-fill"></div></div>
+          <p class="tax-saved num">Set aside so far: $1,560 of $2,340</p>
+          <p class="tax-method">Safe harbor method: matched to last year's tax, paid in four.</p>
+        </div>
+      </div>
+      <div class="feature-copy">
+        <h2 id="f3-h">September 15 stops being scary</h2>
+        <p>Ledgerbird tracks profit as invoices get paid, applies the safe harbor rule, and keeps a running set-aside number you can actually save toward, week by week.</p>
+        <p>When the 1040-ES voucher is due, you already have the amount and the money. Four calm payments a year instead of one April surprise.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="band-surface cascade pricing" id="pricing" aria-labelledby="price-h">
+    <svg class="egg-shape" viewBox="0 0 460 560" aria-hidden="true" focusable="false">
+      <ellipse cx="230" cy="290" rx="210" ry="260"></ellipse>
+    </svg>
+    <div class="wrap">
+      <div class="price-plate lead-pull">
+        <div>
+          <h2 id="price-h">Pick your perch</h2>
+          <p>Start free, upgrade when the invoices multiply. Prices in USD.</p>
+        </div>
+        <div>
+          <button type="button" class="toggle" id="billingToggle" role="switch" aria-checked="false" aria-label="Billing period">
+            <span class="toggle-opt">Monthly</span>
+            <span class="toggle-opt">Annual</span>
+          </button>
+          <p class="toggle-note">Annual billing gives you two months free.</p>
+        </div>
+      </div>
+      <ul class="tiers" aria-live="polite">
+        <li class="card">
+          <p class="tier-tag"></p>
+          <h3>Egg</h3>
+          <p class="tagline">For your first paying clients.</p>
+          <p class="price"><span class="price-cur">$</span><span class="price-num num">0</span><span class="per">free forever</span></p>
+          <ul class="tier-list">
+            <li>Five invoices a month</li>
+            <li>Manual expense tags</li>
+            <li>One linked bank account</li>
+            <li>Email support</li>
+          </ul>
+          <a class="btn" href="#top">Create free account</a>
+        </li>
+        <li class="card card-featured">
+          <p class="tier-tag"><span class="chip">Most picked</span></p>
+          <h3>Fledgling</h3>
+          <p class="tagline">For full-time freelancers.</p>
+          <p class="price"><span class="price-cur">$</span><span class="price-num num" data-monthly="12" data-annual="10">12</span><span class="per per-live">per month, billed monthly</span></p>
+          <ul class="tier-list">
+            <li>Unlimited invoice capture</li>
+            <li>Automatic Schedule C sorting</li>
+            <li>Quarterly tax estimates</li>
+            <li>Year-end CPA export</li>
+          </ul>
+          <a class="btn btn-primary" href="#top">Start 30-day free trial</a>
+        </li>
+        <li class="card">
+          <p class="tier-tag"></p>
+          <h3>Flock</h3>
+          <p class="tagline">For studios and busy duos.</p>
+          <p class="price"><span class="price-cur">$</span><span class="price-num num" data-monthly="29" data-annual="24">29</span><span class="per per-live">per month, billed monthly</span></p>
+          <ul class="tier-list">
+            <li>Everything in Fledgling</li>
+            <li>Five business profiles</li>
+            <li>A seat for your CPA</li>
+            <li>Priority support</li>
+          </ul>
+          <a class="btn" href="#top">Start 30-day free trial</a>
+        </li>
+      </ul>
+      <p class="fine-print">Cancel anytime. Your books leave with you as a CSV export.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="band-ink footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <a class="brand" href="#top" aria-label="Ledgerbird home">
+          <svg class="mark" width="30" height="30" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+            <circle class="f-sec" cx="46" cy="50" r="38"></circle>
+            <polygon class="f-ink" points="82,42 100,50 82,60"></polygon>
+            <circle class="f-ink" cx="58" cy="40" r="6"></circle>
+          </svg>
+          Ledgerbird
+        </a>
+        <p class="footer-tag">Bookkeeping software for freelance creatives. Snap it, sort it, set the tax aside.</p>
+      </div>
+      <div>
+        <h2>Product</h2>
+        <ul>
+          <li><a href="#features">Invoice capture</a></li>
+          <li><a href="#features">Expense sorting</a></li>
+          <li><a href="#features">Quarterly estimates</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Company</h2>
+        <ul>
+          <li><a href="#top">About</a></li>
+          <li><a href="#top">Blog</a></li>
+          <li><a href="#top">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Legal</h2>
+        <ul>
+          <li><a href="#top">Privacy</a></li>
+          <li><a href="#top">Terms</a></li>
+          <li><a href="#top">Security</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-legal">
+      <p>Ledgerbird estimates your quarterly taxes; it does not file returns. For a complicated year, bring a CPA. We will hand over tidy books.</p>
+      <p>&copy; 2026 Ledgerbird</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var toggle = document.getElementById('billingToggle');
+    if (!toggle) return;
+    toggle.addEventListener('click', function () {
+      var annual = toggle.getAttribute('aria-checked') !== 'true';
+      toggle.setAttribute('aria-checked', String(annual));
+      document.querySelectorAll('.price-num[data-monthly]').forEach(function (el) {
+        el.textContent = annual ? el.dataset.annual : el.dataset.monthly;
+      });
+      document.querySelectorAll('.per-live').forEach(function (el) {
+        el.textContent = annual ? 'per month, billed annually' : 'per month, billed monthly';
+      });
+    });
+  })();
+</script>
+</body>
+</html>

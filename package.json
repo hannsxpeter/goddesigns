@@ -1,0 +1,42 @@
+{
+  "name": "@hxp-tools/goddesign",
+  "version": "3.0.0",
+  "description": "Draw one direction from a deck, lock it before any code, and clear a measured gate. A design skill for Claude Code, Codex, and other AI coding tools.",
+  "bin": {
+    "goddesign": "./bin/goddesign.js"
+  },
+  "files": [
+    "bin/",
+    "skills/goddesign/",
+    "docs/assets/",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "node --test scripts/pick.test.mjs scripts/sweep.test.mjs scripts/provenance-hygiene.test.mjs scripts/install.test.mjs && node scripts/lint-decks.mjs && sh skills/goddesign/scripts/verify-install.sh && node skills/goddesign/scripts/pick.mjs --check && sh -n scripts/install.sh && sh -n skills/goddesign/scripts/provenance-hygiene.sh",
+    "release:check": "npm test"
+  },
+  "keywords": [
+    "ai",
+    "ai-agents",
+    "claude-code",
+    "codex",
+    "cursor",
+    "agent-skills",
+    "design",
+    "frontend"
+  ],
+  "author": "Goddesign",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hannsxpeter/goddesigns.git"
+  },
+  "homepage": "https://github.com/hannsxpeter/goddesigns#readme",
+  "bugs": {
+    "url": "https://github.com/hannsxpeter/goddesigns/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

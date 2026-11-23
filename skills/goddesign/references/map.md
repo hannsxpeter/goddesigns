@@ -15,8 +15,6 @@ hold, a destination that fixes scope, a fog section for what cannot yet be
 specified, an out-of-scope section that never graduates, claim-before-work) is
 adapted from the wayfinder skill in `mattpocock/skills` (MIT, Copyright (c)
 2026 Matt Pocock). The rules below are goddesign-native, not transcriptions.
-The full borrow-and-decline record is in
-`validation/research/wayfinder-evaluation-2026-07.md`.
 
 ## When a map applies
 

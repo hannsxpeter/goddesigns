@@ -1,11 +1,10 @@
 // Tests for skills/goddesign/scripts/pick.mjs, the variance engine.
 // Run: node --test scripts/pick.test.mjs
 //
-// The receipts come from real runs: validation/runs/bellweather-2026-08/README.md
-// recorded seed 2110904443 rolling direction 10 Playful Pop, advancing to 11
-// Luxury Serif because the user ledger's last two runs were light paper, and
-// landing on structure 4 Workbench with jitter h+9. The model did that by hand;
-// the script has to make the same call.
+// The receipt is a real run from before 3.0.0: seed 2110904443 rolled direction
+// 10 Playful Pop, advanced to 11 Luxury Serif because the user ledger's last
+// two runs were light paper, and landed on structure 4 Workbench with jitter
+// h+9. The model did that by hand; the script has to make the same call.
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';

@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TaskFlow: the project board your team can point at</title>
+<meta name="description" content="TaskFlow turns scattered tasks into one shared board with owners, due dates, and a plan everyone can see.">
+<meta name="theme-color" content="#FFF8EF">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='28' height='28' rx='8' fill='%23FF4D6D' stroke='%23201A33' stroke-width='3'/%3E%3Cpath d='M9 16.5l5 5 9-11' fill='none' stroke='%23201A33' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Karla:wght@400;700&family=Space+Mono&display=swap" rel="stylesheet">
+<style>
+/* goddesign | structure: Index-First | direction: Playful Pop | accent: 349 */
+/* seed 1014002682 :: direction 10 Playful Pop :: structure 9 Index-First
+   tokens: bg #FFF8EF / surface #FFEFD9 / text #201A33 / muted #6E6680
+           accent #FF4D6D / secondary #2EC4B6 / highlight #FFC53D
+   type: Bricolage Grotesque 800 display / Karla 400,700 body / Space Mono 400 utility
+   shape: radius 16 / border 2px #201A33 / shadow 6px 6px 0 #201A33
+   hero h1: clamp(2.75rem, 1.5rem + 5vw, 4.25rem), max-width 16ch, 3 lines max at ceiling */
+
+:root {
+  --bg: #FFF8EF;
+  --surface: #FFEFD9;
+  --field: #FFFDF8;
+  --ink: #201A33;
+  --muted: #6E6680;
+  --accent: #FF4D6D;
+  --accent-deep: #C2184A;     /* small accent text, 5.6:1 on --bg */
+  --secondary: #2EC4B6;
+  --secondary-deep: #17766D;  /* small teal text and icons on light */
+  --highlight: #FFC53D;
+
+  /* spacing tokens: 4 8 12 16 24 32 48 64 96 128 */
+  --s-1: 4px;  --s0: 8px;   --s1: 12px; --s2: 16px; --s3: 24px;
+  --s4: 32px;  --s5: 48px;  --s6: 64px; --s7: 96px; --s8: 128px;
+
+  /* type scale, ratio 1.25, base 17px */
+  --step--1: 0.85rem;
+  --step-0: 1.0625rem;
+  --step-1: 1.33rem;
+  --step-2: 1.66rem;
+  --step-3: 2.07rem;
+  --step-4: 2.6rem;
+  --step-5: 3.24rem;
+
+  --radius: 16px;
+  --radius-sm: 12px;
+  --border: 2px solid var(--ink);
+  --shadow: 6px 6px 0 var(--ink);
+  --shadow-sm: 3px 3px 0 var(--ink);
+
+  --display: "Bricolage Grotesque", "Arial Black", sans-serif;
+  --body: "Karla", "Segoe UI", sans-serif;
+  --mono: "Space Mono", "Courier New", monospace;
+
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --settle: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --accent-hover: oklch(from var(--accent) calc(l - 0.07) c h);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; }
+
+html { overflow-x: clip; scroll-padding-top: 88px; }
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+
+body {
+  overflow-x: clip;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: var(--step-0);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+h1, h2, h3 {
+  font-family: var(--display);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+p { text-wrap: pretty; }
+
+.measure { max-width: 60ch; }
+
+img, svg { max-width: 100%; }
+
+a { color: inherit; }
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+::selection { background: var(--highlight); color: var(--ink); }
+
+.skip-link {
+  position: absolute;
+  left: var(--s2);
+  top: -100px;
+  z-index: 20;
+  background: var(--ink);
+  color: var(--bg);
+  padding: var(--s1) var(--s3);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  font-weight: 700;
+}
+.skip-link:focus-visible { top: var(--s2); }
+
+.wrap {
+  max-width: 1120px;
+  margin-inline: auto;
+  padding-inline: clamp(var(--s2), 4vw, var(--s5));
+}
+
+/* ---------- mono utility label ---------- */
+
+.mono-label {
+  font-family: var(--mono);
+  font-size: var(--step--1);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ---------- buttons ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s0);
+  min-height: 48px;
+  padding: var(--s1) var(--s3);
+  font-family: var(--body);
+  font-size: var(--step-0);
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--accent);
+  border: var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform 250ms var(--spring),
+    box-shadow 250ms var(--spring),
+    background-color 180ms linear;
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 5px 5px 0 var(--ink); background: var(--accent-hover); }
+.btn:active { transform: scale(0.97); box-shadow: 2px 2px 0 var(--ink); }
+.btn:disabled {
+  cursor: not-allowed;
+  background: color-mix(in oklab, var(--accent), var(--bg) 55%);
+  color: color-mix(in oklab, var(--ink), var(--bg) 30%);
+  border-color: var(--muted);
+  box-shadow: none;
+  transform: none;
+}
+
+.btn--quiet { background: var(--bg); }
+.btn--quiet:hover { background: var(--surface); }
+
+.link-cta {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: var(--s-1);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 3px;
+  text-underline-offset: 5px;
+  transition: background-color 180ms linear;
+}
+.link-cta:hover { background: var(--highlight); }
+.link-cta:active { background: color-mix(in oklab, var(--highlight), var(--ink) 12%); }
+
+/* ---------- top bar ---------- */
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--bg);
+  border-bottom: var(--border);
+}
+.topbar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s2);
+  min-height: 72px;
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s1);
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: var(--step-1);
+  letter-spacing: -0.02em;
+  text-decoration: none;
+  min-height: 44px;
+}
+.brand svg { flex: none; }
+
+.chapter-indicator {
+  color: var(--muted);
+  display: none;
+}
+@media (min-width: 768px) {
+  .chapter-indicator { display: block; }
+}
+
+.topbar .btn { min-height: 44px; padding: var(--s0) var(--s2); font-size: var(--step--1); }
+
+/* ---------- hero ---------- */
+
+.hero {
+  padding-block: clamp(var(--s5), 8vw, var(--s7));
+  display: grid;
+  grid-template-areas: "copy" "toc";
+  gap: clamp(var(--s5), 6vw, var(--s6));
+}
+@media (min-width: 1024px) {
+  .hero {
+    grid-template-areas: "copy toc";
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    align-items: center;
+    gap: var(--s6);
+  }
+}
+
+.hero-copy { grid-area: copy; }
+
+.hero h1 {
+  font-size: clamp(2.75rem, 1.5rem + 5vw, 4.25rem);
+  max-width: 16ch;
+  margin-bottom: var(--s3);
+}
+
+.hero-sub {
+  font-size: var(--step-1);
+  color: var(--muted);
+  max-width: 44ch;
+  margin-bottom: var(--s4);
+}
+
+.cta-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s3);
+}
+
+/* the signature: contents panel + one oversized tilted highlight shape */
+
+.toc-wrap {
+  grid-area: toc;
+  position: relative;
+}
+.toc-wrap::before {
+  content: "";
+  position: absolute;
+  inset: -20px -14px auto -18px;
+  height: 82%;
+  background: var(--highlight);
+  border: var(--border);
+  border-radius: 24px;
+  transform: rotate(-3.5deg);
+  z-index: 0;
+}
+
+.toc {
+  position: relative;
+  z-index: 1;
+  background: var(--surface);
+  border: var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: var(--s3) var(--s3) var(--s2);
+}
+.toc-title {
+  font-family: var(--display);
+  font-size: var(--step-2);
+  margin-bottom: var(--s2);
+  padding-bottom: var(--s1);
+  border-bottom: var(--border);
+}
+.toc ol { list-style: none; padding: 0; }
+.toc a {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s1);
+  min-height: 44px;
+  padding: var(--s1) var(--s0);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  font-weight: 700;
+  transition: background-color 180ms linear;
+}
+.toc a:hover { background: color-mix(in oklab, var(--surface), var(--ink) 7%); }
+.toc a:hover .toc-num { color: var(--accent-deep); }
+.toc a:active { background: color-mix(in oklab, var(--surface), var(--ink) 12%); }
+.toc-num {
+  font-family: var(--mono);
+  font-size: var(--step--1);
+  color: var(--muted);
+  transition: color 180ms linear;
+}
+.toc-leader {
+  flex: 1;
+  border-bottom: 2px dotted color-mix(in oklab, var(--ink), var(--surface) 55%);
+  transform: translateY(-4px);
+  min-width: var(--s3);
+}
+.toc-hint {
+  font-family: var(--mono);
+  font-size: var(--step--1);
+  font-weight: 400;
+  color: var(--muted);
+  white-space: nowrap;
+}
+@media (max-width: 420px) {
+  .toc-hint { display: none; }
+  .toc-leader { display: none; }
+  .toc a { justify-content: flex-start; }
+}
+
+/* ---------- hero entrance (motion 1 of 2, plus 200ms state changes) ---------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  .reveal { animation: rise 450ms var(--settle) both; }
+  .reveal-2 { animation-delay: 60ms; }
+  .reveal-3 { animation-delay: 120ms; }
+  .reveal-4 { animation-delay: 180ms; }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(12px); }
+  }
+}
+
+/* ---------- chapters ---------- */
+
+.chapter {
+  border-top: var(--border);
+  padding-block: clamp(var(--s6), 9vw, var(--s8));
+}
+
+.ch-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s2);
+  margin-bottom: var(--s4);
+}
+.ch-num {
+  font-family: var(--mono);
+  font-size: var(--step--1);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-deep);
+  white-space: nowrap;
+}
+.chapter h2 { font-size: clamp(2rem, 1.2rem + 3.6vw, 3.25rem); max-width: 22ch; }
+
+.chapter .lede {
+  font-size: var(--step-1);
+  color: var(--muted);
+  margin-bottom: var(--s4);
+}
+
+/* chapter 01: example task list */
+
+.tasklist-fig { max-width: 720px; margin-top: var(--s5); }
+.tasklist {
+  list-style: none;
+  padding: 0;
+  border: var(--border);
+  border-radius: var(--radius);
+  background: var(--field);
+  overflow: hidden;
+}
+.tasklist li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--s2);
+  padding: var(--s2) var(--s3);
+}
+.tasklist li + li { border-top: 2px solid color-mix(in oklab, var(--ink), var(--field) 82%); }
+.task-done .task-name { text-decoration: line-through; color: var(--muted); }
+.task-check { flex: none; display: grid; place-items: center; }
+.task-name { font-weight: 700; min-width: 0; overflow-wrap: anywhere; }
+.task-owner {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: var(--border);
+  border-radius: 50%;
+  background: var(--surface);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.task-due { font-family: var(--mono); font-size: var(--step--1); color: var(--muted); }
+.tasklist-fig figcaption {
+  margin-top: var(--s1);
+  font-family: var(--mono);
+  font-size: var(--step--1);
+  color: var(--muted);
+}
+
+/* chapter 02: three views */
+
+.views {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  margin-top: var(--s5);
+  border-top: 2px solid color-mix(in oklab, var(--ink), var(--bg) 75%);
+}
+.view {
+  padding-block: var(--s3);
+  border-bottom: 2px solid color-mix(in oklab, var(--ink), var(--bg) 75%);
+}
+.view h3 { font-size: var(--step-1); margin-block: var(--s1) var(--s0); }
+.view p { color: var(--muted); max-width: 38ch; }
+@media (min-width: 768px) {
+  .views { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s5); }
+  .view { border-bottom: none; padding-block: var(--s3) 0; }
+}
+
+/* chapter 03: automation recipes */
+
+.recipes {
+  margin-top: var(--s5);
+  border: var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  max-width: 860px;
+}
+.recipe {
+  display: block;
+  font-family: var(--mono);
+  font-size: clamp(0.85rem, 0.75rem + 0.5vw, 1rem);
+  line-height: 1.7;
+  padding: var(--s2) var(--s3);
+  overflow-wrap: anywhere;
+}
+.recipe + .recipe { border-top: var(--border); }
+.recipe .cond { color: var(--muted); }
+.recipe .arrow { color: var(--accent-deep); font-weight: 700; }
+
+/* chapter 04: pricing tiers (the one legitimate card use: 3 parallel items) */
+
+.tiers-wrap { container-type: inline-size; margin-top: var(--s5); }
+.tiers {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--s4);
+  list-style: none;
+  padding: 0;
+}
+@container (min-width: 720px) {
+  .tiers { grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; }
+}
+.tier {
+  background: var(--field);
+  border: var(--border);
+  border-radius: var(--radius);
+  padding: var(--s3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+}
+.tier--star {
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.tier-flag {
+  align-self: flex-start;
+  background: var(--highlight);
+  border: var(--border);
+  border-radius: 8px;
+  padding: 2px var(--s1);
+}
+.tier h3 { font-size: var(--step-1); }
+.tier-price {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: var(--step-4);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.tier-price small {
+  font-family: var(--body);
+  font-weight: 400;
+  font-size: var(--step--1);
+  color: var(--muted);
+  letter-spacing: 0;
+}
+.tier-for { color: var(--muted); }
+.tier ul { list-style: none; padding: 0; display: grid; gap: var(--s0); }
+.tier ul li { display: flex; gap: var(--s1); align-items: baseline; }
+.tier ul svg { flex: none; transform: translateY(2px); }
+.tier .btn { margin-top: var(--s1); }
+.tiers-note { margin-top: var(--s4); color: var(--muted); }
+
+/* chapter 05: FAQ */
+
+.faq { margin-top: var(--s5); max-width: 760px; }
+.faq details { border-top: var(--border); }
+.faq details:last-child { border-bottom: var(--border); }
+.faq summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s2);
+  min-height: 64px;
+  padding-block: var(--s2);
+  cursor: pointer;
+  transition: background-color 180ms linear;
+}
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary:hover { background: color-mix(in oklab, var(--bg), var(--ink) 4%); }
+.faq summary h3 { font-size: var(--step-1); }
+.faq-marker {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: var(--border);
+  border-radius: 50%;
+  background: var(--surface);
+  font-family: var(--body);
+  font-size: var(--step-1);
+  font-weight: 700;
+  line-height: 1;
+  transition: transform 200ms var(--settle), background-color 180ms linear;
+}
+.faq details[open] .faq-marker { transform: rotate(45deg); background: var(--highlight); }
+.faq details > p { padding-bottom: var(--s3); color: var(--muted); max-width: 60ch; }
+
+/* chapter 06: start */
+
+.start {
+  background: var(--surface);
+  border-top: var(--border);
+}
+.start-inner { padding-block: clamp(var(--s6), 9vw, var(--s8)); }
+.start h2 { font-size: clamp(2.4rem, 1.4rem + 4.5vw, 4rem); max-width: 16ch; }
+.start .lede { margin-top: var(--s2); }
+
+.signup {
+  margin-top: var(--s4);
+  max-width: 560px;
+}
+.signup label { display: block; font-weight: 700; margin-bottom: var(--s0); }
+.field-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+}
+.signup input[type="email"] {
+  flex: 1 1 260px;
+  min-height: 52px;
+  min-width: 0;
+  padding: var(--s1) var(--s2);
+  font: 400 var(--step-0) var(--body);
+  color: var(--ink);
+  background: var(--field);
+  border: var(--border);
+  border-radius: var(--radius-sm);
+  transition: border-color 180ms linear;
+}
+.signup input[type="email"]::placeholder { color: var(--muted); }
+.signup input[type="email"]:hover { border-color: color-mix(in oklab, var(--ink), var(--accent) 40%); }
+.signup input[type="email"]:disabled { background: var(--surface); color: var(--muted); cursor: not-allowed; }
+.signup input[aria-invalid="true"] { border-color: var(--accent-deep); }
+.field-error {
+  display: none;
+  margin-top: var(--s1);
+  color: var(--accent-deep);
+  font-weight: 700;
+}
+.field-error.show { display: block; }
+.signup-fineprint { margin-top: var(--s2); font-family: var(--mono); font-size: var(--step--1); color: var(--muted); }
+
+.signup-done {
+  display: none;
+  margin-top: var(--s4);
+  max-width: 560px;
+  background: var(--field);
+  border: var(--border);
+  border-radius: var(--radius);
+  padding: var(--s3);
+}
+.signup-done.show { display: flex; gap: var(--s2); align-items: flex-start; }
+.signup-done svg { flex: none; transform: translateY(3px); }
+.signup-done p strong { display: block; font-size: var(--step-1); font-family: var(--display); margin-bottom: var(--s-1); }
+
+/* ---------- footer ---------- */
+
+footer {
+  background: var(--ink);
+  color: var(--bg);
+  padding-block: var(--s6);
+}
+.foot-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s3);
+}
+.foot-brand { font-family: var(--display); font-weight: 800; font-size: var(--step-1); }
+.foot-tag { color: color-mix(in oklab, var(--bg), var(--ink) 25%); }
+.foot-nav { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s3); list-style: none; padding: 0; }
+.foot-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--bg);
+  text-decoration: none;
+  font-weight: 700;
+}
+.foot-nav a:hover { text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 3px; text-underline-offset: 5px; }
+.foot-nav a:focus-visible { outline-color: var(--bg); }
+.foot-legal { width: 100%; margin-top: var(--s3); font-family: var(--mono); font-size: var(--step--1); color: color-mix(in oklab, var(--bg), var(--ink) 30%); }
+
+/* ---------- reduced motion kill switch ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="#top" aria-label="TaskFlow, back to top">
+      <svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true">
+        <rect x="2" y="2" width="28" height="28" rx="8" fill="#FF4D6D" stroke="#201A33" stroke-width="3"/>
+        <path d="M9 16.5l5 5 9-11" fill="none" stroke="#201A33" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      TaskFlow
+    </a>
+    <p class="chapter-indicator mono-label" aria-hidden="true">reading: <span id="ch-indicator">contents</span></p>
+    <a class="btn" href="#start">Start free trial</a>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- hero: one composition. headline, one sentence, one CTA group, and the
+       index itself as the dominant visual (Index-First macrostructure). -->
+  <section class="wrap hero" id="top" aria-label="Introduction and contents">
+    <div class="hero-copy">
+      <h1 class="reveal">Plans that survive contact with Monday.</h1>
+      <p class="hero-sub reveal reveal-2">TaskFlow turns scattered tasks into one shared board with owners, due dates, and a plan everyone can see.</p>
+      <div class="cta-group reveal reveal-3">
+        <a class="btn" href="#start">Start free trial</a>
+        <a class="link-cta" href="#pricing">See pricing</a>
+      </div>
+    </div>
+
+    <div class="toc-wrap reveal reveal-4">
+      <nav class="toc" aria-label="Page contents">
+        <p class="toc-title" id="contents">Contents</p>
+        <ol>
+          <li><a href="#plan"><span class="toc-num">01</span> Plan <span class="toc-leader" aria-hidden="true"></span> <span class="toc-hint">tasks with owners</span></a></li>
+          <li><a href="#track"><span class="toc-num">02</span> Track <span class="toc-leader" aria-hidden="true"></span> <span class="toc-hint">board, timeline, list</span></a></li>
+          <li><a href="#automate"><span class="toc-num">03</span> Automate <span class="toc-leader" aria-hidden="true"></span> <span class="toc-hint">rules and nudges</span></a></li>
+          <li><a href="#pricing"><span class="toc-num">04</span> Pricing <span class="toc-leader" aria-hidden="true"></span> <span class="toc-hint">three tiers, one free</span></a></li>
+          <li><a href="#questions"><span class="toc-num">05</span> Questions <span class="toc-leader" aria-hidden="true"></span> <span class="toc-hint">quick answers</span></a></li>
+          <li><a href="#start"><span class="toc-num">06</span> Start <span class="toc-leader" aria-hidden="true"></span> <span class="toc-hint">about two minutes</span></a></li>
+        </ol>
+      </nav>
+    </div>
+  </section>
+
+  <!-- chapter 01: loud -->
+  <section class="chapter" id="plan" data-chapter="ch. 01 / plan">
+    <div class="wrap">
+      <div class="ch-head">
+        <span class="ch-num">Chapter 01</span>
+      </div>
+      <h2>Start with a plan people can point at.</h2>
+      <p class="lede measure">A TaskFlow project is a list of tasks anyone can read at a glance.</p>
+      <p class="measure">Each task gets one owner, one due date, and a status. That is the whole trick: the plan lives on the board instead of in someone's head, so "who has this?" stops being a meeting.</p>
+
+      <figure class="tasklist-fig">
+        <ul class="tasklist" aria-label="Example task list">
+          <li class="task-done">
+            <span class="task-check" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="6" fill="#2EC4B6" stroke="#201A33" stroke-width="2"/><path d="M7 12.5l3.5 3.5L17 9" fill="none" stroke="#201A33" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="task-name">Draft the launch brief <span class="mono-label">(done)</span></span>
+            <span class="task-owner" title="Owner: M.K." aria-label="Owner M.K.">MK</span>
+            <span class="task-due">due Tue</span>
+          </li>
+          <li>
+            <span class="task-check" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="6" fill="#FFFDF8" stroke="#201A33" stroke-width="2"/></svg>
+            </span>
+            <span class="task-name">Book user interviews</span>
+            <span class="task-owner" title="Owner: A.R." aria-label="Owner A.R.">AR</span>
+            <span class="task-due">due Wed</span>
+          </li>
+          <li>
+            <span class="task-check" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="6" fill="#FFFDF8" stroke="#201A33" stroke-width="2"/></svg>
+            </span>
+            <span class="task-name">Cut the release branch</span>
+            <span class="task-owner" title="Owner: J.T." aria-label="Owner J.T.">JT</span>
+            <span class="task-due">due Fri</span>
+          </li>
+        </ul>
+        <figcaption>An example task list. Owner, due date, status: nothing hides.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- chapter 02: quiet -->
+  <section class="chapter" id="track" data-chapter="ch. 02 / track">
+    <div class="wrap">
+      <div class="ch-head">
+        <span class="ch-num">Chapter 02</span>
+      </div>
+      <h2>One board, three honest views.</h2>
+      <p class="lede measure">The same tasks, shown three ways. Change one, the other two follow.</p>
+
+      <div class="views">
+        <div class="view">
+          <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="#201A33" stroke-width="2">
+            <rect x="3" y="4" width="7" height="24" rx="2"/><rect x="12.5" y="4" width="7" height="16" rx="2"/><rect x="22" y="4" width="7" height="20" rx="2"/>
+          </svg>
+          <h3>Board</h3>
+          <p>Columns for each status. Drag a card and the plan updates everywhere.</p>
+        </div>
+        <div class="view">
+          <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="#201A33" stroke-width="2">
+            <path d="M3 8h14M3 16h22M3 24h10" stroke-linecap="round" stroke-width="4"/>
+          </svg>
+          <h3>Timeline</h3>
+          <p>Every due date on one strip, so collisions show up before they happen.</p>
+        </div>
+        <div class="view">
+          <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="#201A33" stroke-width="2">
+            <path d="M9 7h20M9 16h20M9 25h20" stroke-linecap="round"/><circle cx="4" cy="7" r="1.8" fill="#201A33"/><circle cx="4" cy="16" r="1.8" fill="#201A33"/><circle cx="4" cy="25" r="1.8" fill="#201A33"/>
+          </svg>
+          <h3>List</h3>
+          <p>The whole project as a sortable list, for people who think in rows.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- chapter 03: loud, mono recipes -->
+  <section class="chapter" id="automate" data-chapter="ch. 03 / automate">
+    <div class="wrap">
+      <div class="ch-head">
+        <span class="ch-num">Chapter 03</span>
+      </div>
+      <h2>Teach the board to do the boring parts.</h2>
+      <p class="lede measure">Write a rule once and TaskFlow runs it every time. Rules read like sentences, because they should.</p>
+
+      <div class="recipes" role="list" aria-label="Example automation rules">
+        <p class="recipe" role="listitem"><span class="cond">when status becomes</span> "Done" <span class="arrow">-&gt;</span> move the card to Shipped</p>
+        <p class="recipe" role="listitem"><span class="cond">when a due date slips</span> <span class="arrow">-&gt;</span> nudge the owner, not the whole channel</p>
+        <p class="recipe" role="listitem"><span class="cond">when a task sits idle 5 days</span> <span class="arrow">-&gt;</span> flag it in the Friday digest</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- chapter 04: pricing -->
+  <section class="chapter" id="pricing" data-chapter="ch. 04 / pricing">
+    <div class="wrap">
+      <div class="ch-head">
+        <span class="ch-num">Chapter 04</span>
+      </div>
+      <h2>Pricing that fits on an index card.</h2>
+
+      <div class="tiers-wrap">
+        <ul class="tiers">
+          <li class="tier">
+            <h3>Starter</h3>
+            <p class="tier-price">$0</p>
+            <p class="tier-for">For small crews getting organized.</p>
+            <ul>
+              <li><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 8.5l4 4 7-9" fill="none" stroke="#17766D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Up to 5 people</li>
+              <li><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 8.5l4 4 7-9" fill="none" stroke="#17766D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>3 projects</li>
+              <li><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 8.5l4 4 7-9" fill="none" stroke="#17766D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Board and list views</li>
+              <li><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 8.5l4 4 7-9" fill="none" stroke="#17766D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>CSV import</li>
+            </ul>
+            <a class="btn btn--quiet" href="#start">Start free</a>
+          </li>
+          <li class="tier tier--star">
+            <p class="tier-flag mono-label">the usual pick</p>
+            <h3>Team</h3>
+            <p class="tier-price">$8 <small>per person, per month</small></p>
+            <p class="tier-for">For teams who ship on a schedule.</p>
+            <ul>
+              <li><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 8.5l4 4 7-9" fill="none" stroke="#17766D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Unlimited projects</li>
+              <li><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 8.5l4 4 7-9" fill="none" stroke="#17766D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Board, timeline, and list views</li>
+              <li><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 8.5l4 4 7-9" fill="none" stroke="#17766D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Automation rules</li>
+              <li><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 8.5l4 4 7-9" fill="none" stroke="#17766D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Guest viewers, always free</li>
+            </ul>
+            <a class="btn" href="#start">Start free trial</a>
+          </li>
+          <li class="tier">
+            <h3>Business</h3>
+            <p class="tier-price">$15 <small>per person, per month</small></p>
+            <p class="tier-for">For many teams working at once.</p>
+            <ul>
+              <li><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 8.5l4 4 7-9" fill="none" stroke="#17766D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Everything in Team</li>
+              <li><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 8.5l4 4 7-9" fill="none" stroke="#17766D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Roles and permissions</li>
+              <li><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 8.5l4 4 7-9" fill="none" stroke="#17766D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Private projects</li>
+              <li><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 8.5l4 4 7-9" fill="none" stroke="#17766D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Priority support</li>
+            </ul>
+            <a class="btn btn--quiet" href="#start">Talk to us</a>
+          </li>
+        </ul>
+      </div>
+      <p class="tiers-note measure">Every paid plan starts with 14 free days. No card up front, no surprise invoice at the end.</p>
+    </div>
+  </section>
+
+  <!-- chapter 05: quiet FAQ -->
+  <section class="chapter" id="questions" data-chapter="ch. 05 / questions">
+    <div class="wrap">
+      <div class="ch-head">
+        <span class="ch-num">Chapter 05</span>
+      </div>
+      <h2>Questions teams actually ask.</h2>
+
+      <div class="faq">
+        <details name="faq">
+          <summary>
+            <h3>Can we import from the tool we use now?</h3>
+            <span class="faq-marker" aria-hidden="true">+</span>
+          </summary>
+          <p>Yes. TaskFlow reads CSV exports from most project tools. During import you map columns to owners, due dates, and statuses, and the board builds itself.</p>
+        </details>
+        <details name="faq">
+          <summary>
+            <h3>What happens when the trial ends?</h3>
+            <span class="faq-marker" aria-hidden="true">+</span>
+          </summary>
+          <p>Your boards go read-only. Nothing is deleted, and upgrading turns everything back on exactly as you left it.</p>
+        </details>
+        <details name="faq">
+          <summary>
+            <h3>Is there a limit on projects?</h3>
+            <span class="faq-marker" aria-hidden="true">+</span>
+          </summary>
+          <p>Starter caps you at 3 projects. Team and Business have no limit, and archived projects never count against you.</p>
+        </details>
+        <details name="faq">
+          <summary>
+            <h3>How does per-person pricing work?</h3>
+            <span class="faq-marker" aria-hidden="true">+</span>
+          </summary>
+          <p>You pay only for people who can edit. Viewers, guests, and clients who just need to see the plan are free on every tier.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- chapter 06: loud closing on surface band -->
+  <section class="start" id="start" data-chapter="ch. 06 / start">
+    <div class="wrap start-inner">
+      <div class="ch-head">
+        <span class="ch-num">Chapter 06</span>
+      </div>
+      <h2>Give Monday a plan.</h2>
+      <p class="lede measure">Setup takes about two minutes. Bring one messy project and watch it become a board.</p>
+
+      <!-- demo form: no backend. JS validates, then shows a confirmation. -->
+      <form class="signup" id="signup" novalidate>
+        <label for="email">Work email</label>
+        <div class="field-row">
+          <input type="email" id="email" name="email" autocomplete="email"
+                 placeholder="you@company.com" required
+                 aria-describedby="email-error email-fineprint">
+          <button class="btn" type="submit" id="signup-btn">Create my workspace</button>
+        </div>
+        <p class="field-error" id="email-error" role="alert"></p>
+        <p class="signup-fineprint" id="email-fineprint">Free for 14 days. No card needed.</p>
+      </form>
+
+      <div class="signup-done" id="signup-done" role="status">
+        <svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="6" fill="#2EC4B6" stroke="#201A33" stroke-width="2"/><path d="M7 12.5l3.5 3.5L17 9" fill="none" stroke="#201A33" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <p><strong>Workspace reserved.</strong> In the live product a setup link would be in your inbox now. This page is a design demo, so nothing was sent.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap foot-inner">
+    <div>
+      <p class="foot-brand">TaskFlow</p>
+      <p class="foot-tag">The board your plans deserve.</p>
+    </div>
+    <ul class="foot-nav" aria-label="Footer contents">
+      <li><a href="#plan">Plan</a></li>
+      <li><a href="#track">Track</a></li>
+      <li><a href="#automate">Automate</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#questions">Questions</a></li>
+    </ul>
+    <p class="foot-legal">TaskFlow, 2026. A demonstration product page.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  /* scroll-spy: update the top-bar chapter indicator (decorative, aria-hidden) */
+  var indicator = document.getElementById("ch-indicator");
+  var sections = document.querySelectorAll("[data-chapter]");
+  if (indicator && "IntersectionObserver" in window) {
+    var spy = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          indicator.textContent = entry.target.getAttribute("data-chapter");
+        }
+      });
+    }, { rootMargin: "-35% 0px -55% 0px" });
+    sections.forEach(function (s) { spy.observe(s); });
+    var hero = document.getElementById("top");
+    if (hero) {
+      var heroSpy = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) { indicator.textContent = "contents"; }
+        });
+      }, { rootMargin: "-35% 0px -55% 0px" });
+      heroSpy.observe(hero);
+    }
+  }
+
+  /* signup form: validate, then demo-confirm. No data leaves the page. */
+  var form = document.getElementById("signup");
+  var email = document.getElementById("email");
+  var error = document.getElementById("email-error");
+  var btn = document.getElementById("signup-btn");
+  var done = document.getElementById("signup-done");
+
+  function setError(msg) {
+    error.textContent = msg;
+    error.classList.add("show");
+    email.setAttribute("aria-invalid", "true");
+    email.focus();
+  }
+  function clearError() {
+    error.textContent = "";
+    error.classList.remove("show");
+    email.removeAttribute("aria-invalid");
+  }
+
+  if (form) {
+    email.addEventListener("input", clearError);
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var value = email.value.trim();
+      if (value === "") {
+        setError("Enter your work email so we know where to send the setup link.");
+        return;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+        setError("That email looks incomplete. Try the full address, like you@company.com.");
+        return;
+      }
+      clearError();
+      btn.disabled = true;
+      email.disabled = true;
+      btn.textContent = "Creating workspace...";
+      window.setTimeout(function () {
+        form.hidden = true;
+        done.classList.add("show");
+      }, 900);
+    });
+  }
+})();
+</script>
+
+</body>
+</html>

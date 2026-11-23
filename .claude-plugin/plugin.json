@@ -1,0 +1,12 @@
+{
+  "name": "goddesign",
+  "version": "3.0.0",
+  "description": "Draw one direction from a deck, lock it before any code, and clear a measured gate.",
+  "author": {
+    "name": "Goddesign"
+  },
+  "homepage": "https://github.com/hannsxpeter/goddesigns#readme",
+  "repository": "https://github.com/hannsxpeter/goddesigns",
+  "license": "MIT",
+  "keywords": ["design", "frontend", "agent-skills", "claude-code", "codex"]
+}

@@ -24,6 +24,8 @@ jobs:
         run: sh skills/goddesign/scripts/verify-install.sh && node skills/goddesign/scripts/pick.mjs --check
       - name: installer syntax
         run: sh -n scripts/install.sh
+      - name: installer tests
+        run: node --test scripts/install.test.mjs
       - name: deck lint
         run: node scripts/lint-decks.mjs
       - name: variance engine tests
@@ -31,9 +33,6 @@ jobs:
       - name: provenance hygiene adapter tests
         run: sh -n skills/goddesign/scripts/provenance-hygiene.sh && node --test scripts/provenance-hygiene.test.mjs
       # The mechanical half of the QA gate. sweep.test.mjs asserts the corpus
-      # split on a named subset (the kilnhouse, wayfare, and ledgerbird skill
-      # pages against their comparison pages), not on every artifact on file.
+      # split on test/corpus (skill pages against comparison pages).
       - name: gate sweep tests
         run: node --test scripts/sweep.test.mjs
-      - name: comparison harness tests
-        run: node --test scripts/arm-test.test.mjs

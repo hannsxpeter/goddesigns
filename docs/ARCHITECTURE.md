@@ -1,130 +1,49 @@
 # Architecture
 
-How goddesign works and why each mechanism exists. Visual fingerprint decisions trace to measured evidence: a 346-comment verified study of public sentiment about AI frontend design ([validation/research/sentiment-evidence-2026-07.md](../validation/research/sentiment-evidence-2026-07.md)) plus defects observed in real validation runs ([validation/runs/kilnhouse-2026-07/README.md](../validation/runs/kilnhouse-2026-07/README.md)). Adapted quality mechanisms carry a frozen source, license record, refusal log, and repository calibration under `validation/research/`.
+Goddesign is one skill and the scripts beside it. The model designs. The
+scripts deal, remember, and measure.
 
-This is the deep version, written for contributors and for anyone evaluating whether the mechanisms hold up. If you only want to use the skill, the [README](../README.md) and the [setup guide](INSTALL.md) are enough.
+## Draw
 
-## The short version
+`skills/goddesign/scripts/pick.mjs` rolls a seed, reads the deck in
+`references/`, and applies two ledgers: one for this machine, one for this
+run. It will not repeat a recent structure, and it will not deal a third paper
+or accent in a row. It then nudges the colors so two runs that draw the same
+row still differ. The printout is the direction, the page structure, the
+tokens, and a lock with three lines left for the model to fill.
 
-For readers who want the shape before the detail:
+A model asked to "pick at random" picks the same favorite. The script is the
+part that actually picks.
 
-1. **The problem is two-sided.** Some models converge on the same tasteful look every time; others invent nothing at all. A ban list cannot fix either, because banning the popular choice just promotes the next one. Variety has to come from a mechanism.
-2. **So the design is chosen, not improvised, and a script does the choosing.** `pick.mjs` rolls a seed, applies two run ledgers, rests overused rows, jitters the tokens, and prints one complete package (direction, layout, tokens) plus a pre-filled lock. A model cannot pick at random or remember past runs; a script can.
-3. **The choice is written down before any code.** That written plan, the DIRECTION LOCK, is what the finished page is graded against, and the repair loop is forbidden from changing it.
-4. **Then implementation is graded by scripts first.** A source scan that needs no browser or model and a rendered visual audit are the pass/fail gate, followed by a look at the screenshots and a short check against the lock. Failures go into one bounded repair loop.
-5. **Each model reads only what it needs.** Frontier models get a lean core (v2.0.0); literal executors and smaller tiers also get the full enumeration of craft rules and the long-form checklist. Edits skip the pick entirely.
-6. **Bigger than one session gets a map.** Three or more surfaces share a single lock so a product looks like one product.
-7. **Nothing ships on taste alone.** Visual fingerprint rules trace to counted public evidence or to a defect caught in a real run. Adapted quality mechanisms carry a frozen source, license record, explicit refusals, and repository calibration. Evaluated and declined work is recorded beside what shipped.
+## Lock, then build
 
-The rest of this document is the why behind each of those.
+The lock is plain text, written before code: exact colors, fonts, the
+signature, and the four grammar breaks. The page is graded against that text.
+An edit to an existing page skips the draw and the lock. It keeps the current
+tokens and runs the source scan on the files that changed.
 
-## The problem, measured
+If the project already has tokens, `extract-tokens.mjs` reads them and the run
+builds inside that system instead of dealing a new card.
 
-Public discourse names two opposite failure modes:
+A brief with three or more surfaces gets `references/map.md` first, so later
+sessions share one system. `verify-map.mjs` checks the map's shape.
 
-- Taste-heavy models (Claude-class) converge: purple gradient heroes, cream-serif-terracotta pages, the unthemed shadcn kit look, scroll-reveal cascades. The top complaint cluster (15 independent comments) is that these sites are identifiable on sight.
-- Literal models (GPT/Codex-class) under-design: browser defaults, one recycled template that resists instruction ("one-template gravity", 11 comments), decisions returned as adjectives instead of values (7 comments).
+## The gate
 
-A ban list alone cannot fix this: bans redirect probability mass to the next attractor (the cream-terracotta cliche is itself the product of everyone banning purple). Variety has to come from a mechanism.
+`sweep.mjs` reads source. It knows HTML, CSS, React, Vue, Svelte, Astro, and
+the UI macros in Leptos (`view!`), Yew (`html!`), and Dioxus (`rsx!`). It
+skips `target/` and a Rust file with no UI macro. Findings point at the real
+line.
 
-## The lean core and the two lanes
+`audit.mjs` renders the page at 375, 768, and 1280 and reports overflow,
+collisions, hidden text, small targets, and fonts that fell back. If no
+renderer is available it says so. A skipped audit is not a pass.
 
-Until v1.8.0 every run read about 95 KB of instructions: a 36 KB `SKILL.md`, a 31 KB checklist, both decks, the motion and copy references. Most of it taught things a current frontier model does unprompted (type scales, contrast ratios, modern CSS, interaction states) or governed rare cases (cross-host scope, provenance hygiene, degraded-state taxonomy). Measured across the owner's real sessions, the skill's own reads and scripts were a small share of tool calls; the cost that mattered was the fixed reading on every invocation, the self-graded critique, and the full ceremony on small jobs. v2.0.0 keeps what no model does for itself and moves the rest to where it is needed.
+A failure is fixed with the lock frozen. The run does not get to redesign its
+way out of a finding.
 
-- **The lean core** (`SKILL.md`, 12.7 KB, with a 13,000-byte ceiling that `lint-decks.mjs` enforces): routing, the full path in five short steps, the Banned list, the four-step gate, and the no-node fallback. Plus the picker's printout, about 16 KB per new page in total.
-- **The frontier lane**: Claude Opus and Fable class models read the core and the picker's output, nothing else by default.
-- **The full lane**: literal executors (Codex and GPT models), smaller or faster tiers (Sonnet, Haiku, mini, flash, lite), and any model unsure which it is also read `references/full-lane.md`: the literal-execution rules, the enumerated craft floor, and routing through the long-form checklist and the copy review. This is the old EXPAND lane plus the craft floor that used to sit in every model's context.
-- **Routing by task**: an edit to an existing page reads only the core and runs the sweep on the changed files; a design system in the repo takes extension mode; three or more surfaces take the map; only a new page or surface takes the full path.
+## What a run reads
 
-Whether the cut cost quality is a claim, so it has a test: `validation/studies/lean-core-2026-09/` pre-registers a four-arm comparison (no skill, the lean core, v1.8.0, and the lean core on a cheaper model routed to the full lane) with its decision rules fixed before any run.
-
-## The variance engine
-
-`skills/goddesign/scripts/pick.mjs` is the variance engine as code. Before v2.0.0 the model executed it in prose, which cost about 5 KB of deck reading per run and trusted model arithmetic with four rotation rules.
-
-- The seed hashes the project folder name and the current minute. Its derivation (direction, structure, palette, typepair, three jitter values) is the one the shell seed used, with deck sizes read from the decks, so no modulus can drift out of sync. The regression suite pins a real receipt: the seed the Bellweather run rolled by hand lands on the same row, structure, and jitter.
-- Two ledgers force rotation: `.design-log.json` in the project and `~/.design-log.json` across projects. The structure never repeats the last 3; the direction must differ from the previous run on paper band, display class, or accent hue band; the user ledger may not see the same paper or accent band three times in a row; and any direction appearing 3 or more times (structure 4 or more) in the last 8 runs rests. An offending index advances by one until legal, and the printout says which rule moved it. Each direction row carries a `Class:` line for the display class; paper and accent bands are computed from the hexes in OKLCH.
-- **Seeded jitter** rotates the accent hue (-12 to 12 degrees), nudges paper lightness, and steps radius via CSS relative color, so two projects that land on the same row never ship identical values. The picker prints the tokens ready to paste.
-- `--reroll` is the steering override for "less AI" briefs: the new row differs from the first pick on both display class and accent band. `--keep-direction` serves a brief that names its own aesthetic. `--log` writes the ledger entry after the gate and refuses malformed or placeholder entries.
-- Edits skip the engine entirely: a page carrying a `/* goddesign | */` stamp keeps its tokens.
-
-## The DIRECTION LOCK
-
-Every visual decision is written in plain text before any code: seed numbers, tokens, jitter, type, layout sketch, signature element, grammar breaks, motion budget. The picker prints the lock with everything mechanical filled in; the model adds the three lines that need judgment (Layout, Signature, Grammar). The lock is the accountability artifact: the gate compares the rendered page against it, and the self-correction loop is forbidden from changing it.
-
-## The design map
-
-Every other mechanism here is scoped to one run, and the only artifact that outlived a run was a ledger whose job is to make the next run *differ*. That is correct across projects and backwards across the surfaces of one product: it pushes the pricing page away from the home page it has to match. Three failures follow from rules already in the skill. Rotation (the picker's ledger rules) starts a sibling surface by pushing it off its own system. The popularity cap (rest any direction appearing 3+ times in the last 8 entries) is tripped by the third surface of a nine-surface product, which then fills the whole window with one project. And the full lane's "do not silently trim scope" is unkeepable for nine surfaces in one 100K session.
-
-`.design-map.md` at the project root fixes all three. It is an index, not a store: a **Destination** that fixes the scope, one **System lock** (a DIRECTION LOCK rolled once, with jitter, that every surface inherits verbatim), the surfaces **locked** as links plus one-line gists, the surfaces **to design** each carrying its one action and audience and a claim slot, the fog in **Not yet specified**, ruled-out work in **Out of scope**, and human-only facts parked in **Open questions**. Three inversions follow: the seed rolls once per map, surfaces must MATCH the system rather than differ from it, and a map writes exactly one ledger entry when its last surface locks.
-
-Two rules keep it from becoming ceremony. The threshold is mechanical and narrow (3 or more distinct surfaces, a stated hand-off, or an existing map), and charting that surfaces fewer than 3 specifiable surfaces ends by deleting the map. The inversions are enforced, not only stated: once the map's System lock carries a seed, `pick.mjs` refuses to roll in that project, and `pick.mjs --log` refuses a per-surface ledger entry until the final surface passes `--map-final`. `scripts/verify-map.mjs` validates the contract mechanically (sections and their order, the System lock's seven fields and five hex tokens, surface-line shape, claim format, one-surface-one-state, dated open questions), and `scripts/lint-decks.mjs` checks that the validator and the deck cannot drift apart. The structure is adapted from the wayfinder skill in `mattpocock/skills` (MIT); the borrow-and-decline record is [validation/research/wayfinder-evaluation-2026-07.md](../validation/research/wayfinder-evaluation-2026-07.md).
-
-## The copy review
-
-Visible copy receives its own post-draft pass before the gate on the full lane, and on copy-heavy marketing pages in any lane; the core carries the three rules that matter everywhere (labels say what happens, claims name a mechanism or source, nothing invented). `references/copy.md` assigns mode by block: transactional copy names actions, failures, and next steps; marketing copy names mechanisms, observable results, examples, or sources and may carry a point of view. Both preserve user-supplied terminology, facts, legal text, and voice.
-
-The pass adapts the review-loop, specificity, and source-or-delete ideas from pstack's `unslop` skill without importing its universal prose rules. Three patterns resolve cleanly enough for source scanning: vague attribution, filler phrases, and formulaic contrasts or conclusions. They remain advisories because the scanner cannot see every citation or deliberate quotation. The substitution test, forced triads, synonym cycling, false ranges, sentence density, and rhythm remain manual checks where context is available. The full adoption and refusal record is [validation/research/unslop-evaluation-2026-08.md](../validation/research/unslop-evaluation-2026-08.md).
-
-## The QA gate
-
-Frontier models run four steps from `SKILL.md`: the sweep, the audit, a look at the 1280 and 375 captures (the Bellweather run found a section painted over a button that neither script can see), and a short check against the lock. The full lane runs the long form in `references/checklist.md`, with these phases:
-
-1. **Self-critique, retired in v2.0.0.** It scored seven axes 1-5 with mandatory citations, but the same context that made the choices graded them, it could not pass or fail a run, and it was the gate's most output-heavy step. Its useful parts live where they can be checked: Specificity is the subject test and the substance gate, Credibility is the trust-surface gate (who is behind this, how to reach them, what are the terms; it entered from a controlled 48-participant study cited in validation/research/external-evidence-2026-07.md), Variety is the picker's ledger rules, and an outside opinion is the blind read.
-2. **Boolean sweep**: one testable assertion per line. Pass/fail gate, first half, and it runs in two halves of its own. Phase 2a is `scripts/sweep.mjs`, a dependency-free source scanner that executes the 32 assertions resolving to a string, a number, or a count, and reports each with file, line, and offending value: banned faces and hexes, gradient text, `transition: all`, stray `!important`, inline styles, container accent stripes, `<hr>`, numbered chapter cadence, achromatic neutrals, hexes outside `:root`, the band metronome, missing focus-visible, missing reduced-motion, missing webfont imports, buzzword copy, vague attribution, filler and formulaic copy, the missing stamp, and the reveal cascade that renders a page blank in static capture. Exit 0 green, 1 named failures, 2 nothing scannable. Rust frontends are read through their UI macros (Leptos `view!`, Yew `html!`, Dioxus `rsx!`) by a small lexer that blanks comments and locates literals, so the Rust around the markup is never mistaken for it. It needs no browser, no network, and no model, which is the point: `audit.mjs` exits 2 in a sandbox, and before this the whole gate collapsed to self-report there. Rules split `fail` from `advisory`, because some patterns are legal when the locked row states them, and an inline `goddesign-allow: <rule> <reason>` comment waives one rule for one file with a mandatory reason (a reasonless waiver is itself a failure). Phase 2b is the remainder: the assertions that need judgment, a render, or the lock in hand. The sweep and the audit are complements and neither excuses skipping the other, because static analysis cannot see a collision and a render cannot see a banned value behind a lock that never shipped.
-3. **Visual verification**: the measured audit (`scripts/audit.mjs`) detects horizontal overflow, text-on-text collisions, content hidden at effective opacity 0 (the reveal bug that made both vendors' baseline pages render blank), sub-24px targets, and silently fallen-back webfonts, per viewport, with screenshots. Pass/fail gate, second half. A bounded self-correction loop fixes only audit-named failures, lock frozen, maximum 3 cycles. The blind read (a separate process sees only the pixels and reconstructs the page's identity; advisory verdict) runs on request since v2.0.0, because it spends a second model call on every run. Hosts that cannot render fall back through a screenshot chain to an honest `DEGRADED` declaration with a machine-readable operator handoff.
-
-## Extension mode, measured
-
-`SKILL.md` route 2 sends a repo that already has a design system into faithful extension, and the gate compares the build against "the existing system's tokens". Nothing used to produce that list, so the model inferred it by reading around, which is the "use gray" failure the skill bans everywhere else. `scripts/extract-tokens.mjs` reads it instead: W3C design-token JSON, CSS custom properties, `@theme` blocks, Tailwind config, and `@font-face` and import declarations, resolved into the five DIRECTION LOCK role slots plus fonts, radii, spacing, and the palette by frequency. A role it cannot resolve is reported as unresolved rather than guessed. Exit 2 is an answer, not an error: no design system means this is a greenfield run, so roll the seed. The baseline then feeds `sweep.mjs --tokens`, which reports every hex, font, and radius the build introduced that the existing system does not have. Extraction is deterministic and local; the network path (crawling a live site for a genome) stays a contributor step outside a design run.
-
-## Cross-host design constraints
-
-- Only `name` and `description` frontmatter: no host-specific syntax anywhere.
-- Every rule resolves to a number, a hex, a greppable string, or a yes/no test, so a literal-execution model can verify it without taste.
-- Scripts are plain POSIX shell and Node; each degrades gracefully and states its skip.
-- Discovery never becomes lock-in: core design work requires no particular CLI, editor, model vendor, deployment platform, account, domain, DNS configuration, or network service.
-- Cross-host means portable, not multi-host by default. Host scope is prompt-specified: a design run uses its active host unless the user explicitly requests comparison, replication, or compatibility testing across hosts. A second host is otherwise neither required nor scored. Named maintainer validation protocols are the only non-prompt exception.
-- Capabilities the host lacks are delegated rather than dropped. Image generation runs through Codex and ChatGPT: `scripts/genimage.sh` hands the art-directed prompt to the `codex` CLI, which generates it with ChatGPT's built-in image tool, so hosts with no native image tool (Claude Code and most CLIs) still ship imagery; exit 2 falls back to the row's CSS/SVG art rather than stalling. Sandboxed Codex gets an outside-the-sandbox audit loop (`scripts/codex-audit-loop.sh`).
-
-## Imagery
-
-Gated, not ambient: pixels only when the seeded macrostructure, the row's signature, or the brief demands them; most runs ship zero raster images and generating an unrequested one is scored as a Restraint failure. When imagery fires, the prompt derives from the DIRECTION LOCK (locked hexes, row medium, composition, light) with mandatory negative clauses against the generic AI-image look, honesty rules against fabricated people, and a two-regeneration cap. Generation itself is delegated to Codex and ChatGPT through `scripts/genimage.sh`, so the same art direction produces the same class of image regardless of which host is running the design.
-
-## The taste loop
-
-Mechanical metrics (audits, distinctness) are necessary and insufficient: the skill's owner ranked competitor pages above audit-green goddesign pages until owner verdicts were compiled into rules (the Subject test, the substance gate, the atmosphere layer, grammar breaks). The loop is deliberate: a one-line human verdict becomes a mechanically-checkable rule the same day, and the next validation round tests it. Three owner-caught clustering axes (accent hues, color pairings, depth treatments) are now measured and capped in the deck, and the process is repeatable for any axis caught next.
-
-## The grammar layer
-
-Forensics on real Claude-built production sites identified seven compositional tells that survive font/palette/structure rotation: the band metronome, the eyebrow ceremony, three-caste type, the rationed accent, uniform finish, symmetrized content, and a stock ornament kit (full evidence in `validation/research/claude-grammar-2026-07.md`). Every page must now break that grammar in declared, gated ways: a band that escapes the container, a section with no heading ceremony, an orphan grid cell, uneven padding rhythm. The breaks are written into the DIRECTION LOCK and verified by the Grammar gate group.
-
-## The conception avenues
-
-Conception is multiplied deliberately: the same disciplined executor (lock, gates, audit) can receive a design imagined through different acts, each with different defaults. Proven avenues: the seeded deck (curated form), human-genome rows (real-world grammar), and comp-first mode, in which an image model renders a lock-derived full-page mockup and the code model replicates it (comp governs composition, lock governs values, comp text is never transcribed; validated end to end, proof pair in validation/). A page may mix up to three avenues, declared in the lock's conception map: mixed conception, never mixed identity. Avenues are admitted by a test-first protocol; a failed candidate (page-scale SVG-first) is recorded in the evidence and kept out of the skill.
-
-## The human-genome lane
-
-A model cannot author its way out of its own distribution: every Claude-authored deck row, however varied, is still drawn from the distribution being escaped. Deck rows 16 and up are therefore genomes extracted from real human-built sites (single-family type systems, full-coverage accent bands, business-fact grammar, deliberate unevenness), which Claude executes but did not design. The lane grows as the owner supplies admired sites; the long-term intent is for human genomes to outnumber authored rows.
-
-## The refresh loop
-
-The recognizable-AI look is a moving target, so the tells catalog is a living artifact. [validation/protocols/sentiment-refresh-protocol.md](../validation/protocols/sentiment-refresh-protocol.md) documents the repeatable collect, verify, cluster, encode, validate cycle that keeps the skill current. New tells require counted, sourced evidence and land in two places: the Banned list in `SKILL.md` (with an INSTEAD that points back into the deck), and the gate, as a `sweep.mjs` rule when a script can see it or a Phase 2b assertion when it needs the lock.
-
-## Evaluated and declined
-
-The same evidence bar that admits mechanisms also records what was evaluated and kept out, so the reasoning survives. The page-scale SVG-first conception avenue failed on coordinate alignment and renderer reliability and is documented in [validation/experiments/comp-first-2026-07/README.md](../validation/experiments/comp-first-2026-07/README.md). The ADHD reasoning skill (UditAkhourii/adhd, MIT) was evaluated as a candidate to borrow from and its parallel fan-out declined: it fights convergence, as goddesign does, but by multiplying the model distribution the skill exists to escape, at five to ten times the cost, on a mechanism the Codex host cannot guarantee. The borrow-and-decline verdict, the four native leverage seams it surfaced (each a hypothesis with a kill criterion, none shipped), and a grounded critique of its benchmark are recorded in [validation/research/adhd-evaluation-2026-07.md](../validation/research/adhd-evaluation-2026-07.md).
-
-Three published design skills were read the same way in 2026-07 and produced a third pattern: borrow the mechanism, decline the product. impeccable (pbakaus, Apache 2.0) proved that the greppable half of a design gate runs deterministically with no model and no browser, which exposed that goddesign's Phase 2 was executed by the model that wrote the code and that a sandboxed run had no objective gate at all; its detector idea, its `fail`/`advisory` split, and its inline waivers ship as `scripts/sweep.mjs`, while its 23-command surface, four modes, per-host edit hooks, live browser mode, and rule registry were declined (the last on the evidence bar, not on quality). skillui (amaancoderx, MIT) proved that token extraction is pure static analysis, which ships as `scripts/extract-tokens.mjs`; its URL crawl, ultra mode, and `.skill` packaging were declined as the network half. ui-ux-pro-max (nextlevelbuilder, MIT) contributed token-conformance validation as the `--tokens` flag, while its 84-style and 192-palette catalogue and its requirements-to-pattern generator were declined outright: uncapped decks cannot carry the accent and depth distribution caps `CONTRIBUTING.md` sets for the deck (enforced in review; `lint-decks.mjs` does not measure them), and a lookup from category to layout is the convergence engine this skill exists to fight. No text or code was copied. The record, the corpus calibration, and the kill criterion are in [validation/research/design-skills-evaluation-2026-07.md](../validation/research/design-skills-evaluation-2026-07.md).
-
-impeccable was re-read at v3.5.0 in 2026-08 after a substantial release, and the second pass produced a different kind of yield: not mechanisms to port, but four places where goddesign stated a rule and did not enforce it, each found by chasing an impeccable diagnosis and landing somewhere sharper. `banned-font` did not enforce its own prose in two independent ways: it was anchored so that "Arial Black" never matched, with its one backstop defeated by a whole-build boolean, and the clause's "or a system stack" tail had no enforcer at all because `GENERIC_FAMILY` skipped `system-ui` and its siblings before any ban was tested. Both are closed, keyed to the chosen-face position so a fallback tail stays correct. `@theme` token blocks were never scanned at all despite `isRootRule` anticipating them, which left Tailwind v4 projects measurable by `extract-tokens.mjs` and unpoliceable by the sweep. A run that could not execute the sweep had no words to say, while the two other degraded states were carefully drafted, so a host that renders natively could finish clean having never run the mechanical half. And `verify-install.sh` tested presence where it needed integrity, so a stale copy with 14 direction rows passed while Step 3b rolled `% 17`; the check that would have caught it lives at repo level and never ships inside the skill. All four are fixed in v1.6.2, which shipped with 22 sweep tests and 316 lint checks.
-
-The release's own new refusals were declined, which is the more useful half of the record. Thirteen of its headline claims carry no rule id and no script, so they are doctrine to author under goddesign's evidence bar rather than mechanism to port. Its native subagents on thirteen harnesses, decision board, and image-generation API path each fail a standing constraint above. And a hard-offset-shadow rule, the strongest-looking candidate in the evaluation, died on the discovery that its corpus hits were artifacts faithfully executing the deck as it read before commit `e5255b8`, that the post-fix corpus shows zero recurrence, and that the rule tripped `sweep.test.mjs`'s own false-positive assertion. The record is [validation/research/impeccable-evaluation-2026-08.md](../validation/research/impeccable-evaluation-2026-08.md).
-
-A follow-on attempt to mechanize the five Banned-list clauses that remained produced zero new rules and is recorded as a refusal in [validation/research/banned-list-mechanization-2026-08.md](../validation/research/banned-list-mechanization-2026-08.md). The finding generalizes: the Banned list's escapes ("only when the seed selects them deliberately", "flourishes only as a direction's stated signature") are load-bearing, and a source scanner cannot read the DIRECTION LOCK that makes a pattern legal, so a rule that catches the tell also catches the deck row that states it. Four of five candidates died on a named row; the fifth, a purple-shadow ban, collided with Step 3d's mandated accent jitter, which rotates row 12's `#2B4BFF` from hue 267.1 into the banned band on eight of twenty-five rolls. Those clauses moved to Phase 2b, which is read with the lock in hand. The exercise also found that an `@import` before the first rule made `rulesOf()` swallow that rule entirely, so the stylesheet shape the skill prescribes (webfont import, then `:root` tokens) was the shape that evaded its own gate; fixed in v1.6.3, corpus-neutral across all 49 pre-existing artifacts.
-
-The wayfinder skill (mattpocock/skills, MIT) was evaluated the same way and produced the opposite verdict: seven of its structural disciplines shipped as the design map, and its substrate did not. The issue tracker was declined because core design work depends on no account or network service; blocking edges were declined because design surfaces are not a dependency graph once the System lock exists, only an ordering; the ticket types and their sub-skills were declined as another skill's ecosystem, keeping only the human-in-the-loop distinction as the Open questions rule; and planning-by-default was declined outright as the inversion that would turn a design skill into a planning skill. The record, including the kill criterion the map ships under, is [validation/research/wayfinder-evaluation-2026-07.md](../validation/research/wayfinder-evaluation-2026-07.md).
-
-watermarks-remover (guillaumemeyer, MIT) was evaluated at v0.4.0 as a delivery companion, not a source of design rules. The useful mechanism is its sequence: inspect before mutation, classify confidence, clean only the requested channel, re-inspect, and separate verifiable removals from residual risk. That ships behind `scripts/provenance-hygiene.sh`, which discovers an existing companion install and exposes its file, image, text-rewrite, directory, and website operations only after an explicit prompt request and only after the design gate. The product's default anti-detection posture, automatic offer of statistical rewriting, pixel regeneration, whole-repository cleaning, and any implication of human authorship were declined. A direct audit of this repository also demonstrated why the boundary matters: it correctly found three PNG C2PA containers, but treated the skill's own frontmatter description as probable AI metadata, interpreted unsupported WebP bytes as suspicious Unicode, and flagged an LRM inside a frozen study corpus. Those are useful inspection results and unsafe automatic-cleaning instructions. Frozen evidence is therefore excluded, companion absence never affects the design score, and any lossy mutation invalidates the old visual gate. No upstream code is copied. The full record is [validation/research/watermarks-remover-evaluation-2026-08.md](../validation/research/watermarks-remover-evaluation-2026-08.md).
-
-pstack's `unslop` skill (Lauren Tan, MIT) was evaluated as a copy-quality source, not as a universal writing policy. Its four-part review loop, specificity test, and source-or-delete discipline ship in `references/copy.md`, split into transactional and marketing modes. Three mechanically narrow patterns ship as advisories and stayed neutral across all 49 non-withdrawn validation artifacts. Universal word bans, grammar bans, intentional messiness, automatic rewriting, and human-authorship implications were declined. No upstream text or code is copied. The full record is [validation/research/unslop-evaluation-2026-08.md](../validation/research/unslop-evaluation-2026-08.md).
+A new page on a frontier model reads `SKILL.md` and the dealer's printout.
+Literal and smaller models also read `references/full-lane.md` and the
+checklist. Motion and copy notes are read only when the page needs them.
